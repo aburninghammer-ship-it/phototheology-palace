@@ -153,7 +153,7 @@ export function ImmersiveAudioPlayer({
   }, [isOpen]);
 
   // Use DB tracks for ambient-sounds mode, fall back to hardcoded
-  const AMBIENT_SOUND_TRACKS = dbAmbientTracks && dbAmbientTracks.length > 0
+  const ambientSoundTracks = dbAmbientTracks && dbAmbientTracks.length > 0
     ? dbAmbientTracks
     : FALLBACK_AMBIENT_SOUND_TRACKS;
   
@@ -367,13 +367,13 @@ export function ImmersiveAudioPlayer({
   // Randomize ambient starting track each time the player opens or DB tracks load
   useEffect(() => {
     if (isOpen) {
-      const trackList = defaultAmbientMode === "ambient-sounds" ? AMBIENT_SOUND_TRACKS : AMBIENT_BG_TRACKS;
+      const trackList = defaultAmbientMode === "ambient-sounds" ? ambientSoundTracks : AMBIENT_BG_TRACKS;
       setAmbientTrackIdx(Math.floor(Math.random() * trackList.length));
     }
   }, [isOpen, defaultAmbientMode, dbAmbientTracks]);
 
   // Crossfade helper: fade out old ambient, fade in new one
-  const crossfadeToNext = useCallback((trackList: typeof AMBIENT_SOUND_TRACKS, nextIdx: number) => {
+  const crossfadeToNext = useCallback((trackList: { id: string; name: string; url: string }[], nextIdx: number) => {
     const outgoing = ambientRef.current;
     const incoming = ambientNextRef.current;
     if (!outgoing || !incoming) return;
@@ -420,7 +420,7 @@ export function ImmersiveAudioPlayer({
       return;
     }
 
-    const trackList = ambientMode === "ambient-sounds" ? AMBIENT_SOUND_TRACKS : AMBIENT_BG_TRACKS;
+    const trackList = ambientMode === "ambient-sounds" ? ambientSoundTracks : AMBIENT_BG_TRACKS;
 
     if (isOpen && ambientMusicEnabled) {
       const ambient = ambientRef.current;

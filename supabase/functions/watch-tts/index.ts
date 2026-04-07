@@ -13,8 +13,8 @@ const VOICE_ID = "JBFqnCBsd6RMkjVDRZzb";
 const MODEL_ID = "eleven_multilingual_v2";
 const MAX_CHUNK = 4500;
 // Bump this version to invalidate ALL cached watch TTS audio
-// v11 = 2026-04-07 Rebalance Morning Watch: more time in biblical scene before personal application
-const WATCH_CACHE_VERSION = "v11";
+// v12 = 2026-04-07 Longer inter-sentence pauses (2-4 sec between sentences)
+const WATCH_CACHE_VERSION = "v12";
 
 async function sha256Hex(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);
@@ -54,11 +54,11 @@ function splitAtSentences(text: string, max: number): string[] {
  */
 function preprocessPauses(text: string): string {
   // Replace [extended silence] with very long pause (used in VR sessions)
-  let processed = text.replace(/\[extended silence\]/gi, "\n\n...\n\n...\n\n...\n\n...\n\n...\n\n");
-  // Replace [long pause] with a triple ellipsis and extra whitespace
-  processed = processed.replace(/\[long pause\]/gi, "\n\n...\n\n...\n\n...\n\n");
-  // Replace [pause] with a double ellipsis
-  processed = processed.replace(/\[pause\]/gi, "\n\n...\n\n");
+  let processed = text.replace(/\[extended silence\]/gi, "\n\n...\n\n...\n\n...\n\n...\n\n...\n\n...\n\n...\n\n");
+  // Replace [long pause] with ~6-8 seconds of silence (5x ellipsis blocks)
+  processed = processed.replace(/\[long pause\]/gi, "\n\n...\n\n...\n\n...\n\n...\n\n...\n\n");
+  // Replace [pause] with ~2-4 seconds of silence (3x ellipsis blocks)
+  processed = processed.replace(/\[pause\]/gi, "\n\n...\n\n...\n\n...\n\n");
   return processed;
 }
 
@@ -76,7 +76,7 @@ async function generateElevenLabs(
       similarity_boost: 0.75,
       style: 0.10,
       use_speaker_boost: true,
-      speed: 1.0, // normal speed for George
+      speed: 0.92, // slightly slower for unhurried meditational pacing
     },
   };
   if (previousText) body.previous_text = previousText;
