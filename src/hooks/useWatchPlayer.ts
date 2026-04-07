@@ -215,17 +215,25 @@ Your mind is a theatre — and right now, you choose what plays on that screen.
 [pause]
 Let this mind be in you, which was also in Christ Jesus.
 [long pause]
-Last night, you were there. You felt the silence before He spoke. The void pressing in from every side — formless, empty, dark. And then His voice. Not loud. Not strained. Just… certain. And light came. Not gradually. Instantly. As if the darkness had no argument against it.
-[long pause]
-That certainty is still in you this morning. You can feel it — quiet, steady, underneath everything else.
+Last night, you were there. You felt the silence before He spoke. The void pressing in from every side — formless, empty, dark.
 [pause]
-That download is still active. This morning, we activate it.
+And then His voice. Not loud. Not strained. Just… certain. And light came. Not gradually. Instantly. As if the darkness had no argument against it.
+[long pause]
+Stay in that scene this morning. Don't leave it yet.
+[pause]
+Look at what just happened. There was nothing. Absolutely nothing. And He spoke — and something existed that had never existed before. Not because the conditions were right. Not because the void was ready. Because He decided it was time.
+[long pause]
+Feel the weight of that. The darkness didn't agree to leave. It didn't negotiate. It didn't get a vote. Light came because He said so. And darkness… just moved.
+[pause]
+That's authority. Not the kind that argues. Not the kind that convinces. The kind that simply speaks — and reality shifts.
 [long pause]
 Now hear this morning's word.
 [pause]
+That certainty is still in you this morning. You can feel it — quiet, steady, underneath everything else.
+[pause]
 This is who you are now. Not who you are trying to become. Who you already are because of what was placed in you. You are someone who speaks into darkness — and things change. Not because you are loud. Because you are certain.
 [long pause]
-Download this deeper. Not as an idea you agree with — as instinct you act from. Override the hesitation. Override the second-guessing. Make this certainty your first response — not your second thought.
+Download this deeper. Not as an idea you agree with — as instinct you act from. Override the hesitation. Override the second-guessing. Make this certainty your first response — not my second thought.
 [long pause]
 Now bring your life into this.
 [pause]
@@ -246,17 +254,17 @@ Follow this MANDATORY FLOW:
 1. LOCK IN (~1 minute):
 Warm, grounded authority. "Lock in." "Guard this moment." Establish the mind as a screen. Reference Philippians 2:5 in spoken form. [long pause]
 
-2. RECALL THE DOWNLOAD — EMOTIONALLY (~1.5 minutes):
-Do NOT just summarize last night's scene ("${session.pairedNightTitle}"). EVOKE a felt flash of the emotional experience. "Last night you were there. You felt…" Make the listener re-experience a moment of what they felt — the tension, the weight, the encounter. Weave in ${session.nightScripture} naturally. The Night insight: ${session.nightInsight}. "That download is still active. This morning, we activate it." [long pause]
+2. RE-ENTER THE BIBLICAL SCENE — PAINT THE PICTURE (~2.5 minutes):
+THIS IS THE HEART OF THE MORNING WATCH. Do NOT rush past this. Do NOT just summarize last night. RE-PAINT the biblical scene from "${session.pairedNightTitle}" with full cinematic detail. Let the listener SEE it again — the colors, the sounds, the weight of the moment. Then LINGER in the scene and draw out the deeper revelation they might have missed. What does this scene REVEAL about God's character? What does the way He acted in that moment tell you about who He is? Weave in ${session.nightScripture} naturally. The Night insight: ${session.nightInsight}. Stay in the SCRIPTURE WORLD — do NOT jump to the listener's personal life yet. [long pause] between imagery blocks.
 
-3. IDENTITY DECLARATION — FELT, NOT LABELED (~1.5 minutes):
-This morning's Scripture: ${session.morningScripture}. Speak it with weight. The activation principle: ${session.activationPrinciple}. But do NOT just label the identity — let the listener FEEL it. Use felt language: "That certainty is still in you. You can feel it — quiet, steady." NAME the divine mindset AFTER they've felt it: "This is the mind of [authority/mercy/surrender/faith]." DOWNLOAD LANGUAGE — forceful and felt: "Download this deeper. Not as an idea you agree with — as instinct you act from. Override [specific old pattern]. Make this my first response." [long pause]
+3. THE BRIDGE — FROM SCENE TO IDENTITY (~1.5 minutes):
+NOW transition from the biblical scene to the listener. "That [quality] is still in you this morning." This morning's Scripture: ${session.morningScripture}. Speak it with weight. The activation principle: ${session.activationPrinciple}. Use felt language: "You can feel it — quiet, steady, underneath everything else." NAME the divine mindset AFTER they've felt it. DOWNLOAD LANGUAGE: "Download this deeper. Not as an idea you agree with — as instinct you act from. Override [specific old pattern]. Make this my first response." [long pause]
 
-4. USER INSERTION — VISCERAL SCENARIOS (~2 minutes):
-"Now bring your life into this." One vivid scenario from: ${session.scenarioTypes.join(", ")}. Make it visceral — show the OLD reaction as a physical sensation the listener recognizes: "You can feel it — the familiar tightness, the heat rising, the voice that says…" Then show the NEW response as a felt shift: "But something else is there now. Something that wasn't there before." Let the listener SEE and FEEL themselves responding from the downloaded mind. [long pause] A second brief scenario, different context, same felt pattern. [long pause]
+4. USER INSERTION — ONE BRIEF SCENARIO (~1 minute):
+"Now bring your life into this." ONE vivid scenario from: ${session.scenarioTypes.join(", ")}. Keep it brief — the scene should have already done the heavy lifting. Show the old reaction, then overlay the new response. The listener sees themselves acting from the downloaded mind. [long pause]
 
 5. IMPRINT AND SEAL (~1 minute):
-[long pause] "What you repeatedly behold, you become. This is how the mind is renewed." [long pause] "Say it quietly: I receive the mind of Christ." [long pause] ${session.commitmentStyle} style close. Do NOT break immersion. Keep the listener inside — felt, not narrated: "Today, you carry this with you. When the pressure builds — this steadiness returns. The screen stays on. What you continue to behold… you will become. Let the music carry you."
+[long pause] "What you repeatedly behold, you become. This is how the mind is renewed." [long pause] "Say it quietly: I receive the mind of Christ." [long pause] ${session.commitmentStyle} style close. Do NOT break immersion. "Today, you carry this with you. The screen stays on. What you continue to behold… you will become. Let the music carry you."
 
 CRITICAL RULES:
 - 800-1,200 WORDS. Voice is 5-8 minutes. The rest is ambient music only.
