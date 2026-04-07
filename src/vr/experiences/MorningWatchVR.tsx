@@ -32,9 +32,18 @@ Commitment Style: ${session.commitmentStyle}
 Scenario Types: ${session.scenarioTypes.join(', ')}
 
 CRITICAL PHILOSOPHY — READ THIS FIRST:
-This meditation has ZERO to do with breathing, posture, or relaxation. Do NOT mention deep breathing. Do NOT mention posture. Do NOT mention "getting comfortable" or body awareness. This is CINEMATIC BIBLICAL MIND ACTIVATION.
+This has ZERO to do with breathing, posture, or relaxation. Do NOT mention deep breathing. Do NOT mention posture. Do NOT mention "getting comfortable" or body awareness. This is CINEMATIC BIBLICAL MIND ACTIVATION.
 
-Last night the listener BEHELD the thoughts and feelings of Christ on the screen of their mind. This morning, those thoughts and feelings become THEIRS. The download completes. The mind transplant activates. They are THINKING WITH HIM today. The screen never turns off. Every situation gets overlaid with the Master Mind.
+ANTI-EASTERN GUARDRAIL (NON-NEGOTIABLE):
+- NEVER use language from Eastern meditation, mindfulness, centering prayer, Lectio Divina, or contemplative mysticism.
+- NEVER say: "empty your mind," "clear your thoughts," "let go of all thinking," "observe your thoughts without judgment," "be present," "center yourself," "find your inner stillness," "breathe into the space," "namaste," "mantra," "chakra," "energy flow," "universe," or any New Age terminology.
+- This is BIBLICAL MEDITATION — FILLING the mind with Scripture, NOT emptying it. The mind is being actively LOADED with the thoughts of Christ, not cleared.
+- Prayer is conversational and Scripture-based, NOT technique-based.
+- Do NOT reference "meditation" generically. Use "Morning Watch" or "this time" instead.
+
+TIME-OF-DAY CONTEXT: This is a MORNING Watch. Naturally reference "this morning" and "today" throughout — e.g., "This morning, you carry…", "Today, you walk differently…", "This morning, the download activates…" The listener knows it is morning. Anchor the experience in the start of the day.
+
+PACING — INTER-SENTENCE PAUSES: Place a [pause] marker after EVERY 2-3 sentences to create 2-4 seconds of breathing room. The narration should feel unhurried with generous silence between thoughts.
 
 Follow this 6-phase structure. Each phase flows seamlessly — no labels, no headers, no time references.
 

@@ -32,9 +32,18 @@ Mood: ${session.mood}
 Primary Struggle: ${session.struggle}
 
 CRITICAL PHILOSOPHY — READ THIS FIRST:
-This meditation has ZERO to do with breathing, posture, or relaxation technique. Do NOT mention deep breathing. Do NOT mention posture. Do NOT mention "getting comfortable." Do NOT mention body scans or physical sensations. This is CINEMATIC BIBLICAL MIND TRANSPLANT.
+This has ZERO to do with breathing, posture, or relaxation technique. Do NOT mention deep breathing. Do NOT mention posture. Do NOT mention "getting comfortable." Do NOT mention body scans or physical sensations. This is CINEMATIC BIBLICAL MIND TRANSPLANT.
 
-The listener's mind is a movie theater. The screen is INSIDE them. What they place on that screen shapes who they become. Tonight, they project a scene from Scripture in VIVID FULL COLOR and step inside it. The goal: observe the THOUGHTS AND FEELINGS of Christ (or the biblical figure), then ASK THE HOLY SPIRIT TO DOWNLOAD those exact thoughts and feelings into their own mind. "Let this mind be in you which was also in Christ Jesus" (Philippians 2:5).
+ANTI-EASTERN GUARDRAIL (NON-NEGOTIABLE):
+- NEVER use language from Eastern meditation, mindfulness, centering prayer, Lectio Divina, or contemplative mysticism.
+- NEVER say: "empty your mind," "clear your thoughts," "let go of all thinking," "observe your thoughts without judgment," "be present," "center yourself," "find your inner stillness," "breathe into the space," "namaste," "mantra," "chakra," "energy flow," "universe," or any New Age terminology.
+- This is BIBLICAL MEDITATION — FILLING the mind with Scripture, NOT emptying it. The mind is being actively LOADED with the thoughts of Christ, not cleared.
+- Prayer is conversational and Scripture-based, NOT technique-based.
+- Do NOT reference "meditation" generically. Use "Night Watch" or "this time" instead.
+
+TIME-OF-DAY CONTEXT: This is a NIGHT Watch. Naturally reference "tonight" throughout — e.g., "Tonight, you step into…", "Tonight, He shows you…", "Tonight, before you sleep…" The listener knows it is nighttime. Anchor the experience in the evening.
+
+PACING — INTER-SENTENCE PAUSES: Place a [pause] marker after EVERY 2-3 sentences to create 2-4 seconds of breathing room. The narration should feel unhurried with generous silence between thoughts.
 
 Follow this 6-phase structure. Each phase flows seamlessly — no labels, no headers, no time references.
 
