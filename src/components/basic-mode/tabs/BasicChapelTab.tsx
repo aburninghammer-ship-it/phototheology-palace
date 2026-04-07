@@ -3,6 +3,7 @@
  * Uses the same dark theme as Level 3 via Tailwind tokens
  */
 import { useNavigate } from "react-router-dom";
+import { DailyAudioDevotional } from "@/components/DailyAudioDevotional";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
