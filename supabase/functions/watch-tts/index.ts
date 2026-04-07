@@ -14,7 +14,7 @@ const MODEL_ID = "eleven_multilingual_v2";
 const MAX_CHUNK = 4500;
 // Bump this version to invalidate ALL cached watch TTS audio
 // v8 = 2026-04-07 Switch to George (British male epic)
-const WATCH_CACHE_VERSION = "v9";
+const WATCH_CACHE_VERSION = "v10";
 
 async function sha256Hex(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);
@@ -59,6 +59,8 @@ function preprocessPauses(text: string): string {
   processed = processed.replace(/\[long pause\]/gi, "\n\n...\n\n...\n\n...\n\n");
   // Replace [pause] with a double ellipsis
   processed = processed.replace(/\[pause\]/gi, "\n\n...\n\n");
+  // Add breathing pauses between sentences for meditative pacing
+  processed = processed.replace(/([.!?])\s+(?=[A-Z])/g, "$1\n\n...\n\n");
   return processed;
 }
 
