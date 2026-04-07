@@ -108,7 +108,9 @@ export function ImmersiveAudioPlayer({
   const ambientRef = useRef<HTMLAudioElement | null>(null);
   const ambientNextRef = useRef<HTMLAudioElement | null>(null);
   const crossfadeTimerRef = useRef<number>();
-  const [ambientTrackIdx, setAmbientTrackIdx] = useState(0);
+  const [ambientTrackIdx, setAmbientTrackIdx] = useState(() =>
+    Math.floor(Math.random() * AMBIENT_SOUND_TRACKS.length)
+  );
   const [ambientPlaying, setAmbientPlaying] = useState(false);
   
   // Verse display
@@ -326,6 +328,14 @@ export function ImmersiveAudioPlayer({
   useEffect(() => {
     setAmbientModeOverride(null);
   }, [currentIndex]);
+
+  // Randomize ambient starting track each time the player opens
+  useEffect(() => {
+    if (isOpen) {
+      const trackList = defaultAmbientMode === "ambient-sounds" ? AMBIENT_SOUND_TRACKS : AMBIENT_BG_TRACKS;
+      setAmbientTrackIdx(Math.floor(Math.random() * trackList.length));
+    }
+  }, [isOpen, defaultAmbientMode]);
 
   // Crossfade helper: fade out old ambient, fade in new one
   const crossfadeToNext = useCallback((trackList: typeof AMBIENT_SOUND_TRACKS, nextIdx: number) => {
