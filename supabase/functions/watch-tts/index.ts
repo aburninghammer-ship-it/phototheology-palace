@@ -8,13 +8,13 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Laura – calm, mature, soothing female ElevenLabs voice
-const VOICE_ID = "FGY2WhTYpPnrIDTdsKH5";
+// Sarah – soft, gentle, intimate female ElevenLabs voice
+const VOICE_ID = "EXAVITQu4vr4xnSDxMaL";
 const MODEL_ID = "eleven_multilingual_v2";
 const MAX_CHUNK = 4500;
 // Bump this version to invalidate ALL cached watch TTS audio
-// v6 = 2026-04-07 Switch to Laura voice
-const WATCH_CACHE_VERSION = "v6";
+// v7 = 2026-04-07 Switch to Sarah voice
+const WATCH_CACHE_VERSION = "v7";
 
 async function sha256Hex(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);
