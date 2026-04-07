@@ -36,17 +36,18 @@ const AMBIENT_BG_TRACKS = [
 ];
 
 // Meditation ambient tracks — calming, gentle, designed to sit under voice
+// Shuffled order so sequential plays feel varied; randomized start index on each open
 const AMBIENT_SOUND_TRACKS = [
-  { id: "still-water-mind", name: "Still Water Mind", url: "/audio/still-water-mind.mp3" },
-  { id: "still-water-mind-2", name: "Still Water Mind II", url: "/audio/still-water-mind-2.mp3" },
-  { id: "still-waters-gentle-word", name: "Still Waters Gentle Word", url: "/audio/still-waters-gentle-word.mp3" },
-  { id: "still-waters-gentle-word-2", name: "Still Waters Gentle Word II", url: "/audio/still-waters-gentle-word-2.mp3" },
-  { id: "breath-of-your-presence", name: "Breath of Your Presence", url: "/audio/breath-of-your-presence.mp3" },
-  { id: "breath-of-your-presence-2", name: "Breath of Your Presence II", url: "/audio/breath-of-your-presence-2.mp3" },
-  { id: "still-waters-quiet-soul", name: "Still Waters Quiet Soul", url: "/audio/still-waters-quiet-soul.mp3" },
-  { id: "still-waters-quiet-soul-2", name: "Still Waters Quiet Soul II", url: "/audio/still-waters-quiet-soul-2.mp3" },
   { id: "weightless-river", name: "Weightless River", url: "/audio/weightless-river.mp3" },
+  { id: "breath-of-your-presence", name: "Breath of Your Presence", url: "/audio/breath-of-your-presence.mp3" },
+  { id: "still-waters-quiet-soul", name: "Still Waters Quiet Soul", url: "/audio/still-waters-quiet-soul.mp3" },
+  { id: "still-waters-gentle-word-2", name: "Still Waters Gentle Word II", url: "/audio/still-waters-gentle-word-2.mp3" },
+  { id: "still-water-mind-2", name: "Still Water Mind II", url: "/audio/still-water-mind-2.mp3" },
   { id: "weightless-river-2", name: "Weightless River II", url: "/audio/weightless-river-2.mp3" },
+  { id: "still-waters-gentle-word", name: "Still Waters Gentle Word", url: "/audio/still-waters-gentle-word.mp3" },
+  { id: "breath-of-your-presence-2", name: "Breath of Your Presence II", url: "/audio/breath-of-your-presence-2.mp3" },
+  { id: "still-water-mind", name: "Still Water Mind", url: "/audio/still-water-mind.mp3" },
+  { id: "still-waters-quiet-soul-2", name: "Still Waters Quiet Soul II", url: "/audio/still-waters-quiet-soul-2.mp3" },
 ];
 
 // Crossfade duration in ms
