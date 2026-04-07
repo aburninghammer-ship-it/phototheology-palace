@@ -64,6 +64,7 @@ export function NotificationCenter() {
 
       if (link) {
         console.log('🔔 NotificationCenter: Navigating to', link);
+        setOpen(false);
         navigate(link);
       } else {
         console.log('🔔 NotificationCenter: No navigation link found for notification', {
