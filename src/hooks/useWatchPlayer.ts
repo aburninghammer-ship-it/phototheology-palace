@@ -131,7 +131,19 @@ CRITICAL RULES:
 - Do NOT break immersion at the end.
 - Second person ("you"). Intimate. Cinematic. Meditational.
 - TTS: scripture refs in spoken form.
-- ONE subtle neuroplasticity line near the end.`;
+- ONE subtle neuroplasticity line near the end.
+
+AUTHENTICITY RULES — THIS IS CRITICAL:
+Write like you are actually sitting in a quiet room at 2am speaking to one person — not like a writer crafting prose for publication. The script should feel UNPOLISHED and HUMAN.
+- Use the SIMPLEST words possible. Say "stay" not "remain." Say "look" not "behold." Say "hard" not "unbearable." Avoid any word you wouldn't say in a real late-night conversation.
+- Sentence fragments are fine. Trailing thoughts are fine. "And He just… stays." is better than a complete literary sentence.
+- Do NOT use rhetorical triplets ("Not X. Not Y. But Z.") more than ONCE in the entire script. These patterns feel rehearsed and fake when repeated.
+- Do NOT use parallel constructions repeatedly. One "Not as X — as Y" pattern is enough. More than that sounds like a TED talk.
+- Vary sentence length dramatically. Some sentences should be 3 words. Others should wander a little before landing.
+- Let some thoughts feel slightly incomplete — like you're searching for the right word in real time. "It's like He… He just won't let go. Even when it makes no sense."
+- Avoid poetic or literary vocabulary: no "crucible," "tapestry," "mantle," "beckons," "illuminates," "vessel." Use plain, felt words.
+- Sound like someone who has been changed by what they're describing — not someone performing a script about it.
+- The overall feel should be: a trusted friend who has seen something real, sitting with you in the dark, trying to help you see it too.`;
 }
 
 function buildMorningPrompt(session: MorningWatchSession, tractName: string): string {
@@ -236,7 +248,19 @@ CRITICAL RULES:
 - Second person ("you"). Intimate. Cinematic. Meditational.
 - TTS: scripture refs in spoken form.
 - ONE subtle neuroplasticity line near the end.
-- The Master Mind = the mind of Christ (Philippians 2:5). The mind is a THEATRE. Godly imagination in VIVID COLOR.`;
+- The Master Mind = the mind of Christ (Philippians 2:5). The mind is a THEATRE. Godly imagination in VIVID COLOR.
+
+AUTHENTICITY RULES — THIS IS CRITICAL:
+Write like you are actually sitting with someone at sunrise — not like a writer crafting prose. The script should feel UNPOLISHED and HUMAN.
+- Use the SIMPLEST words possible. Say "stay" not "remain." Say "look" not "behold." Say "hard" not "unbearable." Avoid any word you wouldn't say in a real morning conversation.
+- Sentence fragments are fine. Trailing thoughts are fine. "And that feeling… it's still there." is better than a complete literary sentence.
+- Do NOT use rhetorical triplets ("Not X. Not Y. But Z.") more than ONCE in the entire script. These patterns feel rehearsed and fake when repeated.
+- Do NOT use parallel constructions repeatedly. One "Not as X — as Y" pattern is enough. More than that sounds like a TED talk.
+- Vary sentence length dramatically. Some sentences should be 3 words. Others should wander a little before landing.
+- Let some thoughts feel slightly incomplete — like you're searching for the right word in real time. "It's like that thing from last night… it just stuck. You know?"
+- Avoid poetic or literary vocabulary: no "crucible," "tapestry," "mantle," "beckons," "illuminates," "vessel." Use plain, felt words.
+- Sound like someone who woke up still carrying what they experienced — not someone performing a motivational script.
+- The overall feel should be: a trusted friend who is gently helping you remember what you felt last night and carry it into today.`;
 }
 
 async function generateWatchTTS(script: string, watchType: "night" | "morning"): Promise<string | null> {
