@@ -35,9 +35,8 @@ const AMBIENT_BG_TRACKS = [
   { id: "follow", name: "Follow", url: "/audio/follow.mp3" },
 ];
 
-// Meditation ambient tracks — calming, gentle, designed to sit under voice
-// Shuffled order so sequential plays feel varied; randomized start index on each open
-const AMBIENT_SOUND_TRACKS = [
+// Fallback meditation ambient tracks (used if DB fetch fails)
+const FALLBACK_AMBIENT_SOUND_TRACKS = [
   { id: "weightless-river", name: "Weightless River", url: "/audio/weightless-river.mp3" },
   { id: "breath-of-your-presence", name: "Breath of Your Presence", url: "/audio/breath-of-your-presence.mp3" },
   { id: "still-waters-quiet-soul", name: "Still Waters Quiet Soul", url: "/audio/still-waters-quiet-soul.mp3" },
@@ -122,6 +121,41 @@ export function ImmersiveAudioPlayer({
   
   // Settings panel
   const [showSettings, setShowSettings] = useState(false);
+
+  // Dynamic ambient tracks from Supabase (watch_music_tracks table)
+  const [dbAmbientTracks, setDbAmbientTracks] = useState<typeof AMBIENT_BG_TRACKS | null>(null);
+
+  // Fetch watch music tracks from DB when player opens
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from("watch_music_tracks")
+          .select("id, name, file_url")
+          .eq("is_active", true)
+          .order("sort_order", { ascending: true });
+        if (error || !data || data.length === 0) {
+          if (!cancelled) setDbAmbientTracks(null);
+          return;
+        }
+        if (!cancelled) {
+          setDbAmbientTracks(
+            data.map((t: any) => ({ id: t.id, name: t.name, url: t.file_url }))
+          );
+        }
+      } catch {
+        if (!cancelled) setDbAmbientTracks(null);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [isOpen]);
+
+  // Use DB tracks for ambient-sounds mode, fall back to hardcoded
+  const AMBIENT_SOUND_TRACKS = dbAmbientTracks && dbAmbientTracks.length > 0
+    ? dbAmbientTracks
+    : FALLBACK_AMBIENT_SOUND_TRACKS;
   
   // Visual effects
   const [pulseIntensity, setPulseIntensity] = useState(0);
@@ -330,13 +364,13 @@ export function ImmersiveAudioPlayer({
     setAmbientModeOverride(null);
   }, [currentIndex]);
 
-  // Randomize ambient starting track each time the player opens
+  // Randomize ambient starting track each time the player opens or DB tracks load
   useEffect(() => {
     if (isOpen) {
       const trackList = defaultAmbientMode === "ambient-sounds" ? AMBIENT_SOUND_TRACKS : AMBIENT_BG_TRACKS;
       setAmbientTrackIdx(Math.floor(Math.random() * trackList.length));
     }
-  }, [isOpen, defaultAmbientMode]);
+  }, [isOpen, defaultAmbientMode, dbAmbientTracks]);
 
   // Crossfade helper: fade out old ambient, fade in new one
   const crossfadeToNext = useCallback((trackList: typeof AMBIENT_SOUND_TRACKS, nextIdx: number) => {
