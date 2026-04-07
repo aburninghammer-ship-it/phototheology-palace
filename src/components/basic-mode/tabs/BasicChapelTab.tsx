@@ -92,6 +92,9 @@ export default function BasicChapelTab() {
         {/* Daily Verse preview card — always visible */}
         <DailyVersePreview />
 
+        {/* Daily Audio Devotional card */}
+        <DailyAudioDevotional />
+
         <div className="grid gap-3">
           {CHAPEL_ITEMS.map((item) => {
             const Icon = item.icon;
