@@ -21,14 +21,21 @@ export function useBackgroundMusic(_variant: 'night' | 'morning') {
   const tracksRef = useRef<string[]>(FALLBACK_TRACKS);
   const [tracksLoaded, setTracksLoaded] = useState(false);
 
+  const lastFirstTrackRef = useRef<string | null>(null);
+
   const shuffleTracks = useCallback(() => {
-    const shuffled = [...tracksRef.current];
-    for (let i = shuffled.length - 1; i > 0; i--) {
+    const tracks = [...tracksRef.current];
+    for (let i = tracks.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      [tracks[i], tracks[j]] = [tracks[j], tracks[i]];
     }
-    tracksRef.current = shuffled;
+    // If the new first track is the same as last session's first track, rotate it to the end
+    if (tracks.length > 1 && lastFirstTrackRef.current && tracks[0] === lastFirstTrackRef.current) {
+      tracks.push(tracks.shift()!);
+    }
+    tracksRef.current = tracks;
     trackIndexRef.current = 0;
+    lastFirstTrackRef.current = tracks[0] || null;
   }, []);
 
   const preparePlaylistStart = useCallback((autoplay: boolean) => {
