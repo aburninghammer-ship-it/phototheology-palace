@@ -38,6 +38,9 @@ export function useBackgroundMusic(_variant: 'night' | 'morning') {
     tracksRef.current = tracks;
     trackIndexRef.current = 0;
     lastFirstTrackRef.current = tracks[0] || null;
+    if (tracks[0]) {
+      try { localStorage.setItem('bgMusic_lastFirstTrack', tracks[0]); } catch {}
+    }
   }, []);
 
   const preparePlaylistStart = useCallback((autoplay: boolean) => {
