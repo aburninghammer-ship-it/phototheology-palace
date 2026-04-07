@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Eye, Blocks, Crown, Check, ChevronDown } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { useRef } from "react";
+import { SavedItemsTab } from "@/components/level-select/SavedItemsTab";
 
 interface LevelOption {
   mode: ExperienceMode;
@@ -345,6 +346,9 @@ export default function LevelSelect() {
               but based on who you're ready to become.
             </span>
           </motion.p>
+
+          {/* Saved Items Section */}
+          <SavedItemsTab />
         </div>
       </div>
     </>
