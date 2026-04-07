@@ -21,7 +21,43 @@ export function useBackgroundMusic(_variant: 'night' | 'morning') {
   const tracksRef = useRef<string[]>(FALLBACK_TRACKS);
   const [tracksLoaded, setTracksLoaded] = useState(false);
 
-  // Load tracks from DB
+  const shuffleTracks = useCallback(() => {
+    const shuffled = [...tracksRef.current];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    tracksRef.current = shuffled;
+    trackIndexRef.current = 0;
+  }, []);
+
+  const preparePlaylistStart = useCallback((autoplay: boolean) => {
+    const audioA = audioARef.current;
+    const audioB = audioBRef.current;
+    const firstTrack = tracksRef.current[0];
+
+    if (!audioA || !audioB || !firstTrack) return;
+
+    if (crossfadeTimerRef.current) clearInterval(crossfadeTimerRef.current);
+
+    [audioA, audioB].forEach((audio) => {
+      audio.pause();
+      audio.currentTime = 0;
+    });
+
+    audioA.src = firstTrack;
+    audioA.volume = BASE_VOLUME;
+    audioB.removeAttribute('src');
+    audioB.load();
+    audioB.volume = 0;
+    activeRef.current = 'a';
+    wantPlayRef.current = autoplay;
+
+    if (autoplay) {
+      audioA.play().catch((e) => console.warn('[bgMusic] play failed:', e));
+    }
+  }, []);
+
   useEffect(() => {
     (async () => {
       try {
@@ -36,17 +72,12 @@ export function useBackgroundMusic(_variant: 'night' | 'morning') {
           tracksRef.current = data.map((t: any) => t.file_url);
         }
       } catch {
-        // Use fallback
       }
-      // Shuffle tracks so playback order is different every session
-      for (let i = tracksRef.current.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [tracksRef.current[i], tracksRef.current[j]] = [tracksRef.current[j], tracksRef.current[i]];
-      }
-      trackIndexRef.current = 0;
+
+      shuffleTracks();
       setTracksLoaded(true);
     })();
-  }, []);
+  }, [shuffleTracks]);
 
   const getActive = useCallback(() =>
     activeRef.current === 'a' ? audioARef.current : audioBRef.current, []);
@@ -57,10 +88,11 @@ export function useBackgroundMusic(_variant: 'night' | 'morning') {
     if (!wantPlayRef.current) return;
     const outgoing = getActive();
     const incoming = getIncoming();
-    if (!outgoing || !incoming) return;
+    if (!outgoing || !incoming || tracksRef.current.length === 0) return;
 
     trackIndexRef.current = (trackIndexRef.current + 1) % tracksRef.current.length;
     incoming.src = tracksRef.current[trackIndexRef.current];
+    incoming.currentTime = 0;
     incoming.volume = 0;
     incoming.play().catch((e) => console.warn('[bgMusic] crossfade play failed:', e));
 
@@ -78,7 +110,8 @@ export function useBackgroundMusic(_variant: 'night' | 'morning') {
       if (step >= steps) {
         clearInterval(crossfadeTimerRef.current);
         outgoing.pause();
-        outgoing.src = '';
+        outgoing.removeAttribute('src');
+        outgoing.load();
         incoming.volume = BASE_VOLUME;
         activeRef.current = activeRef.current === 'a' ? 'b' : 'a';
       }
@@ -95,11 +128,10 @@ export function useBackgroundMusic(_variant: 'night' | 'morning') {
       a.volume = 0;
       a.preload = 'auto';
     });
-    audioA.volume = BASE_VOLUME;
-    audioA.src = tracksRef.current[trackIndexRef.current];
     audioARef.current = audioA;
     audioBRef.current = audioB;
     activeRef.current = 'a';
+    preparePlaylistStart(false);
 
     const handleTimeUpdate = () => {
       const active = activeRef.current === 'a' ? audioA : audioB;
@@ -140,7 +172,7 @@ export function useBackgroundMusic(_variant: 'night' | 'morning') {
       });
       wantPlayRef.current = false;
     };
-  }, [tracksLoaded, crossfadeToNext]);
+  }, [tracksLoaded, crossfadeToNext, preparePlaylistStart]);
 
   const play = useCallback(() => {
     wantPlayRef.current = true;
@@ -149,6 +181,11 @@ export function useBackgroundMusic(_variant: 'night' | 'morning') {
     audio.play().catch((e) => console.warn('[bgMusic] play failed:', e));
   }, [getActive]);
 
+  const startNewSession = useCallback(() => {
+    shuffleTracks();
+    preparePlaylistStart(true);
+  }, [preparePlaylistStart, shuffleTracks]);
+
   const pause = useCallback(() => {
     wantPlayRef.current = false;
     if (crossfadeTimerRef.current) clearInterval(crossfadeTimerRef.current);
@@ -156,5 +193,5 @@ export function useBackgroundMusic(_variant: 'night' | 'morning') {
     audioBRef.current?.pause();
   }, []);
 
-  return { play, pause };
+  return { play, pause, startNewSession };
 }
