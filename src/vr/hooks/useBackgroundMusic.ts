@@ -38,8 +38,12 @@ export function useBackgroundMusic(_variant: 'night' | 'morning') {
       } catch {
         // Use fallback
       }
-      // Randomize start position
-      trackIndexRef.current = Math.floor(Math.random() * tracksRef.current.length);
+      // Shuffle tracks so playback order is different every session
+      for (let i = tracksRef.current.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [tracksRef.current[i], tracksRef.current[j]] = [tracksRef.current[j], tracksRef.current[i]];
+      }
+      trackIndexRef.current = 0;
       setTracksLoaded(true);
     })();
   }, []);
