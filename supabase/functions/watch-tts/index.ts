@@ -13,8 +13,8 @@ const VOICE_ID = "JBFqnCBsd6RMkjVDRZzb";
 const MODEL_ID = "eleven_multilingual_v2";
 const MAX_CHUNK = 4500;
 // Bump this version to invalidate ALL cached watch TTS audio
-// v8 = 2026-04-07 Switch to George (British male epic)
-const WATCH_CACHE_VERSION = "v9";
+// v10 = 2026-04-07 Add anti-Eastern guardrails, time-of-day context, inter-sentence pauses
+const WATCH_CACHE_VERSION = "v10";
 
 async function sha256Hex(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);
