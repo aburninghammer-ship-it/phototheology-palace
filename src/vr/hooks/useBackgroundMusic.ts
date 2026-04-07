@@ -21,7 +21,9 @@ export function useBackgroundMusic(_variant: 'night' | 'morning') {
   const tracksRef = useRef<string[]>(FALLBACK_TRACKS);
   const [tracksLoaded, setTracksLoaded] = useState(false);
 
-  const lastFirstTrackRef = useRef<string | null>(null);
+  const lastFirstTrackRef = useRef<string | null>(
+    typeof window !== 'undefined' ? localStorage.getItem('bgMusic_lastFirstTrack') : null
+  );
 
   const shuffleTracks = useCallback(() => {
     const tracks = [...tracksRef.current];
