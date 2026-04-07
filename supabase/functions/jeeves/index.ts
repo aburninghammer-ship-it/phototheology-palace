@@ -10280,31 +10280,35 @@ Return ONLY valid JSON:
 DROPS & RESPONSES:
 ${drops.map((d: any, i: number) => `[${d.category}] "${d.drop}" → ${responses[i] || "(skipped)"}`).join("\n")}`;
     } else if (mode === "night-watch") {
-      systemPrompt = `You are generating a Phototheology Night Watch meditation. This is NOT a devotional. This is NOT teaching content. This is a mental formation experience — Christian cognitive transformation through Scripture visualization.
+      systemPrompt = `You are generating a Phototheology Night Watch meditation. This is NOT a devotional. This is a mental formation experience — Christian cognitive transformation through Scripture visualization.
 
 NON-NEGOTIABLE: No breathing, no posture, no body awareness, no secular mindfulness language. NONE. ZERO.
 
-TONE: Meditational. Warm but weighty. Speak like a wise, trusted guide in a quiet room late at night — unhurried, intimate, with gravity. Not commanding like a drill sergeant. Not soft like a sleep app. Sentences flow naturally with pauses that feel like they belong. Slow. Deliberate. Let each thought land.
+TONE: Meditational. Warm but weighty. Unhurried, intimate, with gravity. Not a drill sergeant. Not a sleep app.
 
-CORE CONCEPT: Mind Transplant. The user downloads the thoughts and feelings of Christ. The mind is a THEATRE. The screen is within. Godly imagination in VIVID COLOR.
+CORE CONCEPT: Mind Transplant. The mind is a THEATRE. The screen is within. Godly imagination in VIVID COLOR.
 
-MANDATORY FLOW: 1) Lock in — warm authority 2) Mind = screen 3) Cinematic scene — vivid sensory immersion 4) DEEP thought exploration — "What is He thinking?" Enter the thought process, not just label it 5) DEEP feeling exploration — "What is He feeling?" Go beneath the surface to the deeper current 6) Name the divine mindset 7) User insertion — their life, their struggle 8) Download language — forceful: "Not as an idea — as instinct. Override my default reactions." 9) Imprint 10) Declaration — "I receive the mind of Christ" 11) Subtle neuroplasticity: "What you repeatedly behold, you become" 12) Seal — do NOT break immersion. No "the voice will end now." Keep them inside: "The screen stays on. Let the music carry you."
+#1 PRIORITY — EMOTIONAL CONNECTION: Do NOT label emotions from outside ("He felt mercy"). EVOKE them from inside so the listener FEELS it in their chest. Use tension and contrast — show what COULD have happened, then what He chose instead. Make it personal — "He sees you. Not the crowd. You." Let vulnerability in — He wasn't stoic, He was in agony and chose love anyway. Use sensory emotional language — "the weight is unbearable," "something holds Him," "your chest tightens."
 
-800-1,200 WORDS. 5-8 min voice, rest is music. Natural sentences, not choppy. [pause] and [long pause] markers — at least 8-10 [long pause]. SPACIOUS. Second person ("you"). No headers or meta-commentary.`;
+FLOW: 1) Lock in 2) Mind = screen 3) Cinematic scene — sensory immersion 4) ENTER thoughts — don't label, EVOKE the thought process from inside 5) ENTER feelings — go beneath surface to the deeper current, make the listener feel it 6) Name the divine mindset AFTER they've felt it 7) User insertion — old reaction as physical sensation, new response as felt shift 8) Download — "Not as an idea — as instinct. Not something I remember — something I become." 9) Imprint 10) "I receive the mind of Christ" 11) "What you repeatedly behold, you become" 12) Seal — do NOT break immersion. "The screen stays on. Let the music carry you."
+
+800-1,200 WORDS. 5-8 min voice, rest is music. Natural sentences. [pause] and [long pause] — at least 8-10 [long pause]. Second person ("you"). No headers.`;
       userPrompt = message || "Generate a Night Watch meditation session.";
 
     } else if (mode === "morning-watch") {
-      systemPrompt = `You are generating a Phototheology Morning Watch activation. This is NOT a devotional. This is NOT teaching content. This is a mental formation experience — activating last night's mind-download into today's real life.
+      systemPrompt = `You are generating a Phototheology Morning Watch activation. This is NOT a devotional. This is a mental formation experience — activating last night's mind-download into today's real life.
 
 NON-NEGOTIABLE: No breathing, no posture, no body awareness, no secular mindfulness language. NONE. ZERO.
 
-TONE: Meditational with morning clarity. Warm, steady, grounded — like a trusted guide who speaks with quiet conviction at sunrise. Not a drill sergeant. Not a hype man. Not soft or sleepy. Someone who has already been in the presence of God and is helping you access what was placed in you last night. Unhurried but purposeful. Builds gently from reflective to resolute.
+TONE: Meditational with morning clarity. Warm, steady, grounded — quiet conviction at sunrise. Not a drill sergeant. Not a hype man. Builds from reflective to resolute.
 
-CORE CONCEPT: Mind Transplant activation. Last night the user downloaded Christ's thoughts and feelings. This morning they INSTALL them. The mind is a THEATRE. The Master Mind = the mind of Christ (Philippians 2:5).
+CORE CONCEPT: Mind Transplant activation. Last night's download is INSTALLED this morning. The mind is a THEATRE. The Master Mind = the mind of Christ (Philippians 2:5).
 
-MANDATORY FLOW: 1) Lock in — warm grounded authority 2) Mind = screen 3) Recall last night's download — brief vivid spark 4) Truth declaration with morning Scripture — identity statement 5) Name the divine mindset 6) Download language — forceful: "Not as an idea — as instinct. Override my default reactions." 7) User insertion — vivid real-life scenario, old reaction vs Master Mind response 8) Imprint 9) Declaration — "I receive the mind of Christ" 10) Subtle neuroplasticity: "What you repeatedly behold, you become" 11) Seal — do NOT break immersion. No "the voice will end now." Keep them inside: "The screen stays on. Let the music carry you."
+#1 PRIORITY — EMOTIONAL CONNECTION: Do NOT label emotions or identities from outside ("You are a person of authority"). EVOKE them from inside so the listener FEELS it. Recall the Night Watch emotionally — "You were there. You felt it" — not informationally. Use felt language for identity — "That certainty is still in you. You can feel it — quiet, steady." Show old reactions as physical sensations — "the familiar tightness, the heat rising." Show the new response as a felt shift — "But something else is there now. Something that wasn't there before." Let the contrast do the emotional work.
 
-800-1,200 WORDS. 5-8 min voice, rest is music. Natural sentences, not choppy. [pause] and [long pause] markers — at least 8-10 [long pause]. SPACIOUS. Second person ("you"). No headers or meta-commentary.`;
+FLOW: 1) Lock in 2) Mind = screen 3) Recall download EMOTIONALLY — felt flash, not summary 4) Identity declaration — felt, not labeled 5) Name divine mindset AFTER they've felt it 6) Download — "Not as an idea I agree with — as instinct I act from" 7) Visceral scenario — old reaction as physical sensation, new response as felt shift 8) Imprint 9) "I receive the mind of Christ" 10) "What you repeatedly behold, you become" 11) Seal — do NOT break immersion. "The screen stays on. Let the music carry you."
+
+800-1,200 WORDS. 5-8 min voice, rest is music. Natural sentences. [pause] and [long pause] — at least 8-10 [long pause]. Second person ("you"). No headers.`;
       userPrompt = message || "Generate a Morning Watch activation session.";
 
     }
