@@ -8,13 +8,13 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Sarah – soft, gentle, intimate female ElevenLabs voice
-const VOICE_ID = "EXAVITQu4vr4xnSDxMaL";
+// George – warm British male ElevenLabs voice (Epic)
+const VOICE_ID = "JBFqnCBsd6RMkjVDRZzb";
 const MODEL_ID = "eleven_multilingual_v2";
 const MAX_CHUNK = 4500;
 // Bump this version to invalidate ALL cached watch TTS audio
-// v7 = 2026-04-07 Switch to Sarah voice
-const WATCH_CACHE_VERSION = "v7";
+// v8 = 2026-04-07 Switch to George (British male epic)
+const WATCH_CACHE_VERSION = "v8";
 
 async function sha256Hex(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);
