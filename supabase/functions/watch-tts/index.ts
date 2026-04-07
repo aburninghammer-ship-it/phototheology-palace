@@ -59,6 +59,8 @@ function preprocessPauses(text: string): string {
   processed = processed.replace(/\[long pause\]/gi, "\n\n...\n\n...\n\n...\n\n");
   // Replace [pause] with a double ellipsis
   processed = processed.replace(/\[pause\]/gi, "\n\n...\n\n");
+  // Add breathing pauses between sentences for meditative pacing
+  processed = processed.replace(/([.!?])\s+(?=[A-Z])/g, "$1\n\n...\n\n");
   return processed;
 }
 
