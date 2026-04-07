@@ -109,7 +109,7 @@ export function ImmersiveAudioPlayer({
   const ambientNextRef = useRef<HTMLAudioElement | null>(null);
   const crossfadeTimerRef = useRef<number>();
   const [ambientTrackIdx, setAmbientTrackIdx] = useState(() =>
-    Math.floor(Math.random() * AMBIENT_SOUND_TRACKS.length)
+    Math.floor(Math.random() * FALLBACK_AMBIENT_SOUND_TRACKS.length)
   );
   const [ambientPlaying, setAmbientPlaying] = useState(false);
   
