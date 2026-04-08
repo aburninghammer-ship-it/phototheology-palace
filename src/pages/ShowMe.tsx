@@ -212,6 +212,7 @@ export default function ShowMe() {
               onClick={() => handleCardClick("study-experience")}
             />
           </div>
+          </div>
         </motion.div>
 
         {/* Free Tier Notice */}
