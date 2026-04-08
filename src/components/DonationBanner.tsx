@@ -67,7 +67,7 @@ export const DonationBanner = () => {
       `}</style>
       <div
         ref={bannerRef}
-        className="fixed top-0 left-0 right-0 z-[60] pt-[env(safe-area-inset-top,0px)] pb-2 px-4 backdrop-blur-lg bg-gradient-to-r from-primary/80 via-primary/90 to-primary/80 border-b-2 border-primary-foreground/30"
+        className="fixed top-0 left-0 right-0 z-[60] pt-[env(safe-area-inset-top,0px)] pb-2 px-4  bg-gradient-to-r from-primary/80 via-primary/90 to-primary/80 border-b-2 border-primary-foreground/30"
         style={{
           animation: "banner-glow 1.5s ease-in-out infinite alternate",
         }}

@@ -30,12 +30,13 @@ const MOOD_HUES: Record<string, number[]> = {
   study: [150, 170],       // scholarly teal
 };
 
-const PARTICLE_COUNT = 60;
+const PARTICLE_COUNT = 30; // Reduced from 60 for iPad/mobile performance
 
 export function ImmersiveParticles({ isPlaying, mood = "commentary", intensity = 0.6 }: ImmersiveParticlesProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const rafRef = useRef<number>();
+  const lastFrameRef = useRef<number>(0);
   const hueRange = MOOD_HUES[mood] || MOOD_HUES.commentary;
 
   useEffect(() => {
@@ -57,8 +58,14 @@ export function ImmersiveParticles({ isPlaying, mood = "commentary", intensity =
       particlesRef.current = Array.from({ length: PARTICLE_COUNT }, () => createParticle(canvas.width, canvas.height, hueRange));
     }
 
-    const draw = () => {
+    const draw = (now: number) => {
       if (!ctx || !canvas) return;
+      // Throttle to ~24fps to reduce GPU load on tablets
+      if (now - lastFrameRef.current < 42) {
+        rafRef.current = requestAnimationFrame(draw);
+        return;
+      }
+      lastFrameRef.current = now;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const speedMul = isPlaying ? 1 : 0.15;

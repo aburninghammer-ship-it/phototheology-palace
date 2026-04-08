@@ -239,7 +239,7 @@ export function TrialUrgencyMessage() {
         className="fixed left-4 right-4 md:left-auto md:right-4 md:w-[420px] z-40"
         style={{ top: "calc(var(--app-header-height, 64px) + 0.75rem)" }}
       >
-        <div className={`relative rounded-xl p-4 shadow-lg border backdrop-blur-sm ${urgencyColors[message.urgency]}`}>
+        <div className={`relative rounded-xl p-4 shadow-lg border  ${urgencyColors[message.urgency]}`}>
           <button
             onClick={handleDismiss}
             className="absolute top-2 right-2 p-1.5 rounded-full hover:bg-muted/50 transition-colors"
