@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,8 +6,9 @@ import { Sun, Play, ChevronDown, Lock } from "lucide-react";
 import morningWatchImage from "@/assets/morning-watch-sunrise.jpg";
 import { WatchQuickShare } from "@/components/audio/WatchQuickShare";
 import { ImmersiveAudioPlayer } from "@/components/audio/ImmersiveAudioPlayer";
-import { useWatchPlayer } from "@/hooks/useWatchPlayer";
+import { useWatchPlayer, generateWatchTTS } from "@/hooks/useWatchPlayer";
 import { useWatchProgress } from "@/hooks/useWatchProgress";
+import { callJeeves } from "@/lib/jeevesClient";
 import {
   WATCH_TRACTS,
   ENERGY_COLORS,
@@ -34,6 +35,21 @@ export default function MorningWatches() {
     startTract(tract.id);
     startMorningWatch(session, tract.name, tract.id);
   };
+
+  const generateAudioForSession = useCallback(
+    async (session: MorningWatchSession, tractName: string): Promise<string | null> => {
+      const { data, error } = await callJeeves(
+        { mode: "morning-watch", message: `Generate a Morning Watch activation for "${session.title}" (${session.morningScripture}). Paired night: ${session.pairedNightTitle}. Energy: ${session.energy}. Commitment: ${session.commitmentStyle}. Keep it 800-1200 words.` },
+        "morning-watches",
+      );
+      if (error) throw new Error(String(error));
+      const d = data as Record<string, unknown> | string | null;
+      const script = typeof d === "string" ? d : d ? String((d as any).response || (d as any).result || JSON.stringify(d)) : "";
+      if (!script) throw new Error("Empty script returned");
+      return generateWatchTTS(script, "morning");
+    },
+    [],
+  );
 
   const renderSessionCard = (session: MorningWatchSession, tract: WatchTract) => {
     const unlocked = isDayUnlocked(tract.id, session.dayNumber);
@@ -78,6 +94,7 @@ export default function MorningWatches() {
                   watchType="morning"
                   dayNumber={session.dayNumber}
                   tractName={tract.name}
+                  onGenerateAudio={() => generateAudioForSession(session, tract.name)}
                 />
               )}
               {!unlocked ? (

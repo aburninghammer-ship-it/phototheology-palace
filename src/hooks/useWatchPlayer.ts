@@ -315,7 +315,7 @@ Write like you are actually sitting with someone at sunrise — not like a write
 - The overall feel should be: a trusted friend who is gently helping you remember what you felt last night and carry it into today.`;
 }
 
-async function generateWatchTTS(script: string, watchType: "night" | "morning"): Promise<string | null> {
+export async function generateWatchTTS(script: string, watchType: "night" | "morning"): Promise<string | null> {
   // Try ElevenLabs first
   try {
     console.log(`[WatchPlayer] Generating ${watchType} TTS via ElevenLabs (${script.length} chars)...`);

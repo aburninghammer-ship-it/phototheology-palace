@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,8 +6,9 @@ import { Moon, Play, ChevronDown, Lock } from "lucide-react";
 import nightWatchImage from "@/assets/night-watch-starry.jpg";
 import { ImmersiveAudioPlayer } from "@/components/audio/ImmersiveAudioPlayer";
 import { WatchQuickShare } from "@/components/audio/WatchQuickShare";
-import { useWatchPlayer } from "@/hooks/useWatchPlayer";
+import { useWatchPlayer, generateWatchTTS } from "@/hooks/useWatchPlayer";
 import { useWatchProgress } from "@/hooks/useWatchProgress";
+import { callJeeves } from "@/lib/jeevesClient";
 import {
   WATCH_TRACTS,
   MOOD_COLORS,
@@ -36,6 +37,21 @@ export default function NightWatches() {
     startTract(tract.id);
     startNightWatch(session, tract.name, tract.id);
   };
+
+  const generateAudioForSession = useCallback(
+    async (session: WatchSession, tractName: string): Promise<string | null> => {
+      const { data, error } = await callJeeves(
+        { mode: "night-watch", message: `Generate a Night Watch meditation for "${session.title}" (${session.scripture}). Scene: ${session.scene}. Mood: ${session.mood}. Struggle: ${session.struggle}. Keep it 800-1200 words.` },
+        "night-watches",
+      );
+      if (error) throw new Error(String(error));
+      const d = data as Record<string, unknown> | string | null;
+      const script = typeof d === "string" ? d : d ? String((d as any).response || (d as any).result || JSON.stringify(d)) : "";
+      if (!script) throw new Error("Empty script returned");
+      return generateWatchTTS(script, "night");
+    },
+    [],
+  );
 
   const renderSessionCard = (session: WatchSession, tract: WatchTract) => {
     const StruggleIcon = STRUGGLE_ICONS[session.struggle] || Heart;
@@ -81,6 +97,7 @@ export default function NightWatches() {
                   watchType="night"
                   dayNumber={session.dayNumber}
                   tractName={tract.name}
+                  onGenerateAudio={() => generateAudioForSession(session, tract.name)}
                 />
               )}
               {!unlocked ? (
