@@ -50,9 +50,9 @@ export const ROOM_SUB_PRINCIPLES: Record<string, RoomSubPrinciples> = {
     subPrinciples: [
       { id: 'dr-literal', name: 'Literal', shortName: 'Literal', description: 'Plain historical meaning', icon: 'BookOpen' },
       { id: 'dr-christ', name: 'Christological', shortName: 'Christ', description: 'Points to Christ', icon: 'Cross' },
-      { id: 'dr-personal', name: 'Personal', shortName: 'Personal', description: 'Individual application', icon: 'User' },
-      { id: 'dr-church', name: 'Ecclesiological', shortName: 'Church', description: 'Church body application', icon: 'Church' },
-      { id: 'dr-eschaton', name: 'Eschatological', shortName: 'End Times', description: 'Last-day events', icon: 'Hourglass' },
+      { id: 'dr-personal', name: 'Personal', shortName: 'Me', description: 'Individual application', icon: 'User' },
+      { id: 'dr-church', name: 'Church', shortName: 'Church', description: 'Church body application', icon: 'Church' },
+      { id: 'dr-heaven', name: 'Heaven', shortName: 'Heaven', description: 'Heavenly and eternal application', icon: 'Star' },
     ],
   },
 
