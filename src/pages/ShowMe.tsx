@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Headphones, Moon, Network, GraduationCap, ArrowRight } from "lucide-react";
+import { BookOpen, Headphones, Moon, Network, GraduationCap, ArrowRight, ArrowLeft, Film } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShowMeCard } from "@/components/show-me/ShowMeCard";
 import { ShowMeVerseBreakdown } from "@/components/show-me/ShowMeVerseBreakdown";
@@ -9,16 +9,19 @@ import { ShowMeEpicCommentary } from "@/components/show-me/ShowMeEpicCommentary"
 import { ShowMeNightWatch } from "@/components/show-me/ShowMeNightWatch";
 import { ShowMeMindMap } from "@/components/show-me/ShowMeMindMap";
 import { ShowMeStudyBible } from "@/components/show-me/ShowMeStudyBible";
+import { ShowMe24FPS } from "@/components/show-me/ShowMe24FPS";
 import { ShowMeUpgradeWall } from "@/components/show-me/ShowMeUpgradeWall";
 import { useShowMeUsage } from "@/hooks/useShowMeUsage";
+import { useAuth } from "@/hooks/useAuth";
 import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
 import { showMeTourSteps } from "@/components/show-me/ShowMeTourSteps";
 import type { Feature } from "@/hooks/useShowMeUsage";
 
-type Experience = "verse" | "commentary" | "meditation" | "mindmap" | "study" | null;
+type Experience = "verse" | "commentary" | "meditation" | "mindmap" | "study" | "fps" | null;
 
 export default function ShowMe() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const {
     canUse, use, getRemaining, saveResult, getSavedResults, hasSavedResults,
     isTourSeen, markTourSeen,
@@ -47,7 +50,6 @@ export default function ShowMe() {
       setReviewMode(false);
       setActiveExperience(feature);
     } else if (hasSavedResults(feature as Feature)) {
-      // Uses exhausted but has saved results — open in review mode
       setReviewMode(true);
       setActiveExperience(feature);
     } else {
@@ -62,6 +64,32 @@ export default function ShowMe() {
       <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 py-12 md:py-20">
+        {/* Back Navigation */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex items-center gap-2 mb-8"
+        >
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-1 text-muted-foreground hover:text-foreground"
+            onClick={() => navigate(-1)}
+          >
+            <ArrowLeft className="h-4 w-4" /> Back
+          </Button>
+          {user && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1 text-muted-foreground hover:text-foreground"
+              onClick={() => navigate("/pricing")}
+            >
+              View Plans
+            </Button>
+          )}
+        </motion.div>
+
         {/* Hero */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -146,6 +174,18 @@ export default function ShowMe() {
               onClick={() => handleCardClick("study")}
             />
           </div>
+          <div data-showme-card="fps">
+            <ShowMeCard
+              icon={Film}
+              title="24 Frames Per Second"
+              description="Flip through Genesis 1–24, one image per chapter."
+              accent="sky"
+              remaining={null}
+              canUse={canUse("fps")}
+              hasSaved={hasSavedResults("fps")}
+              onClick={() => handleCardClick("fps")}
+            />
+          </div>
         </motion.div>
 
         {/* Bottom CTA */}
@@ -164,9 +204,9 @@ export default function ShowMe() {
             <Button
               size="lg"
               className="gap-2"
-              onClick={() => navigate("/auth")}
+              onClick={() => navigate(user ? "/pricing" : "/auth")}
             >
-              Start Free Trial <ArrowRight className="h-4 w-4" />
+              {user ? "Upgrade Now" : "Start Free Trial"} <ArrowRight className="h-4 w-4" />
             </Button>
             <Button
               variant="outline"
@@ -207,6 +247,11 @@ export default function ShowMe() {
         open={activeExperience === "study"}
         onOpenChange={(open) => !open && setActiveExperience(null)}
         onUse={() => use("study")}
+      />
+      <ShowMe24FPS
+        open={activeExperience === "fps"}
+        onOpenChange={(open) => !open && setActiveExperience(null)}
+        onUse={() => use("fps")}
       />
 
       {/* Upgrade Wall */}
