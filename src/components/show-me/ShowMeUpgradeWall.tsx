@@ -14,6 +14,7 @@ const featureDescriptions: Record<string, string> = {
   meditation: "Full access unlocks the complete Night Watch library — guided meditations through every season of Scripture.",
   mindmap: "Unlock unlimited mind maps that reveal the hidden connections between any verse, theme, or principle in Scripture.",
   study: "The full Study Bible gives you five dimensions of analysis, cross-references, PT codes, and AI-powered commentary on every verse.",
+  "study-experience": "Unlock unlimited Study Experience sessions — layer rooms and principles on any verse to see how Phototheology's study system reveals Scripture.",
 };
 
 export function ShowMeUpgradeWall({ feature, onClose }: ShowMeUpgradeWallProps) {

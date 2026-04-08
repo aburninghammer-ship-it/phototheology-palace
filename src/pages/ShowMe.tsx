@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Headphones, Moon, Network, GraduationCap, ArrowRight, ArrowLeft, Film } from "lucide-react";
+import { BookOpen, Headphones, Moon, Network, GraduationCap, ArrowRight, ArrowLeft, Film, Layers } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShowMeCard } from "@/components/show-me/ShowMeCard";
 import { ShowMeVerseBreakdown } from "@/components/show-me/ShowMeVerseBreakdown";
@@ -17,7 +17,7 @@ import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/G
 import { showMeTourSteps } from "@/components/show-me/ShowMeTourSteps";
 import type { Feature } from "@/hooks/useShowMeUsage";
 
-type Experience = "verse" | "commentary" | "meditation" | "mindmap" | "study" | "fps" | null;
+type Experience = "verse" | "commentary" | "meditation" | "mindmap" | "study" | "fps" | "study-experience" | null;
 
 export default function ShowMe() {
   const navigate = useNavigate();
@@ -46,6 +46,16 @@ export default function ShowMe() {
 
   const handleCardClick = (feature: Experience) => {
     if (!feature) return;
+    // Study Experience navigates to its own page
+    if (feature === "study-experience") {
+      if (canUse(feature)) {
+        use(feature);
+        navigate("/study-experience");
+      } else {
+        setUpgradeFeature(feature);
+      }
+      return;
+    }
     if (canUse(feature)) {
       setReviewMode(false);
       setActiveExperience(feature);
@@ -187,6 +197,18 @@ export default function ShowMe() {
               canUse={canUse("fps")}
               hasSaved={hasSavedResults("fps")}
               onClick={() => handleCardClick("fps")}
+            />
+          </div>
+          <div data-showme-card="study-experience">
+            <ShowMeCard
+              icon={Layers}
+              title="Study Experience"
+              description="Pick a verse, choose rooms and principles — watch layers of understanding unfold."
+              accent="sky"
+              remaining={null}
+              canUse={canUse("study-experience")}
+              hasSaved={false}
+              onClick={() => handleCardClick("study-experience")}
             />
           </div>
         </motion.div>

@@ -39,6 +39,20 @@ export interface NavTab {
 // Default tab order - users can customize this
 export const DEFAULT_NAV_TABS: NavTab[] = [
   {
+    id: "study-experience",
+    to: "/study-experience",
+    label: "Study Experience",
+    shortLabel: "Study",
+    icon: Layers,
+    gradient: {
+      from: "from-blue-500/10",
+      to: "to-indigo-500/10",
+      border: "border-blue-500/20",
+      text: "from-blue-600 to-indigo-600",
+      glow: "rgba(59,130,246,0.5)"
+    }
+  },
+  {
     id: "test-me",
     to: "/test-me",
     label: "Test Me",

@@ -84,6 +84,7 @@ const LockInRedeem = lazy(() => import("./pages/LockInRedeem"));
 const GuestPassTracker = lazy(() => import("./pages/GuestPassTracker"));
 const PublicChallenge = lazy(() => import("./pages/PublicChallenge"));
 const ShowMe = lazy(() => import("./pages/ShowMe"));
+const StudyExperience = lazy(() => import("./pages/StudyExperience"));
 const GoalsSurveyPage = lazy(() => import("./pages/GoalsSurveyPage"));
 const InstallApp = lazy(() => import("./pages/InstallApp"));
 
@@ -467,6 +468,7 @@ function App() {
             <Route path="/patreon-callback" element={<PatreonCallback />} />
             <Route path="/interactive-demo" element={<InteractiveDemo />} />
             <Route path="/show-me" element={<ShowMe />} />
+            <Route path="/study-experience" element={<StudyExperience />} />
             <Route path="/comparison" element={<Comparison />} />
             <Route path="/onboarding" element={
               <ProtectedRoute>

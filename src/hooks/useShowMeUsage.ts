@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 
 type CountFeature = "verse" | "mindmap";
-type BooleanFeature = "meditation" | "commentary" | "study" | "fps";
+type BooleanFeature = "meditation" | "commentary" | "study" | "fps" | "study-experience";
 export type Feature = CountFeature | BooleanFeature;
 
 const COUNT_LIMITS: Record<CountFeature, number> = {
@@ -16,6 +16,7 @@ const STORAGE_KEYS: Record<Feature, string> = {
   commentary: "showme-commentary-used",
   study: "showme-study-used",
   fps: "showme-fps-used",
+  "study-experience": "showme-study-experience-used",
 };
 
 const RESULTS_KEY = "showme-saved-results";
