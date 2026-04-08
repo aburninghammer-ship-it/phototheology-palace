@@ -179,9 +179,9 @@ export const ROOM_SUB_PRINCIPLES: Record<string, RoomSubPrinciples> = {
     roomId: '123h',
     roomName: 'Three Heavens Room',
     subPrinciples: [
-      { id: '123h-first', name: 'First Heaven', shortName: '1st Heaven', description: 'Atmospheric realm', icon: 'Cloud' },
-      { id: '123h-second', name: 'Second Heaven', shortName: '2nd Heaven', description: 'Cosmic realm', icon: 'Star' },
-      { id: '123h-third', name: 'Third Heaven', shortName: '3rd Heaven', description: 'Divine throne room', icon: 'Crown' },
+      { id: '123h-first', name: 'First Heaven (DoL¹/NE¹)', shortName: '1H', description: 'Babylon destroys Jerusalem → Cyrusic restoration', icon: 'Cloud' },
+      { id: '123h-second', name: 'Second Heaven (DoL²/NE²)', shortName: '2H', description: '70 AD → New-Covenant heavenly sanctuary order', icon: 'Star' },
+      { id: '123h-third', name: 'Third Heaven (DoL³/NE³)', shortName: '3H', description: 'Final judgment → literal New Heavens & Earth', icon: 'Crown' },
     ],
   },
 
@@ -194,8 +194,8 @@ export const ROOM_SUB_PRINCIPLES: Record<string, RoomSubPrinciples> = {
       { id: 'cycles-noah', name: '@No (Noah)', shortName: 'Noah', description: 'Judgment, ark, new beginning', icon: 'Ship' },
       { id: 'cycles-abraham', name: '@Ab (Abraham)', shortName: 'Abraham', description: 'Covenant, faith, promised seed', icon: 'Star' },
       { id: 'cycles-moses', name: '@Mo (Moses)', shortName: 'Moses', description: 'Exodus, law, tabernacle', icon: 'Mountain' },
-      { id: 'cycles-david', name: '@Da (David)', shortName: 'David', description: 'Kingdom, throne, Messiah', icon: 'Crown' },
       { id: 'cycles-cyrus', name: '@Cy (Cyrus)', shortName: 'Cyrus', description: 'Captivity, return, restoration', icon: 'Building' },
+      { id: 'cycles-cyruschrist', name: '@CyC (Cyrus-Christ)', shortName: 'CyC', description: 'Type meets antitype Deliverer', icon: 'Crown' },
       { id: 'cycles-spirit', name: '@Sp (Spirit)', shortName: 'Spirit', description: 'Pentecost, church, mission', icon: 'Flame' },
       { id: 'cycles-restoration', name: '@Re (Restoration)', shortName: 'Restore', description: 'Second Coming, new earth', icon: 'Sparkles' },
     ],
@@ -228,14 +228,11 @@ export const ROOM_SUB_PRINCIPLES: Record<string, RoomSubPrinciples> = {
   // Floor 7 - Sanctuary Room (6 Personal Elements)
   srm: {
     roomId: 'srm',
-    roomName: 'Sanctuary Room',
+    roomName: 'Speed Room',
     subPrinciples: [
-      { id: 'srm-altar', name: 'Your Altar', shortName: 'Altar', description: 'Sacrifice God is asking', icon: 'Flame' },
-      { id: 'srm-laver', name: 'Your Laver', shortName: 'Laver', description: 'Cleansing you need', icon: 'Droplets' },
-      { id: 'srm-lamp', name: 'Your Lampstand', shortName: 'Lamp', description: 'Light to carry', icon: 'Lightbulb' },
-      { id: 'srm-table', name: 'Your Table', shortName: 'Table', description: 'Nourishment provided', icon: 'Utensils' },
-      { id: 'srm-incense', name: 'Your Incense', shortName: 'Incense', description: 'Prayers arising', icon: 'Wind' },
-      { id: 'srm-ark', name: 'Your Ark', shortName: 'Ark', description: 'Covenant commitment', icon: 'Package' },
+      { id: 'srm-rapid', name: 'Rapid Scan', shortName: 'Scan', description: 'Quick connections across chapters', icon: 'Zap' },
+      { id: 'srm-flash', name: 'Flash Recall', shortName: 'Flash', description: 'Instant Christ-connections', icon: 'Lightbulb' },
+      { id: 'srm-sprint', name: 'Sprint Map', shortName: 'Sprint', description: 'Map a book in 60 seconds', icon: 'Timer' },
     ],
   },
 };
