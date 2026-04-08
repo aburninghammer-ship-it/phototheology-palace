@@ -35,7 +35,7 @@ export function AnalysisCard({ layer, index, onRemove }: AnalysisCardProps) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.05 }}
-      className="rounded-xl border border-border/50 bg-card/70 backdrop-blur-sm overflow-hidden"
+      className="rounded-xl border border-white/10 bg-card/40 backdrop-blur-xl overflow-hidden shadow-[0_0_20px_-5px_hsl(var(--primary)/0.15)] ring-1 ring-white/5"
     >
       <div className="flex items-center gap-2 px-4 py-2 border-b border-border/30">
         <Badge variant="outline" className={colorClass}>
@@ -54,6 +54,9 @@ export function AnalysisCard({ layer, index, onRemove }: AnalysisCardProps) {
       </div>
 
       <div className="p-4 space-y-3">
+        {!layer.userAttempt && !layer.jeevesEvaluation && (
+          <div className="absolute inset-0 rounded-xl pointer-events-none bg-gradient-to-br from-primary/5 via-transparent to-transparent" />
+        )}
         {layer.userAttempt && (
           <div className="pl-3 border-l-2 border-muted-foreground/30">
             <p className="text-xs text-muted-foreground mb-1 font-medium">Your Connection:</p>
