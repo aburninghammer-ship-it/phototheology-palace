@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
 
 export interface StudyLayer {
   roomId: string;
@@ -14,6 +15,7 @@ export interface StudyLayer {
 interface AnalysisCardProps {
   layer: StudyLayer;
   index: number;
+  onRemove?: (principleId: string) => void;
 }
 
 const ROOM_COLORS: Record<string, string> = {
@@ -25,7 +27,7 @@ const ROOM_COLORS: Record<string, string> = {
   cec: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
 };
 
-export function AnalysisCard({ layer, index }: AnalysisCardProps) {
+export function AnalysisCard({ layer, index, onRemove }: AnalysisCardProps) {
   const colorClass = ROOM_COLORS[layer.roomId] || "bg-primary/20 text-primary border-primary/30";
 
   return (
@@ -39,7 +41,16 @@ export function AnalysisCard({ layer, index }: AnalysisCardProps) {
         <Badge variant="outline" className={colorClass}>
           {layer.roomName}
         </Badge>
-        <span className="text-xs text-muted-foreground">{layer.principleName}</span>
+        <span className="text-xs text-muted-foreground flex-1">{layer.principleName}</span>
+        {onRemove && (
+          <button
+            onClick={() => onRemove(layer.principleId)}
+            className="p-0.5 rounded hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors"
+            title="Remove this layer"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        )}
       </div>
 
       <div className="p-4 space-y-3">

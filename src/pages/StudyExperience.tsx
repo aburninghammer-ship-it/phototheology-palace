@@ -123,11 +123,21 @@ export default function StudyExperience() {
     setVerseLookupLoading(false);
   };
 
+  const handleRemoveLayer = useCallback((principleId: string) => {
+    setLayers((prev) => prev.filter((l) => l.principleId !== principleId));
+  }, []);
+
   const handlePrincipleClick = useCallback(async (roomId: string, principle: SubPrinciple) => {
     if (!parsedRef || loadingPrinciple) return;
 
     const room = ROOM_SUB_PRINCIPLES[roomId];
     if (!room) return;
+
+    // If principle already used, remove its layer (toggle off)
+    if (usedPrinciples.has(principle.id)) {
+      handleRemoveLayer(principle.id);
+      return;
+    }
 
     if (mode === "user-led") {
       // In user-led mode, clicking the suggested principle just focuses it
@@ -324,7 +334,12 @@ export default function StudyExperience() {
                   Analysis Layers ({layers.length})
                 </h3>
                 {layers.map((layer, i) => (
-                  <AnalysisCard key={`${layer.principleId}-${i}`} layer={layer} index={i} />
+                  <AnalysisCard
+                    key={`${layer.principleId}-${i}`}
+                    layer={layer}
+                    index={i}
+                    onRemove={handleRemoveLayer}
+                  />
                 ))}
               </div>
             )}
