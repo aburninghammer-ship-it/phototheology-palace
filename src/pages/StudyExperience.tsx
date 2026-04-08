@@ -142,7 +142,7 @@ export default function StudyExperience() {
         verseText: "",
       }, "study-experience");
 
-      const response = typeof data === "string" ? data : data?.response;
+      const response = typeof data === "string" ? data : (data as any)?.response;
       if (response) {
         try {
           const suggestions = JSON.parse(response);
