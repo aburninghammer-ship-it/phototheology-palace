@@ -35,7 +35,7 @@ export function AnalysisCard({ layer, index, onRemove }: AnalysisCardProps) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.05 }}
-      className="rounded-xl border border-white/10 bg-card/40 backdrop-blur-xl overflow-hidden shadow-[0_0_20px_-5px_hsl(var(--primary)/0.15)] ring-1 ring-white/5"
+      className="relative rounded-xl border border-white/10 bg-card/40 backdrop-blur-xl overflow-hidden shadow-[0_0_20px_-5px_hsl(var(--primary)/0.15)] ring-1 ring-white/5"
     >
       <div className="flex items-center gap-2 px-4 py-2 border-b border-border/30">
         <Badge variant="outline" className={colorClass}>

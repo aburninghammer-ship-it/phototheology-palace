@@ -73,7 +73,7 @@ export function VersePanel({ verseRef, parsedRef, verseText, onStudy, loading }:
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-4 rounded-xl bg-card/80 border border-border/50"
+          className="p-4 rounded-xl bg-card/40 backdrop-blur-xl border border-white/10 shadow-[0_0_20px_-5px_hsl(var(--primary)/0.2)] ring-1 ring-white/5"
         >
           <div className="flex items-center gap-2 mb-2">
             <BookOpen className="w-4 h-4 text-primary" />
@@ -83,8 +83,10 @@ export function VersePanel({ verseRef, parsedRef, verseText, onStudy, loading }:
             <p className="text-sm text-muted-foreground leading-relaxed italic">
               "{verseText}"
             </p>
+          ) : loading ? (
+            <p className="text-xs text-muted-foreground animate-pulse">Looking up verse text...</p>
           ) : (
-            <p className="text-xs text-muted-foreground">Verse text will appear with analysis</p>
+            <p className="text-xs text-muted-foreground">Enter a verse reference above to begin</p>
           )}
         </motion.div>
       )}
