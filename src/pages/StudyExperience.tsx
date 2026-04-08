@@ -283,14 +283,26 @@ INSTRUCTIONS FOR SYNTHESIS:
     localStorage.setItem(SAVE_KEY, JSON.stringify(trimmed));
   }, [verseRef]);
 
+  // Determine if the current study is topic-based
+  const isCurrentTopicStudy = verseRef ? isTopicInput(verseRef) : false;
+
   // Deep, profound Jeeves prompt for Jeeves-led mode
   const buildDeepPrompt = (roomName: string, roomId: string, principleName: string, description: string) => {
+    const subjectLine = isCurrentTopicStudy
+      ? `The student is studying the biblical topic/theme/story: "${verseRef}".`
+      : `The student is studying ${verseRef}.`;
+
     return `${roomName} (${roomId.toUpperCase()}): ${principleName} - ${description}
+
+${subjectLine}
 
 IMPORTANT INSTRUCTIONS FOR DEPTH:
 - Provide a DEEP, PROFOUND, and THOROUGH analysis — not surface-level.
-- Begin with the verse text if not already provided.
-- Show how this principle SPECIFICALLY illuminates this verse in ways the reader may never have considered.
+${isCurrentTopicStudy
+  ? `- Since this is a TOPIC study (not a single verse), identify and cite the KEY SCRIPTURES most relevant to "${verseRef}" and this principle.
+- Ground every claim in specific Bible texts (KJV preferred).`
+  : `- Begin with the verse text if not already provided.
+- Show how this principle SPECIFICALLY illuminates this verse in ways the reader may never have considered.`}
 - Include at minimum: (1) The direct application of this principle, (2) A cross-reference to at least one other Scripture that deepens the insight, (3) A practical or devotional takeaway that makes this personal.
 - Use the Phototheology study method language naturally.
 - End with a "Spark" — one sentence of surprising, memorable insight that the reader will carry with them. Format it as: ✨ Spark: [your insight]`;
