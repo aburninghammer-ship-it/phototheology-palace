@@ -75,6 +75,8 @@ export default function StudyExperience() {
   const [layers, setLayers] = useState<StudyLayer[]>([]);
   const [loadingPrinciple, setLoadingPrinciple] = useState<string | null>(null);
   const [verseLookupLoading, setVerseLookupLoading] = useState(false);
+  const [synthesizedOutput, setSynthesizedOutput] = useState<string | null>(null);
+  const [synthesizing, setSynthesizing] = useState(false);
 
   // User-led state
   const [suggestedRoom, setSuggestedRoom] = useState<{ roomId: string; principleId: string } | null>(null);
