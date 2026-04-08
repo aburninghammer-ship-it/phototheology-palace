@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Lock } from "lucide-react";
+import { Lock, RotateCcw } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 interface ShowMeCardProps {
@@ -10,6 +10,7 @@ interface ShowMeCardProps {
   accent: string; // tailwind color class e.g. "violet", "amber"
   remaining?: number | null; // null = boolean feature (1 use)
   canUse: boolean;
+  hasSaved?: boolean; // true if saved results exist for review
   onClick: () => void;
 }
 
@@ -22,7 +23,7 @@ const accentMap: Record<string, { border: string; glow: string; bg: string; text
   sky: { border: "border-sky-500/30", glow: "shadow-sky-500/20", bg: "bg-sky-500", text: "text-sky-400" },
 };
 
-export function ShowMeCard({ icon: Icon, title, description, accent, remaining, canUse, onClick }: ShowMeCardProps) {
+export function ShowMeCard({ icon: Icon, title, description, accent, remaining, canUse, hasSaved, onClick }: ShowMeCardProps) {
   const colors = accentMap[accent] || accentMap.violet;
 
   return (
@@ -43,7 +44,11 @@ export function ShowMeCard({ icon: Icon, title, description, accent, remaining, 
 
       {/* Usage badge */}
       <div className="mt-4 flex items-center gap-2">
-        {!canUse ? (
+        {!canUse && hasSaved ? (
+          <Badge variant="outline" className={`${colors.border} ${colors.text} gap-1`}>
+            <RotateCcw className="h-3 w-3" /> Review
+          </Badge>
+        ) : !canUse ? (
           <Badge variant="outline" className="border-muted-foreground/30 text-muted-foreground gap-1">
             <Lock className="h-3 w-3" /> Used
           </Badge>

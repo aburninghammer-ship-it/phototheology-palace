@@ -1,17 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { BookOpen, Loader2, Sparkles, Eye, Layers, Link2, Lightbulb } from "lucide-react";
+import { BookOpen, Loader2, Sparkles, Eye, Layers, Link2, Lightbulb, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { callJeeves } from "@/lib/jeevesClient";
 import { toast } from "sonner";
 import type { LucideIcon } from "lucide-react";
+import type { SavedResult } from "@/hooks/useShowMeUsage";
 
 interface ShowMeVerseBreakdownProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUse: () => void;
+  onSave?: (label: string, data: unknown) => void;
+  savedResults?: SavedResult[];
+  reviewOnly?: boolean;
 }
 
 interface BreakdownSection {
@@ -117,10 +121,17 @@ function parseBreakdown(text: string): BreakdownSection[] {
   return sections;
 }
 
-export function ShowMeVerseBreakdown({ open, onOpenChange, onUse }: ShowMeVerseBreakdownProps) {
+export function ShowMeVerseBreakdown({ open, onOpenChange, onUse, onSave, savedResults = [], reviewOnly }: ShowMeVerseBreakdownProps) {
   const [verseRef, setVerseRef] = useState("");
   const [loading, setLoading] = useState(false);
   const [sections, setSections] = useState<BreakdownSection[]>([]);
+  const [currentLabel, setCurrentLabel] = useState("");
+  // Review mode: browse saved results
+  const [reviewIndex, setReviewIndex] = useState(0);
+  const [isReviewing, setIsReviewing] = useState(false);
+
+  // When opening in review-only mode, show saved results immediately
+  const effectiveReviewOnly = reviewOnly && savedResults.length > 0;
 
   const handleReveal = async () => {
     if (!verseRef.trim()) {
@@ -129,6 +140,7 @@ export function ShowMeVerseBreakdown({ open, onOpenChange, onUse }: ShowMeVerseB
     }
     setLoading(true);
     setSections([]);
+    setIsReviewing(false);
     try {
       onUse();
       const ref = verseRef.trim();
@@ -148,7 +160,11 @@ export function ShowMeVerseBreakdown({ open, onOpenChange, onUse }: ShowMeVerseB
       );
       if (error) throw error;
       const text = typeof data === "string" ? data : (data as any)?.response || "";
-      setSections(parseBreakdown(text));
+      const parsed = parseBreakdown(text);
+      setSections(parsed);
+      setCurrentLabel(ref);
+      // Save the result
+      onSave?.(ref, text);
     } catch (err) {
       toast.error("Something went wrong. Try again.");
       console.error(err);
@@ -157,13 +173,31 @@ export function ShowMeVerseBreakdown({ open, onOpenChange, onUse }: ShowMeVerseB
     }
   };
 
+  const loadSavedResult = (index: number) => {
+    const result = savedResults[index];
+    if (!result) return;
+    const text = typeof result.data === "string" ? result.data : "";
+    setSections(parseBreakdown(text));
+    setCurrentLabel(result.label);
+    setReviewIndex(index);
+    setIsReviewing(true);
+  };
+
   const handleClose = () => {
     onOpenChange(false);
     setTimeout(() => {
       setSections([]);
       setVerseRef("");
+      setIsReviewing(false);
     }, 300);
   };
+
+  // Auto-load first saved result when opening in review-only mode
+  useEffect(() => {
+    if (open && effectiveReviewOnly && sections.length === 0) {
+      loadSavedResult(savedResults.length - 1); // show most recent first
+    }
+  }, [open, effectiveReviewOnly]);
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -177,28 +211,74 @@ export function ShowMeVerseBreakdown({ open, onOpenChange, onUse }: ShowMeVerseB
             </div>
             <div>
               <h2 className="text-xl font-bold">Verse Breakdown</h2>
-              <p className="text-sm text-muted-foreground">Enter any verse to see what's hidden beneath the surface</p>
+              <p className="text-sm text-muted-foreground">
+                {effectiveReviewOnly
+                  ? "Reviewing your saved breakdowns"
+                  : "Enter any verse to see what's hidden beneath the surface"}
+              </p>
             </div>
           </div>
 
-          {/* Input */}
-          <div className="flex gap-2 mb-6">
-            <Input
-              placeholder="e.g. John 3:16, Genesis 3:15, Psalm 23:1"
-              value={verseRef}
-              onChange={(e) => setVerseRef(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && !loading && handleReveal()}
-              className="flex-1"
-            />
+          {/* Input — hidden in review-only mode */}
+          {!effectiveReviewOnly && (
+            <div className="flex gap-2 mb-6">
+              <Input
+                placeholder="e.g. John 3:16, Genesis 3:15, Psalm 23:1"
+                value={verseRef}
+                onChange={(e) => setVerseRef(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && !loading && handleReveal()}
+                className="flex-1"
+              />
+              <Button
+                onClick={handleReveal}
+                disabled={loading || !verseRef.trim()}
+                className="gap-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white"
+              >
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                Reveal
+              </Button>
+            </div>
+          )}
+
+          {/* Saved results picker — shown when reviewing or when saved results exist in review-only mode */}
+          {(effectiveReviewOnly || isReviewing) && savedResults.length > 0 && (
+            <div className="flex items-center justify-between mb-4 px-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={reviewIndex <= 0}
+                onClick={() => loadSavedResult(reviewIndex - 1)}
+                className="gap-1"
+              >
+                <ChevronLeft className="h-4 w-4" /> Prev
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                <span className="font-medium text-foreground">{currentLabel}</span>
+                {" "}({reviewIndex + 1} of {savedResults.length})
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={reviewIndex >= savedResults.length - 1}
+                onClick={() => loadSavedResult(reviewIndex + 1)}
+                className="gap-1"
+              >
+                Next <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+
+          {/* Non-review: show saved results button when results exist and viewing fresh content */}
+          {!effectiveReviewOnly && !isReviewing && savedResults.length > 0 && sections.length === 0 && !loading && (
             <Button
-              onClick={handleReveal}
-              disabled={loading || !verseRef.trim()}
-              className="gap-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white"
+              variant="ghost"
+              size="sm"
+              onClick={() => loadSavedResult(savedResults.length - 1)}
+              className="mb-4 gap-2 text-muted-foreground"
             >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-              Reveal
+              <RotateCcw className="h-3.5 w-3.5" /> Review saved breakdowns ({savedResults.length})
             </Button>
-          </div>
+          )}
 
           {/* Loading state */}
           <AnimatePresence mode="wait">
@@ -215,6 +295,11 @@ export function ShowMeVerseBreakdown({ open, onOpenChange, onUse }: ShowMeVerseB
             )}
           </AnimatePresence>
 
+          {/* Current label when showing fresh results */}
+          {!isReviewing && !effectiveReviewOnly && currentLabel && sections.length > 0 && (
+            <p className="text-sm font-medium text-violet-300 mb-4">{currentLabel}</p>
+          )}
+
           {/* Response sections with staggered fade-in */}
           {sections.length > 0 && (
             <div className="space-y-4">
@@ -223,10 +308,10 @@ export function ShowMeVerseBreakdown({ open, onOpenChange, onUse }: ShowMeVerseB
                 const colors = ACCENT_CLASSES[section.accent] || ACCENT_CLASSES.violet;
                 return (
                   <motion.div
-                    key={i}
+                    key={`${currentLabel}-${i}`}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.2 }}
+                    transition={{ delay: i * 0.15 }}
                     className={`rounded-xl border ${colors.border} ${colors.bg} p-4`}
                   >
                     <div className="flex items-center gap-2 mb-2">

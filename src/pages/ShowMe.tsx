@@ -13,14 +13,19 @@ import { ShowMeUpgradeWall } from "@/components/show-me/ShowMeUpgradeWall";
 import { useShowMeUsage } from "@/hooks/useShowMeUsage";
 import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
 import { showMeTourSteps } from "@/components/show-me/ShowMeTourSteps";
+import type { Feature } from "@/hooks/useShowMeUsage";
 
 type Experience = "verse" | "commentary" | "meditation" | "mindmap" | "study" | null;
 
 export default function ShowMe() {
   const navigate = useNavigate();
-  const { canUse, use, getRemaining, isTourSeen, markTourSeen } = useShowMeUsage();
+  const {
+    canUse, use, getRemaining, saveResult, getSavedResults, hasSavedResults,
+    isTourSeen, markTourSeen,
+  } = useShowMeUsage();
 
   const [activeExperience, setActiveExperience] = useState<Experience>(null);
+  const [reviewMode, setReviewMode] = useState(false);
   const [upgradeFeature, setUpgradeFeature] = useState<string | null>(null);
   const [showTour, setShowTour] = useState(false);
 
@@ -39,6 +44,11 @@ export default function ShowMe() {
   const handleCardClick = (feature: Experience) => {
     if (!feature) return;
     if (canUse(feature)) {
+      setReviewMode(false);
+      setActiveExperience(feature);
+    } else if (hasSavedResults(feature as Feature)) {
+      // Uses exhausted but has saved results — open in review mode
+      setReviewMode(true);
       setActiveExperience(feature);
     } else {
       setUpgradeFeature(feature);
@@ -84,6 +94,7 @@ export default function ShowMe() {
               accent="violet"
               remaining={getRemaining("verse")}
               canUse={canUse("verse")}
+              hasSaved={hasSavedResults("verse")}
               onClick={() => handleCardClick("verse")}
             />
           </div>
@@ -95,6 +106,7 @@ export default function ShowMe() {
               accent="amber"
               remaining={null}
               canUse={canUse("commentary")}
+              hasSaved={hasSavedResults("commentary")}
               onClick={() => handleCardClick("commentary")}
             />
           </div>
@@ -106,6 +118,7 @@ export default function ShowMe() {
               accent="indigo"
               remaining={null}
               canUse={canUse("meditation")}
+              hasSaved={hasSavedResults("meditation")}
               onClick={() => handleCardClick("meditation")}
             />
           </div>
@@ -117,6 +130,7 @@ export default function ShowMe() {
               accent="emerald"
               remaining={getRemaining("mindmap")}
               canUse={canUse("mindmap")}
+              hasSaved={hasSavedResults("mindmap")}
               onClick={() => handleCardClick("mindmap")}
             />
           </div>
@@ -128,6 +142,7 @@ export default function ShowMe() {
               accent="rose"
               remaining={null}
               canUse={canUse("study")}
+              hasSaved={hasSavedResults("study")}
               onClick={() => handleCardClick("study")}
             />
           </div>
@@ -169,6 +184,9 @@ export default function ShowMe() {
         open={activeExperience === "verse"}
         onOpenChange={(open) => !open && setActiveExperience(null)}
         onUse={() => use("verse")}
+        onSave={(label, data) => saveResult("verse", label, data)}
+        savedResults={getSavedResults("verse")}
+        reviewOnly={reviewMode && !canUse("verse")}
       />
       <ShowMeEpicCommentary
         open={activeExperience === "commentary"}
