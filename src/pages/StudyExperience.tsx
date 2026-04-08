@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Save, Share2, Sparkles, ChevronDown, ChevronRight, FileText } from "lucide-react";
+import { Save, Share2, Sparkles, ChevronDown, ChevronRight, FileText, ClipboardCopy } from "lucide-react";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -378,17 +378,12 @@ ${isCurrentTopicStudy
 - Use the Phototheology study method language naturally.
 - STRICTLY BIBLICAL: All parallels, cross-references, and connections must be to OTHER SCRIPTURE — not to historical figures, secular history, or extra-biblical sources. Stay within the 66 books of the Bible. Do not reference Josephus, church fathers, or any non-biblical source as a parallel. The Bible interprets itself.
 - PROPHECY GUARDRAIL: Do NOT present Antiochus Epiphanes as a biblical fulfillment of Daniel 7 or Daniel 8. The little horn of Daniel 7 and Daniel 8 points to a greater prophetic power, not a historical Greek king. Follow the historicist interpretation — the Bible's own prophetic framework.
+${roomId === "hf" ? `- HISTORY FREESTYLE GUARDRAIL: This is the History/Social Freestyle room. Use SECULAR history, culture, and current events as the source material — NOT biblical history. The goal is to find gospel illustrations and spiritual parallels in SECULAR events, trends, and historical figures. Do not analyze biblical narratives here — that belongs to other rooms. Draw from world history, social movements, science, art, politics, and culture to illuminate the biblical text.` : ""}
 - End with a "Spark" — one sentence of surprising, memorable insight. Format it as: ✨ Spark: [your insight]`;
   };
 
   const handlePrincipleClick = useCallback(async (roomId: string, principle: SubPrinciple) => {
     if (!parsedRef || loadingPrinciple) return;
-
-    // If principle already used, remove its layer (toggle off)
-    if (usedPrinciples.has(principle.id)) {
-      handleRemoveLayer(principle.id);
-      return;
-    }
 
     if (mode === "user-led") return;
 
@@ -396,6 +391,12 @@ ${isCurrentTopicStudy
     const subRoom = ROOM_SUB_PRINCIPLES[roomId];
     const palaceRoom = palaceFloors.flatMap((f) => f.rooms).find((r) => r.id === roomId);
     const roomName = subRoom?.roomName || palaceRoom?.name || roomId;
+
+    // If principle already used, re-apply it with a fresh angle
+    const previousLayers = layers.filter((l) => l.principleId === principle.id);
+    const reApplyNote = previousLayers.length > 0
+      ? `\n\nIMPORTANT — FRESH ANGLE REQUIRED: The student has already explored "${principle.name}" for this text ${previousLayers.length} time(s). You MUST take a completely DIFFERENT angle this time. Do NOT repeat any of the same points, scriptures, or insights from before. Find a FRESH connection, a new cross-reference, a different facet of this principle that hasn't been explored yet. Surprise the student with something they haven't considered.`
+      : "";
 
     setLoadingPrinciple(principle.id);
     try {
@@ -405,7 +406,7 @@ ${isCurrentTopicStudy
         chapter: parsedRef.chapter,
         verse: parsedRef.verse,
         verseText: verseText,
-        principle: buildDeepPrompt(roomName, roomId, principle.name, principle.description),
+        principle: buildDeepPrompt(roomName, roomId, principle.name, principle.description) + reApplyNote,
       }, "study-experience");
 
       const response = typeof data === "string" ? data : (data as any)?.response || "";
@@ -429,7 +430,7 @@ ${isCurrentTopicStudy
       console.error("Jeeves principle-amplification failed:", err);
     }
     setLoadingPrinciple(null);
-  }, [parsedRef, loadingPrinciple, mode, verseText, usedPrinciples, handleRemoveLayer]);
+  }, [parsedRef, loadingPrinciple, mode, verseText, layers]);
 
   // Handle click on a room that has NO sub-principles (single-principle room)
   const handleSingleRoomClick = useCallback(async (roomId: string, roomName: string) => {
@@ -437,16 +438,17 @@ ${isCurrentTopicStudy
 
     const syntheticId = `${roomId}-main`;
 
-    if (usedPrinciples.has(syntheticId)) {
-      handleRemoveLayer(syntheticId);
-      return;
-    }
-
     if (mode === "user-led") return;
 
     const palaceRoom = palaceFloors.flatMap((f) => f.rooms).find((r) => r.id === roomId);
     const purpose = palaceRoom?.purpose || `Apply the ${roomName} lens`;
     const coreQuestion = palaceRoom?.coreQuestion || "";
+
+    // If room already used, re-apply with a fresh angle
+    const previousLayers = layers.filter((l) => l.principleId === syntheticId);
+    const reApplyNote = previousLayers.length > 0
+      ? `\n\nIMPORTANT — FRESH ANGLE REQUIRED: The student has already explored "${roomName}" for this text ${previousLayers.length} time(s). You MUST take a completely DIFFERENT angle this time. Do NOT repeat any of the same points, scriptures, or insights from before. Find a FRESH connection, a new cross-reference, a different facet that hasn't been explored yet. Surprise the student with something they haven't considered.`
+      : "";
 
     setLoadingPrinciple(syntheticId);
     try {
@@ -456,7 +458,7 @@ ${isCurrentTopicStudy
         chapter: parsedRef.chapter,
         verse: parsedRef.verse,
         verseText: verseText,
-        principle: buildDeepPrompt(roomName, roomId, roomName, `${purpose}${coreQuestion ? ` Core question: ${coreQuestion}` : ""}`),
+        principle: buildDeepPrompt(roomName, roomId, roomName, `${purpose}${coreQuestion ? ` Core question: ${coreQuestion}` : ""}`) + reApplyNote,
       }, "study-experience");
 
       const response = typeof data === "string" ? data : (data as any)?.response || "";
@@ -480,7 +482,7 @@ ${isCurrentTopicStudy
       console.error("Jeeves single-room analysis failed:", err);
     }
     setLoadingPrinciple(null);
-  }, [parsedRef, loadingPrinciple, mode, verseText, usedPrinciples, handleRemoveLayer]);
+  }, [parsedRef, loadingPrinciple, mode, verseText, layers]);
 
   const handleUserLedSubmit = useCallback(async () => {
     if (!parsedRef || !suggestedRoom || !userInput.trim()) return;
@@ -609,6 +611,40 @@ INSTRUCTIONS FOR RECAP:
     toast.success(`Study on ${verseRef} saved! (${layers.length} layers)`);
   };
 
+  // Export full study as formatted text
+  const handleExport = () => {
+    if (!verseRef || layers.length === 0) return;
+    const lines = [
+      `ULTIMATE STUDY EXPERIENCE (U.S.E)`,
+      `Study: ${verseRef}`,
+      verseText ? `"${verseText}"` : "",
+      `Layers: ${layers.length}`,
+      `Date: ${new Date().toLocaleDateString()}`,
+      "",
+      "─".repeat(40),
+      "",
+    ];
+    layers.forEach((l, i) => {
+      lines.push(`[${i + 1}] ${l.roomName}: ${l.principleName}`);
+      if (l.userAttempt) {
+        lines.push(`\nYour Connection:\n${l.userAttempt}`);
+      }
+      lines.push(`\n${l.analysis}`);
+      lines.push("");
+      lines.push("─".repeat(40));
+      lines.push("");
+    });
+    if (recapText) {
+      lines.push("RECAP");
+      lines.push(recapText);
+      lines.push("");
+    }
+    lines.push("— Generated with Phototheology Palace");
+    const text = lines.filter(Boolean).join("\n");
+    navigator.clipboard.writeText(text);
+    toast.success("Full study exported to clipboard!");
+  };
+
   const suggestedPrinciple = mode === "user-led" ? suggestedRoom?.principleId ?? null : null;
   const suggestedRoomData = suggestedRoom ? ROOM_SUB_PRINCIPLES[suggestedRoom.roomId] : null;
   const suggestedPrincipleData = suggestedRoomData?.subPrinciples.find(
@@ -636,7 +672,7 @@ INSTRUCTIONS FOR RECAP:
           className="text-center mb-10"
         >
           <h1 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent">
-            Ultimate Study Experience
+            Ultimate Study Experience <span className="text-primary/60 font-normal">(U.S.E)</span>
           </h1>
           <p className="text-lg text-primary/80 font-medium mb-2">
             One Verse. Endless Combinations.
@@ -722,6 +758,10 @@ INSTRUCTIONS FOR RECAP:
                     <FileText className="w-4 h-4" />
                   )}
                   Recap
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleExport} className="gap-1.5">
+                  <ClipboardCopy className="w-4 h-4" />
+                  Export Study
                 </Button>
                 <TextShareButton
                   type="study"
