@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 const BasicChatTab = lazy(() => import("@/components/basic-mode/tabs/BasicChatTab"));
 const BasicBibleTab = lazy(() => import("@/components/basic-mode/tabs/BasicBibleTab"));
 const BasicChapelTab = lazy(() => import("@/components/basic-mode/tabs/BasicChapelTab"));
+const BasicStudyExperienceTab = lazy(() => import("@/components/basic-mode/tabs/BasicStudyExperienceTab"));
 const ExplorerSpaceTab = lazy(() => import("./ExplorerSpaceTab"));
 const ExplorerPalaceTab = lazy(() => import("./ExplorerPalaceTab"));
 
@@ -78,6 +79,8 @@ export function ExplorerModeShell() {
         return <BasicBibleTab />;
       case "chapel":
         return <BasicChapelTab />;
+      case "study":
+        return <BasicStudyExperienceTab />;
       case "games-space":
       case "university-space":
         return <ExplorerSpaceTab spaceId={activeTab} />;

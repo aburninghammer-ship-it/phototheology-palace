@@ -267,15 +267,8 @@ export default function StudyExperience() {
     (p) => p.id === suggestedRoom?.principleId
   );
 
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Dark cinematic gradient background */}
-      <div className="fixed inset-0 bg-gradient-to-b from-background via-background to-background/90 pointer-events-none" />
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
-
-      <Navigation />
-
-      <div className="relative z-10 max-w-6xl mx-auto px-4 py-8 md:py-14">
+  const innerContent = (
+    <div className="max-w-6xl mx-auto px-4 py-8 md:py-14">
         {/* Hero */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -407,9 +400,17 @@ export default function StudyExperience() {
             </div>
           </div>
         </div>
-      </div>
+    </div>
+  );
 
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <div className="fixed inset-0 bg-gradient-to-b from-background via-background to-background/90 pointer-events-none" />
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
+      <Navigation />
+      <div className="relative z-10">{innerContent}</div>
       <Footer />
     </div>
   );
 }
+
