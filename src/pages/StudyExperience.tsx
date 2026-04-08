@@ -400,8 +400,6 @@ export default function StudyExperience() {
             </div>
           </div>
         </div>
-      </div>
-
     </div>
   );
 
@@ -414,13 +412,6 @@ export default function StudyExperience() {
       <Footer />
     </div>
   );
-}
-
-/** Inline version without Navigation/Footer for embedding in shell tabs */
-export function StudyExperienceInline() {
-  // Re-use the full component but we need a standalone version.
-  // For now, render the page-level component's inner content via a thin wrapper.
-  return <StudyExperienceInlineContent />;
 }
 
 function StudyExperienceInlineContent() {
