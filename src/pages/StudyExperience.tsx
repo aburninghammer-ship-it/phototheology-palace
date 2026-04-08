@@ -201,10 +201,60 @@ export default function StudyExperience() {
   }, []);
 
   // Accept (Build) a layer — marks it as accepted
-  const handleAcceptLayer = useCallback((principleId: string) => {
+  const handleAcceptLayer = useCallback(async (principleId: string) => {
+    // Mark this layer as accepted
     setLayers((prev) => prev.map((l) => l.principleId === principleId ? { ...l, accepted: true } : l));
-    toast.success("Layer accepted! Building on your study.");
-  }, []);
+
+    // Check how many accepted layers we now have (including this one)
+    const updatedLayers = layers.map((l) => l.principleId === principleId ? { ...l, accepted: true } : l);
+    const acceptedLayers = updatedLayers.filter((l) => l.accepted);
+
+    if (acceptedLayers.length < 2) {
+      toast.success("Layer accepted! Add more layers and Build to synthesize.");
+      return;
+    }
+
+    // Synthesize all accepted layers into one seamless output
+    setSynthesizing(true);
+    toast("Jeeves is weaving your layers together…", { icon: "🧵" });
+
+    try {
+      const layerSummaries = acceptedLayers.map((l, i) =>
+        `LAYER ${i + 1} — ${l.roomName} / ${l.principleName}:\n${l.analysis}`
+      ).join("\n\n---\n\n");
+
+      const { data } = await callJeeves({
+        mode: "principle-amplification",
+        book: parsedRef?.book || "",
+        chapter: parsedRef?.chapter || "",
+        verse: parsedRef?.verse || "",
+        verseText: verseText,
+        principle: "Synthesis — Unified Study Output",
+        message: `You have ${acceptedLayers.length} separate study layers on ${verseRef}. The student has accepted all of them and wants you to BUILD — meaning weave them into ONE seamless, unified theological narrative.
+
+HERE ARE THE ACCEPTED LAYERS:
+${layerSummaries}
+
+INSTRUCTIONS FOR SYNTHESIS:
+- Combine all insights into ONE flowing, cohesive study — NOT a list of separate sections.
+- Thread together the principles naturally: show how each lens (${acceptedLayers.map(l => l.principleName).join(", ")}) illuminates the verse from different angles that converge on Christ.
+- Start with the verse text, then build layer upon layer of meaning like a master painter adding depth.
+- Use smooth transitions between insights — the reader should feel the connections, not see the seams.
+- Include all key cross-references and KJV quotes from the individual layers.
+- End with a powerful unified ✨ Spark that captures the combined insight.
+- End with a 💎 Gem that only becomes visible when ALL these principles are combined.
+- Write in a warm, pastoral, scholarly tone. This is the crown jewel of their study session.`,
+      }, "study-experience");
+
+      const response = typeof data === "string" ? data : (data as any)?.response || "";
+      setSynthesizedOutput(response);
+      toast.success("Study synthesized! Scroll down to see your unified output.");
+    } catch (err) {
+      console.error("Synthesis failed:", err);
+      toast.error("Synthesis failed — try again.");
+    }
+    setSynthesizing(false);
+  }, [layers, parsedRef, verseText, verseRef]);
 
   // Rebuild a layer — removes it so the user can re-click the principle
   const handleRebuildLayer = useCallback((principleId: string) => {
