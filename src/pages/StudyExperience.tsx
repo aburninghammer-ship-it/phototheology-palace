@@ -1,47 +1,68 @@
-import { useState, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
+import { Save, Share2, Sparkles, ChevronDown, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import { Button } from "@/components/ui/button";
 import { VersePanel } from "@/components/study-experience/VersePanel";
 import { RoomBox } from "@/components/study-experience/RoomBox";
 import { AnalysisCard, type StudyLayer } from "@/components/study-experience/AnalysisCard";
 import { UserLedInput } from "@/components/study-experience/UserLedInput";
 import { ROOM_SUB_PRINCIPLES } from "@/components/mind-map/data/roomSubPrinciples";
-import type { SubPrinciple } from "@/components/mind-map/data/roomSubPrinciples";
+import type { RoomSubPrinciples, SubPrinciple } from "@/components/mind-map/data/roomSubPrinciples";
+import { palaceFloors } from "@/data/palaceData";
 import { callJeeves } from "@/lib/jeevesClient";
+import { useSparks } from "@/hooks/useSparks";
+import { SparkContainer } from "@/components/sparks";
+import { TextShareButton } from "@/components/TextShareButton";
 import { cn } from "@/lib/utils";
 
-// The 6 showcase rooms in display order
-const SHOWCASE_ROOMS = [
-  { id: "dr", floor: 4 },
-  { id: "c6", floor: 4 },
-  { id: "tz", floor: 4 },
-  { id: "cr", floor: 4 },
-  { id: "bl", floor: 5 },
-  { id: "cec", floor: 5 },
-] as const;
+// Build ALL rooms organized by floor from palaceData
+interface FloorGroup {
+  floor: number;
+  name: string;
+  rooms: { id: string; name: string; room: RoomSubPrinciples | null }[];
+}
+
+function buildAllRooms(): FloorGroup[] {
+  return palaceFloors.map((f) => ({
+    floor: f.number,
+    name: f.name,
+    rooms: f.rooms.map((r) => ({
+      id: r.id,
+      name: r.name,
+      room: ROOM_SUB_PRINCIPLES[r.id] || null,
+    })),
+  }));
+}
+
+// For rooms without sub-principles, create a synthetic one using the room itself
+function getSyntheticPrinciple(roomId: string, roomName: string): SubPrinciple {
+  return {
+    id: `${roomId}-main`,
+    name: roomName,
+    shortName: roomName,
+    description: `Apply the ${roomName} lens to this verse`,
+  };
+}
 
 type Mode = "jeeves-led" | "user-led";
-
-function getJeevesResponse(data: unknown): string {
-  if (typeof data === "string") return data;
-  if (
-    data &&
-    typeof data === "object" &&
-    "response" in data &&
-    typeof data.response === "string"
-  ) {
-    return data.response;
-  }
-
-  return "";
-}
 
 function parseVerseRef(ref: string): { book: string; chapter: string; verse: string } | null {
   const m = ref.match(/^(.+?)\s+(\d+):(\d+.*)$/);
   if (!m) return null;
   return { book: m[1], chapter: m[2], verse: m[3] };
+}
+
+const SAVE_KEY = "study-experience-saved";
+
+function loadSavedStudies(): { ref: string; layers: StudyLayer[]; timestamp: number }[] {
+  try {
+    return JSON.parse(localStorage.getItem(SAVE_KEY) || "[]");
+  } catch {
+    return [];
+  }
 }
 
 export default function StudyExperience() {
@@ -50,6 +71,7 @@ export default function StudyExperience() {
   const [verseText, setVerseText] = useState("");
   const [mode, setMode] = useState<Mode>("jeeves-led");
   const [expandedRoom, setExpandedRoom] = useState<string | null>(null);
+  const [expandedFloor, setExpandedFloor] = useState<number | null>(null);
   const [layers, setLayers] = useState<StudyLayer[]>([]);
   const [loadingPrinciple, setLoadingPrinciple] = useState<string | null>(null);
   const [verseLookupLoading, setVerseLookupLoading] = useState(false);
@@ -58,7 +80,35 @@ export default function StudyExperience() {
   const [suggestedRoom, setSuggestedRoom] = useState<{ roomId: string; principleId: string } | null>(null);
   const [userInput, setUserInput] = useState("");
 
+  // All rooms organized by floor
+  const allFloors = useMemo(() => buildAllRooms(), []);
+
+  // Sparks integration
+  const {
+    sparks,
+    generateSpark,
+    openSpark,
+    saveSpark,
+    dismissSpark,
+    exploreSpark,
+  } = useSparks({
+    surface: "study",
+    contextType: "study",
+    contextId: verseRef || "study-experience",
+  });
+
+  // Generate sparks when layers accumulate
+  useEffect(() => {
+    if (layers.length > 0 && layers.length % 2 === 0) {
+      const content = layers.map((l) => `${l.roomName} - ${l.principleName}: ${l.analysis}`).join("\n\n");
+      if (content.length >= 100) {
+        generateSpark(content.slice(-1000), verseRef || undefined);
+      }
+    }
+  }, [layers.length]);
+
   const usedPrinciples = new Set(layers.map((l) => l.principleId));
+  const usedRoomIds = new Set(layers.map((l) => l.roomId));
 
   const handleStudyVerse = useCallback(async (ref: string) => {
     const parsed = parseVerseRef(ref);
@@ -71,28 +121,8 @@ export default function StudyExperience() {
     setSuggestedRoom(null);
     setUserInput("");
     setExpandedRoom(null);
+    setExpandedFloor(4); // Default open Floor 4
 
-    // Fetch verse text from database
-    try {
-      setVerseLookupLoading(true);
-      const { data: verseData } = await supabase
-        .from("bible_verses_tokenized")
-        .select("text_kjv")
-        .ilike("book", parsed.book)
-        .eq("chapter", parseInt(parsed.chapter))
-        .eq("verse_num", parseInt(parsed.verse.split("-")[0]))
-        .maybeSingle();
-
-      if (verseData?.text_kjv) {
-        setVerseText(verseData.text_kjv);
-      }
-    } catch (err) {
-      console.error("Failed to fetch verse text:", err);
-    } finally {
-      setVerseLookupLoading(false);
-    }
-
-    // If user-led, immediately fetch cross-room suggestion
     if (mode === "user-led") {
       fetchCrossRoomSuggestion(parsed, ref);
     }
@@ -112,48 +142,54 @@ export default function StudyExperience() {
         verseText: "",
       }, "study-experience");
 
-      const response = getJeevesResponse(data);
-      if (!response) {
-        setVerseLookupLoading(false);
-        return;
-      }
-
-      // Try to parse JSON array from response
-      try {
-        const suggestions = JSON.parse(response);
-        if (Array.isArray(suggestions)) {
-          // Find first suggestion that matches one of our showcase rooms
-          const showcaseIds = SHOWCASE_ROOMS.map((r) => r.id);
-          for (const s of suggestions) {
-            const roomId = s.roomId || s.room_id || s.room;
-            if (roomId && showcaseIds.includes(roomId)) {
-              const room = ROOM_SUB_PRINCIPLES[roomId];
-              if (room) {
-                const principleId = s.principleId || s.principle_id || room.subPrinciples[0]?.id;
-                const matchedPrinciple = room.subPrinciples.find(
-                  (p) => p.id === principleId || p.shortName?.toLowerCase() === (s.principle || "").toLowerCase()
-                );
-                setSuggestedRoom({
-                  roomId,
-                  principleId: matchedPrinciple?.id || room.subPrinciples[0]?.id,
-                });
-                setExpandedRoom(roomId);
-                setVerseLookupLoading(false);
-                return;
+      const response = typeof data === "string" ? data : data?.response;
+      if (response) {
+        try {
+          const suggestions = JSON.parse(response);
+          if (Array.isArray(suggestions)) {
+            const allRoomIds = allFloors.flatMap((f) => f.rooms.map((r) => r.id));
+            for (const s of suggestions) {
+              const roomId = s.roomId || s.room_id || s.room;
+              if (roomId && allRoomIds.includes(roomId)) {
+                const room = ROOM_SUB_PRINCIPLES[roomId];
+                if (room) {
+                  const matchedPrinciple = room.subPrinciples.find(
+                    (p) => p.id === (s.principleId || s.principle_id) || p.shortName?.toLowerCase() === (s.principle || "").toLowerCase()
+                  );
+                  setSuggestedRoom({
+                    roomId,
+                    principleId: matchedPrinciple?.id || room.subPrinciples[0]?.id,
+                  });
+                  setExpandedRoom(roomId);
+                  // Open the floor containing this room
+                  const floorNum = allFloors.find((f) => f.rooms.some((r) => r.id === roomId))?.floor;
+                  if (floorNum) setExpandedFloor(floorNum);
+                  setVerseLookupLoading(false);
+                  return;
+                } else {
+                  // Room without sub-principles
+                  setSuggestedRoom({ roomId, principleId: `${roomId}-main` });
+                  setExpandedRoom(roomId);
+                  const floorNum = allFloors.find((f) => f.rooms.some((r) => r.id === roomId))?.floor;
+                  if (floorNum) setExpandedFloor(floorNum);
+                  setVerseLookupLoading(false);
+                  return;
+                }
               }
             }
           }
+        } catch {
+          // Not JSON
         }
-      } catch {
-        // Not JSON — just pick a default suggestion
       }
-
-      // Fallback: suggest Dimensions Room, Christological
+      // Fallback
       setSuggestedRoom({ roomId: "dr", principleId: "dr-christ" });
       setExpandedRoom("dr");
+      setExpandedFloor(4);
     } catch {
       setSuggestedRoom({ roomId: "dr", principleId: "dr-christ" });
       setExpandedRoom("dr");
+      setExpandedFloor(4);
     }
     setVerseLookupLoading(false);
   };
@@ -162,11 +198,21 @@ export default function StudyExperience() {
     setLayers((prev) => prev.filter((l) => l.principleId !== principleId));
   }, []);
 
+  // Deep, profound Jeeves prompt for Jeeves-led mode
+  const buildDeepPrompt = (roomName: string, roomId: string, principleName: string, description: string) => {
+    return `${roomName} (${roomId.toUpperCase()}): ${principleName} - ${description}
+
+IMPORTANT INSTRUCTIONS FOR DEPTH:
+- Provide a DEEP, PROFOUND, and THOROUGH analysis — not surface-level.
+- Begin with the verse text if not already provided.
+- Show how this principle SPECIFICALLY illuminates this verse in ways the reader may never have considered.
+- Include at minimum: (1) The direct application of this principle, (2) A cross-reference to at least one other Scripture that deepens the insight, (3) A practical or devotional takeaway that makes this personal.
+- Use the Phototheology study method language naturally.
+- End with a "Spark" — one sentence of surprising, memorable insight that the reader will carry with them. Format it as: ✨ Spark: [your insight]`;
+  };
+
   const handlePrincipleClick = useCallback(async (roomId: string, principle: SubPrinciple) => {
     if (!parsedRef || loadingPrinciple) return;
-
-    const room = ROOM_SUB_PRINCIPLES[roomId];
-    if (!room) return;
 
     // If principle already used, remove its layer (toggle off)
     if (usedPrinciples.has(principle.id)) {
@@ -174,12 +220,13 @@ export default function StudyExperience() {
       return;
     }
 
-    if (mode === "user-led") {
-      // In user-led mode, clicking a principle triggers Jeeves analysis too
-      // (same as jeeves-led behavior)
-    }
+    if (mode === "user-led") return;
 
-    // Jeeves-led: call principle-amplification
+    // Look up room name from either sub-principles or palace data
+    const subRoom = ROOM_SUB_PRINCIPLES[roomId];
+    const palaceRoom = palaceFloors.flatMap((f) => f.rooms).find((r) => r.id === roomId);
+    const roomName = subRoom?.roomName || palaceRoom?.name || roomId;
+
     setLoadingPrinciple(principle.id);
     try {
       const { data } = await callJeeves({
@@ -188,14 +235,13 @@ export default function StudyExperience() {
         chapter: parsedRef.chapter,
         verse: parsedRef.verse,
         verseText: verseText,
-        principle: `${room.roomName} (${roomId.toUpperCase()}): ${principle.name} - ${principle.description}`,
+        principle: buildDeepPrompt(roomName, roomId, principle.name, principle.description),
       }, "study-experience");
 
-      const response = getJeevesResponse(data);
+      const response = typeof data === "string" ? data : data?.response || "";
 
-      // Extract verse text from first response if we don't have it
       if (!verseText && response) {
-        const vMatch = response.match(/[""]([^""]+)[""]/);
+        const vMatch = response.match(/[""\u201C\u201D]([^""\u201C\u201D]{10,})["""\u201C\u201D]/);
         if (vMatch) setVerseText(vMatch[1]);
       }
 
@@ -203,7 +249,7 @@ export default function StudyExperience() {
         ...prev,
         {
           roomId,
-          roomName: room.roomName,
+          roomName,
           principleId: principle.id,
           principleName: principle.name,
           analysis: response,
@@ -213,16 +259,26 @@ export default function StudyExperience() {
       console.error("Jeeves principle-amplification failed:", err);
     }
     setLoadingPrinciple(null);
-  }, [parsedRef, loadingPrinciple, mode, verseText]);
+  }, [parsedRef, loadingPrinciple, mode, verseText, usedPrinciples, handleRemoveLayer]);
 
-  const handleUserLedSubmit = useCallback(async () => {
-    if (!parsedRef || !suggestedRoom || !userInput.trim()) return;
+  // Handle click on a room that has NO sub-principles (single-principle room)
+  const handleSingleRoomClick = useCallback(async (roomId: string, roomName: string) => {
+    if (!parsedRef || loadingPrinciple) return;
 
-    const room = ROOM_SUB_PRINCIPLES[suggestedRoom.roomId];
-    const principle = room?.subPrinciples.find((p) => p.id === suggestedRoom.principleId);
-    if (!room || !principle) return;
+    const syntheticId = `${roomId}-main`;
 
-    setLoadingPrinciple(principle.id);
+    if (usedPrinciples.has(syntheticId)) {
+      handleRemoveLayer(syntheticId);
+      return;
+    }
+
+    if (mode === "user-led") return;
+
+    const palaceRoom = palaceFloors.flatMap((f) => f.rooms).find((r) => r.id === roomId);
+    const purpose = palaceRoom?.purpose || `Apply the ${roomName} lens`;
+    const coreQuestion = palaceRoom?.coreQuestion || "";
+
+    setLoadingPrinciple(syntheticId);
     try {
       const { data } = await callJeeves({
         mode: "principle-amplification",
@@ -230,19 +286,65 @@ export default function StudyExperience() {
         chapter: parsedRef.chapter,
         verse: parsedRef.verse,
         verseText: verseText,
-        principle: `${room.roomName} (${suggestedRoom.roomId.toUpperCase()}): ${principle.name} - ${principle.description}`,
-        message: `The student's connection: "${userInput}". Evaluate their insight (what they got right, what they missed), then provide the full analysis.`,
+        principle: buildDeepPrompt(roomName, roomId, roomName, `${purpose}${coreQuestion ? ` Core question: ${coreQuestion}` : ""}`),
       }, "study-experience");
 
-      const response = getJeevesResponse(data);
+      const response = typeof data === "string" ? data : data?.response || "";
 
-      // Try to split evaluation from full analysis
+      if (!verseText && response) {
+        const vMatch = response.match(/[""\u201C\u201D]([^""\u201C\u201D]{10,})["""\u201C\u201D]/);
+        if (vMatch) setVerseText(vMatch[1]);
+      }
+
+      setLayers((prev) => [
+        ...prev,
+        {
+          roomId,
+          roomName,
+          principleId: syntheticId,
+          principleName: roomName,
+          analysis: response,
+        },
+      ]);
+    } catch (err) {
+      console.error("Jeeves single-room analysis failed:", err);
+    }
+    setLoadingPrinciple(null);
+  }, [parsedRef, loadingPrinciple, mode, verseText, usedPrinciples, handleRemoveLayer]);
+
+  const handleUserLedSubmit = useCallback(async () => {
+    if (!parsedRef || !suggestedRoom || !userInput.trim()) return;
+
+    const subRoom = ROOM_SUB_PRINCIPLES[suggestedRoom.roomId];
+    const palaceRoom = palaceFloors.flatMap((f) => f.rooms).find((r) => r.id === suggestedRoom.roomId);
+    const roomName = subRoom?.roomName || palaceRoom?.name || suggestedRoom.roomId;
+
+    let principleName = roomName;
+    if (subRoom) {
+      const p = subRoom.subPrinciples.find((p) => p.id === suggestedRoom.principleId);
+      if (p) principleName = p.name;
+    }
+
+    setLoadingPrinciple(suggestedRoom.principleId);
+    try {
+      const { data } = await callJeeves({
+        mode: "principle-amplification",
+        book: parsedRef.book,
+        chapter: parsedRef.chapter,
+        verse: parsedRef.verse,
+        verseText: verseText,
+        principle: `${roomName} (${suggestedRoom.roomId.toUpperCase()}): ${principleName}`,
+        message: `The student's connection: "${userInput}". Evaluate their insight thoroughly — what they got right, what they missed, and what deeper layers they could explore. Then provide the full analysis with a ✨ Spark at the end.`,
+      }, "study-experience");
+
+      const response = typeof data === "string" ? data : data?.response || "";
+
       const evalSplit = response.split(/(?:full analysis|here'?s? (?:the )?(?:full|complete) (?:analysis|breakdown))/i);
       const evaluation = evalSplit.length > 1 ? evalSplit[0].trim() : undefined;
       const analysis = evalSplit.length > 1 ? evalSplit[1].trim() : response;
 
       if (!verseText && response) {
-        const vMatch = response.match(/[""]([^""]+)[""]/);
+        const vMatch = response.match(/[""\u201C\u201D]([^""\u201C\u201D]{10,})["""\u201C\u201D]/);
         if (vMatch) setVerseText(vMatch[1]);
       }
 
@@ -250,9 +352,9 @@ export default function StudyExperience() {
         ...prev,
         {
           roomId: suggestedRoom.roomId,
-          roomName: room.roomName,
-          principleId: principle.id,
-          principleName: principle.name,
+          roomName,
+          principleId: suggestedRoom.principleId,
+          principleName,
           analysis,
           userAttempt: userInput,
           jeevesEvaluation: evaluation,
@@ -262,7 +364,6 @@ export default function StudyExperience() {
       setUserInput("");
       setSuggestedRoom(null);
 
-      // Fetch next suggestion
       setTimeout(() => {
         fetchCrossRoomSuggestion(parsedRef, verseRef);
       }, 500);
@@ -281,14 +382,35 @@ export default function StudyExperience() {
     }
   };
 
+  // Save study to localStorage
+  const handleSave = () => {
+    if (!verseRef || layers.length === 0) return;
+    const saved = loadSavedStudies();
+    saved.push({ ref: verseRef, layers, timestamp: Date.now() });
+    const trimmed = saved.slice(-20);
+    localStorage.setItem(SAVE_KEY, JSON.stringify(trimmed));
+    toast.success(`Study on ${verseRef} saved! (${layers.length} layers)`);
+  };
+
   const suggestedPrinciple = mode === "user-led" ? suggestedRoom?.principleId ?? null : null;
   const suggestedRoomData = suggestedRoom ? ROOM_SUB_PRINCIPLES[suggestedRoom.roomId] : null;
   const suggestedPrincipleData = suggestedRoomData?.subPrinciples.find(
     (p) => p.id === suggestedRoom?.principleId
   );
 
-  const innerContent = (
-    <div className="max-w-6xl mx-auto px-4 py-8 md:py-14">
+  // Build share description from layers
+  const shareDescription = layers.length > 0
+    ? `${layers.length} layers of analysis using: ${[...new Set(layers.map((l) => l.roomName))].join(", ")}`
+    : undefined;
+
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <div className="fixed inset-0 bg-gradient-to-b from-background via-background to-background/90 pointer-events-none" />
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
+
+      <Navigation />
+
+      <div className="relative z-10 max-w-6xl mx-auto px-4 py-8 md:py-14">
         {/* Hero */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -331,7 +453,7 @@ export default function StudyExperience() {
         </motion.div>
 
         {/* Main layout */}
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_340px] gap-6">
           {/* Left column: Verse + Analysis */}
           <div className="space-y-6 min-w-0">
             <VersePanel
@@ -354,9 +476,48 @@ export default function StudyExperience() {
               />
             )}
 
+            {/* Save + Share bar */}
+            {layers.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex items-center gap-2 flex-wrap"
+              >
+                <Button variant="outline" size="sm" onClick={handleSave} className="gap-1.5">
+                  <Save className="w-4 h-4" />
+                  Save Study
+                </Button>
+                <TextShareButton
+                  type="study"
+                  title={`Study Experience: ${verseRef}`}
+                  description={shareDescription}
+                  variant="outline"
+                  size="sm"
+                />
+              </motion.div>
+            )}
+
+            {/* Sparks */}
+            {sparks.length > 0 && (
+              <div className="relative">
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  <span className="text-xs font-medium text-amber-400">Sparks</span>
+                </div>
+                <SparkContainer
+                  sparks={sparks}
+                  onOpen={openSpark}
+                  onSave={saveSpark}
+                  onDismiss={dismissSpark}
+                  onExplore={exploreSpark}
+                  position="inline"
+                />
+              </div>
+            )}
+
             {/* Analysis stack */}
             {layers.length > 0 && (
-              <div className="space-y-4 p-4 rounded-2xl border border-white/10 bg-card/30 backdrop-blur-xl shadow-[0_0_30px_-5px_hsl(var(--primary)/0.2)] ring-1 ring-white/5">
+              <div className="space-y-4">
                 <h3 className="text-sm font-medium text-muted-foreground">
                   Analysis Layers ({layers.length})
                 </h3>
@@ -372,65 +533,178 @@ export default function StudyExperience() {
             )}
           </div>
 
-          {/* Right column: Room boxes */}
+          {/* Right column: ALL rooms by floor */}
           <div className="order-first md:order-last">
-            {/* Mobile: horizontal scroll */}
-            <div className="flex md:hidden gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-              {SHOWCASE_ROOMS.map(({ id, floor }) => {
-                const room = ROOM_SUB_PRINCIPLES[id];
-                if (!room) return null;
-                return (
-                  <div key={id} className="min-w-[260px] flex-shrink-0">
-                    <RoomBox
-                      room={room}
-                      floor={floor}
-                      expanded={expandedRoom === id}
-                      onToggle={() => setExpandedRoom(expandedRoom === id ? null : id)}
-                      onPrincipleClick={(p) => handlePrincipleClick(id, p)}
-                      usedPrinciples={usedPrinciples}
-                      loadingPrinciple={loadingPrinciple}
-                      suggestedPrinciple={suggestedPrinciple}
-                      disabled={!parsedRef}
-                    />
-                  </div>
-                );
-              })}
+            {/* Mobile: horizontal scroll of floor groups */}
+            <div className="md:hidden space-y-3">
+              {allFloors.map((fg) => (
+                <FloorSection
+                  key={fg.floor}
+                  fg={fg}
+                  expandedFloor={expandedFloor}
+                  setExpandedFloor={setExpandedFloor}
+                  expandedRoom={expandedRoom}
+                  setExpandedRoom={setExpandedRoom}
+                  usedPrinciples={usedPrinciples}
+                  usedRoomIds={usedRoomIds}
+                  loadingPrinciple={loadingPrinciple}
+                  suggestedPrinciple={suggestedPrinciple}
+                  disabled={!parsedRef}
+                  onPrincipleClick={handlePrincipleClick}
+                  onSingleRoomClick={handleSingleRoomClick}
+                />
+              ))}
             </div>
 
             {/* Desktop: vertical stack */}
-            <div className="hidden md:flex flex-col gap-3 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pr-1">
-              {SHOWCASE_ROOMS.map(({ id, floor }) => {
-                const room = ROOM_SUB_PRINCIPLES[id];
-                if (!room) return null;
-                return (
-                  <RoomBox
-                    key={id}
-                    room={room}
-                    floor={floor}
-                    expanded={expandedRoom === id}
-                    onToggle={() => setExpandedRoom(expandedRoom === id ? null : id)}
-                    onPrincipleClick={(p) => handlePrincipleClick(id, p)}
-                    usedPrinciples={usedPrinciples}
-                    loadingPrinciple={loadingPrinciple}
-                    suggestedPrinciple={suggestedPrinciple}
-                    disabled={!parsedRef}
-                  />
-                );
-              })}
+            <div className="hidden md:flex flex-col gap-2 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pr-1">
+              {allFloors.map((fg) => (
+                <FloorSection
+                  key={fg.floor}
+                  fg={fg}
+                  expandedFloor={expandedFloor}
+                  setExpandedFloor={setExpandedFloor}
+                  expandedRoom={expandedRoom}
+                  setExpandedRoom={setExpandedRoom}
+                  usedPrinciples={usedPrinciples}
+                  usedRoomIds={usedRoomIds}
+                  loadingPrinciple={loadingPrinciple}
+                  suggestedPrinciple={suggestedPrinciple}
+                  disabled={!parsedRef}
+                  onPrincipleClick={handlePrincipleClick}
+                  onSingleRoomClick={handleSingleRoomClick}
+                />
+              ))}
             </div>
           </div>
         </div>
-    </div>
-  );
+      </div>
 
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="fixed inset-0 bg-gradient-to-b from-background via-background to-background/90 pointer-events-none" />
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
-      <Navigation />
-      <div className="relative z-10">{innerContent}</div>
       <Footer />
     </div>
   );
 }
 
+// Floor section component — collapsible floor header with rooms inside
+function FloorSection({
+  fg,
+  expandedFloor,
+  setExpandedFloor,
+  expandedRoom,
+  setExpandedRoom,
+  usedPrinciples,
+  usedRoomIds,
+  loadingPrinciple,
+  suggestedPrinciple,
+  disabled,
+  onPrincipleClick,
+  onSingleRoomClick,
+}: {
+  fg: FloorGroup;
+  expandedFloor: number | null;
+  setExpandedFloor: (f: number | null) => void;
+  expandedRoom: string | null;
+  setExpandedRoom: (r: string | null) => void;
+  usedPrinciples: Set<string>;
+  usedRoomIds: Set<string>;
+  loadingPrinciple: string | null;
+  suggestedPrinciple: string | null;
+  disabled: boolean;
+  onPrincipleClick: (roomId: string, p: SubPrinciple) => void;
+  onSingleRoomClick: (roomId: string, roomName: string) => void;
+}) {
+  const isOpen = expandedFloor === fg.floor;
+  const roomsUsed = fg.rooms.filter((r) => usedRoomIds.has(r.id)).length;
+
+  return (
+    <div className="rounded-lg border border-border/40 bg-card/40 overflow-hidden">
+      <button
+        onClick={() => setExpandedFloor(isOpen ? null : fg.floor)}
+        className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-muted/30 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-primary/70 w-5">F{fg.floor}</span>
+          <span className="text-sm font-medium">{fg.name}</span>
+          {roomsUsed > 0 && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-500/20 text-green-400">
+              {roomsUsed}/{fg.rooms.length}
+            </span>
+          )}
+        </div>
+        {isOpen ? (
+          <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+        ) : (
+          <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
+        )}
+      </button>
+
+      {isOpen && (
+        <div className="px-2 pb-2 space-y-2">
+          {fg.rooms.map(({ id, name, room }) =>
+            room ? (
+              <RoomBox
+                key={id}
+                room={room}
+                floor={fg.floor}
+                expanded={expandedRoom === id}
+                onToggle={() => setExpandedRoom(expandedRoom === id ? null : id)}
+                onPrincipleClick={(p) => onPrincipleClick(id, p)}
+                usedPrinciples={usedPrinciples}
+                loadingPrinciple={loadingPrinciple}
+                suggestedPrinciple={suggestedPrinciple}
+                disabled={disabled}
+              />
+            ) : (
+              <SingleRoomButton
+                key={id}
+                roomId={id}
+                roomName={name}
+                isUsed={usedRoomIds.has(id)}
+                isLoading={loadingPrinciple === `${id}-main`}
+                disabled={disabled}
+                onClick={() => onSingleRoomClick(id, name)}
+              />
+            )
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Simple clickable button for rooms without sub-principles
+function SingleRoomButton({
+  roomId,
+  roomName,
+  isUsed,
+  isLoading,
+  disabled,
+  onClick,
+}: {
+  roomId: string;
+  roomName: string;
+  isUsed: boolean;
+  isLoading: boolean;
+  disabled: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled || isLoading}
+      className={cn(
+        "w-full flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-left transition-all",
+        isUsed
+          ? "border-green-500/30 bg-green-500/10 text-green-400"
+          : "border-blue-500/30 bg-card/60 hover:border-blue-400/50 text-muted-foreground hover:text-foreground",
+        disabled && "opacity-50 pointer-events-none"
+      )}
+    >
+      <span className="flex-1 font-medium">{roomName}</span>
+      {isUsed && <span className="text-green-400 text-xs">✓</span>}
+      {isLoading && (
+        <div className="w-3.5 h-3.5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+      )}
+    </button>
+  );
+}
