@@ -102,8 +102,11 @@ export default function ShowMe() {
             <br />
             <span className="text-primary">See what's been hidden in plain sight.</span>
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Choose one experience below. In less than a minute, you'll understand the difference.
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-3">
+            PhototheologyOS turns Scripture into a living palace of memory, imagination, and discovery — powered by AI, built for biblical intelligence.
+          </p>
+          <p className="text-sm text-muted-foreground/70 max-w-xl mx-auto">
+            Try any demonstration below. Each one showcases a different dimension of the system — from cinematic narration to mind-mapping connections across all 66 books.
           </p>
         </motion.div>
 
