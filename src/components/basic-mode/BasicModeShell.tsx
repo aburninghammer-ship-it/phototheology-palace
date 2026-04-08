@@ -21,11 +21,13 @@ import { supabase } from "@/integrations/supabase/client";
 const BasicChatTab = lazy(() => import("./tabs/BasicChatTab"));
 const BasicBibleTab = lazy(() => import("./tabs/BasicBibleTab"));
 const BasicChapelTab = lazy(() => import("./tabs/BasicChapelTab"));
+const BasicStudyExperienceTab = lazy(() => import("./tabs/BasicStudyExperienceTab"));
 
 const TAB_COMPONENTS: Record<BasicTab, React.LazyExoticComponent<() => JSX.Element>> = {
   chat: BasicChatTab,
   bible: BasicBibleTab,
   chapel: BasicChapelTab,
+  study: BasicStudyExperienceTab,
 };
 
 /** Simplified profile stats for Level 1 */
