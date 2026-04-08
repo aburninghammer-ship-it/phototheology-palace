@@ -175,9 +175,8 @@ export default function StudyExperience() {
     }
 
     if (mode === "user-led") {
-      // In user-led mode, clicking the suggested principle just focuses it
-      // The user should write in the textarea instead
-      return;
+      // In user-led mode, clicking a principle triggers Jeeves analysis too
+      // (same as jeeves-led behavior)
     }
 
     // Jeeves-led: call principle-amplification
