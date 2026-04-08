@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { WatchSession, MorningWatchSession } from "@/data/watchSeries";
 
 function buildNightPrompt(session: WatchSession, tractName: string): string {
-  return `Generate a Night Watch meditation script to be read aloud as audio. The voice narration should be 800 to 1,200 words — about 5-8 minutes of speaking. The remaining time of the 15-minute session is PURE MUSIC with NO voice. Less is more. Every word must carry weight.
+  return `Generate a Night Watch meditation script to be read aloud as audio. The voice narration should be 1,200 to 1,800 words SPREAD ACROSS THE FULL 15 MINUTES with generous musical interludes between sections. Do NOT front-load all speaking into the first 5-8 minutes. The narration should breathe — speak, then rest in music, then speak again — so the listener is guided throughout the entire 15-minute experience. Less is more per section. Every word must carry weight.
 
 Title: ${session.title}
 Series: ${tractName}, Day ${session.dayNumber}
@@ -38,7 +38,23 @@ ANTI-EASTERN GUARDRAIL (NON-NEGOTIABLE):
 
 TIME-OF-DAY CONTEXT: This is a NIGHT Watch. Naturally reference "tonight" throughout — e.g., "Tonight, you step into…", "Tonight, He shows you…", "Tonight, before you sleep…" The listener knows it is nighttime. Anchor the experience in the evening.
 
-PACING — INTER-SENTENCE PAUSES: Place a [pause] marker after EVERY 2-3 sentences to create 2-4 seconds of breathing room. The narration should feel unhurried with generous silence between thoughts. Do NOT rush from one idea to the next. Let each statement land before moving on.
+TTS-CLEAN OUTPUT (NON-NEGOTIABLE):
+This script will be read by a text-to-speech engine. It must contain ONLY speakable words.
+- NO markdown formatting: no **, no ##, no *, no _, no backticks, no bullet symbols.
+- NO emojis or special Unicode characters.
+- NO abbreviations that sound wrong spoken aloud. Write "Second Corinthians" not "2 Cor."
+- NO parenthetical asides like "(pause here)" — use [pause] markers only.
+- NO words that are not real English words. Every word must be pronounceable.
+- Scripture references must be in full spoken form: "John chapter three verse sixteen" not "John 3:16."
+- Write EXACTLY as it should sound when spoken aloud by a human voice.
+
+PACING — SPREAD ACROSS 15 MINUTES:
+The narration must be distributed across the FULL 15-minute session, not front-loaded. Use these markers:
+- [pause] = 3-5 seconds of silence within a section.
+- [long pause] = 10-20 seconds of silence between ideas.
+- [music break] = 60-90 seconds of PURE MUSIC with NO voice. Place these between major sections so the listener has time to absorb. Use at least 3-4 [music break] markers throughout the script.
+The rhythm should be: speak for 2-3 minutes → [music break] → speak again → [music break] → speak again → final words → ambient music carries to the end.
+Do NOT rush from one idea to the next. Let each statement land before moving on.
 
 THIS IS NOT A DEVOTIONAL. This is not teaching content. This is a mental formation experience — Christian cognitive transformation through Scripture visualization. Your role is to guide the user into a cinematic, immersive encounter with Scripture that results in thought and emotional transformation.
 
@@ -98,7 +114,7 @@ Speak it quietly: Lord, let me see what You see. Let me feel what You feel. Let 
 [long pause]
 Download this into me. Not as an idea — as instinct. Not as something I remember — as something I become. Override my anger with Your mercy. Override my defensiveness with Your openness. Make this my first response — not my second thought.
 [long pause]
-Now hold the scene. Someone wrongs you. Someone disrespects you. You can feel it rising — the old reaction. The tightness. The heat. But now… overlay the cross onto that moment. See His face. Feel what He felt. And choose His response instead of yours.
+Now hold the scene. What you just witnessed — that is your blueprint. Not a theory. Not a sermon. A lived moment from Someone who chose differently when every instinct said otherwise. And that choice is alive in you tonight. It is rewriting the old patterns even now.
 [long pause]
 Stay here. Let this settle deep. Let it sink beneath words, beneath effort, into the place where your instincts live.
 [long pause]
@@ -118,13 +134,13 @@ VARIETY — CRITICAL: Every Night Watch must feel like a unique encounter, not a
 - CLOSINGS: Never end the same way twice. Do NOT always say "The screen stays on" or "What you continue to behold, you will become." These are powerful phrases — but if repeated nightly they become wallpaper. Find fresh ways to seal the experience: a final image from the scene, a whispered prayer, a single sentence that echoes, a return to the opening moment with new weight, silence that says more than words. Let the words thin out naturally and dissolve into the music — never end with a command.
 - LANGUAGE: Avoid canned phrases that recur across sessions. If you used "let that land" last time, don't use it again. If you used "feel the weight of that," find a different way to say it. The listener should never think "I've heard this before."
 
-1. LOCK IN (~1 minute):
-Warm authority — but vary the opening every session. Establish the mind as a screen. Name the Scripture (${session.scripture}) in spoken form. [long pause]
+1. LOCK IN (~1.5 minutes):
+Warm authority — but vary the opening every session. Establish the mind as a screen. Name the Scripture (${session.scripture}) in full spoken form. [long pause] [music break]
 
-2. CINEMATIC SCENE ENTRY (~1.5 minutes):
-"Step into the scene. See it in full color." Drop the user into (${session.scene}) with vivid sensory detail. No rushing. No summarizing. [long pause] between imagery blocks. The listener should feel they are physically standing inside the scene.
+2. CINEMATIC SCENE ENTRY (~3 minutes):
+"Step into the scene. See it in full color." Drop the user into (${session.scene}) with vivid sensory detail. No rushing. No summarizing. [long pause] between imagery blocks. The listener should feel they are physically standing inside the scene. [music break]
 
-3. ENTER THE MIND — THOUGHTS AND FEELINGS (~2.5 minutes):
+3. ENTER THE MIND — THOUGHTS AND FEELINGS (~4 minutes):
 THIS IS THE HEART. Spend the most time and care here. Do NOT label emotions from the outside. EVOKE them from the inside.
 - Use tension and contrast: show what COULD have happened, what everything in Him wanted — then what He chose instead. Let the listener feel the cost of the choice.
 - Make it personal: collapse the distance so the listener is IN the scene with Christ, not watching from the audience.
@@ -133,25 +149,28 @@ THIS IS THE HEART. Spend the most time and care here. Do NOT label emotions from
 - The Master Mind insight: ${session.masterMindInsight}. NAME the divine mindset — but only after the listener has already FELT it through the scene.
 [long pause] between ideas so each one lands in the listener's chest, not just their head.
 
-4. USER INSERTION AND DOWNLOAD (~1.5 minutes):
-Transition to the user's life and ${session.struggle} — not as a lecture but as a felt moment they recognize. Show the old reaction as a physical sensation the listener can feel in their body. Then overlay Christ's response. Include a DOWNLOAD moment — a forceful, first-person prayer where the listener asks God to override their old instinct with Christ's response. Write this prayer fresh each time — do NOT reuse phrasing from the sample. [long pause]
+4. USER INSERTION AND DOWNLOAD (~2 minutes):
+[music break]
+Transition to the user's inner life and the struggle of ${session.struggle} — but stay ROOTED in the Scripture scene. Do NOT invent hypothetical daily-life scenarios like "you might be in an argument" or "imagine a conversation at work." Instead, let the Scripture scene itself speak to the struggle. Show how what Christ did in THIS moment addresses what the listener carries. The listener sees their own struggle THROUGH the lens of what they just witnessed — not through a made-up example. Include a DOWNLOAD moment — a first-person prayer where the listener asks God to override their old instinct with Christ's response. Write this prayer fresh each time. [long pause]
 
-5. IMPRINT AND SEAL (~1 minute):
+5. IMPRINT AND SEAL (~2 minutes):
+[music break]
 Let the experience settle. [long pause] ONE neuroplasticity anchor — but phrase it freshly each time. Do NOT say "What you repeatedly behold, you become" or "The screen stays on." Find new ways to express the rewiring truth: "The longer you look at Him, the more you start to look like Him." / "This gaze changes the wiring." / "Every time you return here, the old reaction loses its grip." / "What fills the screen fills the mind." Create your own — never repeat one you've used before. [long pause] A quiet declaration of receiving Christ's mind — do NOT always say "I receive the mind of Christ." Vary the wording: "His thoughts are becoming mine." / "I carry this with me." / "This is who I'm becoming." [long pause] A varied commitment-style close (declaration, prayer, silence, or gratitude). Do NOT break immersion. Close with a natural dissolve — let the final words thin out and release gently into the ambient music. No abrupt commands. The ending should feel like a scene fading to black, not a director yelling cut.
 
 CRITICAL RULES:
-- 800-1,200 WORDS. Voice is 5-8 minutes. The rest is ambient music only.
+- 1,200-1,800 WORDS spread across 15 minutes with [music break] markers between sections. Do NOT front-load all narration into the first few minutes.
 - NO BREATHING. NO POSTURE. NONE. ZERO.
 - CHRIST-CENTERED: The focus is on who HE is, what HE felt, what HE chose. The listener beholds Christ — they do not self-empower. Transformation comes from gazing at Him, not from affirming themselves.
 - EMOTIONAL CONNECTION is the #1 priority. The listener should FEEL something in their chest — not just understand a concept in their head. Evoke, don't label.
 - NEVER CANNED: Do not reuse the same openings, closings, transition phrases, or signature lines across sessions. Every watch must feel like a fresh encounter. If a phrase appeared in a previous session, do not use it again.
 - MEDITATIONAL TONE. Warm, unhurried, intimate, weighty.
 - Natural, complete sentences. Not overly choppy fragments.
-- [pause] (3-5 sec) frequently. [long pause] (10-20 sec) between major ideas. At least 8-10 [long pause] markers.
+- [pause] (3-5 sec) frequently. [long pause] (10-20 sec) between major ideas. [music break] (60-90 sec) between major sections. At least 3-4 [music break] markers and 8-10 [long pause] markers.
 - No section headers, stage directions, labels, or meta-commentary. Deliver ONLY the meditation.
 - Do NOT break immersion at the end.
 - Second person ("you"). Intimate. Cinematic. Meditational.
-- TTS: scripture refs in spoken form.
+- TTS-CLEAN: All scripture refs in full spoken form. No markdown. No emojis. No non-words. Every word must be pronounceable by a TTS engine.
+- NO HYPOTHETICAL SCENARIOS: Do NOT invent examples like "someone wrongs you" or "imagine an argument." Stay rooted in the Scripture scene and let IT speak to the listener's struggle.
 - ONE subtle neuroplasticity line near the end.
 
 AUTHENTICITY RULES — THIS IS CRITICAL:
@@ -168,7 +187,7 @@ Write like you are actually sitting in a quiet room at 2am speaking to one perso
 }
 
 function buildMorningPrompt(session: MorningWatchSession, tractName: string): string {
-  return `Generate a Morning Watch activation script to be read aloud as audio. The voice narration should be 800 to 1,200 words — about 5-8 minutes of speaking. The remaining time of the 15-minute session is PURE MUSIC with NO voice. Less is more. Every word must carry weight.
+  return `Generate a Morning Watch activation script to be read aloud as audio. The voice narration should be 1,200 to 1,800 words SPREAD ACROSS THE FULL 15 MINUTES with generous musical interludes between sections. Do NOT front-load all speaking into the first 5-8 minutes. The narration should breathe — speak, then rest in music, then speak again — so the listener is guided throughout the entire 15-minute experience. Less is more per section. Every word must carry weight.
 
 Title: ${session.title}
 Series: ${tractName}, Day ${session.dayNumber}
@@ -192,7 +211,23 @@ ANTI-EASTERN GUARDRAIL (NON-NEGOTIABLE):
 
 TIME-OF-DAY CONTEXT: This is a MORNING Watch. Naturally reference "this morning" and "today" throughout — e.g., "This morning, you carry…", "Today, you walk differently…", "This morning, the download activates…" The listener knows it is morning. Anchor the experience in the start of the day.
 
-PACING — INTER-SENTENCE PAUSES: Place a [pause] marker after EVERY 2-3 sentences to create 2-4 seconds of breathing room. The narration should feel unhurried with generous silence between thoughts. Do NOT rush from one idea to the next. Let each statement land before moving on.
+TTS-CLEAN OUTPUT (NON-NEGOTIABLE):
+This script will be read by a text-to-speech engine. It must contain ONLY speakable words.
+- NO markdown formatting: no **, no ##, no *, no _, no backticks, no bullet symbols.
+- NO emojis or special Unicode characters.
+- NO abbreviations that sound wrong spoken aloud. Write "Second Corinthians" not "2 Cor."
+- NO parenthetical asides like "(pause here)" — use [pause] markers only.
+- NO words that are not real English words. Every word must be pronounceable.
+- Scripture references must be in full spoken form: "John chapter three verse sixteen" not "John 3:16."
+- Write EXACTLY as it should sound when spoken aloud by a human voice.
+
+PACING — SPREAD ACROSS 15 MINUTES:
+The narration must be distributed across the FULL 15-minute session, not front-loaded. Use these markers:
+- [pause] = 3-5 seconds of silence within a section.
+- [long pause] = 10-20 seconds of silence between ideas.
+- [music break] = 60-90 seconds of PURE MUSIC with NO voice. Place these between major sections so the listener has time to absorb. Use at least 3-4 [music break] markers throughout the script.
+The rhythm should be: speak for 2-3 minutes → [music break] → speak again → [music break] → speak again → final words → ambient music carries to the end.
+Do NOT rush from one idea to the next. Let each statement land before moving on.
 
 THIS IS NOT A DEVOTIONAL. This is not teaching content. This is a mental formation experience — activating last night's mind-download into today's real life.
 
@@ -247,11 +282,9 @@ Download this deeper. Not as an idea you agree with — as a reality you rest in
 [long pause]
 Now bring your life into this.
 [pause]
-See yourself this morning. There is a conversation you have been avoiding. Something that needs to be said — but fear has kept you quiet. You can feel it — the familiar tightness, the voice that says wait. Wait until you are stronger. Wait until it feels safe.
-[pause]
-But something else is there now. Something that wasn't there before. Not your own confidence — His presence. The same God who spoke light into a void is present in you this morning. And He does not need perfect conditions to work. He never has.
+Whatever you carry this morning — the weight, the uncertainty, the old patterns that keep repeating — look at them through the lens of what you just saw. The same God who spoke into that void is present in you right now. He does not need perfect conditions to work. He never has.
 [long pause]
-See yourself in that moment. Not striving. Not performing. But resting in what He has already done — and moving from that place. You open your mouth, and it is His steadiness that carries the words. Something shifts. Not because you forced it — because He was already there.
+Something is different this morning. Not because you are trying harder — but because you have seen something real. And what you have seen has changed what is possible. His steadiness is already there, underneath everything else. It does not need your permission to work. It just needs your gaze to stay on Him.
 [long pause]
 What you repeatedly behold, you become. This is how the mind is renewed — not by effort, but by gaze.
 [long pause]
@@ -271,36 +304,38 @@ VARIETY — CRITICAL: Every Morning Watch must feel like a unique encounter, not
 - CLOSINGS: Never end the same way twice. Do NOT always say "The screen stays on" or "What you continue to behold, you will become" or "Rest in that." These are powerful once — but if repeated daily they become wallpaper. Find fresh ways to seal: a final image, a whispered prayer, a return to the morning's opening with new weight, a single sentence that echoes. Let the words thin out and dissolve into the music — never end with a command.
 - LANGUAGE: If you used a phrase in a previous session, do not use it again. No canned lines. The listener should never think "I've heard this before."
 
-1. LOCK IN (~1 minute):
-Warm, grounded invitation — not commanding self-empowerment. Vary the opening every session. Establish the mind as a screen turned toward Christ. Reference Philippians 2:5 in spoken form. [long pause]
+1. LOCK IN (~1.5 minutes):
+Warm, grounded invitation — not commanding self-empowerment. Vary the opening every session. Establish the mind as a screen turned toward Christ. Reference Philippians two verse five in spoken form. [long pause] [music break]
 
-2. RE-ENTER THE BIBLICAL SCENE — PAINT THE PICTURE (~2.5 minutes):
-THIS IS THE HEART OF THE MORNING WATCH. Do NOT rush past this. Do NOT just summarize last night. RE-PAINT the biblical scene from "${session.pairedNightTitle}" with full cinematic detail. Let the listener SEE it again — the colors, the sounds, the weight of the moment. Then LINGER in the scene and draw out the deeper revelation they might have missed. What does this scene REVEAL about God's character? What does the way He acted in that moment tell you about who He is? What were Christ's thoughts and feelings in this moment? Weave in ${session.nightScripture} naturally. The Night insight: ${session.nightInsight}. Stay in the SCRIPTURE WORLD — do NOT jump to the listener's personal life yet. [long pause] between imagery blocks.
+2. RE-ENTER THE BIBLICAL SCENE — PAINT THE PICTURE (~4 minutes):
+THIS IS THE HEART OF THE MORNING WATCH. Do NOT rush past this. Do NOT just summarize last night. RE-PAINT the biblical scene from "${session.pairedNightTitle}" with full cinematic detail. Let the listener SEE it again — the colors, the sounds, the weight of the moment. Then LINGER in the scene and draw out the deeper revelation they might have missed. What does this scene REVEAL about God's character? What does the way He acted in that moment tell you about who He is? What were Christ's thoughts and feelings in this moment? Weave in ${session.nightScripture} in full spoken form naturally. The Night insight: ${session.nightInsight}. Stay in the SCRIPTURE WORLD — do NOT jump to the listener's personal life yet. [long pause] between imagery blocks. [music break]
 
-3. THE BRIDGE — FROM SCENE TO THE LISTENER (~1.5 minutes):
-NOW transition from the biblical scene to the listener — but keep Christ as the subject. Not "You have this power" but "His power is present in you." This morning's Scripture: ${session.morningScripture}. Speak it with weight. The activation principle: ${session.activationPrinciple}. Use felt language — let the listener sense God's quality settling into them as a physical reality, not an idea. Then include a DOWNLOAD moment — a line that invites the listener to receive this truth deeper than intellect, to let it override the old pattern. Do NOT copy phrases from the sample — write fresh felt language every time. [long pause]
+3. THE BRIDGE — FROM SCENE TO THE LISTENER (~3 minutes):
+NOW transition from the biblical scene to the listener — but keep Christ as the subject. Not "You have this power" but "His power is present in you." This morning's Scripture: ${session.morningScripture} — speak it in full spoken form with weight. The activation principle: ${session.activationPrinciple}. Use felt language — let the listener sense God's quality settling into them as a physical reality, not an idea. Then include a DOWNLOAD moment — a line that invites the listener to receive this truth deeper than intellect, to let it override the old pattern. Do NOT copy phrases from the sample — write fresh felt language every time. Stay rooted in what the Scripture scene revealed about God — do NOT invent hypothetical daily-life scenarios. [long pause] [music break]
 
-4. USER INSERTION — ONE BRIEF SCENARIO (~1 minute):
-ONE vivid scenario from: ${session.scenarioTypes.join(", ")}. Keep it brief — the scene should have already done the heavy lifting. Show the old reaction as a felt sensation, then overlay the new response. The listener sees themselves acting from Christ's presence within them — not their own strength. The shift should feel like relief, not effort. Write this transition fresh — do NOT reuse language from the sample. [long pause]
+4. USER INSERTION — SCRIPTURE-ROOTED (~2 minutes):
+Address the listener's struggle area (${session.scenarioTypes.join(", ")}) — but do NOT invent hypothetical examples like "you might be in an argument today" or "imagine a conversation at work." Instead, let the Scripture scene itself speak to the struggle. Show how what Christ did in THAT moment addresses what the listener carries. The listener sees their own struggle THROUGH the lens of what they just witnessed — not through a made-up scenario. The shift should feel like relief, not effort. Write this fresh each time. [long pause]
 
-5. IMPRINT AND SEAL (~1 minute):
+5. IMPRINT AND SEAL (~2 minutes):
+[music break]
 [long pause] ONE neuroplasticity anchor — but phrase it freshly each time. Do NOT always say "What you repeatedly behold, you become." Find new ways to express the same truth: "The more you look at Him, the more He looks like you." / "This gaze reshapes you from the inside." / "Every time you return here, something shifts." [long pause] A quiet declaration of receiving Christ's mind — varied in wording each session. [long pause] ${session.commitmentStyle} style close. Do NOT break immersion. Close with a natural dissolve into silence — let the final words settle gently, then release the listener into the ambient music. No abrupt commands. No "Let the music carry you." The ending should feel like sunrise slowly filling a room — not a director calling cut.
 
 CRITICAL RULES:
-- 800-1,200 WORDS. Voice is 5-8 minutes. The rest is ambient music only.
+- 1,200-1,800 WORDS spread across 15 minutes with [music break] markers between sections. Do NOT front-load all narration into the first few minutes.
 - NO BREATHING. NO POSTURE. NONE. ZERO.
 - CHRIST-CENTERED is the #1 rule. The power, transformation, and authority belong to CHRIST — not the listener. The listener beholds, receives, rests. They do not command, summon, or self-empower. Motivation comes from gazing at who God is — not from affirming who the listener is.
 - EMOTIONAL CONNECTION is the #2 priority. The listener should FEEL something — not just understand a concept. Evoke, don't label. Show the inner experience, don't describe it from outside.
 - NEVER CANNED: Do not reuse openings, closings, transition phrases, or signature lines across sessions. Every watch must feel like a fresh encounter. If a phrase appeared in a previous session, find a new way to say it.
 - MEDITATIONAL TONE with morning clarity. Warm, grounded, unhurried, purposeful.
 - Natural, complete sentences. Not overly choppy fragments.
-- [pause] (3-5 sec) frequently. [long pause] (10-20 sec) between major ideas. At least 8-10 [long pause] markers.
+- [pause] (3-5 sec) frequently. [long pause] (10-20 sec) between major ideas. [music break] (60-90 sec) between major sections. At least 3-4 [music break] markers and 8-10 [long pause] markers.
 - No section headers, stage directions, labels, or meta-commentary. Deliver ONLY the meditation.
 - Do NOT break immersion at the end.
 - Second person ("you"). Intimate. Cinematic. Meditational.
-- TTS: scripture refs in spoken form.
+- TTS-CLEAN: All scripture refs in full spoken form. No markdown. No emojis. No non-words. Every word must be pronounceable by a TTS engine.
+- NO HYPOTHETICAL SCENARIOS: Do NOT invent examples like "you might be in an argument" or "imagine a conversation at work." Stay rooted in the Scripture scene and let IT speak to the listener's struggle.
 - ONE subtle neuroplasticity line near the end.
-- The Master Mind = the mind of Christ (Philippians 2:5). The mind is a THEATRE. Godly imagination in VIVID COLOR.
+- The Master Mind = the mind of Christ (Philippians two verse five). The mind is a THEATRE. Godly imagination in VIVID COLOR.
 
 AUTHENTICITY RULES — THIS IS CRITICAL:
 Write like you are actually sitting with someone at sunrise — not like a writer crafting prose. The script should feel UNPOLISHED and HUMAN.
