@@ -6,16 +6,27 @@ export interface FreeTierAccess {
   // What tier the user is on
   tier: "free" | "trial" | "essential" | "premium" | "student" | "patron";
   
-  // Feature access
+  // --- Free-tier features (zero cost, always available) ---
   canAccessFloor: (floorNumber: number) => boolean;
   canAccessRoom: (roomId: string) => boolean;
+  canAccessDailyVerse: boolean;        // 1. Daily Verse
+  canAccessStoryRoom: boolean;         // 2. Story Room browsing
+  canAccessPalaceTour: boolean;        // 3. Palace Tour
+  canAccess24FPS: boolean;             // 4. 24FPS chapter frames
+  canAccessBookmarks: boolean;         // 5. Bookmarks & highlights
+  canAccessCommunity: boolean;         // 6. Community feed (read-only)
+  canAccessProfile: boolean;           // 7. Profile & onboarding
+  canAccessWatches: boolean;           // 8. Morning/Night Watch (pre-recorded)
+  canAccessBibleReader: boolean;       // 9. Bible reader (text only, no AI)
+  canAccessAchievements: boolean;      // 10. Achievement badges
+  canAccessImageBible: boolean;        // 11. Bible Rendered Room (Image Bible)
+  
+  // --- Metered free-tier features ---
   canUseJeeves: boolean;
   canAccessDevotionals: boolean;
   canAccessDailyChallenge: boolean;
-  canAccessCommunity: boolean;
-  canAccessBibleReader: boolean;
   
-  // Premium features
+  // --- Premium-only features (cost money / AI tokens) ---
   canAccessAllFloors: boolean;
   canAccessAdvancedAI: boolean;
   canAccessPremiumGames: boolean;
@@ -276,14 +287,25 @@ export function useFreeTier(): FreeTierAccess {
     isLoading,
     isPremium,
     
-    // Free tier features
+    // Free-tier features (always available, zero cost)
     canAccessFloor,
     canAccessRoom,
+    canAccessDailyVerse: true,
+    canAccessStoryRoom: true,
+    canAccessPalaceTour: true,
+    canAccess24FPS: true,
+    canAccessBookmarks: true,
+    canAccessCommunity: true,
+    canAccessProfile: true,
+    canAccessWatches: true,
+    canAccessBibleReader: true,       // Text-only reader is free
+    canAccessAchievements: true,
+    canAccessImageBible: true,        // Pre-generated flashcards are free
+    
+    // Metered free-tier features
     canUseJeeves: !jeevesLimitReached,
     canAccessDevotionals: true,
     canAccessDailyChallenge: !challengeLimitReached,
-    canAccessCommunity: true,
-    canAccessBibleReader: isPremium,
     
     // Premium-only features
     canAccessAllFloors: isPremium,
@@ -297,7 +319,7 @@ export function useFreeTier(): FreeTierAccess {
     jeevesLimitReached,
     dailyChallengeSubmissionsThisWeek,
     challengeLimitReached,
-    canPostInCommunity: isPremium, // Free users can view only
+    canPostInCommunity: isPremium,
     
     showUpgradePrompt,
   };
