@@ -130,13 +130,46 @@ export default function StudyExperience() {
 
     setVerseRef(ref);
     setParsedRef(parsed || { book: ref, chapter: "", verse: "" });
-    setVerseText(isTopic ? "" : "");
+    setVerseText("");
     setLayers([]);
     setSynthesizedOutput(null);
     setSuggestedRoom(null);
     setUserInput("");
     setExpandedRoom(null);
     setExpandedFloor(4);
+
+    // For topics, ask Jeeves to identify the key scripture passage(s)
+    if (isTopic) {
+      setVerseLookupLoading(true);
+      try {
+        const { data } = await callJeeves({
+          mode: "topic-scripture-lookup",
+          message: `The student wants to study the biblical topic/theme/object: "${ref}".
+
+Your task: Identify the PRIMARY scripture passage(s) where this topic is found or most clearly taught. 
+Provide the KEY BIBLE TEXTS (KJV) that a student must read to study "${ref}".
+
+Format your response as:
+📖 KEY PASSAGES FOR "${ref.toUpperCase()}"
+
+Then for each passage (2-4 passages max):
+📍 [Reference]
+"[Full KJV text of the passage]"
+
+Then a brief 1-2 sentence overview of why these passages are central to understanding "${ref}".
+
+Use KJV text only. Be precise with references.`,
+        }, "study-experience");
+
+        const response = typeof data === "string" ? data : (data as any)?.response || "";
+        if (response) {
+          setVerseText(response);
+        }
+      } catch (err) {
+        console.error("Topic scripture lookup failed:", err);
+      }
+      setVerseLookupLoading(false);
+    }
 
     if (mode === "user-led" && parsed) {
       fetchCrossRoomSuggestion(parsed, ref);
