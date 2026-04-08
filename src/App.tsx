@@ -61,6 +61,7 @@ import { DonationBanner } from "@/components/DonationBanner";
 // Critical pages - load immediately (landing + auth only)
 import Gatehouse from "./pages/Gatehouse";
 import Auth from "./pages/Auth";
+import { HomeLanding } from "./components/HomeLanding";
 const VRHub = lazy(() => import("./vr/VRHub"));
 const LevelSelect = lazy(() => import("./pages/LevelSelect"));
 
@@ -457,7 +458,7 @@ function App() {
                           <Suspense fallback={<LoadingScreen />}>
                             <KeepAliveRoutes maxCached={20} excludePaths={["/auth", "/auth/callback", "/guesthouse", "/vr"]}>
                             <Routes>
-            <Route path="/" element={<Gatehouse />} />
+            <Route path="/" element={<HomeLanding />} />
             <Route path="/landing" element={<Index />} />
             <Route path="/genesis-challenge" element={<GenesisHighRise />} />
             <Route path="/auth" element={<Auth />} />
