@@ -75,6 +75,8 @@ export default function StudyExperience() {
   const [layers, setLayers] = useState<StudyLayer[]>([]);
   const [loadingPrinciple, setLoadingPrinciple] = useState<string | null>(null);
   const [verseLookupLoading, setVerseLookupLoading] = useState(false);
+  const [synthesizedOutput, setSynthesizedOutput] = useState<string | null>(null);
+  const [synthesizing, setSynthesizing] = useState(false);
 
   // User-led state
   const [suggestedRoom, setSuggestedRoom] = useState<{ roomId: string; principleId: string } | null>(null);
@@ -118,6 +120,7 @@ export default function StudyExperience() {
     setParsedRef(parsed);
     setVerseText("");
     setLayers([]);
+    setSynthesizedOutput(null);
     setSuggestedRoom(null);
     setUserInput("");
     setExpandedRoom(null);
@@ -199,10 +202,60 @@ export default function StudyExperience() {
   }, []);
 
   // Accept (Build) a layer — marks it as accepted
-  const handleAcceptLayer = useCallback((principleId: string) => {
+  const handleAcceptLayer = useCallback(async (principleId: string) => {
+    // Mark this layer as accepted
     setLayers((prev) => prev.map((l) => l.principleId === principleId ? { ...l, accepted: true } : l));
-    toast.success("Layer accepted! Building on your study.");
-  }, []);
+
+    // Check how many accepted layers we now have (including this one)
+    const updatedLayers = layers.map((l) => l.principleId === principleId ? { ...l, accepted: true } : l);
+    const acceptedLayers = updatedLayers.filter((l) => l.accepted);
+
+    if (acceptedLayers.length < 2) {
+      toast.success("Layer accepted! Add more layers and Build to synthesize.");
+      return;
+    }
+
+    // Synthesize all accepted layers into one seamless output
+    setSynthesizing(true);
+    toast("Jeeves is weaving your layers together…", { icon: "🧵" });
+
+    try {
+      const layerSummaries = acceptedLayers.map((l, i) =>
+        `LAYER ${i + 1} — ${l.roomName} / ${l.principleName}:\n${l.analysis}`
+      ).join("\n\n---\n\n");
+
+      const { data } = await callJeeves({
+        mode: "principle-amplification",
+        book: parsedRef?.book || "",
+        chapter: parsedRef?.chapter || "",
+        verse: parsedRef?.verse || "",
+        verseText: verseText,
+        principle: "Synthesis — Unified Study Output",
+        message: `You have ${acceptedLayers.length} separate study layers on ${verseRef}. The student has accepted all of them and wants you to BUILD — meaning weave them into ONE seamless, unified theological narrative.
+
+HERE ARE THE ACCEPTED LAYERS:
+${layerSummaries}
+
+INSTRUCTIONS FOR SYNTHESIS:
+- Combine all insights into ONE flowing, cohesive study — NOT a list of separate sections.
+- Thread together the principles naturally: show how each lens (${acceptedLayers.map(l => l.principleName).join(", ")}) illuminates the verse from different angles that converge on Christ.
+- Start with the verse text, then build layer upon layer of meaning like a master painter adding depth.
+- Use smooth transitions between insights — the reader should feel the connections, not see the seams.
+- Include all key cross-references and KJV quotes from the individual layers.
+- End with a powerful unified ✨ Spark that captures the combined insight.
+- End with a 💎 Gem that only becomes visible when ALL these principles are combined.
+- Write in a warm, pastoral, scholarly tone. This is the crown jewel of their study session.`,
+      }, "study-experience");
+
+      const response = typeof data === "string" ? data : (data as any)?.response || "";
+      setSynthesizedOutput(response);
+      toast.success("Study synthesized! Scroll down to see your unified output.");
+    } catch (err) {
+      console.error("Synthesis failed:", err);
+      toast.error("Synthesis failed — try again.");
+    }
+    setSynthesizing(false);
+  }, [layers, parsedRef, verseText, verseRef]);
 
   // Rebuild a layer — removes it so the user can re-click the principle
   const handleRebuildLayer = useCallback((principleId: string) => {
@@ -558,6 +611,56 @@ IMPORTANT INSTRUCTIONS FOR DEPTH:
                   />
                 ))}
               </div>
+            )}
+
+            {/* Synthesized Output */}
+            {synthesizing && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="rounded-2xl border-2 border-primary/40 bg-card/30 backdrop-blur-xl p-6 shadow-[0_0_30px_-5px_hsl(var(--primary)/0.3)] ring-1 ring-primary/20"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                  <p className="text-sm text-primary font-medium">Jeeves is synthesizing your study layers…</p>
+                </div>
+              </motion.div>
+            )}
+
+            {synthesizedOutput && !synthesizing && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-primary/5 via-card/40 to-violet-500/5 backdrop-blur-xl overflow-hidden shadow-[0_0_40px_-8px_hsl(var(--primary)/0.35)] ring-1 ring-primary/20"
+              >
+                <div className="px-5 py-3 border-b border-primary/20 bg-primary/5 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-bold text-primary">Unified Study — {verseRef}</span>
+                  <span className="text-[10px] text-muted-foreground ml-auto">
+                    {layers.filter(l => l.accepted).length} layers combined
+                  </span>
+                </div>
+                <div className="p-5">
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed text-foreground/90">{synthesizedOutput}</p>
+                </div>
+                <div className="px-5 py-3 border-t border-primary/20 bg-primary/5 flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-8 px-3 text-xs gap-1.5 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30"
+                    onClick={() => {
+                      const saved = loadSavedStudies();
+                      saved.push({ ref: verseRef, layers: [{ roomId: "synthesis", roomName: "Unified Study", principleId: "synthesis", principleName: "Combined Analysis", analysis: synthesizedOutput!, accepted: true }], timestamp: Date.now() });
+                      localStorage.setItem(SAVE_KEY, JSON.stringify(saved.slice(-50)));
+                      toast.success("Unified study saved!");
+                    }}
+                  >
+                    <Save className="w-3.5 h-3.5" />
+                    Save Unified Study
+                  </Button>
+                </div>
+              </motion.div>
             )}
           </div>
 
