@@ -28,7 +28,23 @@ export function ShowMeEpicCommentary({ open, onOpenChange, onUse }: ShowMeEpicCo
       });
       if (error) throw error;
 
-      const audioUrl = data?.audioUrl || data?.audio_url;
+      let audioUrl = data?.audioUrl || data?.audio_url;
+
+      // New generation returns id but no audioUrl — fetch from the DB record
+      if (!audioUrl && data?.id) {
+        const { data: record } = await supabase
+          .from("epic_commentaries")
+          .select("audio_storage_path")
+          .eq("id", data.id)
+          .single();
+        if (record?.audio_storage_path) {
+          const { data: signedData } = await supabase.storage
+            .from("epic-audio")
+            .createSignedUrl(record.audio_storage_path, 3600);
+          audioUrl = signedData?.signedUrl;
+        }
+      }
+
       if (!audioUrl) throw new Error("No audio returned");
 
       setTrack({
