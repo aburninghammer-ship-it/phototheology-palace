@@ -10345,7 +10345,16 @@ CORE CONCEPT: Mind Transplant. The mind is a THEATRE. The screen is within. Godl
 
 FLOW: 1) Lock in 2) Mind = screen 3) Cinematic scene — sensory immersion 4) ENTER thoughts — don't label, EVOKE the thought process from inside 5) ENTER feelings — go beneath surface to the deeper current, make the listener feel it 6) Name the divine mindset AFTER they've felt it 7) User insertion — old reaction as physical sensation, new response as felt shift 8) Download — "Not as an idea — as instinct. Not something I remember — something I become." 9) Imprint 10) "I receive the mind of Christ" 11) "What you repeatedly behold, you become" 12) Seal — do NOT break immersion. "The screen stays on. Let the music carry you."
 
-800-1,200 WORDS. 5-8 min voice, rest is music. Natural sentences. [pause] and [long pause] — at least 8-10 [long pause]. Second person ("you"). No headers.`;
+800-1,200 WORDS. 5-8 min voice, rest is music. Natural sentences. [pause] and [long pause] — at least 8-10 [long pause]. Second person ("you"). No headers.
+
+CRITICAL FORMATTING RULES:
+- NEVER write "music break", "[music break]", "[music]", or any variation. These are NOT valid markers.
+- The ONLY valid pause markers are [pause] and [long pause]. Use these generously between paragraphs and after key sentences.
+- Write every word clearly and completely. Do NOT use abbreviations, truncated words, or invented words.
+- Scripture references must be written out fully for spoken delivery (e.g., "John chapter three, verse sixteen" NOT "John 3:16").
+- Numbers under 100 must be written as words (e.g., "forty" not "40").
+- Use full Bible book names (e.g., "First Corinthians" not "1 Cor").
+- No colons, slashes, or technical abbreviations — these cause TTS glitches.`;
       userPrompt = message || "Generate a Night Watch meditation session.";
 
     } else if (mode === "morning-watch") {
@@ -10361,7 +10370,16 @@ CORE CONCEPT: Mind Transplant activation. Last night's download is INSTALLED thi
 
 FLOW: 1) Lock in 2) Mind = screen 3) Recall download EMOTIONALLY — felt flash, not summary 4) Identity declaration — felt, not labeled 5) Name divine mindset AFTER they've felt it 6) Download — "Not as an idea I agree with — as instinct I act from" 7) Visceral scenario — old reaction as physical sensation, new response as felt shift 8) Imprint 9) "I receive the mind of Christ" 10) "What you repeatedly behold, you become" 11) Seal — do NOT break immersion. "The screen stays on. Let the music carry you."
 
-800-1,200 WORDS. 5-8 min voice, rest is music. Natural sentences. [pause] and [long pause] — at least 8-10 [long pause]. Second person ("you"). No headers.`;
+800-1,200 WORDS. 5-8 min voice, rest is music. Natural sentences. [pause] and [long pause] — at least 8-10 [long pause]. Second person ("you"). No headers.
+
+CRITICAL FORMATTING RULES:
+- NEVER write "music break", "[music break]", "[music]", or any variation. These are NOT valid markers.
+- The ONLY valid pause markers are [pause] and [long pause]. Use these generously between paragraphs and after key sentences.
+- Write every word clearly and completely. Do NOT use abbreviations, truncated words, or invented words.
+- Scripture references must be written out fully for spoken delivery (e.g., "John chapter three, verse sixteen" NOT "John 3:16").
+- Numbers under 100 must be written as words (e.g., "forty" not "40").
+- Use full Bible book names (e.g., "First Corinthians" not "1 Cor").
+- No colons, slashes, or technical abbreviations — these cause TTS glitches.`;
       userPrompt = message || "Generate a Morning Watch activation session.";
 
     }
@@ -10454,7 +10472,7 @@ FLOW: 1) Lock in 2) Mind = screen 3) Recall download EMOTIONALLY — felt flash,
         model: "google/gemini-2.5-flash",
         messages: finalMessages,
         temperature: modelTemperature,
-        max_tokens: requestBody.maxTokens || (mode === "polish-story" ? 16384 : mode === "analyze-thoughts" ? 8192 : mode === "analyze-thoughts-scholar" ? 8192 : mode === "research" ? 2048 : mode === "forge-defend-boss-battle" ? 8192 : mode === "forge-defend-draft" ? 4096 : mode === "forge-defend-team-coach" ? 4096 : mode === "defense-coach" ? 16384 : mode === "defense-coach-continue" ? 16384 : mode === "defense-analyze-weapon" ? 4096 : mode === "defense-refine-weapon" ? 4096 : mode === "defense-sharpen-weapon" ? 4096 : mode === "defense-jeeves-generate" ? 8192 : mode === "defense-extract-weapons" ? 8192 : mode === "defense-custom-setup" ? 2048 : mode === "defense-analyze-transcript" ? 8192 : mode === "defense-prophecy-compare" ? 8192 : mode === "defense-detective-generate" ? 4096 : mode === "defense-detective-evaluate" ? 2048 : mode === "defense-character-simulate" ? 4096 : mode === "defense-character-apply" ? 4096 : mode === "defense-discovery-evaluate" ? 2048 : 4096),
+        max_tokens: requestBody.maxTokens || (mode === "night-watch" ? 8192 : mode === "morning-watch" ? 8192 : mode === "polish-story" ? 16384 : mode === "analyze-thoughts" ? 8192 : mode === "analyze-thoughts-scholar" ? 8192 : mode === "research" ? 2048 : mode === "forge-defend-boss-battle" ? 8192 : mode === "forge-defend-draft" ? 4096 : mode === "forge-defend-team-coach" ? 4096 : mode === "defense-coach" ? 16384 : mode === "defense-coach-continue" ? 16384 : mode === "defense-analyze-weapon" ? 4096 : mode === "defense-refine-weapon" ? 4096 : mode === "defense-sharpen-weapon" ? 4096 : mode === "defense-jeeves-generate" ? 8192 : mode === "defense-extract-weapons" ? 8192 : mode === "defense-custom-setup" ? 2048 : mode === "defense-analyze-transcript" ? 8192 : mode === "defense-prophecy-compare" ? 8192 : mode === "defense-detective-generate" ? 4096 : mode === "defense-detective-evaluate" ? 2048 : mode === "defense-character-simulate" ? 4096 : mode === "defense-character-apply" ? 4096 : mode === "defense-discovery-evaluate" ? 2048 : 4096),
       }),
     });
 
