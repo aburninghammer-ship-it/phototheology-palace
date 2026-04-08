@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { BookOpen, Loader2, Sparkles } from "lucide-react";
+import { BookOpen, Loader2, Sparkles, Eye, Layers, Link2, Lightbulb } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { callJeeves } from "@/lib/jeevesClient";
 import { toast } from "sonner";
+import type { LucideIcon } from "lucide-react";
 
 interface ShowMeVerseBreakdownProps {
   open: boolean;
@@ -16,31 +17,104 @@ interface ShowMeVerseBreakdownProps {
 interface BreakdownSection {
   heading: string;
   content: string;
+  icon: LucideIcon;
+  accent: string;
 }
 
+// Map section headings to icons and colors for visual depth
+const SECTION_STYLE: Record<string, { icon: LucideIcon; accent: string }> = {
+  "Opening Observation": { icon: Eye, accent: "violet" },
+  "Dimensions Revealed": { icon: Layers, accent: "amber" },
+  "Palace Principles Visible": { icon: Sparkles, accent: "emerald" },
+  "Interconnections": { icon: Link2, accent: "sky" },
+  "Synthesis": { icon: Lightbulb, accent: "rose" },
+};
+
+const ACCENT_CLASSES: Record<string, { border: string; bg: string; text: string }> = {
+  violet: { border: "border-violet-500/20", bg: "bg-violet-500/5", text: "text-violet-300" },
+  amber: { border: "border-amber-500/20", bg: "bg-amber-500/5", text: "text-amber-300" },
+  emerald: { border: "border-emerald-500/20", bg: "bg-emerald-500/5", text: "text-emerald-300" },
+  sky: { border: "border-sky-500/20", bg: "bg-sky-500/5", text: "text-sky-300" },
+  rose: { border: "border-rose-500/20", bg: "bg-rose-500/5", text: "text-rose-300" },
+  indigo: { border: "border-indigo-500/20", bg: "bg-indigo-500/5", text: "text-indigo-300" },
+};
+
+const DEFAULT_STYLE = { icon: BookOpen, accent: "indigo" };
+
 function parseBreakdown(text: string): BreakdownSection[] {
-  // Split response by markdown headings or numbered sections
   const sections: BreakdownSection[] = [];
+  // Split on known section labels (plain text headings used by commentary-revealed)
+  const knownHeadings = [
+    "Opening Observation",
+    "Dimensions Revealed",
+    "Palace Principles Visible",
+    "Interconnections",
+    "Synthesis",
+  ];
+
+  // Build a regex that splits on these headings at the start of a line
+  const headingPattern = new RegExp(
+    `^(${knownHeadings.join("|")})\\s*$`,
+    "m"
+  );
+
+  // Also handle markdown-style headings or bold headings as fallback
   const lines = text.split("\n");
-  let currentHeading = "Overview";
+  let currentHeading = "";
   let currentContent: string[] = [];
 
   for (const line of lines) {
-    const headingMatch = line.match(/^#{1,3}\s+(.+)/) || line.match(/^\*\*(.+?)\*\*/);
-    if (headingMatch && currentContent.length > 0) {
-      sections.push({ heading: currentHeading, content: currentContent.join("\n").trim() });
-      currentHeading = headingMatch[1].replace(/\*\*/g, "");
+    const trimmed = line.trim();
+
+    // Strip the PRINCIPLES_REVEALED line
+    if (trimmed.startsWith("PRINCIPLES_REVEALED:")) continue;
+
+    // Check if this line is a known section heading
+    const matchKnown = knownHeadings.find(
+      (h) => trimmed === h || trimmed.replace(/[^\w\s]/g, "").trim() === h
+    );
+    // Also check markdown headings or bold
+    const mdMatch = trimmed.match(/^#{1,3}\s+(.+)/) || trimmed.match(/^\*\*(.+?)\*\*$/);
+    const detectedHeading = matchKnown || mdMatch?.[1]?.replace(/\*\*/g, "").trim();
+
+    if (detectedHeading) {
+      if (currentHeading && currentContent.length > 0) {
+        const style = SECTION_STYLE[currentHeading] || DEFAULT_STYLE;
+        sections.push({
+          heading: currentHeading,
+          content: currentContent.join("\n").trim(),
+          icon: style.icon,
+          accent: style.accent,
+        });
+      }
+      currentHeading = detectedHeading;
       currentContent = [];
-    } else if (headingMatch && currentContent.length === 0) {
-      currentHeading = headingMatch[1].replace(/\*\*/g, "");
     } else {
       currentContent.push(line);
     }
   }
-  if (currentContent.length > 0) {
-    sections.push({ heading: currentHeading, content: currentContent.join("\n").trim() });
+  // Push final section
+  if (currentHeading && currentContent.length > 0) {
+    const style = SECTION_STYLE[currentHeading] || DEFAULT_STYLE;
+    sections.push({
+      heading: currentHeading,
+      content: currentContent.join("\n").trim(),
+      icon: style.icon,
+      accent: style.accent,
+    });
   }
-  return sections.filter((s) => s.content.length > 0);
+
+  // If no sections were parsed (fallback), put everything in one block
+  if (sections.length === 0 && text.trim()) {
+    sections.push({
+      heading: "Analysis",
+      content: text.trim(),
+      icon: BookOpen,
+      accent: "violet",
+    });
+  }
+
+  return sections;
 }
 
 export function ShowMeVerseBreakdown({ open, onOpenChange, onUse }: ShowMeVerseBreakdownProps) {
@@ -58,16 +132,17 @@ export function ShowMeVerseBreakdown({ open, onOpenChange, onUse }: ShowMeVerseB
     try {
       onUse();
       const ref = verseRef.trim();
-      // Parse "Genesis 1:1" into book/chapter/verse for the verse-explanation mode
       const match = ref.match(/^(.+?)\s+(\d+):(\d+.*)$/);
       const { data, error } = await callJeeves(
         {
-          mode: "verse-explanation",
+          mode: "commentary-revealed",
           message: ref,
           book: match?.[1] || ref,
           chapter: match?.[2] || "",
           verse: match?.[3] || "",
-          verseText: ref, // fallback so the prompt always has context
+          verseText: { verse: match?.[3] || "", text: ref },
+          commentaryDepth: "depth",
+          activeDimensions: ["1D", "2D", "3D", "4D", "5D"],
         },
         "show-me"
       );
@@ -84,7 +159,6 @@ export function ShowMeVerseBreakdown({ open, onOpenChange, onUse }: ShowMeVerseB
 
   const handleClose = () => {
     onOpenChange(false);
-    // Reset after close animation
     setTimeout(() => {
       setSections([]);
       setVerseRef("");
@@ -110,7 +184,7 @@ export function ShowMeVerseBreakdown({ open, onOpenChange, onUse }: ShowMeVerseB
           {/* Input */}
           <div className="flex gap-2 mb-6">
             <Input
-              placeholder="e.g. John 3:16, Genesis 1:1, Psalm 23:1"
+              placeholder="e.g. John 3:16, Genesis 3:15, Psalm 23:1"
               value={verseRef}
               onChange={(e) => setVerseRef(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && !loading && handleReveal()}
@@ -126,7 +200,7 @@ export function ShowMeVerseBreakdown({ open, onOpenChange, onUse }: ShowMeVerseB
             </Button>
           </div>
 
-          {/* Response sections with staggered fade-in */}
+          {/* Loading state */}
           <AnimatePresence mode="wait">
             {loading && (
               <motion.div
@@ -136,27 +210,35 @@ export function ShowMeVerseBreakdown({ open, onOpenChange, onUse }: ShowMeVerseB
                 className="flex flex-col items-center justify-center py-12 gap-3"
               >
                 <Loader2 className="h-8 w-8 animate-spin text-violet-400" />
-                <p className="text-sm text-muted-foreground">Revealing hidden layers...</p>
+                <p className="text-sm text-muted-foreground">Scanning 5 dimensions, cross-references, and Palace principles...</p>
               </motion.div>
             )}
           </AnimatePresence>
 
+          {/* Response sections with staggered fade-in */}
           {sections.length > 0 && (
             <div className="space-y-4">
-              {sections.map((section, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.15 }}
-                  className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-4"
-                >
-                  <h3 className="font-semibold text-violet-300 mb-2">{section.heading}</h3>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
-                    {section.content}
-                  </p>
-                </motion.div>
-              ))}
+              {sections.map((section, i) => {
+                const Icon = section.icon;
+                const colors = ACCENT_CLASSES[section.accent] || ACCENT_CLASSES.violet;
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.2 }}
+                    className={`rounded-xl border ${colors.border} ${colors.bg} p-4`}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <Icon className={`h-4 w-4 ${colors.text}`} />
+                      <h3 className={`font-semibold ${colors.text}`}>{section.heading}</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                      {section.content}
+                    </p>
+                  </motion.div>
+                );
+              })}
             </div>
           )}
         </div>
