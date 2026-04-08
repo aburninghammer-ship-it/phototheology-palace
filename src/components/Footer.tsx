@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Building2, Mail, MessageSquare, FileText } from "lucide-react";
+import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 
 export const Footer = () => {
   const { t } = useTranslation();
+  const { isBasic, isImmersion } = useExperienceMode();
 
   return (
     <footer className="border-t border-border bg-card/50 backdrop-blur-sm mt-auto pb-28 md:pb-0">
@@ -22,7 +24,7 @@ export const Footer = () => {
             </p>
           </div>
 
-          {/* Quick Links */}
+          {/* Quick Links — adapted per level */}
           <div>
             <h3 className="font-semibold mb-3 text-foreground">{t('footer.quickLinks')}</h3>
             <ul className="space-y-2 text-sm">
@@ -41,21 +43,27 @@ export const Footer = () => {
                   {t('footer.appTour')}
                 </Link>
               </li>
-              <li>
-                <Link to="/palace" className="text-muted-foreground hover:text-primary transition-colors">
-                  {t('footer.thePalace')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/sermon-topics" className="text-muted-foreground hover:text-primary transition-colors">
-                  {t('footer.sermonTopics')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/games" className="text-muted-foreground hover:text-primary transition-colors">
-                  {t('footer.games')}
-                </Link>
-              </li>
+              {!isBasic && (
+                <li>
+                  <Link to="/palace" className="text-muted-foreground hover:text-primary transition-colors">
+                    {t('footer.thePalace')}
+                  </Link>
+                </li>
+              )}
+              {isImmersion && (
+                <li>
+                  <Link to="/sermon-topics" className="text-muted-foreground hover:text-primary transition-colors">
+                    {t('footer.sermonTopics')}
+                  </Link>
+                </li>
+              )}
+              {!isBasic && (
+                <li>
+                  <Link to="/games" className="text-muted-foreground hover:text-primary transition-colors">
+                    {t('footer.games')}
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link to="/pricing" className="text-muted-foreground hover:text-primary transition-colors">
                   {t('footer.pricing')}
@@ -64,7 +72,7 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Training Products */}
+          {/* Training — adapted per level */}
           <div>
             <h3 className="font-semibold mb-3 text-foreground">{t('footer.training')}</h3>
             <ul className="space-y-2 text-sm">
@@ -73,25 +81,31 @@ export const Footer = () => {
                   {t('footer.quickStartGuide')}
                 </Link>
               </li>
-              <li>
-                <Link to="/study-suite" className="text-muted-foreground hover:text-primary transition-colors">
-                  {t('footer.studySuite')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/courses" className="text-muted-foreground hover:text-primary transition-colors">
-                  {t('footer.courses')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/video-training" className="text-muted-foreground hover:text-primary transition-colors">
-                  {t('footer.videoTraining')}
-                </Link>
-              </li>
+              {!isBasic && (
+                <li>
+                  <Link to="/study-suite" className="text-muted-foreground hover:text-primary transition-colors">
+                    {t('footer.studySuite')}
+                  </Link>
+                </li>
+              )}
+              {!isBasic && (
+                <li>
+                  <Link to="/courses" className="text-muted-foreground hover:text-primary transition-colors">
+                    {t('footer.courses')}
+                  </Link>
+                </li>
+              )}
+              {isImmersion && (
+                <li>
+                  <Link to="/video-training" className="text-muted-foreground hover:text-primary transition-colors">
+                    {t('footer.videoTraining')}
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
 
-          {/* Contact & Legal */}
+          {/* Contact & Legal — same for all levels */}
           <div>
             <h3 className="font-semibold mb-3 text-foreground">{t('footer.supportLegal')}</h3>
             <ul className="space-y-2 text-sm">
