@@ -296,16 +296,28 @@ INSTRUCTIONS FOR SYNTHESIS:
 
 ${subjectLine}
 
-IMPORTANT INSTRUCTIONS FOR DEPTH:
-- Provide a DEEP, PROFOUND, and THOROUGH analysis — not surface-level.
+CRITICAL INSTRUCTION — DIRECT APPLICATION REQUIRED:
+You MUST directly APPLY the principle "${principleName}" to the subject "${verseRef}".
+- Do NOT merely describe what the principle is or how it works in general.
+- Instead, DEMONSTRATE the principle by finding and citing the specific biblical content that connects "${verseRef}" to "${principleName}".
+${principleName.toLowerCase().includes("parable") 
+  ? `- You MUST identify a specific parable from the Bible that directly connects to or illuminates "${verseRef}". Quote the parable text (KJV), explain the connection, and show how the parable deepens understanding of "${verseRef}".`
+  : principleName.toLowerCase().includes("type") || principleName.toLowerCase().includes("symbol")
+  ? `- You MUST identify specific types, shadows, or symbols from Scripture that directly connect to "${verseRef}". Quote the relevant texts (KJV) and trace the typological connection.`
+  : principleName.toLowerCase().includes("pattern")
+  ? `- You MUST identify a specific recurring biblical pattern that "${verseRef}" fits into. Show the pattern across multiple texts with KJV citations.`
+  : principleName.toLowerCase().includes("parallel")
+  ? `- You MUST find a specific biblical event or action that mirrors/parallels "${verseRef}". Quote both texts (KJV) and show how they reflect each other.`
+  : `- Pick and quote specific KJV scriptures. Identify concrete historical or theological connections.`}
+
 ${isCurrentTopicStudy
-  ? `- Since this is a TOPIC study (not a single verse), identify and cite the KEY SCRIPTURES most relevant to "${verseRef}" and this principle.
+  ? `- Since this is a TOPIC study, identify and cite the KEY SCRIPTURES most relevant to "${verseRef}" and this principle.
 - Ground every claim in specific Bible texts (KJV preferred).`
   : `- Begin with the verse text if not already provided.
 - Show how this principle SPECIFICALLY illuminates this verse in ways the reader may never have considered.`}
-- Include at minimum: (1) The direct application of this principle, (2) A cross-reference to at least one other Scripture that deepens the insight, (3) A practical or devotional takeaway that makes this personal.
+- Include at minimum: (1) The direct application of this principle with specific scripture, (2) A cross-reference to at least one other Scripture that deepens the insight, (3) A practical or devotional takeaway.
 - Use the Phototheology study method language naturally.
-- End with a "Spark" — one sentence of surprising, memorable insight that the reader will carry with them. Format it as: ✨ Spark: [your insight]`;
+- End with a "Spark" — one sentence of surprising, memorable insight. Format it as: ✨ Spark: [your insight]`;
   };
 
   const handlePrincipleClick = useCallback(async (roomId: string, principle: SubPrinciple) => {
