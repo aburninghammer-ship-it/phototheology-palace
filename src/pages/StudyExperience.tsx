@@ -757,7 +757,7 @@ ${isCurrentTopicStudy
             </div>
 
             {/* Desktop: vertical stack */}
-            <div className="hidden md:flex flex-col gap-2 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pr-1">
+            <div className="hidden md:flex flex-col gap-2 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pr-1 min-h-0">
               {allFloors.map((fg) => (
                 <FloorSection
                   key={fg.floor}
@@ -851,7 +851,7 @@ function FloorSection({
       </button>
 
       {isOpen && (
-        <div className="px-2 pb-2 space-y-2 max-h-[60vh] overflow-y-auto">
+        <div className="px-2 pb-2 space-y-2 overflow-y-auto min-h-0">
           {fg.rooms.map(({ id, name, room }) =>
             room ? (
               <RoomBox
