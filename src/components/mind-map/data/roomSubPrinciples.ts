@@ -17,18 +17,7 @@ export interface RoomSubPrinciples {
 
 // Define sub-principles for all multi-principle rooms
 export const ROOM_SUB_PRINCIPLES: Record<string, RoomSubPrinciples> = {
-  // Floor 1 - Imagination Room (5 Senses)
-  ir: {
-    roomId: 'ir',
-    roomName: 'Imagination Room',
-    subPrinciples: [
-      { id: 'ir-sight', name: 'Sight', shortName: 'Sight', description: 'What do you see?', icon: 'Eye' },
-      { id: 'ir-sound', name: 'Sound', shortName: 'Sound', description: 'What do you hear?', icon: 'Ear' },
-      { id: 'ir-touch', name: 'Touch', shortName: 'Touch', description: 'What do you feel?', icon: 'Hand' },
-      { id: 'ir-smell', name: 'Smell', shortName: 'Smell', description: 'What do you smell?', icon: 'Wind' },
-      { id: 'ir-taste', name: 'Taste', shortName: 'Taste', description: 'What do you taste?', icon: 'Utensils' },
-    ],
-  },
+  // Floor 1 - Imagination Room: no sub-principles — vividly paints the scene as a whole
 
   // Floor 2 - Observation Room (5 W's)
   or: {
