@@ -109,7 +109,7 @@ export const Navigation = () => {
           role="navigation"
           aria-label="Main navigation"
           style={{ top: "var(--app-top-banner-height, 0px)" }}
-          className="fixed left-0 right-0 z-40 bg-card/95 backdrop-blur-xl border-b border-border shadow-sm pt-[env(safe-area-inset-top)]"
+className="fixed left-0 right-0 z-40 bg-card border-b border-border shadow-sm pt-[env(safe-area-inset-top)]"
         >
           <div className="w-full px-4">
             <div className="flex items-center justify-between h-16 max-w-7xl mx-auto">
@@ -132,7 +132,7 @@ export const Navigation = () => {
         role="navigation"
         aria-label="Main navigation"
         style={{ top: "var(--app-top-banner-height, 0px)" }}
-        className="fixed left-0 right-0 z-40 bg-card/95 backdrop-blur-xl border-b border-border shadow-sm pt-[env(safe-area-inset-top)]"
+        className="fixed left-0 right-0 z-40 bg-card border-b border-border shadow-sm pt-[env(safe-area-inset-top)]"
       >
         <div className="w-full px-4">
           <div className="flex items-center justify-between h-16 max-w-7xl mx-auto">
