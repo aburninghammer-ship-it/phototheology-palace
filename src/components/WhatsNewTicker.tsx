@@ -79,44 +79,46 @@ export function WhatsNewTicker() {
   const item = items[currentIndex];
 
   return (
-    <AnimatePresence mode="wait">
-      {visible && (
-        <motion.div
-          key={currentIndex}
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 8 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Link to={item.path} className="block">
-            <div className="relative flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/8 border border-primary/20 hover:bg-primary/12 transition-colors group">
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0 border-primary/30 text-primary">
-                <Sparkles className="h-3 w-3 mr-1" />
-                New
-              </Badge>
-              <span className="text-xs text-foreground/80 truncate">
-                {item.emoji} {item.text}
-              </span>
-              <button
-                onClick={handleDismiss}
-                className="ml-auto shrink-0 p-0.5 rounded-full hover:bg-muted text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <X className="h-3 w-3" />
-              </button>
-              <div className="hidden sm:flex items-center gap-0.5 ml-1 shrink-0">
-                {items.map((_, i) => (
-                  <div
-                    key={i}
-                    className={`w-1 h-1 rounded-full transition-colors ${
-                      i === currentIndex ? "bg-primary" : "bg-muted-foreground/30"
-                    }`}
-                  />
-                ))}
+    <div className="h-[40px] overflow-hidden">
+      <AnimatePresence mode="wait">
+        {visible && (
+          <motion.div
+            key={currentIndex}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Link to={item.path} className="block">
+              <div className="relative flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/8 border border-primary/20 hover:bg-primary/12 transition-colors group">
+                <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0 border-primary/30 text-primary">
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  New
+                </Badge>
+                <span className="text-xs text-foreground/80 truncate">
+                  {item.emoji} {item.text}
+                </span>
+                <button
+                  onClick={handleDismiss}
+                  className="ml-auto shrink-0 p-0.5 rounded-full hover:bg-muted text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+                <div className="hidden sm:flex items-center gap-0.5 ml-1 shrink-0">
+                  {items.map((_, i) => (
+                    <div
+                      key={i}
+                      className={`w-1 h-1 rounded-full transition-colors ${
+                        i === currentIndex ? "bg-primary" : "bg-muted-foreground/30"
+                      }`}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          </Link>
-        </motion.div>
-      )}
-    </AnimatePresence>
+            </Link>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

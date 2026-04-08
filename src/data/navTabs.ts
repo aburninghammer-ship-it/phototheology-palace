@@ -474,6 +474,7 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
       glow: "rgba(16,185,129,0.5)"
     },
     dropdownItems: [
+      { to: "/study-experience", label: "Ultimate Study Experience (U.S.E)", icon: Layers },
       { to: "/interlinear", label: "Interlinear Bible" },
       { to: "/bible-lexicon", label: "Greek/Hebrew Lexicon" },
       { to: "/bible-timeline", label: "Bible Timeline" },
