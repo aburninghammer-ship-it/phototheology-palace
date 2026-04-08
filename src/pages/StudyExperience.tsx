@@ -198,6 +198,26 @@ export default function StudyExperience() {
     setLayers((prev) => prev.filter((l) => l.principleId !== principleId));
   }, []);
 
+  // Accept (Build) a layer — marks it as accepted
+  const handleAcceptLayer = useCallback((principleId: string) => {
+    setLayers((prev) => prev.map((l) => l.principleId === principleId ? { ...l, accepted: true } : l));
+    toast.success("Layer accepted! Building on your study.");
+  }, []);
+
+  // Rebuild a layer — removes it so the user can re-click the principle
+  const handleRebuildLayer = useCallback((principleId: string) => {
+    setLayers((prev) => prev.filter((l) => l.principleId !== principleId));
+    toast("Layer removed — click the same principle again for a fresh analysis.", { icon: "🔄" });
+  }, []);
+
+  // Save individual layer
+  const handleSaveLayer = useCallback((layer: StudyLayer) => {
+    const saved = loadSavedStudies();
+    saved.push({ ref: verseRef, layers: [layer], timestamp: Date.now() });
+    const trimmed = saved.slice(-50);
+    localStorage.setItem(SAVE_KEY, JSON.stringify(trimmed));
+  }, [verseRef]);
+
   // Deep, profound Jeeves prompt for Jeeves-led mode
   const buildDeepPrompt = (roomName: string, roomId: string, principleName: string, description: string) => {
     return `${roomName} (${roomId.toUpperCase()}): ${principleName} - ${description}
@@ -530,6 +550,9 @@ IMPORTANT INSTRUCTIONS FOR DEPTH:
                     layer={layer}
                     index={i}
                     onRemove={handleRemoveLayer}
+                    onAccept={handleAcceptLayer}
+                    onRebuild={handleRebuildLayer}
+                    onSaveLayer={handleSaveLayer}
                   />
                 ))}
               </div>
