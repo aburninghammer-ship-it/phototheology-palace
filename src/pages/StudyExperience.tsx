@@ -50,9 +50,18 @@ function getSyntheticPrinciple(roomId: string, roomName: string): SubPrinciple {
 type Mode = "jeeves-led" | "user-led";
 
 function parseVerseRef(ref: string): { book: string; chapter: string; verse: string } | null {
-  const m = ref.match(/^(.+?)\s+(\d+):(\d+.*)$/);
-  if (!m) return null;
-  return { book: m[1], chapter: m[2], verse: m[3] };
+  // Match "Book Chapter:Verse" or "Book Chapter:Verse-Verse"
+  const m = ref.match(/^(.+?)\s+(\d+):(\d+(?:\s*[-–—]\s*\d+)?)$/);
+  if (m) return { book: m[1], chapter: m[2], verse: m[3] };
+  // Match "Book Chapter" (whole chapter, e.g. "Genesis 8")
+  const m2 = ref.match(/^(.+?)\s+(\d+)$/);
+  if (m2) return { book: m2[1], chapter: m2[2], verse: "" };
+  return null;
+}
+
+// Determine if input is a verse reference or a topic/theme/story
+function isTopicInput(ref: string): boolean {
+  return !parseVerseRef(ref);
 }
 
 const SAVE_KEY = "study-experience-saved";
@@ -114,19 +123,22 @@ export default function StudyExperience() {
 
   const handleStudyVerse = useCallback(async (ref: string) => {
     const parsed = parseVerseRef(ref);
-    if (!parsed) return;
+    const isTopic = isTopicInput(ref);
+
+    // Must be either a valid verse ref or a topic
+    if (!parsed && !isTopic) return;
 
     setVerseRef(ref);
-    setParsedRef(parsed);
-    setVerseText("");
+    setParsedRef(parsed || { book: ref, chapter: "", verse: "" });
+    setVerseText(isTopic ? "" : "");
     setLayers([]);
     setSynthesizedOutput(null);
     setSuggestedRoom(null);
     setUserInput("");
     setExpandedRoom(null);
-    setExpandedFloor(4); // Default open Floor 4
+    setExpandedFloor(4);
 
-    if (mode === "user-led") {
+    if (mode === "user-led" && parsed) {
       fetchCrossRoomSuggestion(parsed, ref);
     }
   }, [mode]);
