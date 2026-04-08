@@ -356,7 +356,7 @@ export default function StudyExperience() {
 
             {/* Analysis stack */}
             {layers.length > 0 && (
-              <div className="space-y-4">
+              <div className="space-y-4 p-4 rounded-2xl border border-white/10 bg-card/30 backdrop-blur-xl shadow-[0_0_30px_-5px_hsl(var(--primary)/0.2)] ring-1 ring-white/5">
                 <h3 className="text-sm font-medium text-muted-foreground">
                   Analysis Layers ({layers.length})
                 </h3>
