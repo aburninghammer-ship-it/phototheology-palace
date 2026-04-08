@@ -770,7 +770,7 @@ function FloorSection({
       </button>
 
       {isOpen && (
-        <div className="px-2 pb-2 space-y-2">
+        <div className="px-2 pb-2 space-y-2 max-h-[60vh] overflow-y-auto">
           {fg.rooms.map(({ id, name, room }) =>
             room ? (
               <RoomBox
