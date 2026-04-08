@@ -60,6 +60,7 @@ export function ShowMeNightWatch({ open, onOpenChange, onUse }: ShowMeNightWatch
         type: "devotional",
         audioUrl,
         sessionDurationSec: 15 * 60, // 15 minutes
+        ambientMode: "ambient-sounds", // Use admin-uploaded watch music tracks
       });
       setPlayerOpen(true);
       onOpenChange(false);
