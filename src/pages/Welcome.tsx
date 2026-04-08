@@ -16,10 +16,15 @@ import { Button } from "@/components/ui/button";
 import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 import { BasicModeShell } from "@/components/basic-mode/BasicModeShell";
 import { ExplorerModeShell } from "@/components/explorer-mode/ExplorerModeShell";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 const Welcome = () => {
   const navigate = useNavigate();
-  const { isBasic, isExplorer } = useExperienceMode();
+  const { isBasic, isExplorer, isLoading } = useExperienceMode();
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   // Level 1 (Basic) mode: show the ChatGPT-style interface
   if (isBasic) {

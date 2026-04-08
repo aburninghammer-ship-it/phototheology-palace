@@ -5,9 +5,14 @@
  */
 import { Navigate } from "react-router-dom";
 import { useExperienceMode } from "@/contexts/ExperienceModeContext";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 export function BasicModeGate({ children }: { children: React.ReactNode }) {
-  const { isBasic } = useExperienceMode();
+  const { isBasic, isLoading } = useExperienceMode();
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   if (isBasic) {
     return <Navigate to="/welcome" replace />;

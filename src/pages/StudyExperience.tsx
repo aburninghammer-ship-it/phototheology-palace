@@ -23,6 +23,20 @@ const SHOWCASE_ROOMS = [
 
 type Mode = "jeeves-led" | "user-led";
 
+function getJeevesResponse(data: unknown): string {
+  if (typeof data === "string") return data;
+  if (
+    data &&
+    typeof data === "object" &&
+    "response" in data &&
+    typeof data.response === "string"
+  ) {
+    return data.response;
+  }
+
+  return "";
+}
+
 function parseVerseRef(ref: string): { book: string; chapter: string; verse: string } | null {
   const m = ref.match(/^(.+?)\s+(\d+):(\d+.*)$/);
   if (!m) return null;
@@ -77,7 +91,7 @@ export default function StudyExperience() {
         verseText: "",
       }, "study-experience");
 
-      const response = typeof data === "string" ? data : data?.response;
+      const response = getJeevesResponse(data);
       if (!response) {
         setVerseLookupLoading(false);
         return;
@@ -157,7 +171,7 @@ export default function StudyExperience() {
         principle: `${room.roomName} (${roomId.toUpperCase()}): ${principle.name} - ${principle.description}`,
       }, "study-experience");
 
-      const response = typeof data === "string" ? data : data?.response || "";
+      const response = getJeevesResponse(data);
 
       // Extract verse text from first response if we don't have it
       if (!verseText && response) {
@@ -200,7 +214,7 @@ export default function StudyExperience() {
         message: `The student's connection: "${userInput}". Evaluate their insight (what they got right, what they missed), then provide the full analysis.`,
       }, "study-experience");
 
-      const response = typeof data === "string" ? data : data?.response || "";
+      const response = getJeevesResponse(data);
 
       // Try to split evaluation from full analysis
       const evalSplit = response.split(/(?:full analysis|here'?s? (?:the )?(?:full|complete) (?:analysis|breakdown))/i);
