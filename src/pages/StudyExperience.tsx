@@ -142,7 +142,7 @@ export default function StudyExperience() {
         verseText: "",
       }, "study-experience");
 
-      const response = typeof data === "string" ? data : data?.response;
+      const response = typeof data === "string" ? data : (data as any)?.response;
       if (response) {
         try {
           const suggestions = JSON.parse(response);
@@ -238,7 +238,7 @@ IMPORTANT INSTRUCTIONS FOR DEPTH:
         principle: buildDeepPrompt(roomName, roomId, principle.name, principle.description),
       }, "study-experience");
 
-      const response = typeof data === "string" ? data : data?.response || "";
+      const response = typeof data === "string" ? data : (data as any)?.response || "";
 
       if (!verseText && response) {
         const vMatch = response.match(/[""\u201C\u201D]([^""\u201C\u201D]{10,})["""\u201C\u201D]/);
@@ -289,7 +289,7 @@ IMPORTANT INSTRUCTIONS FOR DEPTH:
         principle: buildDeepPrompt(roomName, roomId, roomName, `${purpose}${coreQuestion ? ` Core question: ${coreQuestion}` : ""}`),
       }, "study-experience");
 
-      const response = typeof data === "string" ? data : data?.response || "";
+      const response = typeof data === "string" ? data : (data as any)?.response || "";
 
       if (!verseText && response) {
         const vMatch = response.match(/[""\u201C\u201D]([^""\u201C\u201D]{10,})["""\u201C\u201D]/);
@@ -337,7 +337,7 @@ IMPORTANT INSTRUCTIONS FOR DEPTH:
         message: `The student's connection: "${userInput}". Evaluate their insight thoroughly — what they got right, what they missed, and what deeper layers they could explore. Then provide the full analysis with a ✨ Spark at the end.`,
       }, "study-experience");
 
-      const response = typeof data === "string" ? data : data?.response || "";
+      const response = typeof data === "string" ? data : (data as any)?.response || "";
 
       const evalSplit = response.split(/(?:full analysis|here'?s? (?:the )?(?:full|complete) (?:analysis|breakdown))/i);
       const evaluation = evalSplit.length > 1 ? evalSplit[0].trim() : undefined;

@@ -445,11 +445,30 @@ export function ImmersiveAudioPlayer({
       ambient.volume = Math.max(0, targetVol);
       ambient.play().then(() => setAmbientPlaying(true)).catch(() => {});
 
-      // When ambient track ends, crossfade to next
+      // Crossfade before the track ends (start 4s before end)
+      const handleTimeUpdate = () => {
+        if (
+          ambient.duration &&
+          ambient.duration - ambient.currentTime <= CROSSFADE_DURATION / 1000 &&
+          ambient.duration - ambient.currentTime > (CROSSFADE_DURATION / 1000) - 0.3
+        ) {
+          const nextIdx = (ambientTrackIdx + 1) % trackList.length;
+          setAmbientTrackIdx(nextIdx);
+          crossfadeToNext(trackList, nextIdx);
+        }
+      };
+      ambient.addEventListener('timeupdate', handleTimeUpdate);
+
+      // Fallback: if track ends without crossfade trigger
       ambient.onended = () => {
         const nextIdx = (ambientTrackIdx + 1) % trackList.length;
         setAmbientTrackIdx(nextIdx);
         crossfadeToNext(trackList, nextIdx);
+      };
+
+      // Cleanup listener
+      return () => {
+        ambient.removeEventListener('timeupdate', handleTimeUpdate);
       };
     } else if (!isOpen) {
       ambientRef.current.pause();
