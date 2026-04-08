@@ -18,18 +18,12 @@ interface VersePanelProps {
   loading: boolean;
 }
 
-const SUGGESTED_VERSES = [
-  "John 3:16",
-  "Genesis 1:1",
-  "Romans 8:28",
-  "Psalm 23:1",
-];
-
-const SUGGESTED_TOPICS = [
-  "The Parable of the Good Samaritan",
-  "The New Covenant",
-  "The Little Horn",
-  "The Sanctuary",
+const SUGGESTED_EXAMPLES = [
+  { label: "John 3:16", type: "Verse" },
+  { label: "Genesis 1:1-5", type: "Range" },
+  { label: "David and Goliath", type: "Story" },
+  { label: "The Ark of the Covenant", type: "Object" },
+  { label: "Redemption", type: "Theme" },
 ];
 
 function isTopicInput(ref: string): boolean {
@@ -68,35 +62,17 @@ export function VersePanel({ verseRef, parsedRef, verseText, onStudy, loading }:
       </form>
 
       {!parsedRef && (
-        <div className="space-y-3">
-          <div>
-            <p className="text-xs text-muted-foreground mb-1.5 font-medium">📖 Verses</p>
-            <div className="flex flex-wrap gap-2">
-              {SUGGESTED_VERSES.map((v) => (
-                <button
-                  key={v}
-                  onClick={() => handleChipClick(v)}
-                  className="px-3 py-1.5 text-xs rounded-full bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-colors"
-                >
-                  {v}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground mb-1.5 font-medium">💡 Topics &amp; Themes</p>
-            <div className="flex flex-wrap gap-2">
-              {SUGGESTED_TOPICS.map((t) => (
-                <button
-                  key={t}
-                  onClick={() => handleChipClick(t)}
-                  className="px-3 py-1.5 text-xs rounded-full bg-accent/30 border border-accent/40 text-accent-foreground hover:bg-accent/50 transition-colors"
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          </div>
+        <div className="flex flex-wrap gap-2">
+          {SUGGESTED_EXAMPLES.map((item) => (
+            <button
+              key={item.label}
+              onClick={() => handleChipClick(item.label)}
+              className="px-3 py-1.5 text-xs rounded-full bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-colors"
+            >
+              {item.label}
+              <span className="ml-1.5 text-[10px] text-muted-foreground">({item.type})</span>
+            </button>
+          ))}
         </div>
       )}
 
