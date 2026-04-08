@@ -549,6 +549,8 @@ IMPORTANT INSTRUCTIONS FOR DEPTH:
                     key={`${layer.principleId}-${i}`}
                     layer={layer}
                     index={i}
+                    verseRef={verseRef}
+                    verseText={verseText}
                     onRemove={handleRemoveLayer}
                     onAccept={handleAcceptLayer}
                     onRebuild={handleRebuildLayer}
