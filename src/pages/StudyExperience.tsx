@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -70,6 +71,26 @@ export default function StudyExperience() {
     setSuggestedRoom(null);
     setUserInput("");
     setExpandedRoom(null);
+
+    // Fetch verse text from database
+    try {
+      setVerseLookupLoading(true);
+      const { data: verseData } = await supabase
+        .from("bible_verses_tokenized")
+        .select("text_kjv")
+        .ilike("book", parsed.book)
+        .eq("chapter", parseInt(parsed.chapter))
+        .eq("verse_num", parseInt(parsed.verse.split("-")[0]))
+        .maybeSingle();
+
+      if (verseData?.text_kjv) {
+        setVerseText(verseData.text_kjv);
+      }
+    } catch (err) {
+      console.error("Failed to fetch verse text:", err);
+    } finally {
+      setVerseLookupLoading(false);
+    }
 
     // If user-led, immediately fetch cross-room suggestion
     if (mode === "user-led") {
