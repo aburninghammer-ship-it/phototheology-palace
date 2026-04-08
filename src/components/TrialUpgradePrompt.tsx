@@ -169,7 +169,7 @@ export function TrialUpgradePrompt({ variant = 'banner', onDismiss }: TrialUpgra
 
   if (variant === 'modal') {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 ">
         <Card className="max-w-md mx-4 border-primary/30">
           <CardContent className="pt-6">
             <button 

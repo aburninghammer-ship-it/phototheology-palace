@@ -674,7 +674,7 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
 
       {/* Stats row — adapted per level */}
       <div className={cn(
-        "rounded-xl border backdrop-blur-sm px-4 py-3 flex items-center gap-3 transition-all duration-500",
+        "rounded-xl border  px-4 py-3 flex items-center gap-3 transition-all duration-500",
         isBasic
           ? "border-emerald-500/20 bg-gradient-to-r from-emerald-950/60 via-teal-950/40 to-cyan-950/30 shadow-[0_0_15px_rgba(16,185,129,0.06)]"
           : isExplorer
@@ -789,7 +789,7 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
             transition={{ duration: 0.3 }}
           >
             <div className={cn(
-              "rounded-xl border bg-gradient-to-r backdrop-blur-sm px-3 py-2 flex items-center gap-2.5 transition-all",
+              "rounded-xl border bg-gradient-to-r  px-3 py-2 flex items-center gap-2.5 transition-all",
               style.accent,
               "cursor-pointer active:opacity-80"
             )}
