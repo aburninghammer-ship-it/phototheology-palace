@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { Telescope, Sparkles, Filter, Search, AlertTriangle, Shield, BookOpen, Scale, ChevronRight, Clock, MapPin, Lightbulb, Quote, FileText, HelpCircle, Link, ExternalLink, Loader2, GraduationCap } from "lucide-react";
+import { Telescope, Sparkles, Filter, Search, AlertTriangle, Shield, BookOpen, Scale, ChevronRight, Clock, MapPin, Lightbulb, Quote, FileText, HelpCircle, Link, ExternalLink, Loader2, GraduationCap, Newspaper, CalendarDays, RefreshCw } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion } from "framer-motion";
@@ -69,6 +69,94 @@ const ProphecyWatch = () => {
   const [articleUrl, setArticleUrl] = useState("");
   const [analyzingLink, setAnalyzingLink] = useState(false);
   const [tourOpen, setTourOpen] = useState(false);
+
+  // Daily Briefing state
+  const [dailyBriefing, setDailyBriefing] = useState<string | null>(null);
+  const [generatingBriefing, setGeneratingBriefing] = useState(false);
+  const [briefingDate, setBriefingDate] = useState<string | null>(null);
+
+  const getYesterdayLabel = () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    return yesterday.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+  };
+
+  const runDailyBriefing = async () => {
+    setGeneratingBriefing(true);
+    setDailyBriefing(null);
+
+    const yesterday = getYesterdayLabel();
+
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "prophecy-watch",
+          watchQuery: `DAILY PROPHECY BRIEFING for ${yesterday}.
+
+Scan the most significant events from the PRIOR DAY (${yesterday}) and analyze their prophetic relevance. Focus on these watch topics and key figures/movements:
+
+KEY WATCH TOPICS:
+- Christian nationalism developments (legislation, executive orders, cultural momentum)
+- Church-state fusion signals (10 Commandments displays, prayer in schools, religious tests)
+- MAGA movement and religious branding (Trump as chosen leader narrative, evangelical alignment)
+- Tucker Carlson — any statements on religion, morality, or cultural Christianity
+- Pete Hegseth — any Pentagon/military + faith intersection developments
+- Paula White — any faith advisor or prosperity gospel political connections
+- Right-wing media religious messaging (Fox News, Daily Wire, etc.)
+- Sunday law trajectory (blue laws, Sabbath/Sunday legislation, religious day enforcement)
+- NAR (New Apostolic Reformation) network activity
+- 7 Mountain Dominionism advances in government, media, education, business
+- Religious liberty weaponization (using liberty language to restrict others)
+- Anti-DEI pipeline intersecting with moral restoration narratives
+- Economic coercion tied to religious compliance
+
+FORMAT YOUR RESPONSE AS:
+
+### TODAY'S PROPHECY BRIEFING — ${yesterday}
+
+**HEADLINE SIGNALS** (top 3-5 developments from yesterday with prophetic relevance)
+
+For each headline:
+- **Event**: What happened
+- **Signal Type**: Which watch category it maps to
+- **Intensity Score**: 0-5 rating
+- **Prophetic Connection**: How this connects to biblical eschatology (Daniel, Revelation, Matthew 24)
+- **Key Figures**: People involved
+- **Source**: Where this was reported
+
+**TRAJECTORY READING**
+Brief assessment: Are we seeing acceleration, deceleration, or steady-state on key prophetic indicators?
+
+**WATCHMAN'S NOTE**
+One paragraph — what should students of prophecy be paying attention to TODAY based on yesterday's developments?
+
+GUARDRAILS: No "fulfillment" declarations. Use "trajectory," "convergence," "conditioning." Citation-safe. Non-partisan analysis. Evidence over emotion.`,
+          focusArea: undefined,
+          timeframe: "past 24 hours",
+        },
+      });
+
+      if (error) throw error;
+      if (!data?.content) throw new Error("No briefing returned");
+
+      setDailyBriefing(data.content);
+      setBriefingDate(yesterday);
+
+      toast({
+        title: "Daily Briefing Ready",
+        description: `Prophecy briefing for ${yesterday} generated`,
+      });
+    } catch (error: any) {
+      console.error("Daily briefing error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to generate daily briefing",
+        variant: "destructive",
+      });
+    } finally {
+      setGeneratingBriefing(false);
+    }
+  };
 
   const runProphecyWatch = async () => {
     if (!watchQuery.trim() && focusArea === "all") {
@@ -414,6 +502,107 @@ const ProphecyWatch = () => {
                 Non-Partisan
               </Badge>
             </motion.div>
+          </div>
+        </motion.div>
+
+        {/* Daily Prophecy Briefing Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+          className="bg-gradient-to-r from-amber-900/40 via-orange-900/30 to-red-900/40 backdrop-blur-md text-white py-8 px-4 border-y border-amber-500/20"
+        >
+          <div className="container mx-auto max-w-6xl">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/30 to-orange-500/30 flex items-center justify-center border border-amber-400/30 shadow-lg shadow-amber-500/10">
+                  <Newspaper className="h-7 w-7 text-amber-400" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold flex items-center gap-2">
+                    <span className="bg-gradient-to-r from-amber-300 to-orange-300 bg-clip-text text-transparent">Daily Prophecy Briefing</span>
+                    <Badge className="bg-amber-500/20 border-amber-500/30 text-amber-300 text-[10px]">NEW</Badge>
+                  </h2>
+                  <p className="text-sm text-white/60 flex items-center gap-1.5">
+                    <CalendarDays className="h-3.5 w-3.5" />
+                    Yesterday's events through a prophetic lens — {getYesterdayLabel()}
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={runDailyBriefing}
+                disabled={generatingBriefing || generating || analyzingLink}
+                className="h-12 px-8 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-amber-500/25 transition-all duration-300 whitespace-nowrap"
+              >
+                {generatingBriefing ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Scanning Events...
+                  </>
+                ) : dailyBriefing ? (
+                  <>
+                    <RefreshCw className="mr-2 h-5 w-5" />
+                    Refresh Briefing
+                  </>
+                ) : (
+                  <>
+                    <Newspaper className="mr-2 h-5 w-5" />
+                    Open Today's Briefing
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {/* Daily Briefing Results */}
+            {generatingBriefing && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                className="mt-6 text-center py-12"
+              >
+                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center border border-amber-500/30 animate-pulse">
+                  <Newspaper className="h-10 w-10 text-amber-400" />
+                </div>
+                <p className="text-amber-300 font-medium">Scanning yesterday's events for prophetic signals...</p>
+                <p className="text-white/50 text-sm mt-1">Analyzing church-state developments, Christian nationalism, and key figures</p>
+              </motion.div>
+            )}
+
+            {dailyBriefing && !generatingBriefing && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-6"
+              >
+                <Card variant="glass" className="bg-background/80 border-amber-500/20 overflow-hidden">
+                  <CardHeader className="border-b border-amber-500/10 bg-gradient-to-r from-amber-500/5 to-transparent py-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Newspaper className="h-5 w-5 text-amber-400" />
+                        <CardTitle className="text-lg bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+                          Prophecy Briefing — {briefingDate}
+                        </CardTitle>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setDailyBriefing(null)}
+                        className="text-white/50 hover:text-white"
+                      >
+                        Close
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <ScrollArea className="max-h-[600px]">
+                      <div className="p-6">
+                        {parseAnalysisContent(dailyBriefing).map((section, idx) => renderSection(section, idx))}
+                      </div>
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
           </div>
         </motion.div>
 
