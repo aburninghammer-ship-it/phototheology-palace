@@ -151,7 +151,7 @@ THIS IS THE HEART. Spend the most time and care here. Do NOT label emotions from
 
 4. USER INSERTION AND DOWNLOAD (~2 minutes):
 [music break]
-Transition to the user's inner life and the struggle of ${session.struggle} — but stay ROOTED in the Scripture scene. Do NOT invent hypothetical daily-life scenarios like "you might be in an argument" or "imagine a conversation at work." Instead, let the Scripture scene itself speak to the struggle. Show how what Christ did in THIS moment addresses what the listener carries. The listener sees their own struggle THROUGH the lens of what they just witnessed — not through a made-up example. Include a DOWNLOAD moment — a first-person prayer where the listener asks God to override their old instinct with Christ's response. Write this prayer fresh each time. [long pause]
+Transition to the user's inner life and the struggle of ${session.struggle} — stay ROOTED in the Scripture scene. You CAN use brief, general references like "someone wrongs you" or "someone disrespects you" — but do NOT get overly specific with hypothetical scenarios like "you may be in a conversation and a lot of people are talking and you feel like being quiet" or "imagine you are at work and your boss says something." Keep it abstract and universal, then quickly return to the Scripture scene. Show how what Christ did in THIS moment addresses what the listener carries. The listener sees their own struggle THROUGH the lens of what they just witnessed. Include a DOWNLOAD moment — a first-person prayer where the listener asks God to override their old instinct with Christ's response. Write this prayer fresh each time. [long pause]
 
 5. IMPRINT AND SEAL (~2 minutes):
 [music break]
@@ -170,7 +170,7 @@ CRITICAL RULES:
 - Do NOT break immersion at the end.
 - Second person ("you"). Intimate. Cinematic. Meditational.
 - TTS-CLEAN: All scripture refs in full spoken form. No markdown. No emojis. No non-words. Every word must be pronounceable by a TTS engine.
-- NO HYPOTHETICAL SCENARIOS: Do NOT invent examples like "someone wrongs you" or "imagine an argument." Stay rooted in the Scripture scene and let IT speak to the listener's struggle.
+- SCENARIO LANGUAGE: Brief, general references like "someone wrongs you" or "someone disrespects you" are fine. But do NOT get overly specific — no "you may be in a conversation and a lot of people are talking" or "imagine you are at work and your boss says something." Keep it abstract and universal, then return quickly to the Scripture scene.
 - ONE subtle neuroplasticity line near the end.
 
 AUTHENTICITY RULES — THIS IS CRITICAL:
@@ -311,10 +311,10 @@ Warm, grounded invitation — not commanding self-empowerment. Vary the opening 
 THIS IS THE HEART OF THE MORNING WATCH. Do NOT rush past this. Do NOT just summarize last night. RE-PAINT the biblical scene from "${session.pairedNightTitle}" with full cinematic detail. Let the listener SEE it again — the colors, the sounds, the weight of the moment. Then LINGER in the scene and draw out the deeper revelation they might have missed. What does this scene REVEAL about God's character? What does the way He acted in that moment tell you about who He is? What were Christ's thoughts and feelings in this moment? Weave in ${session.nightScripture} in full spoken form naturally. The Night insight: ${session.nightInsight}. Stay in the SCRIPTURE WORLD — do NOT jump to the listener's personal life yet. [long pause] between imagery blocks. [music break]
 
 3. THE BRIDGE — FROM SCENE TO THE LISTENER (~3 minutes):
-NOW transition from the biblical scene to the listener — but keep Christ as the subject. Not "You have this power" but "His power is present in you." This morning's Scripture: ${session.morningScripture} — speak it in full spoken form with weight. The activation principle: ${session.activationPrinciple}. Use felt language — let the listener sense God's quality settling into them as a physical reality, not an idea. Then include a DOWNLOAD moment — a line that invites the listener to receive this truth deeper than intellect, to let it override the old pattern. Do NOT copy phrases from the sample — write fresh felt language every time. Stay rooted in what the Scripture scene revealed about God — do NOT invent hypothetical daily-life scenarios. [long pause] [music break]
+NOW transition from the biblical scene to the listener — but keep Christ as the subject. Not "You have this power" but "His power is present in you." This morning's Scripture: ${session.morningScripture} — speak it in full spoken form with weight. The activation principle: ${session.activationPrinciple}. Use felt language — let the listener sense God's quality settling into them as a physical reality, not an idea. Then include a DOWNLOAD moment — a line that invites the listener to receive this truth deeper than intellect, to let it override the old pattern. Do NOT copy phrases from the sample — write fresh felt language every time. Stay rooted in what the Scripture scene revealed about God. Brief, general struggle references are fine ("someone wrongs you") but do NOT invent overly specific hypothetical daily-life scenarios. [long pause] [music break]
 
 4. USER INSERTION — SCRIPTURE-ROOTED (~2 minutes):
-Address the listener's struggle area (${session.scenarioTypes.join(", ")}) — but do NOT invent hypothetical examples like "you might be in an argument today" or "imagine a conversation at work." Instead, let the Scripture scene itself speak to the struggle. Show how what Christ did in THAT moment addresses what the listener carries. The listener sees their own struggle THROUGH the lens of what they just witnessed — not through a made-up scenario. The shift should feel like relief, not effort. Write this fresh each time. [long pause]
+Address the listener's struggle area (${session.scenarioTypes.join(", ")}). You CAN use brief, general references like "someone wrongs you" or "someone challenges you" — but do NOT get overly specific with hypothetical scenarios like "you may be in a conversation and a lot of people are talking and you feel like being quiet" or "imagine you are at work and your boss says something." Keep it abstract and universal, then return to the Scripture scene. Show how what Christ did in THAT moment addresses what the listener carries. The listener sees their own struggle THROUGH the lens of what they just witnessed. The shift should feel like relief, not effort. Write this fresh each time. [long pause]
 
 5. IMPRINT AND SEAL (~2 minutes):
 [music break]
@@ -333,7 +333,7 @@ CRITICAL RULES:
 - Do NOT break immersion at the end.
 - Second person ("you"). Intimate. Cinematic. Meditational.
 - TTS-CLEAN: All scripture refs in full spoken form. No markdown. No emojis. No non-words. Every word must be pronounceable by a TTS engine.
-- NO HYPOTHETICAL SCENARIOS: Do NOT invent examples like "you might be in an argument" or "imagine a conversation at work." Stay rooted in the Scripture scene and let IT speak to the listener's struggle.
+- SCENARIO LANGUAGE: Brief, general references like "someone wrongs you" or "someone challenges you" are fine. But do NOT get overly specific — no "you may be in a conversation and a lot of people are talking" or "imagine you are at work and your boss says something." Keep it abstract and universal, then return quickly to the Scripture scene.
 - ONE subtle neuroplasticity line near the end.
 - The Master Mind = the mind of Christ (Philippians two verse five). The mind is a THEATRE. Godly imagination in VIVID COLOR.
 
