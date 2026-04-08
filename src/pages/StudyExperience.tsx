@@ -550,6 +550,9 @@ IMPORTANT INSTRUCTIONS FOR DEPTH:
                     layer={layer}
                     index={i}
                     onRemove={handleRemoveLayer}
+                    onAccept={handleAcceptLayer}
+                    onRebuild={handleRebuildLayer}
+                    onSaveLayer={handleSaveLayer}
                   />
                 ))}
               </div>
