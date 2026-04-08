@@ -191,6 +191,26 @@ export default function ShowMe() {
           </div>
         </motion.div>
 
+        {/* Free Tier Notice */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mb-16 rounded-2xl border border-primary/20 bg-primary/5 backdrop-blur-md p-6 md:p-8 text-center"
+        >
+          <h3 className="text-xl font-bold mb-2">✨ Free Forever Plan</h3>
+          <p className="text-muted-foreground mb-4 max-w-lg mx-auto text-sm">
+            No credit card needed. Get permanent access to the Bible Reader, Daily Verse, Morning & Night Watch, Floor 1 rooms, achievements, and more.
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(user ? "/pricing" : "/auth")}
+          >
+            {user ? "See What's Included" : "Create Free Account"}
+          </Button>
+        </motion.div>
+
         {/* Bottom CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
