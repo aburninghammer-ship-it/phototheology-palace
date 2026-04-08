@@ -757,7 +757,7 @@ ${isCurrentTopicStudy
             </div>
 
             {/* Desktop: vertical stack */}
-            <div className="hidden md:flex flex-col gap-2 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pr-1 min-h-0">
+            <div className="hidden md:flex flex-col gap-2 pr-1">
               {allFloors.map((fg) => (
                 <FloorSection
                   key={fg.floor}
