@@ -4172,7 +4172,28 @@ ${book} ${chapter}:${verse}
 "${verseText}"
 
 **YOUR TASK:**
-Show specifically HOW this principle reveals insight in this verse. Be concrete and practical.
+Show specifically HOW this principle reveals insight in this verse. Be concrete and practical. You MUST demonstrate the principle by actually DOING it, not just describing it.
+
+**PRINCIPLE-SPECIFIC INSTRUCTIONS:**
+• If the principle involves **Parable** (Connect 6): Pick a specific parable of Jesus that connects thematically to this verse. Name it, quote from it (KJV), and show the connection.
+• If the principle involves **Prophecy** (Connect 6): Identify a specific prophecy (Daniel, Revelation, or OT prophets) that links to this verse. Quote it and trace the connection.
+• If the principle involves **Poetry** (Connect 6): Find a Psalm or poetic passage that echoes this verse's theme. Quote it and show the literary/thematic parallel.
+• If the principle involves **History** (Connect 6): Identify a specific historical biblical event that illuminates or parallels this verse. Name it and trace the link.
+• If the principle involves **Gospel** (Connect 6): Show how this verse connects to a specific moment in Christ's life, ministry, death, or resurrection.
+• If the principle involves **Epistle** (Connect 6): Find a specific apostolic teaching (Paul, Peter, James, John) that expands or applies this verse's truth.
+• If the principle involves **Christological** (Dimensions): Show specifically WHERE and HOW Christ appears in this text — as type, shadow, prophecy, or direct reference.
+• If the principle involves **Eschatological** or **Heaven** (Dimensions): Connect this verse to a specific end-time or heavenly reality.
+• If the principle involves **Sanctuary** (Blue Room): Map this verse to specific sanctuary furniture, service, or feast day. Name the element and explain the typological link.
+• If the principle involves **Patterns**: Identify a specific repeating biblical pattern (e.g., 3 days, 40 days, deliverer cycle) and show how this verse fits it.
+• If the principle involves **Parallels**: Find a specific mirrored event across Scripture and show the structural echo.
+• If the principle involves **Types/Symbols**: Identify the specific symbol or type in this verse and trace its meaning across Scripture.
+• If the principle involves **Time Zone**: Place this verse in its specific time zone (past/present/future × heaven/earth) and explain why.
+• If the principle involves **Observation**: List 5-10 specific details a casual reader would miss. Be forensic.
+• If the principle involves **Freestyle** (Nature/Personal/History): Create a vivid real-world analogy or object lesson from nature, daily life, or world history that illustrates this verse's truth.
+• If the principle involves **Fire Room**: Write with emotional weight — make the reader FEEL the gravity of this text.
+• If the principle involves **Meditation**: Slow down. Take one phrase at a time and let it breathe. Guide contemplative reflection.
+
+Always quote Scripture in KJV. Always name specific passages, parables, or events — never speak in generalities.
 
 🎯 **Opening** (2-3 sentences)
 Start with how this principle naturally connects to this verse.
