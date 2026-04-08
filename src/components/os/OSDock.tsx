@@ -18,7 +18,7 @@ export function OSDock() {
   const { mode, isBasic } = useExperienceMode();
   const currentPath = location.pathname;
 
-  const publicPaths = ["/", "/landing", "/auth", "/interactive-demo", "/comparison", "/privacy-policy", "/terms-of-service", "/level-select"];
+  const publicPaths = ["/", "/landing", "/auth", "/interactive-demo", "/comparison", "/privacy-policy", "/terms-of-service", "/level-select", "/show-me"];
   const isPublicPage = publicPaths.some(p => currentPath === p) || currentPath.startsWith("/auth");
   if (isPublicPage || isBasic) return null;
 

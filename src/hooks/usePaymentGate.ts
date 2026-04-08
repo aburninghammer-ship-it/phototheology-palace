@@ -266,9 +266,9 @@ export function usePaymentGate() {
         setChecking(false);
 
         // Only redirect if not already on auth-related pages
-        const excludedPaths = ["/pricing", "/auth", "/patreon-callback", "/stripe-success", "/stripe-cancel", "/fix-billing"];
+        const excludedPaths = ["/pricing", "/auth", "/patreon-callback", "/stripe-success", "/stripe-cancel", "/fix-billing", "/show-me"];
         if (!excludedPaths.some((path) => location.pathname.startsWith(path))) {
-          navigate("/pricing?trial=true", { replace: true });
+          navigate("/show-me", { replace: true });
         }
       } catch (error) {
         console.error("[PaymentGate] Error checking access:", error);
