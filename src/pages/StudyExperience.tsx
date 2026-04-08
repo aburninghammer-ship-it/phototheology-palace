@@ -689,6 +689,8 @@ INSTRUCTIONS FOR RECAP:
               <UserLedInput
                 roomName={suggestedRoomData.roomName}
                 principleName={suggestedPrincipleData.name}
+                principleId={suggestedPrincipleData.id}
+                principleDescription={suggestedPrincipleData.description}
                 userInput={userInput}
                 onChange={setUserInput}
                 onSubmit={handleUserLedSubmit}
