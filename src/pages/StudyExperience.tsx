@@ -771,25 +771,37 @@ function FloorSection({
   const isOpen = expandedFloor === fg.floor;
   const roomsUsed = fg.rooms.filter((r) => usedRoomIds.has(r.id)).length;
 
+  const floorColors: Record<number, { bg: string; border: string; text: string; badge: string }> = {
+    1: { bg: "bg-blue-500/10", border: "border-blue-500/30", text: "text-blue-400", badge: "bg-blue-500/20" },
+    2: { bg: "bg-emerald-500/10", border: "border-emerald-500/30", text: "text-emerald-400", badge: "bg-emerald-500/20" },
+    3: { bg: "bg-amber-500/10", border: "border-amber-500/30", text: "text-amber-400", badge: "bg-amber-500/20" },
+    4: { bg: "bg-purple-500/10", border: "border-purple-500/30", text: "text-purple-400", badge: "bg-purple-500/20" },
+    5: { bg: "bg-rose-500/10", border: "border-rose-500/30", text: "text-rose-400", badge: "bg-rose-500/20" },
+    6: { bg: "bg-cyan-500/10", border: "border-cyan-500/30", text: "text-cyan-400", badge: "bg-cyan-500/20" },
+    7: { bg: "bg-orange-500/10", border: "border-orange-500/30", text: "text-orange-400", badge: "bg-orange-500/20" },
+    8: { bg: "bg-yellow-500/10", border: "border-yellow-500/30", text: "text-yellow-400", badge: "bg-yellow-500/20" },
+  };
+  const colors = floorColors[fg.floor] || floorColors[1];
+
   return (
-    <div className="rounded-lg border border-border/40 bg-card/40 overflow-hidden">
+    <div className={cn("rounded-lg border overflow-hidden", colors.border, colors.bg)}>
       <button
         onClick={() => setExpandedFloor(isOpen ? null : fg.floor)}
-        className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-muted/30 transition-colors"
+        className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-muted/20 transition-colors"
       >
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-primary/70 w-5">F{fg.floor}</span>
+          <span className={cn("text-xs font-bold w-5", colors.text)}>F{fg.floor}</span>
           <span className="text-sm font-medium">{fg.name}</span>
           {roomsUsed > 0 && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-500/20 text-green-400">
+            <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full text-green-400", colors.badge)}>
               {roomsUsed}/{fg.rooms.length}
             </span>
           )}
         </div>
         {isOpen ? (
-          <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+          <ChevronDown className={cn("w-3.5 h-3.5", colors.text)} />
         ) : (
-          <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
+          <ChevronRight className={cn("w-3.5 h-3.5", colors.text)} />
         )}
       </button>
 
