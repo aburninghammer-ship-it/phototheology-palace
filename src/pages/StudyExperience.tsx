@@ -414,10 +414,3 @@ export default function StudyExperience() {
   );
 }
 
-function StudyExperienceInlineContent() {
-  return (
-    <div className="relative">
-      <StudyExperienceInner />
-    </div>
-  );
-}

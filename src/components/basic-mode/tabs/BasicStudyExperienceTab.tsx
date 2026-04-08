@@ -1,21 +1,29 @@
 /**
- * BasicStudyExperienceTab — Embeds the Study Experience inside the shell tabs
+ * BasicStudyExperienceTab — Study Experience embedded inside shell tabs
  */
-import { useState, useCallback, lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 
-const StudyExperienceContent = lazy(() =>
-  import("@/pages/StudyExperience").then((m) => ({
-    default: m.StudyExperienceInline ?? m.default,
-  }))
-);
+const StudyExperience = lazy(() => import("@/pages/StudyExperience"));
 
 export default function BasicStudyExperienceTab() {
   return (
-    <div className="h-full overflow-y-auto">
+    <div className="h-full overflow-y-auto [&>div]:min-h-0">
       <Suspense fallback={<LoadingScreen />}>
-        <StudyExperienceContent />
+        <StudyExperienceEmbedded />
       </Suspense>
+    </div>
+  );
+}
+
+/**
+ * Renders StudyExperience page content without its own Nav/Footer.
+ * We achieve this by rendering it and hiding the full-page chrome via CSS.
+ */
+function StudyExperienceEmbedded() {
+  return (
+    <div className="study-experience-embedded [&_.min-h-screen]:min-h-0 [&>div>div:first-child]:hidden [&>div>div:nth-child(2)]:hidden [&>div>nav]:hidden [&>div>footer]:hidden">
+      <StudyExperience />
     </div>
   );
 }
