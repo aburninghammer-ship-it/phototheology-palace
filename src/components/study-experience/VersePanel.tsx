@@ -119,7 +119,19 @@ export function VersePanel({ verseRef, parsedRef, verseText, onStudy, loading }:
               </span>
             )}
           </div>
-          {isTopic ? (
+          {isTopic && verseText ? (
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">
+                Studying <span className="text-foreground font-medium">"{verseRef}"</span> as a biblical topic.
+              </p>
+              <div className="p-3 rounded-lg bg-background/50 border border-border/30 text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap max-h-[300px] overflow-y-auto">
+                {verseText}
+              </div>
+              <p className="text-xs text-muted-foreground">Select a room and principle below to begin exploring.</p>
+            </div>
+          ) : isTopic && loading ? (
+            <p className="text-xs text-muted-foreground animate-pulse">🔍 Finding key scriptures for "{verseRef}"...</p>
+          ) : isTopic ? (
             <p className="text-sm text-muted-foreground leading-relaxed">
               Studying <span className="text-foreground font-medium">"{verseRef}"</span> as a biblical topic. Select a room and principle below to begin exploring.
             </p>
