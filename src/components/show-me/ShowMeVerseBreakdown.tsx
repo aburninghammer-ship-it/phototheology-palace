@@ -57,8 +57,18 @@ export function ShowMeVerseBreakdown({ open, onOpenChange, onUse }: ShowMeVerseB
     setSections([]);
     try {
       onUse();
+      const ref = verseRef.trim();
+      // Parse "Genesis 1:1" into book/chapter/verse for the verse-explanation mode
+      const match = ref.match(/^(.+?)\s+(\d+):(\d+.*)$/);
       const { data, error } = await callJeeves(
-        { mode: "verse-explanation", message: verseRef.trim() },
+        {
+          mode: "verse-explanation",
+          message: ref,
+          book: match?.[1] || ref,
+          chapter: match?.[2] || "",
+          verse: match?.[3] || "",
+          verseText: ref, // fallback so the prompt always has context
+        },
         "show-me"
       );
       if (error) throw error;
