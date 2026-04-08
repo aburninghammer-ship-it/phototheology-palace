@@ -9,6 +9,7 @@ export function LiveChatToggle() {
   const { user } = useAuth();
   const { isOpen, setIsOpen, totalUnread } = useLiveChat();
   const hasDragged = useRef(false);
+  const dragDistance = useRef(0);
 
   if (!user || isOpen) return null;
 
@@ -19,9 +20,15 @@ export function LiveChatToggle() {
       transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.5 }}
       drag
       dragMomentum={false}
-      onDragStart={() => { hasDragged.current = true; }}
-      onDragEnd={() => { setTimeout(() => { hasDragged.current = false; }, 50); }}
-      className="fixed bottom-[88px] right-4 z-[55] md:bottom-6 touch-none select-none cursor-grab active:cursor-grabbing"
+      onDragStart={() => { dragDistance.current = 0; }}
+      onDrag={(_e, info) => { dragDistance.current = Math.abs(info.offset.x) + Math.abs(info.offset.y); }}
+      onDragEnd={() => {
+        if (dragDistance.current > 5) {
+          hasDragged.current = true;
+          setTimeout(() => { hasDragged.current = false; }, 200);
+        }
+      }}
+      className="fixed bottom-[88px] right-4 z-[55] md:bottom-6 select-none cursor-grab active:cursor-grabbing"
     >
       <Button
         onClick={() => {
