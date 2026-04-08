@@ -120,6 +120,7 @@ export default function StudyExperience() {
     setParsedRef(parsed);
     setVerseText("");
     setLayers([]);
+    setSynthesizedOutput(null);
     setSuggestedRoom(null);
     setUserInput("");
     setExpandedRoom(null);
