@@ -612,6 +612,56 @@ IMPORTANT INSTRUCTIONS FOR DEPTH:
                 ))}
               </div>
             )}
+
+            {/* Synthesized Output */}
+            {synthesizing && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="rounded-2xl border-2 border-primary/40 bg-card/30 backdrop-blur-xl p-6 shadow-[0_0_30px_-5px_hsl(var(--primary)/0.3)] ring-1 ring-primary/20"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                  <p className="text-sm text-primary font-medium">Jeeves is synthesizing your study layers…</p>
+                </div>
+              </motion.div>
+            )}
+
+            {synthesizedOutput && !synthesizing && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-primary/5 via-card/40 to-violet-500/5 backdrop-blur-xl overflow-hidden shadow-[0_0_40px_-8px_hsl(var(--primary)/0.35)] ring-1 ring-primary/20"
+              >
+                <div className="px-5 py-3 border-b border-primary/20 bg-primary/5 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-bold text-primary">Unified Study — {verseRef}</span>
+                  <span className="text-[10px] text-muted-foreground ml-auto">
+                    {layers.filter(l => l.accepted).length} layers combined
+                  </span>
+                </div>
+                <div className="p-5">
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed text-foreground/90">{synthesizedOutput}</p>
+                </div>
+                <div className="px-5 py-3 border-t border-primary/20 bg-primary/5 flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-8 px-3 text-xs gap-1.5 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30"
+                    onClick={() => {
+                      const saved = loadSavedStudies();
+                      saved.push({ ref: verseRef, layers: [{ roomId: "synthesis", roomName: "Unified Study", principleId: "synthesis", principleName: "Combined Analysis", analysis: synthesizedOutput!, accepted: true }], timestamp: Date.now() });
+                      localStorage.setItem(SAVE_KEY, JSON.stringify(saved.slice(-50)));
+                      toast.success("Unified study saved!");
+                    }}
+                  >
+                    <Save className="w-3.5 h-3.5" />
+                    Save Unified Study
+                  </Button>
+                </div>
+              </motion.div>
+            )}
           </div>
 
           {/* Right column: ALL rooms by floor */}
