@@ -421,6 +421,9 @@ IMPORTANT INSTRUCTIONS FOR DEPTH:
           <h1 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent">
             Study Experience
           </h1>
+          <p className="text-lg text-primary/80 font-medium mb-2">
+            One Verse. Endless Combinations.
+          </p>
           <p className="text-muted-foreground max-w-xl mx-auto mb-6">
             Select a verse. Choose a room. Watch understanding unfold.
           </p>
