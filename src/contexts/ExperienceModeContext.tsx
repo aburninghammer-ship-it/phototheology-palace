@@ -38,6 +38,7 @@ export { MODE_LEVEL };
 interface ExperienceModeContextType {
   mode: ExperienceMode;
   setMode: (mode: ExperienceMode) => void;
+  isLoading: boolean;
   isBasic: boolean;
   isExplorer: boolean;
   isImmersion: boolean;
@@ -61,27 +62,42 @@ export function ExperienceModeProvider({ children }: { children: ReactNode }) {
   const [mode, setModeState] = useState<ExperienceMode>(() => {
     return normalizeMode(localStorage.getItem(STORAGE_KEY));
   });
+  const [isLoading, setIsLoading] = useState(true);
 
   // Sync from database on auth
   useEffect(() => {
+    let isMounted = true;
+
     const loadFromProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!isMounted || !user) return;
 
-      const { data } = await supabase
-        .from("profiles")
-        .select("experience_mode")
-        .eq("id", user.id)
-        .single();
+        const { data } = await supabase
+          .from("profiles")
+          .select("experience_mode")
+          .eq("id", user.id)
+          .single();
 
-      if (data?.experience_mode) {
-        const normalized = normalizeMode(data.experience_mode);
-        setModeState(normalized);
-        localStorage.setItem(STORAGE_KEY, normalized);
+        if (!isMounted) return;
+
+        if (data?.experience_mode) {
+          const normalized = normalizeMode(data.experience_mode);
+          setModeState(normalized);
+          localStorage.setItem(STORAGE_KEY, normalized);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     loadFromProfile();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const setMode = useCallback(async (newMode: ExperienceMode) => {
@@ -106,6 +122,7 @@ export function ExperienceModeProvider({ children }: { children: ReactNode }) {
   const value: ExperienceModeContextType = {
     mode,
     setMode,
+    isLoading,
     isBasic: mode === "basic",
     isExplorer: mode === "explorer",
     isImmersion: mode === "immersion",
