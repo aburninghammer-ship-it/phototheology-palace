@@ -57,12 +57,12 @@ Do you feel the difference? The second version doesn't TELL you what He's feelin
 
 HOW TO ACHIEVE THIS:
 - Stop labeling emotions. Start evoking them. Instead of "He felt peace" — describe what peace feels like FROM INSIDE that moment.
-- Use tension and contrast. The emotion hits harder when you feel what COULD HAVE happened first. "Everything in Him wants to stop… but something holds Him."
-- Make it personal and specific. Not "He sees souls" — "He sees you. Not the crowd. You."
-- Let vulnerability in. Christ at the cross wasn't stoic. He was in agony — and chose love anyway. That tension is where the emotional connection lives.
-- Use sensory emotional language — "the weight is unbearable," "something holds Him," "your chest tightens" — not abstract theological labels.
+- Use tension and contrast. The emotion hits harder when you feel what COULD HAVE happened first — show the pull of the alternative before revealing what He chose.
+- Make it personal and specific. Collapse the distance between the listener and Christ — put them in the same room, the same glance, the same silence.
+- Let vulnerability in. Christ wasn't stoic. He was in agony — and chose love anyway. That tension is where the emotional connection lives.
+- Use sensory emotional language — weight, pressure, warmth, cold, tightness — not abstract theological labels.
 
-HERE IS THE FULL SAMPLE. Match this rhythm, emotional depth, and pacing exactly:
+HERE IS A REFERENCE SAMPLE showing the target emotional depth, pacing rhythm, and structure. Study the QUALITY and FEEL — but do NOT copy specific phrases, openings, or closings from this sample. Write completely fresh language every session:
 
 "Lock in.
 [pause]
@@ -127,17 +127,17 @@ Warm authority — but vary the opening every session. Establish the mind as a s
 3. ENTER THE MIND — THOUGHTS AND FEELINGS (~2.5 minutes):
 THIS IS THE HEART. Spend the most time and care here. Do NOT label emotions from the outside. EVOKE them from the inside.
 - Use tension and contrast: show what COULD have happened, what everything in Him wanted — then what He chose instead. Let the listener feel the cost of the choice.
-- Make it personal: "He sees you. Not the crowd. You."
+- Make it personal: collapse the distance so the listener is IN the scene with Christ, not watching from the audience.
 - Let vulnerability in: He wasn't stoic. Show the agony AND the love — the tension between them is where the emotional connection lives.
-- Use sensory emotional language: "the weight is unbearable," "something holds Him," "your chest tightens."
-- The Master Mind insight: ${session.masterMindInsight}. NAME the divine mindset — but after the listener has already FELT it: "This is what [mercy/surrender/authority/faith] actually feels like."
+- Use sensory emotional language — show what the experience feels like physically, not what it means theologically.
+- The Master Mind insight: ${session.masterMindInsight}. NAME the divine mindset — but only after the listener has already FELT it through the scene.
 [long pause] between ideas so each one lands in the listener's chest, not just their head.
 
 4. USER INSERTION AND DOWNLOAD (~1.5 minutes):
-"Now do not just watch this from a distance. Step closer. Enter it." Transition to the user's life and ${session.struggle} — not as a lecture but as a felt moment they recognize. Show the old reaction as a physical sensation: "You can feel it rising — the tightness. The heat." Then overlay Christ's response. DOWNLOAD LANGUAGE — forceful: "Download this into me. Not as an idea — as instinct. Not as something I remember — as something I become. Override my [specific old reaction] with Your [specific Christ response]. Make this my first response — not my second thought." [long pause]
+Transition to the user's life and ${session.struggle} — not as a lecture but as a felt moment they recognize. Show the old reaction as a physical sensation the listener can feel in their body. Then overlay Christ's response. Include a DOWNLOAD moment — a forceful, first-person prayer where the listener asks God to override their old instinct with Christ's response. Write this prayer fresh each time — do NOT reuse phrasing from the sample. [long pause]
 
 5. IMPRINT AND SEAL (~1 minute):
-Let the experience settle. [long pause] ONE neuroplasticity anchor — but phrase it freshly each time (do NOT always say "What you repeatedly behold, you become"). [long pause] A quiet declaration of receiving Christ's mind — varied in wording. [long pause] A varied commitment-style close (declaration, prayer, silence, or gratitude). Do NOT break immersion. Close with a natural dissolve — let the final words thin out and release gently into the ambient music. No abrupt commands. No "Let the music carry you." The ending should feel like a scene fading to black, not a director yelling cut.
+Let the experience settle. [long pause] ONE neuroplasticity anchor — but phrase it freshly each time. Do NOT say "What you repeatedly behold, you become" or "The screen stays on." Find new ways to express the rewiring truth: "The longer you look at Him, the more you start to look like Him." / "This gaze changes the wiring." / "Every time you return here, the old reaction loses its grip." / "What fills the screen fills the mind." Create your own — never repeat one you've used before. [long pause] A quiet declaration of receiving Christ's mind — do NOT always say "I receive the mind of Christ." Vary the wording: "His thoughts are becoming mine." / "I carry this with me." / "This is who I'm becoming." [long pause] A varied commitment-style close (declaration, prayer, silence, or gratitude). Do NOT break immersion. Close with a natural dissolve — let the final words thin out and release gently into the ambient music. No abrupt commands. The ending should feel like a scene fading to black, not a director yelling cut.
 
 CRITICAL RULES:
 - 800-1,200 WORDS. Voice is 5-8 minutes. The rest is ambient music only.
@@ -210,12 +210,12 @@ This script must connect on a THOUGHTS AND FEELINGS level, not just an intellect
 Do you feel the difference? The second version makes the listener feel the certainty in their own chest. It's not describing a theological concept — it's recreating the emotional experience.
 
 HOW TO ACHIEVE THIS:
-- RECALL the Night Watch emotionally, not informationally. Don't summarize what happened — let the listener feel a flash of what they experienced. "You were there. You felt it."
-- Use felt language for identity statements. Not "You are a person of authority" — instead, let the listener feel the quality settling into their body. Show it as a sensation, not a label.
-- Make scenarios visceral. Show the OLD reaction as a physical sensation: "You can feel it building — the familiar tightness in your chest, the heat rising, the voice in your head that says you're not enough." Then show the NEW response as a felt shift: "But something else is there now. Something that wasn't there before. A steadiness. A knowing."
+- RECALL the Night Watch emotionally, not informationally. Don't summarize what happened — let the listener feel a flash of what they experienced.
+- Use felt language for identity statements. Let the listener feel God's quality settling into their body. Show it as a sensation, not a label.
+- Make scenarios visceral. Show the OLD reaction as a physical sensation the listener recognizes in their body. Then show the NEW response as a felt shift — something different is present now, something they didn't put there. Write these sensations fresh each time — do NOT reuse the same body-language patterns (chest tightness, heat rising, etc.) across sessions.
 - Let the contrast do the emotional work. The listener should feel the pull of the old way AND the weight of the new way — and experience the shift between them.
 
-HERE IS THE FULL SAMPLE. Match this rhythm, emotional depth, and pacing exactly:
+HERE IS A REFERENCE SAMPLE showing the target emotional depth, pacing rhythm, and structure. Study the QUALITY and FEEL — but do NOT copy specific phrases, openings, or closings from this sample. Write completely fresh language every session:
 
 "Lock in.
 [pause]
@@ -281,7 +281,7 @@ THIS IS THE HEART OF THE MORNING WATCH. Do NOT rush past this. Do NOT just summa
 NOW transition from the biblical scene to the listener — but keep Christ as the subject. Not "You have this power" but "His power is present in you." This morning's Scripture: ${session.morningScripture}. Speak it with weight. The activation principle: ${session.activationPrinciple}. Use felt language — let the listener sense God's quality settling into them as a physical reality, not an idea. Then include a DOWNLOAD moment — a line that invites the listener to receive this truth deeper than intellect, to let it override the old pattern. Do NOT copy phrases from the sample — write fresh felt language every time. [long pause]
 
 4. USER INSERTION — ONE BRIEF SCENARIO (~1 minute):
-"Now bring your life into this." ONE vivid scenario from: ${session.scenarioTypes.join(", ")}. Keep it brief — the scene should have already done the heavy lifting. Show the old reaction, then overlay the new response. The listener sees themselves NOT acting from their own strength but from Christ's presence within them. "Not striving. Not performing. But resting in what He has already done — and moving from that place." [long pause]
+ONE vivid scenario from: ${session.scenarioTypes.join(", ")}. Keep it brief — the scene should have already done the heavy lifting. Show the old reaction as a felt sensation, then overlay the new response. The listener sees themselves acting from Christ's presence within them — not their own strength. The shift should feel like relief, not effort. Write this transition fresh — do NOT reuse language from the sample. [long pause]
 
 5. IMPRINT AND SEAL (~1 minute):
 [long pause] ONE neuroplasticity anchor — but phrase it freshly each time. Do NOT always say "What you repeatedly behold, you become." Find new ways to express the same truth: "The more you look at Him, the more He looks like you." / "This gaze reshapes you from the inside." / "Every time you return here, something shifts." [long pause] A quiet declaration of receiving Christ's mind — varied in wording each session. [long pause] ${session.commitmentStyle} style close. Do NOT break immersion. Close with a natural dissolve into silence — let the final words settle gently, then release the listener into the ambient music. No abrupt commands. No "Let the music carry you." The ending should feel like sunrise slowly filling a room — not a director calling cut.

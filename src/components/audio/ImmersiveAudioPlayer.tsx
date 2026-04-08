@@ -15,12 +15,14 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   X, Play, Pause, SkipForward, SkipBack, Volume2, VolumeX,
   Music, ListMusic, Maximize2, Settings, Loader2, ChevronUp, ChevronDown,
+  Share2, Download, Link2, MessageSquare,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchChapterVerses } from "@/services/audioBibleService";
 import { globalAudioManager } from "@/lib/globalAudioManager";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import type { ImmersiveTrack } from "@/hooks/useImmersiveMode";
 import { ImmersiveParticles } from "./immersive/ImmersiveParticles";
 import { ImmersiveKaraokeVerse } from "./immersive/ImmersiveKaraokeVerse";
@@ -122,6 +124,10 @@ export function ImmersiveAudioPlayer({
   // Settings panel
   const [showSettings, setShowSettings] = useState(false);
 
+  // Resolved audio URL for sharing
+  const [resolvedAudioUrl, setResolvedAudioUrl] = useState<string | null>(null);
+  const [showShareMenu, setShowShareMenu] = useState(false);
+
   // Dynamic ambient tracks from Supabase (watch_music_tracks table)
   const [dbAmbientTracks, setDbAmbientTracks] = useState<typeof AMBIENT_BG_TRACKS | null>(null);
 
@@ -157,6 +163,67 @@ export function ImmersiveAudioPlayer({
     ? dbAmbientTracks
     : FALLBACK_AMBIENT_SOUND_TRACKS;
   
+  // Audio sharing functions
+  const handleCopyAudioLink = useCallback(async () => {
+    if (!resolvedAudioUrl) return;
+    try {
+      await navigator.clipboard.writeText(resolvedAudioUrl);
+      toast.success("Audio link copied! Paste it in a text message.");
+      setShowShareMenu(false);
+    } catch {
+      toast.error("Failed to copy link");
+    }
+  }, [resolvedAudioUrl]);
+
+  const handleDownloadAudio = useCallback(async () => {
+    if (!resolvedAudioUrl) return;
+    try {
+      const resp = await fetch(resolvedAudioUrl);
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${(track?.title || "watch-session").replace(/[^a-z0-9]/gi, "_").toLowerCase()}.mp3`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("Audio downloaded!");
+      setShowShareMenu(false);
+    } catch {
+      toast.error("Download failed");
+    }
+  }, [resolvedAudioUrl, track?.title]);
+
+  const handleNativeShareAudio = useCallback(async () => {
+    if (!resolvedAudioUrl) return;
+    try {
+      const resp = await fetch(resolvedAudioUrl);
+      const blob = await resp.blob();
+      const file = new File([blob], `${(track?.title || "watch").replace(/[^a-z0-9]/gi, "_")}.mp3`, { type: "audio/mpeg" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: track?.title || "Watch Session",
+          text: `${track?.icon || "🎧"} ${track?.title}\n${track?.subtitle || ""}\n\n— Shared from Phototheology Palace`,
+          files: [file],
+        });
+        toast.success("Shared!");
+      } else if (navigator.share) {
+        await navigator.share({
+          title: track?.title || "Watch Session",
+          text: `${track?.icon || "🎧"} ${track?.title}\n${track?.subtitle || ""}\n\nListen: ${resolvedAudioUrl}\n\n— Shared from Phototheology Palace`,
+        });
+      } else {
+        handleCopyAudioLink();
+      }
+      setShowShareMenu(false);
+    } catch (e) {
+      if ((e as Error).name !== "AbortError") {
+        handleCopyAudioLink();
+      }
+    }
+  }, [resolvedAudioUrl, track, handleCopyAudioLink]);
+
   // Visual effects
   const [pulseIntensity, setPulseIntensity] = useState(0);
   
@@ -245,6 +312,9 @@ export function ImmersiveAudioPlayer({
           console.error("[Immersive] No audio URL returned for track:", track.title);
           return;
         }
+
+        // Store resolved URL for audio sharing
+        setResolvedAudioUrl(url.startsWith("data:") ? null : url);
 
         globalAudioManager.stopAllExcept(audioRef.current);
 
@@ -687,6 +757,57 @@ export function ImmersiveAudioPlayer({
               }}
               onVolumeFade={setSleepFadeMultiplier}
             />
+            {/* Share Audio button */}
+            {resolvedAudioUrl && (
+              <div className="relative">
+                <Button variant="ghost" size="icon" onClick={() => setShowShareMenu(!showShareMenu)}>
+                  <Share2 className="h-4 w-4" />
+                </Button>
+                <AnimatePresence>
+                  {showShareMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                      className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-border/50 bg-card/95 backdrop-blur-xl shadow-2xl z-50 overflow-hidden"
+                    >
+                      <div className="p-1.5 space-y-0.5">
+                        <button
+                          onClick={handleCopyAudioLink}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/50 transition-colors text-left"
+                        >
+                          <Link2 className="h-4 w-4 text-primary shrink-0" />
+                          <div>
+                            <p className="text-sm font-medium">Copy Audio Link</p>
+                            <p className="text-[10px] text-muted-foreground">Paste in a text message</p>
+                          </div>
+                        </button>
+                        <button
+                          onClick={handleNativeShareAudio}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/50 transition-colors text-left"
+                        >
+                          <MessageSquare className="h-4 w-4 text-primary shrink-0" />
+                          <div>
+                            <p className="text-sm font-medium">Send Audio File</p>
+                            <p className="text-[10px] text-muted-foreground">iMessage, WhatsApp, etc.</p>
+                          </div>
+                        </button>
+                        <button
+                          onClick={handleDownloadAudio}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/50 transition-colors text-left"
+                        >
+                          <Download className="h-4 w-4 text-primary shrink-0" />
+                          <div>
+                            <p className="text-sm font-medium">Download MP3</p>
+                            <p className="text-[10px] text-muted-foreground">Save to your device</p>
+                          </div>
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
             <Button variant="ghost" size="icon" onClick={() => setShowSettings(!showSettings)}>
               <Settings className="h-4 w-4" />
             </Button>
