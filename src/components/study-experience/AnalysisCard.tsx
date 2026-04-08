@@ -1,10 +1,11 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { X, Check, RefreshCw, Save, Sparkles, BookOpen, CrosshairIcon } from "lucide-react";
+import { X, Check, RefreshCw, Save, Sparkles, BookOpen, CrosshairIcon, MessageCircle, Send, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { callJeeves } from "@/lib/jeevesClient";
 
 export interface StudyLayer {
   roomId: string;
@@ -17,9 +18,16 @@ export interface StudyLayer {
   accepted?: boolean;
 }
 
+export interface DialogueMessage {
+  role: "user" | "jeeves";
+  content: string;
+}
+
 interface AnalysisCardProps {
   layer: StudyLayer;
   index: number;
+  verseRef?: string;
+  verseText?: string;
   onRemove?: (principleId: string) => void;
   onRebuild?: (principleId: string) => void;
   onAccept?: (principleId: string) => void;
@@ -47,66 +55,113 @@ const ROOM_COLORS: Record<string, { bg: string; border: string; text: string; gl
 
 const DEFAULT_COLORS = { bg: "bg-primary/10", border: "border-primary/30", text: "text-primary", glow: "shadow-[0_0_25px_-5px_hsl(var(--primary)/0.3)]", accent: "from-primary/20 to-primary/5" };
 
-/**
- * Parse Jeeves output into structured sections for beautiful rendering
- */
 function parseAnalysis(text: string) {
   const sections: { type: "text" | "spark" | "scripture" | "gem" | "crossref"; content: string }[] = [];
-  
   const lines = text.split("\n");
   let currentText = "";
 
   for (const line of lines) {
     const trimmed = line.trim();
 
-    // Spark line
     if (trimmed.match(/^✨\s*Spark:/i)) {
       if (currentText.trim()) { sections.push({ type: "text", content: currentText.trim() }); currentText = ""; }
       sections.push({ type: "spark", content: trimmed.replace(/^✨\s*Spark:\s*/i, "") });
       continue;
     }
-
-    // Gem line
     if (trimmed.match(/^💎\s*Gem:/i)) {
       if (currentText.trim()) { sections.push({ type: "text", content: currentText.trim() }); currentText = ""; }
       sections.push({ type: "gem", content: trimmed.replace(/^💎\s*Gem:\s*/i, "") });
       continue;
     }
-
-    // Cross-reference line
     if (trimmed.match(/^📖|^🔗|^Cross-reference:/i)) {
       if (currentText.trim()) { sections.push({ type: "text", content: currentText.trim() }); currentText = ""; }
       sections.push({ type: "crossref", content: trimmed.replace(/^(📖|🔗)\s*/, "").replace(/^Cross-reference:\s*/i, "") });
       continue;
     }
-
-    // Scripture quote (line in quotes or starting with ")
     if (trimmed.match(/^[""\u201C]/) && trimmed.match(/[""\u201D]$/) && trimmed.length > 30) {
       if (currentText.trim()) { sections.push({ type: "text", content: currentText.trim() }); currentText = ""; }
       sections.push({ type: "scripture", content: trimmed.replace(/^[""\u201C\u201D]|[""\u201C\u201D]$/g, "") });
       continue;
     }
-
     currentText += line + "\n";
   }
-
   if (currentText.trim()) sections.push({ type: "text", content: currentText.trim() });
-  
-  // If nothing was parsed specially, return full text
   if (sections.length === 0) sections.push({ type: "text", content: text });
-  
   return sections;
 }
 
-export function AnalysisCard({ layer, index, onRemove, onRebuild, onAccept, onSaveLayer }: AnalysisCardProps) {
+export function AnalysisCard({ layer, index, verseRef, verseText, onRemove, onRebuild, onAccept, onSaveLayer }: AnalysisCardProps) {
   const colors = ROOM_COLORS[layer.roomId] || DEFAULT_COLORS;
   const sections = parseAnalysis(layer.analysis);
   const [isSaved, setIsSaved] = useState(false);
+
+  // Dialogue state
+  const [dialogueOpen, setDialogueOpen] = useState(false);
+  const [dialogueMessages, setDialogueMessages] = useState<DialogueMessage[]>([]);
+  const [dialogueInput, setDialogueInput] = useState("");
+  const [dialogueLoading, setDialogueLoading] = useState(false);
+  const dialogueEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (dialogueEndRef.current) {
+      dialogueEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [dialogueMessages]);
 
   const handleSave = () => {
     onSaveLayer?.(layer);
     setIsSaved(true);
     toast.success("Layer saved to study!");
+  };
+
+  const handleDialogueSend = async () => {
+    const msg = dialogueInput.trim();
+    if (!msg || dialogueLoading) return;
+
+    setDialogueMessages((prev) => [...prev, { role: "user", content: msg }]);
+    setDialogueInput("");
+    setDialogueLoading(true);
+
+    try {
+      // Build conversation context
+      const conversationContext = dialogueMessages
+        .map((m) => `${m.role === "user" ? "Student" : "Jeeves"}: ${m.content}`)
+        .join("\n");
+
+      const { data } = await callJeeves({
+        mode: "principle-amplification",
+        book: verseRef?.split(/\s+\d/)?.[0] || "",
+        chapter: verseRef?.match(/(\d+):/)?.[1] || "",
+        verse: verseRef?.match(/:(\d+)/)?.[1] || "",
+        verseText: verseText || "",
+        principle: `${layer.roomName} (${layer.roomId.toUpperCase()}): ${layer.principleName}`,
+        message: `CONTEXT: You already provided this analysis on this verse using the ${layer.principleName} principle from the ${layer.roomName}:
+---
+${layer.analysis}
+---
+
+CONVERSATION SO FAR:
+${conversationContext}
+
+STUDENT'S NEW QUESTION/THOUGHT:
+"${msg}"
+
+INSTRUCTIONS:
+- Respond directly to what the student said — be conversational and warm.
+- If they share an insight, affirm what's good AND push them deeper with a follow-up question.
+- If they ask a question, answer it with specific Scripture references (KJV), not generalities.
+- Keep the focus on this principle (${layer.principleName}) and this verse (${verseRef}).
+- End with a probing question to keep the dialogue going.
+- Keep your response concise (3-5 paragraphs max).`,
+      }, "study-experience");
+
+      const response = typeof data === "string" ? data : (data as any)?.response || "";
+      setDialogueMessages((prev) => [...prev, { role: "jeeves", content: response }]);
+    } catch (err) {
+      console.error("Dialogue error:", err);
+      toast.error("Failed to get Jeeves' response");
+    }
+    setDialogueLoading(false);
   };
 
   return (
@@ -149,7 +204,6 @@ export function AnalysisCard({ layer, index, onRemove, onRebuild, onAccept, onSa
 
       {/* Content */}
       <div className="relative p-5 space-y-4">
-        {/* User attempt */}
         {layer.userAttempt && (
           <div className="rounded-xl border border-muted-foreground/20 bg-muted/20 p-3">
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5 font-bold">Your Connection</p>
@@ -157,7 +211,6 @@ export function AnalysisCard({ layer, index, onRemove, onRebuild, onAccept, onSa
           </div>
         )}
 
-        {/* Jeeves evaluation */}
         {layer.jeevesEvaluation && (
           <div className={cn("rounded-xl border p-3", colors.border, colors.bg)}>
             <p className={cn("text-[10px] uppercase tracking-wider mb-1.5 font-bold", colors.text)}>Jeeves' Evaluation</p>
@@ -179,7 +232,6 @@ export function AnalysisCard({ layer, index, onRemove, onRebuild, onAccept, onSa
                 </div>
               );
             }
-
             if (section.type === "gem") {
               return (
                 <div key={i} className="rounded-xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-cyan-500/10 p-3 shadow-[0_0_15px_-3px_rgba(52,211,153,0.25)]">
@@ -191,7 +243,6 @@ export function AnalysisCard({ layer, index, onRemove, onRebuild, onAccept, onSa
                 </div>
               );
             }
-
             if (section.type === "scripture") {
               return (
                 <div key={i} className="rounded-xl border border-sky-500/20 bg-sky-500/5 p-3 pl-4 border-l-4 border-l-sky-400/50">
@@ -203,7 +254,6 @@ export function AnalysisCard({ layer, index, onRemove, onRebuild, onAccept, onSa
                 </div>
               );
             }
-
             if (section.type === "crossref") {
               return (
                 <div key={i} className="rounded-lg border border-purple-500/20 bg-purple-500/5 p-2.5 pl-3 border-l-3 border-l-purple-400/40">
@@ -215,13 +265,97 @@ export function AnalysisCard({ layer, index, onRemove, onRebuild, onAccept, onSa
                 </div>
               );
             }
-
-            // Normal text
             return (
               <p key={i} className="text-sm whitespace-pre-wrap leading-relaxed text-foreground/90">{section.content}</p>
             );
           })}
         </div>
+      </div>
+
+      {/* Interactive Dialogue Section */}
+      <div className="relative border-t border-white/10">
+        <button
+          onClick={() => setDialogueOpen(!dialogueOpen)}
+          className={cn(
+            "w-full flex items-center gap-2 px-4 py-2.5 text-xs font-medium transition-colors",
+            dialogueOpen 
+              ? cn("bg-black/30", colors.text) 
+              : "text-muted-foreground hover:text-foreground hover:bg-black/10"
+          )}
+        >
+          <MessageCircle className="w-3.5 h-3.5" />
+          {dialogueMessages.length > 0 
+            ? `Dialogue (${dialogueMessages.length} messages)` 
+            : "Ask Jeeves about this…"}
+        </button>
+
+        <AnimatePresence>
+          {dialogueOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="overflow-hidden"
+            >
+              <div className="px-4 pb-3 space-y-2">
+                {/* Messages */}
+                {dialogueMessages.length > 0 && (
+                  <div className="max-h-60 overflow-y-auto space-y-2 py-2 scrollbar-thin">
+                    {dialogueMessages.map((msg, i) => (
+                      <div
+                        key={i}
+                        className={cn(
+                          "rounded-lg p-2.5 text-sm leading-relaxed",
+                          msg.role === "user"
+                            ? "bg-muted/30 border border-muted-foreground/15 ml-6"
+                            : cn("border mr-6", colors.border, colors.bg)
+                        )}
+                      >
+                        <p className={cn(
+                          "text-[10px] uppercase tracking-wider font-bold mb-1",
+                          msg.role === "user" ? "text-muted-foreground" : colors.text
+                        )}>
+                          {msg.role === "user" ? "You" : "🎩 Jeeves"}
+                        </p>
+                        <p className="whitespace-pre-wrap">{msg.content}</p>
+                      </div>
+                    ))}
+                    {dialogueLoading && (
+                      <div className={cn("rounded-lg p-2.5 border mr-6 flex items-center gap-2", colors.border, colors.bg)}>
+                        <Loader2 className={cn("w-3.5 h-3.5 animate-spin", colors.text)} />
+                        <span className={cn("text-xs", colors.text)}>Jeeves is thinking…</span>
+                      </div>
+                    )}
+                    <div ref={dialogueEndRef} />
+                  </div>
+                )}
+
+                {/* Input */}
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={dialogueInput}
+                    onChange={(e) => setDialogueInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleDialogueSend(); } }}
+                    placeholder="Share a thought, ask a question…"
+                    className="flex-1 bg-muted/20 border border-muted-foreground/15 rounded-lg px-3 py-2 text-sm placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-primary/40"
+                    disabled={dialogueLoading}
+                  />
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className={cn("h-9 px-3 border", colors.border, colors.bg, colors.text, "hover:opacity-80")}
+                    onClick={handleDialogueSend}
+                    disabled={!dialogueInput.trim() || dialogueLoading}
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Action buttons: Build / Rebuild / Save */}
@@ -269,7 +403,6 @@ export function AnalysisCard({ layer, index, onRemove, onRebuild, onAccept, onSa
         </div>
       )}
 
-      {/* Already accepted — show save only */}
       {layer.accepted && onSaveLayer && (
         <div className="relative flex items-center gap-2 px-4 py-3 border-t border-white/10 bg-black/20">
           <Badge className="bg-green-500/15 text-green-400 border-green-500/30 text-[10px]">
