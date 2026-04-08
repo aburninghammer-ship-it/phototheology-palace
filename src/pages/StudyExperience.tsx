@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Save, Share2, Sparkles, ChevronDown, ChevronRight } from "lucide-react";
+import { Save, Share2, Sparkles, ChevronDown, ChevronRight, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -552,6 +552,53 @@ ${isCurrentTopicStudy
     }
   };
 
+  // Recap — Jeeves summarizes all current layers into one smooth output
+  const [recapText, setRecapText] = useState<string | null>(null);
+  const [recapLoading, setRecapLoading] = useState(false);
+
+  const handleRecap = useCallback(async () => {
+    if (layers.length === 0 || !parsedRef) return;
+
+    setRecapLoading(true);
+    setRecapText(null);
+    toast("Jeeves is preparing your recap…", { icon: "📋" });
+
+    try {
+      const layerSummaries = layers.map((l, i) =>
+        `LAYER ${i + 1} — ${l.roomName} / ${l.principleName}:\n${l.analysis}`
+      ).join("\n\n---\n\n");
+
+      const { data } = await callJeeves({
+        mode: "principle-amplification",
+        book: parsedRef.book,
+        chapter: parsedRef.chapter,
+        verse: parsedRef.verse,
+        verseText: verseText,
+        principle: "Recap — Summary of Study So Far",
+        message: `The student has built ${layers.length} study layers on ${verseRef} so far. Give a smooth, flowing RECAP of everything discovered — not a list, but a unified narrative that ties all insights together.
+
+HERE ARE THE LAYERS SO FAR:
+${layerSummaries}
+
+INSTRUCTIONS FOR RECAP:
+- Write ONE flowing summary that weaves all the insights together naturally.
+- Show how the different rooms and principles (${[...new Set(layers.map(l => `${l.roomName}: ${l.principleName}`))].join(", ")}) combine to reveal a richer picture of this verse.
+- Keep it concise but meaningful — this is a recap, not a full re-analysis. Aim for 200-400 words.
+- Use smooth transitions so the reader feels the connections between insights.
+- STRICTLY BIBLICAL: All references must be to Scripture. No extra-biblical sources.
+- End with a brief note of what dimensions remain unexplored — invite the student to keep going.
+- Warm, pastoral tone. This should feel like a wise teacher summarizing what you've uncovered together.`,
+      }, "study-experience");
+
+      const response = typeof data === "string" ? data : (data as any)?.response || "";
+      setRecapText(response);
+    } catch (err) {
+      console.error("Recap failed:", err);
+      toast.error("Recap failed — try again.");
+    }
+    setRecapLoading(false);
+  }, [layers, parsedRef, verseText, verseRef]);
+
   // Save study to localStorage
   const handleSave = () => {
     if (!verseRef || layers.length === 0) return;
@@ -660,6 +707,20 @@ ${isCurrentTopicStudy
                   <Save className="w-4 h-4" />
                   Save Study
                 </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRecap}
+                  disabled={recapLoading || layers.length < 2}
+                  className="gap-1.5"
+                >
+                  {recapLoading ? (
+                    <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                  ) : (
+                    <FileText className="w-4 h-4" />
+                  )}
+                  Recap
+                </Button>
                 <TextShareButton
                   type="study"
                   title={`Study Experience: ${verseRef}`}
@@ -667,6 +728,37 @@ ${isCurrentTopicStudy
                   variant="outline"
                   size="sm"
                 />
+              </motion.div>
+            )}
+
+            {/* Recap Output */}
+            {recapText && !recapLoading && (
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-xl border border-primary/30 bg-gradient-to-br from-primary/5 via-card/60 to-card/40 backdrop-blur-xl shadow-[0_0_30px_-8px_hsl(var(--primary)/0.2)]"
+              >
+                <div className="px-5 py-3 border-b border-primary/20 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-semibold text-primary">Study Recap</span>
+                  <span className="text-xs text-muted-foreground ml-auto">{layers.length} layers</span>
+                </div>
+                <div className="p-5">
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed text-foreground/90">{recapText}</p>
+                </div>
+              </motion.div>
+            )}
+
+            {recapLoading && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="rounded-xl border border-primary/20 bg-card/40 p-4"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                  <p className="text-sm text-primary font-medium">Jeeves is preparing your recap…</p>
+                </div>
               </motion.div>
             )}
 
