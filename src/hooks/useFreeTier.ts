@@ -287,14 +287,25 @@ export function useFreeTier(): FreeTierAccess {
     isLoading,
     isPremium,
     
-    // Free tier features
+    // Free-tier features (always available, zero cost)
     canAccessFloor,
     canAccessRoom,
+    canAccessDailyVerse: true,
+    canAccessStoryRoom: true,
+    canAccessPalaceTour: true,
+    canAccess24FPS: true,
+    canAccessBookmarks: true,
+    canAccessCommunity: true,
+    canAccessProfile: true,
+    canAccessWatches: true,
+    canAccessBibleReader: true,       // Text-only reader is free
+    canAccessAchievements: true,
+    canAccessImageBible: true,        // Pre-generated flashcards are free
+    
+    // Metered free-tier features
     canUseJeeves: !jeevesLimitReached,
     canAccessDevotionals: true,
     canAccessDailyChallenge: !challengeLimitReached,
-    canAccessCommunity: true,
-    canAccessBibleReader: isPremium,
     
     // Premium-only features
     canAccessAllFloors: isPremium,
@@ -308,7 +319,7 @@ export function useFreeTier(): FreeTierAccess {
     jeevesLimitReached,
     dailyChallengeSubmissionsThisWeek,
     challengeLimitReached,
-    canPostInCommunity: isPremium, // Free users can view only
+    canPostInCommunity: isPremium,
     
     showUpgradePrompt,
   };
