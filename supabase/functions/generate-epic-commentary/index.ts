@@ -1608,54 +1608,68 @@ These anchors are non-negotiable. They have been drawn from careful typological 
 
   // Try Lovable AI gateway first, fall back to OpenAI directly
   const tryLovable = async () => {
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        temperature: 0.8,
-        max_tokens: 8000,
-      }),
-    });
-    if (!response.ok) {
-      const err = await response.text();
-      throw new Error(`Lovable AI error: ${response.status} - ${err}`);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 60_000);
+    try {
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: 0.8,
+          max_tokens: 8000,
+        }),
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        const err = await response.text();
+        throw new Error(`Lovable AI error: ${response.status} - ${err}`);
+      }
+      const data = await response.json();
+      return data.choices[0].message.content as string;
+    } finally {
+      clearTimeout(timer);
     }
-    const data = await response.json();
-    return data.choices[0].message.content as string;
   };
 
   const tryOpenAI = async () => {
     if (!OPENAI_API_KEY_LOCAL) throw new Error("No OpenAI API key available");
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${OPENAI_API_KEY_LOCAL}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        temperature: 0.8,
-        max_tokens: 8000,
-      }),
-    });
-    if (!response.ok) {
-      const err = await response.text();
-      throw new Error(`OpenAI error: ${response.status} - ${err}`);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 60_000);
+    try {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${OPENAI_API_KEY_LOCAL}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: 0.8,
+          max_tokens: 8000,
+        }),
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        const err = await response.text();
+        throw new Error(`OpenAI error: ${response.status} - ${err}`);
+      }
+      const data = await response.json();
+      return data.choices[0].message.content as string;
+    } finally {
+      clearTimeout(timer);
     }
-    const data = await response.json();
-    return data.choices[0].message.content as string;
   };
 
   let rawContent: string;
@@ -1740,7 +1754,7 @@ async function generateEpicAudioChunkElevenLabs(
   // Build request body with stitching context for smooth multi-chunk transitions
   const body: Record<string, unknown> = {
     text,
-    model_id: "eleven_multilingual_v2",
+    model_id: "eleven_turbo_v2_5",
     voice_settings: {
       stability: 0.65,
       similarity_boost: 0.75,
@@ -1760,25 +1774,33 @@ async function generateEpicAudioChunkElevenLabs(
     body.next_text = nextChunkText.slice(0, 200);
   }
 
-  const ttsResponse = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
-    {
-      method: "POST",
-      headers: {
-        "xi-api-key": ELEVENLABS_API_KEY!,
-        "Content-Type": "application/json",
-        "Accept": "audio/mpeg",
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 45_000);
+
+  try {
+    const ttsResponse = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
+      {
+        method: "POST",
+        headers: {
+          "xi-api-key": ELEVENLABS_API_KEY!,
+          "Content-Type": "application/json",
+          "Accept": "audio/mpeg",
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal,
       },
-      body: JSON.stringify(body),
-    },
-  );
+    );
 
-  if (!ttsResponse.ok) {
-    const err = await ttsResponse.text();
-    throw new Error(`ElevenLabs TTS error (chunk ${chunkIndex + 1}/${totalChunks}): ${ttsResponse.status} - ${err}`);
+    if (!ttsResponse.ok) {
+      const err = await ttsResponse.text();
+      throw new Error(`ElevenLabs TTS error (chunk ${chunkIndex + 1}/${totalChunks}): ${ttsResponse.status} - ${err}`);
+    }
+
+    return ttsResponse.arrayBuffer();
+  } finally {
+    clearTimeout(timer);
   }
-
-  return ttsResponse.arrayBuffer();
 }
 
 async function generateEpicAudioChunkOpenAI(text: string, chunkIndex: number, totalChunks: number, mode: string = "epic"): Promise<ArrayBuffer> {
@@ -1907,8 +1929,8 @@ async function generateEpicAudio(
     }
   }
 
-  // ── Smaller chunks (600 chars) for ElevenLabs to reduce credit spikes; larger for OpenAI ──
-  const chunkSize = useElevenLabs ? 600 : 3900;
+  // ── Larger chunks with turbo model; even larger for OpenAI ──
+  const chunkSize = useElevenLabs ? 2000 : 3900;
   const chunks = splitTextIntoChunks(processedText, chunkSize);
 
   const openaiVoiceName = OPENAI_FALLBACK_VOICES[mode] || OPENAI_FALLBACK_VOICES.epic;
@@ -1917,49 +1939,47 @@ async function generateEpicAudio(
   const audioBuffers: ArrayBuffer[] = [];
 
   if (useElevenLabs) {
-    // Sequential for ElevenLabs (needs stitching context)
-    // Falls back to OpenAI with re-chunking if ElevenLabs fails (e.g. quota exceeded)
-    for (let i = 0; i < chunks.length; i++) {
-      // Retry up to 3 times on transient errors
-      let lastErr: Error | null = null;
-      for (let attempt = 0; attempt < 3; attempt++) {
-        try {
-          const buffer = await generateEpicAudioChunkElevenLabs(
-            chunks[i], i, chunks.length,
-            i > 0 ? chunks[i - 1] : undefined,
-            i < chunks.length - 1 ? chunks[i + 1] : undefined,
-            voiceId,
-          );
-          audioBuffers.push(buffer);
-          lastErr = null;
-          break;
-        } catch (elevenErr) {
-          lastErr = elevenErr instanceof Error ? elevenErr : new Error(String(elevenErr));
-          console.warn(`[EpicCommentary] ElevenLabs attempt ${attempt + 1}/3 failed on chunk ${i + 1}/${chunks.length}: ${lastErr.message}`);
-          // If quota exceeded or auth error, don't retry — fall back immediately
-          if (lastErr.message.includes("quota_exceeded") || lastErr.message.includes("401")) {
-            break;
-          }
-          if (attempt < 2) {
-            await new Promise(r => setTimeout(r, 1000 * (attempt + 1))); // backoff
-          }
-        }
+    // Parallel batches of 4 for ElevenLabs (turbo model handles concurrency well)
+    // Falls back to OpenAI if any batch fails with quota/auth error
+    const ELEVEN_BATCH = 4;
+    let elevenFailed = false;
+    let failedFromIndex = 0;
+
+    for (let b = 0; b < chunks.length && !elevenFailed; b += ELEVEN_BATCH) {
+      const batch = chunks.slice(b, Math.min(b + ELEVEN_BATCH, chunks.length));
+      try {
+        const results = await Promise.all(
+          batch.map((chunk, idx) => {
+            const i = b + idx;
+            return generateEpicAudioChunkElevenLabs(
+              chunk, i, chunks.length,
+              i > 0 ? chunks[i - 1] : undefined,
+              i < chunks.length - 1 ? chunks[i + 1] : undefined,
+              voiceId,
+            );
+          }),
+        );
+        audioBuffers.push(...results);
+      } catch (elevenErr) {
+        const errMsg = elevenErr instanceof Error ? elevenErr.message : String(elevenErr);
+        console.warn(`[EpicCommentary] ElevenLabs batch failed at chunk ${b + 1}, falling back to OpenAI: ${errMsg}`);
+        elevenFailed = true;
+        failedFromIndex = b;
       }
-      if (lastErr) {
-        console.warn(`[EpicCommentary] ElevenLabs failed on chunk ${i + 1}, falling back to OpenAI TTS for remaining chunks: ${lastErr.message}`);
-        // Re-chunk remaining text into larger OpenAI-friendly chunks to avoid timeout
-        const remainingText = chunks.slice(i).join(" ");
-        const openaiChunks = splitTextIntoChunks(remainingText, 3900);
-        console.log(`[EpicCommentary] Re-chunked ${chunks.length - i} ElevenLabs chunks into ${openaiChunks.length} OpenAI chunks`);
-        const BATCH_SIZE = 4;
-        for (let b = 0; b < openaiChunks.length; b += BATCH_SIZE) {
-          const batch = openaiChunks.slice(b, b + BATCH_SIZE);
-          const results = await Promise.all(
-            batch.map((chunk, idx) => generateEpicAudioChunkOpenAI(chunk, b + idx, openaiChunks.length, mode))
-          );
-          audioBuffers.push(...results);
-        }
-        break; // Exit the ElevenLabs loop — all remaining chunks handled
+    }
+
+    if (elevenFailed) {
+      // Re-chunk remaining text into larger OpenAI-friendly chunks
+      const remainingText = chunks.slice(failedFromIndex).join(" ");
+      const openaiChunks = splitTextIntoChunks(remainingText, 3900);
+      console.log(`[EpicCommentary] Re-chunked ${chunks.length - failedFromIndex} ElevenLabs chunks into ${openaiChunks.length} OpenAI chunks`);
+      const BATCH_SIZE = 4;
+      for (let b = 0; b < openaiChunks.length; b += BATCH_SIZE) {
+        const batch = openaiChunks.slice(b, b + BATCH_SIZE);
+        const results = await Promise.all(
+          batch.map((chunk, idx) => generateEpicAudioChunkOpenAI(chunk, b + idx, openaiChunks.length, mode))
+        );
+        audioBuffers.push(...results);
       }
     }
   } else {

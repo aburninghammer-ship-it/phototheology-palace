@@ -10,8 +10,10 @@ const corsHeaders = {
 
 // George – warm British male ElevenLabs voice (Epic)
 const VOICE_ID = "JBFqnCBsd6RMkjVDRZzb";
-const MODEL_ID = "eleven_multilingual_v2";
+const MODEL_ID = "eleven_turbo_v2_5";
 const MAX_CHUNK = 4500;
+const BATCH_SIZE = 4; // Process chunks in parallel batches
+const FETCH_TIMEOUT_MS = 45_000; // 45s timeout per TTS chunk
 // Bump this version to invalidate ALL cached watch TTS audio
 // v12 = 2026-04-07 Longer inter-sentence pauses (2-4 sec between sentences)
 const WATCH_CACHE_VERSION = "v12";
@@ -82,23 +84,31 @@ async function generateElevenLabs(
   if (previousText) body.previous_text = previousText;
   if (nextText) body.next_text = nextText;
 
-  const response = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}?output_format=mp3_44100_128`,
-    {
-      method: "POST",
-      headers: {
-        "xi-api-key": apiKey,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    },
-  );
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(`ElevenLabs API error ${response.status}: ${errText}`);
+  try {
+    const response = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}?output_format=mp3_44100_128`,
+      {
+        method: "POST",
+        headers: {
+          "xi-api-key": apiKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      },
+    );
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`ElevenLabs API error ${response.status}: ${errText}`);
+    }
+    return response.arrayBuffer();
+  } finally {
+    clearTimeout(timer);
   }
-  return response.arrayBuffer();
 }
 
 serve(async (req) => {
@@ -145,12 +155,18 @@ serve(async (req) => {
     const chunks = splitAtSentences(processed, MAX_CHUNK);
     console.log(`[WatchTTS] ${chunks.length} chunks, generating with ElevenLabs (Lily)`);
 
-    const audioBuffers: ArrayBuffer[] = [];
-    for (let i = 0; i < chunks.length; i++) {
-      const prev = i > 0 ? chunks[i - 1].slice(-300) : undefined;
-      const next = i < chunks.length - 1 ? chunks[i + 1].slice(0, 300) : undefined;
-      const buf = await generateElevenLabs(chunks[i], apiKey, prev, next);
-      audioBuffers.push(buf);
+    const audioBuffers: ArrayBuffer[] = new Array(chunks.length);
+    for (let b = 0; b < chunks.length; b += BATCH_SIZE) {
+      const batch = chunks.slice(b, Math.min(b + BATCH_SIZE, chunks.length));
+      const results = await Promise.all(
+        batch.map((chunk, idx) => {
+          const i = b + idx;
+          const prev = i > 0 ? chunks[i - 1].slice(-300) : undefined;
+          const next = i < chunks.length - 1 ? chunks[i + 1].slice(0, 300) : undefined;
+          return generateElevenLabs(chunk, apiKey, prev, next);
+        }),
+      );
+      results.forEach((buf, idx) => { audioBuffers[b + idx] = buf; });
     }
 
     // Combine
