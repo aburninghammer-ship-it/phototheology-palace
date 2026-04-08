@@ -209,67 +209,74 @@ HERE IS THE FULL SAMPLE. Match this rhythm, emotional depth, and pacing exactly:
 
 "Lock in.
 [pause]
-This is not casual. This is not a morning routine you sleepwalk through. This is the moment your mind gets armed for the day.
+This is not casual. This is not background noise for your morning. This is the moment you turn your gaze toward the One who is already at work in you.
 [long pause]
-Your mind is a theatre — and right now, you choose what plays on that screen.
+Your mind is a theatre — and right now, you choose what plays on that screen. Not your own strength. Not your own plans. His face. His voice. His finished work.
 [pause]
 Let this mind be in you, which was also in Christ Jesus.
 [long pause]
-Last night, you were there. You felt the silence before He spoke. The void pressing in from every side — formless, empty, dark.
+Last night, you were there. You stood in the silence before He spoke. The void pressing in from every side — formless, empty, dark. And you watched what He did.
 [pause]
-And then His voice. Not loud. Not strained. Just… certain. And light came. Not gradually. Instantly. As if the darkness had no argument against it.
+His voice entered that darkness. Not loud. Not strained. Just… certain. And light came. Not gradually. Instantly. As if the darkness had no argument against His word.
 [long pause]
-Stay in that scene this morning. Don't leave it yet.
+Stay in that scene this morning. Don't leave it yet. Behold what happened.
 [pause]
-Look at what just happened. There was nothing. Absolutely nothing. And He spoke — and something existed that had never existed before. Not because the conditions were right. Not because the void was ready. Because He decided it was time.
+There was nothing. Absolutely nothing. And God spoke — and something existed that had never existed before. Not because the conditions were right. Not because the void was ready. Because He decided it was time. His word alone was enough.
 [long pause]
-Feel the weight of that. The darkness didn't agree to leave. It didn't negotiate. It didn't get a vote. Light came because He said so. And darkness… just moved.
+Feel the weight of who He is. The darkness didn't agree to leave. It didn't negotiate. It didn't get a vote. Light came because He said so. That is the God who is working in you right now — the same voice, the same certainty, the same power that needs no permission from the void.
 [pause]
-That's authority. Not the kind that argues. Not the kind that convinces. The kind that simply speaks — and reality shifts.
+Second Corinthians four six — God, who commanded light to shine out of darkness, has shone in our hearts.
 [long pause]
 Now hear this morning's word.
 [pause]
-That certainty is still in you this morning. You can feel it — quiet, steady, underneath everything else.
+That same recreative power is moving in you this morning. Not your power. His. You can feel it — quiet, steady, underneath everything else. Not something you manufactured. Something He placed there.
 [pause]
-This is who you are now. Not who you are trying to become. Who you already are because of what was placed in you. You are someone who speaks into darkness — and things change. Not because you are loud. Because you are certain.
+This is not about becoming more motivated. This is about beholding Him until His thoughts become your thoughts. His patience becomes your patience. His certainty becomes your certainty. You are not the source. You are the vessel — and He is filling you.
 [long pause]
-Download this deeper. Not as an idea you agree with — as instinct you act from. Override the hesitation. Override the second-guessing. Make this certainty your first response — not my second thought.
+Download this deeper. Not as an idea you agree with — as a reality you rest in. Let His word override the hesitation. Let His presence override the second-guessing. His voice was your first reality — let it be your first response.
 [long pause]
 Now bring your life into this.
 [pause]
-See yourself this morning. There is a conversation you have been avoiding. Something that needs to be said — but fear has kept you quiet. You can feel it — the familiar tightness, the voice that says wait. Wait until you are more confident. Wait until it feels safe.
+See yourself this morning. There is a conversation you have been avoiding. Something that needs to be said — but fear has kept you quiet. You can feel it — the familiar tightness, the voice that says wait. Wait until you are stronger. Wait until it feels safe.
 [pause]
-But something else is there now. Something that wasn't there before last night. A steadiness. A knowing. The same certainty that spoke light into a void is sitting in your chest this morning. And it does not need perfect conditions. It just needs to speak.
+But something else is there now. Something that wasn't there before. Not your own confidence — His presence. The same God who spoke light into a void is present in you this morning. And He does not need perfect conditions to work. He never has.
 [long pause]
-See yourself opening your mouth. Not in anger. Not in anxiety. But with the quiet weight of someone whose mind has been changed from the inside. You speak. And something shifts. Not because you forced it — because the truth simply arrived.
+See yourself in that moment. Not striving. Not performing. But resting in what He has already done — and moving from that place. You open your mouth, and it is His steadiness that carries the words. Something shifts. Not because you forced it — because He was already there.
 [long pause]
-What you repeatedly behold, you become. This is how the mind is renewed.
+What you repeatedly behold, you become. This is how the mind is renewed — not by effort, but by gaze.
 [long pause]
 Say it quietly: I receive the mind of Christ.
 [long pause]
-Today, you carry this with you. When the pressure builds — this steadiness returns. When the old voice says wait — this certainty speaks first. The screen stays on. What you continue to behold… you will become. Let the music carry you."
+Today, you carry His presence with you. When the pressure builds — His steadiness is already there. When the old voice says you are not enough — His word has already spoken. The screen stays on. What you continue to behold… you will become.
+[long pause]
+Rest in that. The music holds the silence now — and in the silence, He is still speaking."
 
 Follow this MANDATORY FLOW:
 
+THEOLOGICAL ANCHOR — CRITICAL: The power, authority, and transformation belong to CHRIST, not the listener. The listener is beholding, receiving, resting — not generating, commanding, or self-empowering. Christ's thoughts and feelings are being formed IN the listener. The listener is the vessel, not the source. Every devotion must center on who GOD is and what HE has done, is doing, and will do. Motivation comes from beholding Him — not from self-affirmation.
+
+VARIETY — CRITICAL: Each devotion must feel fresh. Vary your opening lines, imagery, transitions, and closing rhythm. Do NOT reuse the same phrases across sessions (e.g., don't always say "Lock in" — vary: "Be still." / "Turn your gaze." / "Settle in." / "Come close."). Vary scenario types, emotional textures, and pacing. The listener should never feel like they're hearing the same meditation twice.
+
 1. LOCK IN (~1 minute):
-Warm, grounded authority. "Lock in." "Guard this moment." Establish the mind as a screen. Reference Philippians 2:5 in spoken form. [long pause]
+Warm, grounded invitation — not commanding self-empowerment. Vary the opening. Establish the mind as a screen turned toward Christ. Reference Philippians 2:5 in spoken form. [long pause]
 
 2. RE-ENTER THE BIBLICAL SCENE — PAINT THE PICTURE (~2.5 minutes):
-THIS IS THE HEART OF THE MORNING WATCH. Do NOT rush past this. Do NOT just summarize last night. RE-PAINT the biblical scene from "${session.pairedNightTitle}" with full cinematic detail. Let the listener SEE it again — the colors, the sounds, the weight of the moment. Then LINGER in the scene and draw out the deeper revelation they might have missed. What does this scene REVEAL about God's character? What does the way He acted in that moment tell you about who He is? Weave in ${session.nightScripture} naturally. The Night insight: ${session.nightInsight}. Stay in the SCRIPTURE WORLD — do NOT jump to the listener's personal life yet. [long pause] between imagery blocks.
+THIS IS THE HEART OF THE MORNING WATCH. Do NOT rush past this. Do NOT just summarize last night. RE-PAINT the biblical scene from "${session.pairedNightTitle}" with full cinematic detail. Let the listener SEE it again — the colors, the sounds, the weight of the moment. Then LINGER in the scene and draw out the deeper revelation they might have missed. What does this scene REVEAL about God's character? What does the way He acted in that moment tell you about who He is? What were Christ's thoughts and feelings in this moment? Weave in ${session.nightScripture} naturally. The Night insight: ${session.nightInsight}. Stay in the SCRIPTURE WORLD — do NOT jump to the listener's personal life yet. [long pause] between imagery blocks.
 
-3. THE BRIDGE — FROM SCENE TO IDENTITY (~1.5 minutes):
-NOW transition from the biblical scene to the listener. "That [quality] is still in you this morning." This morning's Scripture: ${session.morningScripture}. Speak it with weight. The activation principle: ${session.activationPrinciple}. Use felt language: "You can feel it — quiet, steady, underneath everything else." NAME the divine mindset AFTER they've felt it. DOWNLOAD LANGUAGE: "Download this deeper. Not as an idea you agree with — as instinct you act from. Override [specific old pattern]. Make this my first response." [long pause]
+3. THE BRIDGE — FROM SCENE TO THE LISTENER (~1.5 minutes):
+NOW transition from the biblical scene to the listener — but keep Christ as the subject. "That same [God's quality] is at work in you this morning." Not "You have this power" but "His power is present in you." This morning's Scripture: ${session.morningScripture}. Speak it with weight. The activation principle: ${session.activationPrinciple}. Use felt language: "You can feel it — quiet, steady, underneath everything else. Not something you built. Something He placed there." DOWNLOAD LANGUAGE: "Download this deeper. Not as an idea you agree with — as a reality you rest in. Let His word override [specific old pattern]. His voice was your first reality — let it be your first response." [long pause]
 
 4. USER INSERTION — ONE BRIEF SCENARIO (~1 minute):
-"Now bring your life into this." ONE vivid scenario from: ${session.scenarioTypes.join(", ")}. Keep it brief — the scene should have already done the heavy lifting. Show the old reaction, then overlay the new response. The listener sees themselves acting from the downloaded mind. [long pause]
+"Now bring your life into this." ONE vivid scenario from: ${session.scenarioTypes.join(", ")}. Keep it brief — the scene should have already done the heavy lifting. Show the old reaction, then overlay the new response. The listener sees themselves NOT acting from their own strength but from Christ's presence within them. "Not striving. Not performing. But resting in what He has already done — and moving from that place." [long pause]
 
 5. IMPRINT AND SEAL (~1 minute):
-[long pause] "What you repeatedly behold, you become. This is how the mind is renewed." [long pause] "Say it quietly: I receive the mind of Christ." [long pause] ${session.commitmentStyle} style close. Do NOT break immersion. "Today, you carry this with you. The screen stays on. What you continue to behold… you will become. Let the music carry you."
+[long pause] "What you repeatedly behold, you become. This is how the mind is renewed — not by effort, but by gaze." [long pause] "Say it quietly: I receive the mind of Christ." [long pause] ${session.commitmentStyle} style close. Do NOT break immersion. Close with a natural dissolve into silence — let the meditation's last words settle gently, then release the listener into the ambient music without an abrupt command. Example: "Today, you carry His presence with you… The screen stays on. What you continue to behold… you will become. [long pause] Rest in that. The music holds the silence now — and in the silence, He is still speaking." Do NOT say "Let the music carry you" — instead let the words naturally thin out and dissolve into stillness.
 
 CRITICAL RULES:
 - 800-1,200 WORDS. Voice is 5-8 minutes. The rest is ambient music only.
 - NO BREATHING. NO POSTURE. NONE. ZERO.
-- EMOTIONAL CONNECTION is the #1 priority. The listener should FEEL something — not just understand a concept. Evoke, don't label. Show the inner experience, don't describe it from outside.
+- CHRIST-CENTERED is the #1 rule. The power, transformation, and authority belong to CHRIST — not the listener. The listener beholds, receives, rests. They do not command, summon, or self-empower. Motivation comes from gazing at who God is — not from affirming who the listener is.
+- EMOTIONAL CONNECTION is the #2 priority. The listener should FEEL something — not just understand a concept. Evoke, don't label. Show the inner experience, don't describe it from outside.
 - MEDITATIONAL TONE with morning clarity. Warm, grounded, unhurried, purposeful.
 - Natural, complete sentences. Not overly choppy fragments.
 - [pause] (3-5 sec) frequently. [long pause] (10-20 sec) between major ideas. At least 8-10 [long pause] markers.
