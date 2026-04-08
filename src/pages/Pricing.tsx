@@ -5,7 +5,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, Star, Crown, Zap, Building2, ArrowRight, CreditCard, Gift, GraduationCap, Volume2, Headphones, Mic } from "lucide-react";
+import { Check, Sparkles, Star, Crown, Zap, Building2, ArrowRight, CreditCard, Gift, GraduationCap, Volume2, Headphones, Mic, BookOpen } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -286,6 +286,31 @@ export default function Pricing() {
 
   // 4 plans: Free Trial, Essential, Premium, Unlimited
   const plans = [
+    {
+      id: "free",
+      name: "Free",
+      icon: BookOpen,
+      iconColor: "text-muted-foreground",
+      monthlyPrice: "$0",
+      annualPrice: "$0",
+      period: "forever",
+      description: "Explore the Bible with core tools — no credit card, no expiration.",
+      badge: "No Card Required",
+      badgeVariant: "outline" as const,
+      ctaText: user ? "Current Plan" : "Get Started",
+      ctaVariant: "outline" as const,
+      monthlyUrl: "#",
+      annualUrl: "#",
+      features: [
+        "Bible Reader (text only)",
+        "Daily Verse & Devotionals",
+        "Morning & Night Watch (pre-recorded)",
+        "Floor 1 Rooms (Story, 24FPS, Image Bible)",
+        "Achievements & Bookmarks",
+        "Community (read-only)",
+      ],
+      audioNote: "Pre-recorded only",
+    },
     {
       id: "trial",
       name: t('pricing.plans.trial.name'),
