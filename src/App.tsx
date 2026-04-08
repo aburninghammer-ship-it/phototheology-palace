@@ -468,7 +468,7 @@ function App() {
             <Route path="/patreon-callback" element={<PatreonCallback />} />
             <Route path="/interactive-demo" element={<InteractiveDemo />} />
             <Route path="/show-me" element={<ShowMe />} />
-            <Route path="/study-experience" element={<StudyExperience />} />
+            <Route path="/study-experience" element={<ProtectedRoute><StudyExperience /></ProtectedRoute>} />
             <Route path="/comparison" element={<Comparison />} />
             <Route path="/onboarding" element={
               <ProtectedRoute>

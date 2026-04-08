@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Save, Share2, Sparkles, ChevronDown, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
@@ -25,16 +26,38 @@ interface FloorGroup {
   rooms: { id: string; name: string; room: RoomSubPrinciples | null }[];
 }
 
-function buildAllRooms(): FloorGroup[] {
+// Demo mode: 2 representative rooms per floor (Show Me preview)
+const DEMO_ROOM_IDS = new Set([
+  "sr",       // F1: Story Room
+  "ir",       // F1: Imagination Room
+  "or",       // F2: Observation Room
+  "st",       // F2: Symbols/Types Room
+  "nf",       // F3: Nature Freestyle
+  "bf",       // F3: Bible Freestyle
+  "dr",       // F4: Dimensions Room
+  "c6",       // F4: Connect-6
+  "bl",       // F5: Blue Room — Sanctuary
+  "cec",      // F5: Christ in Every Chapter
+  "123h",     // F6: Three Heavens
+  "cycles",   // F6: Eight Cycles
+  "frm",      // F7: Fire Room
+  "mr",       // F7: Meditation Room
+  "infinity", // F8: Reflexive Mastery
+  "freestyle",// F8: Palace Freestyle
+]);
+
+function buildAllRooms(demo: boolean): FloorGroup[] {
   return palaceFloors.map((f) => ({
     floor: f.number,
     name: f.name,
-    rooms: f.rooms.map((r) => ({
-      id: r.id,
-      name: r.name,
-      room: ROOM_SUB_PRINCIPLES[r.id] || null,
-    })),
-  }));
+    rooms: f.rooms
+      .filter((r) => !demo || DEMO_ROOM_IDS.has(r.id))
+      .map((r) => ({
+        id: r.id,
+        name: r.name,
+        room: ROOM_SUB_PRINCIPLES[r.id] || null,
+      })),
+  })).filter((f) => f.rooms.length > 0);
 }
 
 // For rooms without sub-principles, create a synthetic one using the room itself
@@ -75,6 +98,9 @@ function loadSavedStudies(): { ref: string; layers: StudyLayer[]; timestamp: num
 }
 
 export default function StudyExperience() {
+  const [searchParams] = useSearchParams();
+  const isDemo = searchParams.get("demo") === "true";
+
   const [verseRef, setVerseRef] = useState("");
   const [parsedRef, setParsedRef] = useState<{ book: string; chapter: string; verse: string } | null>(null);
   const [verseText, setVerseText] = useState("");
@@ -91,8 +117,8 @@ export default function StudyExperience() {
   const [suggestedRoom, setSuggestedRoom] = useState<{ roomId: string; principleId: string } | null>(null);
   const [userInput, setUserInput] = useState("");
 
-  // All rooms organized by floor
-  const allFloors = useMemo(() => buildAllRooms(), []);
+  // All rooms organized by floor (demo mode shows only 2 per floor)
+  const allFloors = useMemo(() => buildAllRooms(isDemo), [isDemo]);
 
   // Sparks integration
   const {
@@ -350,6 +376,8 @@ ${isCurrentTopicStudy
 - Show how this principle SPECIFICALLY illuminates this verse in ways the reader may never have considered.`}
 - Include at minimum: (1) The direct application of this principle with specific scripture, (2) A cross-reference to at least one other Scripture that deepens the insight, (3) A practical or devotional takeaway.
 - Use the Phototheology study method language naturally.
+- STRICTLY BIBLICAL: All parallels, cross-references, and connections must be to OTHER SCRIPTURE — not to historical figures, secular history, or extra-biblical sources. Stay within the 66 books of the Bible. Do not reference Josephus, church fathers, or any non-biblical source as a parallel. The Bible interprets itself.
+- PROPHECY GUARDRAIL: Do NOT present Antiochus Epiphanes as a biblical fulfillment of Daniel 7 or Daniel 8. The little horn of Daniel 7 and Daniel 8 points to a greater prophetic power, not a historical Greek king. Follow the historicist interpretation — the Bible's own prophetic framework.
 - End with a "Spark" — one sentence of surprising, memorable insight. Format it as: ✨ Spark: [your insight]`;
   };
 
@@ -829,7 +857,7 @@ function FloorSection({
   const colors = floorColors[fg.floor] || floorColors[1];
 
   return (
-    <div className={cn("rounded-lg border overflow-hidden", colors.border, colors.bg)}>
+    <div className={cn("rounded-lg border", colors.border, colors.bg)}>
       <button
         onClick={() => setExpandedFloor(isOpen ? null : fg.floor)}
         className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-muted/20 transition-colors"

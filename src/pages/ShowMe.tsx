@@ -50,7 +50,7 @@ export default function ShowMe() {
     if (feature === "study-experience") {
       if (canUse(feature)) {
         use(feature);
-        navigate("/study-experience");
+        navigate("/study-experience?demo=true");
       } else {
         setUpgradeFeature(feature);
       }
