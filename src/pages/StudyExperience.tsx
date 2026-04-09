@@ -116,6 +116,7 @@ export default function StudyExperience() {
   // User-led state
   const [suggestedRoom, setSuggestedRoom] = useState<{ roomId: string; principleId: string } | null>(null);
   const [userInput, setUserInput] = useState("");
+  const [userLedTeach, setUserLedTeach] = useState(false);
 
   // All rooms organized by floor (demo mode shows only 2 per floor)
   const allFloors = useMemo(() => buildAllRooms(isDemo), [isDemo]);
@@ -549,6 +550,25 @@ ${roomId === "hf" ? `- HISTORY FREESTYLE GUARDRAIL: This is the History/Social F
 
     setLoadingPrinciple(suggestedRoom.principleId);
     try {
+      const teachMeMessage = userLedTeach
+        ? `You are in TEACH ME mode — a Socratic mentor. The student is trying to apply "${principleName}" from the ${roomName} to ${verseRef}.
+
+The student wrote: "${userInput}"
+
+YOUR ROLE — GUIDE, DO NOT GIVE ANSWERS:
+- Do NOT provide the analysis yourself. Do NOT reveal the connections directly.
+- Instead, GUIDE the student to discover the insight on their own.
+- Acknowledge what they got right — affirm any correct thinking.
+- If they're on the right track, push them deeper with probing questions: "What else do you notice?" "What if you looked at the surrounding context?" "Who else in Scripture faced something similar?"
+- If they're off track, gently redirect WITHOUT giving the answer: "That's an interesting angle — but what if we look at the actual words more carefully?" "What does the original action in the text suggest?"
+- Teach them the CRITICAL THINKING PROCESS: How to observe, how to ask the right questions, how to trace connections, how to think like a Phototheologian.
+- Offer 2-3 specific guiding questions that will lead them closer to the insight.
+- If they seem stuck, give a small hint — like a breadcrumb, not the full loaf.
+- Encourage them warmly. Make them feel like a scholar-in-training, not a student being tested.
+- End with a clear next prompt: "Try again with this in mind…" or "What do you think now?"
+- NEVER give the full principle application. The student must earn the discovery.`
+        : `The student's connection: "${userInput}". Evaluate their insight thoroughly — what they got right, what they missed, and what deeper layers they could explore. Then provide the full analysis with a ✨ Spark at the end.`;
+
       const { data } = await callJeeves({
         mode: "principle-amplification",
         book: parsedRef.book,
@@ -556,44 +576,61 @@ ${roomId === "hf" ? `- HISTORY FREESTYLE GUARDRAIL: This is the History/Social F
         verse: parsedRef.verse,
         verseText: verseText,
         principle: `${roomName} (${suggestedRoom.roomId.toUpperCase()}): ${principleName}`,
-        message: `The student's connection: "${userInput}". Evaluate their insight thoroughly — what they got right, what they missed, and what deeper layers they could explore. Then provide the full analysis with a ✨ Spark at the end.`,
+        message: teachMeMessage,
       }, "study-experience");
 
       const response = typeof data === "string" ? data : (data as any)?.response || "";
 
-      const evalSplit = response.split(/(?:full analysis|here'?s? (?:the )?(?:full|complete) (?:analysis|breakdown))/i);
-      const evaluation = evalSplit.length > 1 ? evalSplit[0].trim() : undefined;
-      const analysis = evalSplit.length > 1 ? evalSplit[1].trim() : response;
+      if (userLedTeach) {
+        // In teach-me mode, keep the same room/principle active so the student can try again
+        setLayers((prev) => [
+          ...prev,
+          {
+            roomId: suggestedRoom.roomId,
+            roomName,
+            principleId: `${suggestedRoom.principleId}-teach-${Date.now()}`,
+            principleName: `🎓 ${principleName} (Guided)`,
+            analysis: response,
+            userAttempt: userInput,
+          },
+        ]);
+        setUserInput("");
+        // Don't clear suggestedRoom — let them try again with the same principle
+      } else {
+        const evalSplit = response.split(/(?:full analysis|here'?s? (?:the )?(?:full|complete) (?:analysis|breakdown))/i);
+        const evaluation = evalSplit.length > 1 ? evalSplit[0].trim() : undefined;
+        const analysis = evalSplit.length > 1 ? evalSplit[1].trim() : response;
 
-      if (!verseText && response) {
-        const vMatch = response.match(/[""\u201C\u201D]([^""\u201C\u201D]{10,})["""\u201C\u201D]/);
-        if (vMatch) setVerseText(vMatch[1]);
+        if (!verseText && response) {
+          const vMatch = response.match(/[""\u201C\u201D]([^""\u201C\u201D]{10,})["""\u201C\u201D]/);
+          if (vMatch) setVerseText(vMatch[1]);
+        }
+
+        setLayers((prev) => [
+          ...prev,
+          {
+            roomId: suggestedRoom.roomId,
+            roomName,
+            principleId: suggestedRoom.principleId,
+            principleName,
+            analysis,
+            userAttempt: userInput,
+            jeevesEvaluation: evaluation,
+          },
+        ]);
+
+        setUserInput("");
+        setSuggestedRoom(null);
+
+        setTimeout(() => {
+          fetchCrossRoomSuggestion(parsedRef, verseRef);
+        }, 500);
       }
-
-      setLayers((prev) => [
-        ...prev,
-        {
-          roomId: suggestedRoom.roomId,
-          roomName,
-          principleId: suggestedRoom.principleId,
-          principleName,
-          analysis,
-          userAttempt: userInput,
-          jeevesEvaluation: evaluation,
-        },
-      ]);
-
-      setUserInput("");
-      setSuggestedRoom(null);
-
-      setTimeout(() => {
-        fetchCrossRoomSuggestion(parsedRef, verseRef);
-      }, 500);
     } catch (err) {
       console.error("Jeeves user-led evaluation failed:", err);
     }
     setLoadingPrinciple(null);
-  }, [parsedRef, suggestedRoom, userInput, verseText, verseRef]);
+  }, [parsedRef, suggestedRoom, userInput, verseText, verseRef, userLedTeach]);
 
   const handleModeSwitch = (newMode: Mode) => {
     setMode(newMode);
@@ -856,17 +893,42 @@ INSTRUCTIONS FOR RECAP:
             />
 
             {/* User-led input */}
-            {mode === "user-led" && suggestedRoomData && suggestedPrincipleData && parsedRef && (
-              <UserLedInput
-                roomName={suggestedRoomData.roomName}
-                principleName={suggestedPrincipleData.name}
-                principleId={suggestedPrincipleData.id}
-                principleDescription={suggestedPrincipleData.description}
-                userInput={userInput}
-                onChange={setUserInput}
-                onSubmit={handleUserLedSubmit}
-                loading={loadingPrinciple !== null}
-              />
+            {mode === "user-led" && parsedRef && (
+              <div className="space-y-3">
+                {/* Teach Me toggle */}
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setUserLedTeach(!userLedTeach)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-xs font-medium transition-all border",
+                      userLedTeach
+                        ? "bg-gradient-to-r from-amber-500/20 to-orange-500/20 border-amber-500/40 text-amber-400"
+                        : "bg-muted/30 border-border/50 text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    🎓 Teach Me
+                  </button>
+                  {userLedTeach && (
+                    <p className="text-[10px] text-amber-400/70">
+                      Jeeves will guide you — not give answers. Think it through!
+                    </p>
+                  )}
+                </div>
+
+                {suggestedRoomData && suggestedPrincipleData && (
+                  <UserLedInput
+                    roomName={suggestedRoomData.roomName}
+                    principleName={suggestedPrincipleData.name}
+                    principleId={suggestedPrincipleData.id}
+                    principleDescription={suggestedPrincipleData.description}
+                    userInput={userInput}
+                    onChange={setUserInput}
+                    onSubmit={handleUserLedSubmit}
+                    loading={loadingPrinciple !== null}
+                    teachMe={userLedTeach}
+                  />
+                )}
+              </div>
             )}
 
             {/* Save + Share bar */}
