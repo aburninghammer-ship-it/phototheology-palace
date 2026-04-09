@@ -11,16 +11,6 @@ export interface PodcastEpisode {
 export const PODCAST_EPISODES: PodcastEpisode[] = [
   // ── Floor 1: Furnishing ──
   {
-    id: "ep-01",
-    episodeNumber: 1,
-    title: "See the Bible with Phototheology OS",
-    description:
-      "An introduction to the Phototheology Operating System — learn to see Scripture through vivid mental imagery and build a visual framework for the entire Bible.",
-    audioFile: "See_the_Bible_with_Phototheology_OS.m4a",
-    duration: "45 min",
-    floor: 1,
-  },
-  {
     id: "ep-02",
     episodeNumber: 2,
     title: "The Eight-Floor Biblical Memory Palace",
