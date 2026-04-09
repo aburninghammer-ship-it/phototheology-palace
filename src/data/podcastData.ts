@@ -111,4 +111,34 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
     duration: "40 min",
     floor: 2,
   },
+  {
+    id: "ep-11",
+    episodeNumber: 11,
+    title: "Building Unbreakable Logical Chains",
+    description:
+      "Learn to construct airtight logical chains from Scripture — linking verses, contexts, and principles into arguments that hold under scrutiny.",
+    audioFile: "Building_Unbreakable_Logical_Chains.m4a",
+    duration: "40 min",
+    floor: 2,
+  },
+  {
+    id: "ep-12",
+    episodeNumber: 12,
+    title: "Reading Like a Crime Scene Detective",
+    description:
+      "Approach every passage like a crime scene — gather evidence, question assumptions, and reconstruct meaning with investigative precision.",
+    audioFile: "Reading_Like_a_Crime_Scene_Detective.m4a",
+    duration: "40 min",
+    floor: 2,
+  },
+  {
+    id: "ep-13",
+    episodeNumber: 13,
+    title: "Interrogate the Text Like a Hostile Witness",
+    description:
+      "Push past surface readings by treating every text as a hostile witness — ask hard questions, press for details, and uncover what the passage is really saying.",
+    audioFile: "Interrogate_the_text_like_a_hostile_witness.m4a",
+    duration: "40 min",
+    floor: 2,
+  },
 ];
