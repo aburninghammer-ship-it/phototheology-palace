@@ -87,6 +87,16 @@ const Welcome = () => {
             The Choice Is Yours
           </motion.p>
 
+          {/* Podcast Episode 1 */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45, duration: 0.4 }}
+            className="max-w-lg mx-auto"
+          >
+            <FrontPagePodcastPreview />
+          </motion.div>
+
           {/* Audio Tour CTA */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -125,11 +135,6 @@ const Welcome = () => {
       <PTSection showIn="immersion">
         <OsSpacesWelcome />
       </PTSection>
-
-      {/* === PODCAST EPISODE 1 === */}
-      <div className="px-4 mb-4">
-        <FrontPagePodcastPreview />
-      </div>
 
       {/* === LOWER CONTENT === */}
       <div className="px-4 space-y-4 pb-6">
