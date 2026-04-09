@@ -4244,7 +4244,7 @@ MANDATORY RULES FOR EACH PRINCIPLE TYPE:
 
 📖 **CYCLES (@Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re):** Place this verse within the named cycle. Show how the verse fits the cycle's Fall → Covenant → Sanctuary → Enemy → Restoration pattern.
 
-📖 **OBSERVATION (Who/What/When/Where/How):** List 5-10 forensic details from the text that a casual reader would miss. Be specific — names, verbs, tenses, repeated words, structural features.
+📖 **OBSERVATION:** List 15-25 forensic observations about the text that a casual reader would miss. Cover people, actions, events, time markers, locations, methods, repeated words, verb tenses, structural features, numbers, contrasts, and progressions. Be specific and thorough — bag every fingerprint like a detective. Do NOT categorize into Who/What/When/Where/How sections; instead provide one rich, flowing list of numbered observations.
 
 📖 **CHRIST EVERY CHAPTER (Explicit/Typological/Thematic/Prophetic):** Using the named lens, trace the Christ-thread in this chapter. Quote the specific verse(s) where Christ appears through that lens.
 
