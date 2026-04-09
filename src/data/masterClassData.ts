@@ -205,7 +205,7 @@ export const MASTER_CLASSES: MasterClassDef[] = [
     duration: "~12 min",
     script: "",
     transcript: "",
-    status: "coming-soon",
+    status: "available",
   },
   {
     id: "class-3-imagination-room",
@@ -222,7 +222,7 @@ export const MASTER_CLASSES: MasterClassDef[] = [
     duration: "~11 min",
     script: "",
     transcript: "",
-    status: "coming-soon",
+    status: "available",
   },
   {
     id: "class-4-24fps-room",
@@ -239,7 +239,7 @@ export const MASTER_CLASSES: MasterClassDef[] = [
     duration: "~10 min",
     script: "",
     transcript: "",
-    status: "coming-soon",
+    status: "available",
   },
   {
     id: "class-5-observation-room",
@@ -256,7 +256,7 @@ export const MASTER_CLASSES: MasterClassDef[] = [
     duration: "~12 min",
     script: "",
     transcript: "",
-    status: "coming-soon",
+    status: "available",
   },
   {
     id: "class-6-freestyle",
@@ -273,7 +273,7 @@ export const MASTER_CLASSES: MasterClassDef[] = [
     duration: "~11 min",
     script: "",
     transcript: "",
-    status: "coming-soon",
+    status: "available",
   },
   {
     id: "class-7-concentration-room",
@@ -290,7 +290,7 @@ export const MASTER_CLASSES: MasterClassDef[] = [
     duration: "~13 min",
     script: "",
     transcript: "",
-    status: "coming-soon",
+    status: "available",
   },
   {
     id: "class-8-prophecy-room",
@@ -307,7 +307,7 @@ export const MASTER_CLASSES: MasterClassDef[] = [
     duration: "~14 min",
     script: "",
     transcript: "",
-    status: "coming-soon",
+    status: "available",
   },
 ];
 
