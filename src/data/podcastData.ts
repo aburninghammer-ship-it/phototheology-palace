@@ -13,10 +13,10 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
   {
     id: "ep-00",
     episodeNumber: 1,
-    title: "A Visual Operating System for Knowledge",
+    title: "Building a Thirty-Nine Room Bible Palace",
     description:
-      "The foundation episode — discover how Phototheology OS turns Scripture into a visual operating system for knowledge, memory, and spiritual mastery.",
-    audioFile: "A_Visual_Operating_System_for_Knowledge.m4a",
+      "The foundation episode — learn how to construct a thirty-nine room mental palace that maps to the entire Bible, giving you a permanent architecture for Scripture mastery.",
+    audioFile: "Building_a_thirty_nine_room_Bible_palace.m4a",
     duration: "40 min",
   },
   // ── Floor 1: Furnishing ──
