@@ -754,6 +754,20 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
     }
   },
   {
+    id: "master-class",
+    to: "/master-class",
+    label: "Master Class",
+    shortLabel: "Master Class",
+    icon: GraduationCap,
+    gradient: {
+      from: "from-amber-500/10",
+      to: "to-orange-500/10",
+      border: "border-amber-500/20",
+      text: "from-amber-600 to-orange-600",
+      glow: "rgba(245,158,11,0.5)"
+    }
+  },
+  {
     id: "community",
     to: "#",
     label: "Community",
