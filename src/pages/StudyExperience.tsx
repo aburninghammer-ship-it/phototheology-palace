@@ -745,6 +745,17 @@ INSTRUCTIONS FOR RECAP:
               Jeeves-led
             </button>
             <button
+              onClick={() => handleModeSwitch("teach")}
+              className={cn(
+                "px-4 py-1.5 rounded-md text-sm font-medium transition-all",
+                mode === "teach"
+                  ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              🎓 Teach
+            </button>
+            <button
               onClick={() => handleModeSwitch("user-led")}
               className={cn(
                 "px-4 py-1.5 rounded-md text-sm font-medium transition-all",
@@ -756,6 +767,11 @@ INSTRUCTIONS FOR RECAP:
               User-led
             </button>
           </div>
+          {mode === "teach" && (
+            <p className="text-xs text-amber-400/80 mt-2 max-w-md mx-auto">
+              Jeeves teaches each principle, shows you how to spot connections and think like a Phototheologian, then applies it to your text.
+            </p>
+          )}
         </motion.div>
 
         {/* Main layout */}
