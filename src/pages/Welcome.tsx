@@ -87,12 +87,12 @@ const Welcome = () => {
             The Choice Is Yours
           </motion.p>
 
-          {/* Phototheology Podcast Episode 1 */}
+          {/* Phototheology Podcast Episode 1 — visible before entering palace */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.45, duration: 0.4 }}
-            className="max-w-lg mx-auto"
+            className="max-w-lg mx-auto w-full"
           >
             <FrontPagePodcastPreview />
           </motion.div>
