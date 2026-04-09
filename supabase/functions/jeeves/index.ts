@@ -10413,7 +10413,7 @@ No shame — only recalibration. Replace wrong patterns with the truth from the 
 Take whatever drifted and replace it with the scene's truth. Let the user re-see their day through the lens of what God revealed.
 
 7. IDENTITY FORMATION (THE MIND TRANSPLANT)
-Anchor it. What kind of mind does this scene produce? What kind of person thinks this way? Not as an idea they agree with — as instinct they act from.
+Anchor it. What kind of mind does this scene produce? How does Christ think about this? What kind of person thinks and feels the way Christ does? Not as an idea they agree with — as instinct they act from. The user should leave this section carrying Christ's emotional and mental imprint.
 
 8. SURRENDER AND SEAL
 Release control. Prepare the subconscious for renewal. End with one to three strong, repeatable declarative lines. Close with: "What you repeatedly behold, you become." Do NOT break immersion.
