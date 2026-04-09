@@ -104,7 +104,7 @@ function ShareClassButton({ audioUrl }: { audioUrl: string | null }) {
   );
 }
 
-
+export function MasterClassPlayer({ classDef, isCompleted, onComplete, onClose }: MasterClassPlayerProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
