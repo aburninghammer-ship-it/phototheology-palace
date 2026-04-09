@@ -448,13 +448,14 @@ ${roomId === "hf" ? `- HISTORY FREESTYLE GUARDRAIL: This is the History/Social F
 
     setLoadingPrinciple(principle.id);
     try {
+      const promptBuilder = mode === "teach" ? buildTeachPrompt : buildDeepPrompt;
       const { data } = await callJeeves({
         mode: "principle-amplification",
         book: parsedRef.book,
         chapter: parsedRef.chapter,
         verse: parsedRef.verse,
         verseText: verseText,
-        principle: buildDeepPrompt(roomName, roomId, principle.name, principle.description) + reApplyNote,
+        principle: promptBuilder(roomName, roomId, principle.name, principle.description) + reApplyNote,
       }, "study-experience");
 
       const response = typeof data === "string" ? data : (data as any)?.response || "";
@@ -500,13 +501,14 @@ ${roomId === "hf" ? `- HISTORY FREESTYLE GUARDRAIL: This is the History/Social F
 
     setLoadingPrinciple(syntheticId);
     try {
+      const promptBuilder = mode === "teach" ? buildTeachPrompt : buildDeepPrompt;
       const { data } = await callJeeves({
         mode: "principle-amplification",
         book: parsedRef.book,
         chapter: parsedRef.chapter,
         verse: parsedRef.verse,
         verseText: verseText,
-        principle: buildDeepPrompt(roomName, roomId, roomName, `${purpose}${coreQuestion ? ` Core question: ${coreQuestion}` : ""}`) + reApplyNote,
+        principle: promptBuilder(roomName, roomId, roomName, `${purpose}${coreQuestion ? ` Core question: ${coreQuestion}` : ""}`) + reApplyNote,
       }, "study-experience");
 
       const response = typeof data === "string" ? data : (data as any)?.response || "";
