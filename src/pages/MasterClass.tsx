@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { GraduationCap, Lock, Play, CheckCircle2, Clock, ChevronRight } from "lucide-react";
+import { GraduationCap, Lock, Play, CheckCircle2, Clock, ChevronRight, ShieldAlert } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,7 @@ import { ProfessorAvatar } from "@/components/master-class/ProfessorAvatar";
 import { MasterClassPlayer } from "@/components/master-class/MasterClassPlayer";
 import { MASTER_CLASSES } from "@/data/masterClassData";
 import { useMasterClassProgress } from "@/hooks/useMasterClassProgress";
+import { useMasterClassAccess } from "@/hooks/useMasterClassAccess";
 import type { MasterClassDef } from "@/data/masterClassData";
 
 // Group classes by floor for display
@@ -48,6 +49,7 @@ function groupByFloor(classes: MasterClassDef[]) {
 export default function MasterClass() {
   const [activeClass, setActiveClass] = useState<MasterClassDef | null>(null);
   const progress = useMasterClassProgress();
+  const access = useMasterClassAccess();
 
   const groups = useMemo(() => groupByFloor(MASTER_CLASSES), []);
 
