@@ -86,6 +86,7 @@ export const DOCK_ITEMS: DockItem[] = [
       { id: "mastery", label: "Mastery", path: "/mastery", icon: Crown, glow: "348 83% 52%" },
       { id: "spiritual-training", label: "Dojo", path: "/spiritual-training", icon: Sword, glow: "0 72% 50%" },
       { id: "master-class", label: "Master Class", path: "/master-class", icon: Headphones, glow: "32 90% 50%" },
+      { id: "podcast", label: "Podcast", path: "/podcast", icon: Headphones, glow: "271 76% 53%" },
     ],
   },
   {

@@ -13,6 +13,7 @@ const DEFAULT_PINS = [
   "/devotionals",
   "/daily-challenges",
   "/audio-library",
+  "/podcast",
 ];
 
 export interface PinnedItem {
