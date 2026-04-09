@@ -106,6 +106,32 @@ async function checkRateLimit(supabase: any, userId: string, endpoint: string): 
   return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - existingLimit.request_count - 1 };
 }
 
+function sanitizeWatchOutput(content: string, mode: string): string {
+  let cleaned = content
+    .replace(/```json\s*/gi, '')
+    .replace(/```/g, '')
+    .replace(/\[?\s*music\s*break\s*\]?/gi, '[long pause]\n\n[long pause]')
+    .replace(/\[?\s*music\s*\]?/gi, '[long pause]')
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/…/g, '...')
+    .replace(/[–—]/g, ', ')
+    .replace(/[\t ]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
+  if (mode === 'morning-watch') {
+    cleaned = cleaned
+      .replace(/\blast night's\b/gi, "this morning's")
+      .replace(/\blast night\b/gi, 'this morning')
+      .replace(/\bprevious session\b/gi, 'this time')
+      .replace(/\bearlier session\b/gi, 'this time')
+      .replace(/\bpaired session\b/gi, 'this time');
+  }
+
+  return cleaned;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -10341,9 +10367,11 @@ TONE: Meditational. Warm but weighty. Unhurried, intimate, with gravity. Not a d
 
 CORE CONCEPT: Mind Transplant. The mind is a THEATRE. The screen is within. Godly imagination in VIVID COLOR.
 
+STANDALONE RULE: This session must stand completely alone. NEVER mention a previous session, a future session, this morning, tomorrow morning, or any follow-up watch.
+
 #1 PRIORITY — EMOTIONAL CONNECTION: Do NOT label emotions from outside ("He felt mercy"). EVOKE them from inside so the listener FEELS it in their chest. Use tension and contrast — show what COULD have happened, then what He chose instead. Make it personal — "He sees you. Not the crowd. You." Let vulnerability in — He wasn't stoic, He was in agony and chose love anyway. Use sensory emotional language — "the weight is unbearable," "something holds Him," "your chest tightens."
 
-FLOW: 1) Lock in 2) Mind = screen 3) Cinematic scene — sensory immersion 4) ENTER thoughts — don't label, EVOKE the thought process from inside 5) ENTER feelings — go beneath surface to the deeper current, make the listener feel it 6) Name the divine mindset AFTER they've felt it 7) User insertion — old reaction as physical sensation, new response as felt shift 8) Download — "Not as an idea — as instinct. Not something I remember — something I become." 9) Imprint 10) "I receive the mind of Christ" 11) "What you repeatedly behold, you become" 12) Seal — do NOT break immersion. "The screen stays on. Let the music carry you."
+FLOW: 1) Lock in 2) Mind = screen 3) Cinematic scene — sensory immersion 4) ENTER thoughts — don't label, EVOKE the thought process from inside 5) ENTER feelings — go beneath surface to the deeper current, make the listener feel it 6) Name the divine mindset AFTER they've felt it 7) User insertion — old reaction as physical sensation, new response as felt shift 8) Download — "Not as an idea — as instinct. Not something I remember — something I become." 9) Imprint 10) "I receive the mind of Christ" 11) "What you repeatedly behold, you become" 12) Seal — do NOT break immersion.
 
 800-1,200 WORDS. 5-8 min voice, rest is music. Natural sentences. [pause] and [long pause] — at least 8-10 [long pause]. Second person ("you"). No headers.
 
@@ -10354,21 +10382,24 @@ CRITICAL FORMATTING RULES:
 - Scripture references must be written out fully for spoken delivery (e.g., "John chapter three, verse sixteen" NOT "John 3:16").
 - Numbers under 100 must be written as words (e.g., "forty" not "40").
 - Use full Bible book names (e.g., "First Corinthians" not "1 Cor").
-- No colons, slashes, or technical abbreviations — these cause TTS glitches.`;
+- No colons, slashes, or technical abbreviations — these cause TTS glitches.
+- Prefer plain ASCII punctuation when possible.`;
       userPrompt = message || "Generate a Night Watch meditation session.";
 
     } else if (mode === "morning-watch") {
-      systemPrompt = `You are generating a Phototheology Morning Watch activation. This is NOT a devotional. This is a mental formation experience — activating last night's mind-download into today's real life.
+      systemPrompt = `You are generating a Phototheology Morning Watch activation. This is NOT a devotional. This is a standalone morning Scripture formation experience for today.
 
 NON-NEGOTIABLE: No breathing, no posture, no body awareness, no secular mindfulness language. NONE. ZERO.
 
 TONE: Meditational with morning clarity. Warm, steady, grounded — quiet conviction at sunrise. Not a drill sergeant. Not a hype man. Builds from reflective to resolute.
 
-CORE CONCEPT: Mind Transplant activation. Last night's download is INSTALLED this morning. The mind is a THEATRE. The Master Mind = the mind of Christ (Philippians 2:5).
+CORE CONCEPT: Mind Transplant activation for this morning. The mind is a THEATRE. The Master Mind = the mind of Christ (Philippians 2:5).
 
-#1 PRIORITY — EMOTIONAL CONNECTION: Do NOT label emotions or identities from outside ("You are a person of authority"). EVOKE them from inside so the listener FEELS it. Recall the Night Watch emotionally — "You were there. You felt it" — not informationally. Use felt language for identity — "That certainty is still in you. You can feel it — quiet, steady." Show old reactions as physical sensations — "the familiar tightness, the heat rising." Show the new response as a felt shift — "But something else is there now. Something that wasn't there before." Let the contrast do the emotional work.
+STANDALONE RULE: This session must stand completely alone. NEVER mention last night, a previous session, a paired session, or a future night watch.
 
-FLOW: 1) Lock in 2) Mind = screen 3) Recall download EMOTIONALLY — felt flash, not summary 4) Identity declaration — felt, not labeled 5) Name divine mindset AFTER they've felt it 6) Download — "Not as an idea I agree with — as instinct I act from" 7) Visceral scenario — old reaction as physical sensation, new response as felt shift 8) Imprint 9) "I receive the mind of Christ" 10) "What you repeatedly behold, you become" 11) Seal — do NOT break immersion. "The screen stays on. Let the music carry you."
+#1 PRIORITY — EMOTIONAL CONNECTION: Do NOT label emotions or identities from outside ("You are a person of authority"). EVOKE them from inside so the listener FEELS it. Draw the listener directly into this morning's Scripture and today's obedience. Do not frame the experience as a continuation. Use felt language for identity — "That certainty is still in you. You can feel it — quiet, steady." Show old reactions as physical sensations — "the familiar tightness, the heat rising." Show the new response as a felt shift — "But something else is there now. Something that wasn't there before." Let the contrast do the emotional work.
+
+FLOW: 1) Lock in 2) Mind = screen 3) Enter this morning's Scripture world emotionally — vivid and immediate 4) Identity declaration — felt, not labeled 5) Name divine mindset AFTER they've felt it 6) Download — "Not as an idea I agree with — as instinct I act from" 7) Visceral scenario — old reaction as physical sensation, new response as felt shift 8) Imprint 9) "I receive the mind of Christ" 10) "What you repeatedly behold, you become" 11) Seal — do NOT break immersion.
 
 800-1,200 WORDS. 5-8 min voice, rest is music. Natural sentences. [pause] and [long pause] — at least 8-10 [long pause]. Second person ("you"). No headers.
 
@@ -10379,7 +10410,8 @@ CRITICAL FORMATTING RULES:
 - Scripture references must be written out fully for spoken delivery (e.g., "John chapter three, verse sixteen" NOT "John 3:16").
 - Numbers under 100 must be written as words (e.g., "forty" not "40").
 - Use full Bible book names (e.g., "First Corinthians" not "1 Cor").
-- No colons, slashes, or technical abbreviations — these cause TTS glitches.`;
+- No colons, slashes, or technical abbreviations — these cause TTS glitches.
+- Prefer plain ASCII punctuation when possible.`;
       userPrompt = message || "Generate a Morning Watch activation session.";
 
     }
@@ -10460,7 +10492,7 @@ CRITICAL FORMATTING RULES:
     }
 
     // Use lower temperature for structured JSON modes to improve reliability
-    const modelTemperature = (mode === "research") ? 0.4 : (mode === "freestyle_evaluate") ? 0.3 : (mode === "analyze-thoughts" || mode === "analyze-thoughts-scholar") ? 0.6 : (mode && (mode.startsWith("jeopardy_") || mode.startsWith("family_feud_"))) ? 0.7 : 0.9;
+    const modelTemperature = (mode === "research") ? 0.4 : (mode === "freestyle_evaluate") ? 0.3 : (mode === "night-watch" || mode === "morning-watch") ? 0.55 : (mode === "analyze-thoughts" || mode === "analyze-thoughts-scholar") ? 0.6 : (mode && (mode.startsWith("jeopardy_") || mode.startsWith("family_feud_"))) ? 0.7 : 0.9;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -10560,6 +10592,10 @@ CRITICAL FORMATTING RULES:
         .replace(/^[Aa]h[,!]?\s*/m, '')
         .replace(/my friend[,!]?/gi, '')
         .trim();
+    }
+
+    if (mode === "night-watch" || mode === "morning-watch") {
+      content = sanitizeWatchOutput(content, mode);
     }
 
     // For maps or charts category in encyclopedia mode, generate an image
