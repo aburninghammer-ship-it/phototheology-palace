@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { X, Check, RefreshCw, Save, Sparkles, BookOpen, CrosshairIcon, MessageCircle, Send, Loader2 } from "lucide-react";
+import { X, Check, RefreshCw, Save, Sparkles, BookOpen, CrosshairIcon, MessageCircle, Send, Loader2, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { callJeeves } from "@/lib/jeevesClient";
@@ -26,11 +26,14 @@ export interface DialogueMessage {
 interface AnalysisCardProps {
   layer: StudyLayer;
   index: number;
+  totalLayers?: number;
   verseRef?: string;
   verseText?: string;
   onRemove?: (principleId: string) => void;
   onRebuild?: (principleId: string) => void;
   onAccept?: (principleId: string) => void;
+  onCompound?: (upToIndex: number) => void;
+  compounding?: boolean;
   onSaveLayer?: (layer: StudyLayer) => void;
 }
 
