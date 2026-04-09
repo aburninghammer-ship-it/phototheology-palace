@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { X, Check, RefreshCw, Save, Sparkles, BookOpen, CrosshairIcon, MessageCircle, Send, Loader2 } from "lucide-react";
+import { X, Check, RefreshCw, Save, Sparkles, BookOpen, CrosshairIcon, MessageCircle, Send, Loader2, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { callJeeves } from "@/lib/jeevesClient";
@@ -26,11 +26,14 @@ export interface DialogueMessage {
 interface AnalysisCardProps {
   layer: StudyLayer;
   index: number;
+  totalLayers?: number;
   verseRef?: string;
   verseText?: string;
   onRemove?: (principleId: string) => void;
   onRebuild?: (principleId: string) => void;
   onAccept?: (principleId: string) => void;
+  onCompound?: (upToIndex: number) => void;
+  compounding?: boolean;
   onSaveLayer?: (layer: StudyLayer) => void;
 }
 
@@ -90,7 +93,7 @@ function parseAnalysis(text: string) {
   return sections;
 }
 
-export function AnalysisCard({ layer, index, verseRef, verseText, onRemove, onRebuild, onAccept, onSaveLayer }: AnalysisCardProps) {
+export function AnalysisCard({ layer, index, totalLayers = 0, verseRef, verseText, onRemove, onRebuild, onAccept, onCompound, compounding, onSaveLayer }: AnalysisCardProps) {
   const colors = ROOM_COLORS[layer.roomId] || DEFAULT_COLORS;
   const sections = parseAnalysis(layer.analysis);
   const [isSaved, setIsSaved] = useState(false);
@@ -359,7 +362,7 @@ INSTRUCTIONS:
       </div>
 
       {/* Action buttons: Build / Rebuild / Save */}
-      {!layer.accepted && (onAccept || onRebuild || onSaveLayer) && (
+      {!layer.accepted && (onAccept || onRebuild || onCompound || onSaveLayer) && (
         <div className="relative flex items-center gap-2 px-4 py-3 border-t border-white/10 bg-black/20">
           {onAccept && (
             <Button
@@ -370,6 +373,22 @@ INSTRUCTIONS:
             >
               <Check className="w-3.5 h-3.5" />
               Build
+            </Button>
+          )}
+          {onCompound && index > 0 && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-8 px-3 text-xs gap-1.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/30 hover:border-purple-400/50 transition-all"
+              onClick={() => onCompound(index)}
+              disabled={compounding}
+            >
+              {compounding ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Layers className="w-3.5 h-3.5" />
+              )}
+              Compound
             </Button>
           )}
           {onRebuild && (

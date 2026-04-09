@@ -604,6 +604,75 @@ ${roomId === "hf" ? `- HISTORY FREESTYLE GUARDRAIL: This is the History/Social F
     }
   };
 
+  // Compound — Jeeves combines all layers up to a given index into one smooth summary
+  const [compounding, setCompounding] = useState(false);
+
+  const handleCompound = useCallback(async (upToIndex: number) => {
+    if (!parsedRef || compounding) return;
+
+    const layersToCompound = layers.slice(0, upToIndex + 1);
+    if (layersToCompound.length < 2) {
+      toast.error("Need at least 2 layers to compound.");
+      return;
+    }
+
+    setCompounding(true);
+    toast("Jeeves is compounding your layers…", { icon: "🧬" });
+
+    try {
+      const layerSummaries = layersToCompound.map((l, i) =>
+        `LAYER ${i + 1} — ${l.roomName} / ${l.principleName}:\n${l.analysis}`
+      ).join("\n\n---\n\n");
+
+      const { data } = await callJeeves({
+        mode: "principle-amplification",
+        book: parsedRef.book,
+        chapter: parsedRef.chapter,
+        verse: parsedRef.verse,
+        verseText: verseText,
+        principle: "Compound — Unified Summary of Layers So Far",
+        message: `The student has built ${layersToCompound.length} study layers on ${verseRef}. They want you to COMPOUND these layers — meaning weave them into ONE smooth, flowing summary that captures the cumulative insight so far. This becomes a foundation before they add the next principle.
+
+HERE ARE THE LAYERS TO COMPOUND:
+${layerSummaries}
+
+INSTRUCTIONS FOR COMPOUNDING:
+- Combine all ${layersToCompound.length} layers into ONE seamless, flowing theological narrative.
+- Do NOT list them separately — thread the principles (${layersToCompound.map(l => l.principleName).join(", ")}) together naturally.
+- Show how each lens builds on the previous: the reader should feel momentum and cumulative depth.
+- Preserve the best cross-references and KJV quotes from each layer.
+- Write as a unified study passage — like a chapter in a study Bible, not a list of bullet points.
+- End with a transitional invitation: "The foundation is laid. What lens will you add next?"
+- Include a 💎 Compound Gem — an insight that only becomes visible when ALL these principles are combined.
+- Warm, pastoral, scholarly tone. This is the compounded bedrock of their study.
+- STRICTLY BIBLICAL: All references must be to Scripture. No extra-biblical sources.`,
+      }, "study-experience");
+
+      const response = typeof data === "string" ? data : (data as any)?.response || "";
+
+      // Replace the compounded layers with a single compound layer
+      const compoundLayer: StudyLayer = {
+        roomId: "compound",
+        roomName: "🧬 Compound",
+        principleId: `compound-${Date.now()}`,
+        principleName: `${layersToCompound.map(l => l.principleName).join(" + ")}`,
+        analysis: response,
+        accepted: true,
+      };
+
+      setLayers((prev) => [
+        compoundLayer,
+        ...prev.slice(upToIndex + 1),
+      ]);
+
+      toast.success("Layers compounded into a unified foundation!");
+    } catch (err) {
+      console.error("Compound failed:", err);
+      toast.error("Compounding failed — try again.");
+    }
+    setCompounding(false);
+  }, [layers, parsedRef, verseText, verseRef, compounding]);
+
   // Recap — Jeeves summarizes all current layers into one smooth output
   const [recapText, setRecapText] = useState<string | null>(null);
   const [recapLoading, setRecapLoading] = useState(false);
@@ -899,11 +968,14 @@ INSTRUCTIONS FOR RECAP:
                     key={`${layer.principleId}-${i}`}
                     layer={layer}
                     index={i}
+                    totalLayers={layers.length}
                     verseRef={verseRef}
                     verseText={verseText}
                     onRemove={handleRemoveLayer}
                     onAccept={handleAcceptLayer}
                     onRebuild={handleRebuildLayer}
+                    onCompound={handleCompound}
+                    compounding={compounding}
                     onSaveLayer={handleSaveLayer}
                   />
                 ))}
