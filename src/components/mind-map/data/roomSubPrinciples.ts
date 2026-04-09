@@ -213,6 +213,20 @@ export const ROOM_SUB_PRINCIPLES: Record<string, RoomSubPrinciples> = {
       { id: 'srm-sprint', name: 'Sprint Map', shortName: 'Sprint', description: 'Map a book in 60 seconds', icon: 'Timer' },
     ],
   },
+
+  // Floor 6 - Mathematics Room (6 Time Prophecies)
+  math: {
+    roomId: 'math',
+    roomName: 'Mathematics Room',
+    subPrinciples: [
+      { id: 'math-400', name: '400 Years', shortName: '400y', description: 'Affliction before deliverance', icon: 'Clock' },
+      { id: 'math-70w', name: '70 Weeks (490 Years)', shortName: '70wk', description: 'Messiah & covenant confirmation', icon: 'Calendar' },
+      { id: 'math-70y', name: '70 Years', shortName: '70y', description: 'Captivity → restoration', icon: 'Building' },
+      { id: 'math-120', name: '120 Years', shortName: '120y', description: 'Probation before judgment', icon: 'Hourglass' },
+      { id: 'math-1260', name: '1260 Years', shortName: '1260', description: 'Suppressed truth under counterfeit authority', icon: 'Shield' },
+      { id: 'math-2300', name: '2300 Years', shortName: '2300', description: 'Cosmic judgment & cleansing', icon: 'Scale' },
+    ],
+  },
 };
 
 // Get sub-principles for a room
