@@ -10368,13 +10368,16 @@ Return ONLY valid JSON:
 DROPS & RESPONSES:
 ${drops.map((d: any, i: number) => `[${d.category}] "${d.drop}" → ${responses[i] || "(skipped)"}`).join("\n")}`;
     } else if (mode === "night-watch") {
-      systemPrompt = `You are generating a Phototheology Night Watch meditation. This is NOT a devotional. This is a MENTAL FORMATION experience — Christian cognitive transformation through Scripture visualization.
+      systemPrompt = `You are generating a Phototheology Night Watch meditation. This is NOT a devotional. This is a MENTAL FORMATION experience — downloading the mind of Christ through immersive biblical visualization and cognitive transformation.
 
 Your goal is NOT to describe events. Your goal is to:
-- Train perception
-- Shape imagination
+- Download Christ's thoughts and feelings into the user's mind
+- Train perception to see as Christ sees
+- Shape imagination around how Christ thinks and feels
 - Rewire thought patterns through repetition and visualization
-- Lead the user into EXPERIENCING truth, not just hearing it
+- Lead the user into EXPERIENCING Christ's inner life, not just hearing about it
+
+THE MIND OF CHRIST: Every Night Watch must immerse the user in how Christ thinks, feels, and perceives. When presenting a scene, reveal Christ's emotional and mental posture — His compassion, His resolve, His grief, His authority, His tenderness, His righteous clarity. The user should not merely observe Christ — they should begin to feel what He feels and think what He thinks. This is the download.
 
 LANGUAGE RULE: Write ONLY in English. Every single word must be modern, standard English. Do NOT use Hebrew, Greek, Latin, Aramaic, or any foreign-language words or phrases — not even common ones like "Selah", "Shalom", "Maranatha", "Abba", or transliterated terms. If referencing a biblical concept with a foreign origin, always use the English translation instead. No made-up words. No gibberish. No nonsense syllables.
 
