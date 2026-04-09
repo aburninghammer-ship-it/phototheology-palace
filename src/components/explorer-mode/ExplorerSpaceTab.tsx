@@ -47,6 +47,7 @@ const GAMES_ITEMS: SpaceItem[] = [
 ];
 
 const UNIVERSITY_ITEMS: SpaceItem[] = [
+  { label: "Master Class",        path: "/master-class",          icon: Headphones, description: "Podcast-style training",    color: "orange" },
   { label: "Bible 101",          path: "/bible-101",             icon: Eye,      description: "30-day visual journey",     color: "amber" },
   { label: "PT Course",          path: "/phototheology-course",  icon: BookText, description: "90-day flagship course",    color: "blue" },
   { label: "Blueprint Course",   path: "/blueprint-course",      icon: BookOpen, description: "Prophecy foundations",      color: "teal" },
