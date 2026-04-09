@@ -15,8 +15,8 @@ const MAX_CHUNK = 4500;
 const BATCH_SIZE = 4; // Process chunks in parallel batches
 const FETCH_TIMEOUT_MS = 45_000; // 45s timeout per TTS chunk
 // Bump this version to invalidate ALL cached watch TTS audio
-// v15 = 2026-04-09 Master Watch rebuild: Call→Scene→Expansion→Application→Identity→Close
-const WATCH_CACHE_VERSION = "v15";
+// v16 = 2026-04-09 Night Watch now downloads Christ's thoughts/feelings like Morning Watch
+const WATCH_CACHE_VERSION = "v16";
 
 
 function normalizeWatchText(text: string, watchType: string): string {
