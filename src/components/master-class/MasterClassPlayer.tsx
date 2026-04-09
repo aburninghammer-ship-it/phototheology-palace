@@ -39,7 +39,72 @@ function scriptToTranscript(script: string): string {
     .trim();
 }
 
-export function MasterClassPlayer({ classDef, isCompleted, onComplete, onClose }: MasterClassPlayerProps) {
+function ShareClassButton({ audioUrl }: { audioUrl: string | null }) {
+  const shareUrl = `${window.location.origin}/master-class/preview`;
+  
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(shareUrl);
+    toast.success("Link copied!");
+  };
+
+  const handleNativeShare = async () => {
+    const shareData: ShareData = {
+      title: "Phototheology Master Class — Introduction",
+      text: "Listen to the Introduction to Phototheology — a revolutionary Bible study system. Free to listen!",
+      url: shareUrl,
+    };
+    if (navigator.share) {
+      try { await navigator.share(shareData); } catch {}
+    } else {
+      handleCopyLink();
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!audioUrl) {
+      toast.error("Play the class first to generate audio, then download.");
+      return;
+    }
+    try {
+      const resp = await fetch(audioUrl);
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "phototheology-master-class-intro.mp3";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error("Download failed");
+    }
+  };
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="sm" className="text-xs gap-1.5">
+          <Share2 className="h-3.5 w-3.5" />
+          Share This Class
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-56 p-2 space-y-1" align="start">
+        <Button variant="ghost" size="sm" className="w-full justify-start text-xs" onClick={handleNativeShare}>
+          <Share2 className="h-3.5 w-3.5 mr-2" /> Share via…
+        </Button>
+        <Button variant="ghost" size="sm" className="w-full justify-start text-xs" onClick={handleCopyLink}>
+          <Link2 className="h-3.5 w-3.5 mr-2" /> Copy Link
+        </Button>
+        <Button variant="ghost" size="sm" className="w-full justify-start text-xs" onClick={handleDownload}>
+          <Download className="h-3.5 w-3.5 mr-2" /> Download Audio
+        </Button>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
