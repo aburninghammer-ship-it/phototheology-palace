@@ -83,7 +83,7 @@ export default function MasterClass() {
           </h1>
 
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
-            39 professors. One system. The complete training.
+            41 professors. One system. The complete training.
             <br />
             <span className="text-sm">
               Progress through each class sequentially — up to 3 per day.
