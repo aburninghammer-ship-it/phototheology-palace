@@ -2,7 +2,22 @@ import { useState, useCallback, useMemo } from "react";
 import { MASTER_CLASSES } from "@/data/masterClassData";
 
 const STORAGE_KEY = "master-class-progress";
+const CREATOR_KEY = "master-class-creator";
 const MAX_CLASSES_PER_DAY = 3;
+
+function isCreatorMode(): boolean {
+  try {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("creator") === "true") {
+        localStorage.setItem(CREATOR_KEY, "true");
+        return true;
+      }
+      return localStorage.getItem(CREATOR_KEY) === "true";
+    }
+  } catch {}
+  return false;
+}
 
 interface ProgressData {
   completedIds: string[];
@@ -39,8 +54,9 @@ export function useMasterClassProgress() {
   const completedIds = progress.completedIds;
   const todayKey = getTodayKey();
   const completionsToday = progress.dailyLog[todayKey] || 0;
-  const canStartNew = completionsToday < MAX_CLASSES_PER_DAY;
-  const remainingToday = MAX_CLASSES_PER_DAY - completionsToday;
+  const creatorMode = isCreatorMode();
+  const canStartNew = creatorMode || completionsToday < MAX_CLASSES_PER_DAY;
+  const remainingToday = creatorMode ? 999 : MAX_CLASSES_PER_DAY - completionsToday;
 
   const isCompleted = useCallback(
     (classId: string) => completedIds.includes(classId),
@@ -52,13 +68,14 @@ export function useMasterClassProgress() {
   // 2. The previous class (by classNumber order) is completed
   const isUnlocked = useCallback(
     (classId: string) => {
+      if (creatorMode) return true;
       const sorted = [...MASTER_CLASSES].sort((a, b) => a.classNumber - b.classNumber);
       const idx = sorted.findIndex((c) => c.id === classId);
       if (idx <= 0) return true; // first class always unlocked
       const prevClass = sorted[idx - 1];
       return completedIds.includes(prevClass.id);
     },
-    [completedIds]
+    [completedIds, creatorMode]
   );
 
   const markComplete = useCallback(
