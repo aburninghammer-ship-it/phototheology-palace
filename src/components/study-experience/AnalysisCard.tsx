@@ -362,7 +362,7 @@ INSTRUCTIONS:
       </div>
 
       {/* Action buttons: Build / Rebuild / Save */}
-      {!layer.accepted && (onAccept || onRebuild || onSaveLayer) && (
+      {!layer.accepted && (onAccept || onRebuild || onCompound || onSaveLayer) && (
         <div className="relative flex items-center gap-2 px-4 py-3 border-t border-white/10 bg-black/20">
           {onAccept && (
             <Button
@@ -373,6 +373,22 @@ INSTRUCTIONS:
             >
               <Check className="w-3.5 h-3.5" />
               Build
+            </Button>
+          )}
+          {onCompound && index > 0 && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-8 px-3 text-xs gap-1.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/30 hover:border-purple-400/50 transition-all"
+              onClick={() => onCompound(index)}
+              disabled={compounding}
+            >
+              {compounding ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Layers className="w-3.5 h-3.5" />
+              )}
+              Compound
             </Button>
           )}
           {onRebuild && (
