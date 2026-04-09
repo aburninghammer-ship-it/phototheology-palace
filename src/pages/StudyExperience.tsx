@@ -647,17 +647,18 @@ YOUR ROLE — GUIDE, DO NOT GIVE ANSWERS:
   const handleCompound = useCallback(async (upToIndex: number) => {
     if (!parsedRef || compounding) return;
 
-    const layersToCompound = layers.slice(0, upToIndex + 1);
-    if (layersToCompound.length < 2) {
+    // Compound ALL accepted layers in the build, not just up to an index
+    const allAcceptedLayers = layers.filter(l => l.accepted && l.roomId !== "compound");
+    if (allAcceptedLayers.length < 2) {
       toast.error("Need at least 2 layers to compound.");
       return;
     }
 
     setCompounding(true);
-    toast("Jeeves is compounding your layers…", { icon: "🧬" });
+    toast("Jeeves is compounding your entire build…", { icon: "🧬" });
 
     try {
-      const layerSummaries = layersToCompound.map((l, i) =>
+      const layerSummaries = allAcceptedLayers.map((l, i) =>
         `LAYER ${i + 1} — ${l.roomName} / ${l.principleName}:\n${l.analysis}`
       ).join("\n\n---\n\n");
 
@@ -667,15 +668,15 @@ YOUR ROLE — GUIDE, DO NOT GIVE ANSWERS:
         chapter: parsedRef.chapter,
         verse: parsedRef.verse,
         verseText: verseText,
-        principle: "Compound — Unified Summary of Layers So Far",
-        message: `The student has built ${layersToCompound.length} study layers on ${verseRef}. They want you to COMPOUND these layers — meaning weave them into ONE smooth, flowing summary that captures the cumulative insight so far. This becomes a foundation before they add the next principle.
+        principle: "Compound — Unified Summary of Entire Build",
+        message: `The student has built ${allAcceptedLayers.length} study layers on ${verseRef}. They want you to COMPOUND the ENTIRE BUILD — meaning weave ALL layers into ONE smooth, cohesive, flowing theological narrative that reads as a single unified thought.
 
-HERE ARE THE LAYERS TO COMPOUND:
+HERE ARE ALL THE LAYERS IN THE BUILD:
 ${layerSummaries}
 
 INSTRUCTIONS FOR COMPOUNDING:
-- Combine all ${layersToCompound.length} layers into ONE seamless, flowing theological narrative.
-- Do NOT list them separately — thread the principles (${layersToCompound.map(l => l.principleName).join(", ")}) together naturally.
+- Combine ALL ${allAcceptedLayers.length} layers into ONE seamless, flowing theological narrative — a single cohesive thought.
+- Do NOT list them separately — thread the principles (${allAcceptedLayers.map(l => l.principleName).join(", ")}) together naturally so it reads like ONE unified meditation.
 - Show how each lens builds on the previous: the reader should feel momentum and cumulative depth.
 - Preserve the best cross-references and KJV quotes from each layer.
 - Write as a unified study passage — like a chapter in a study Bible, not a list of bullet points.
@@ -687,22 +688,19 @@ INSTRUCTIONS FOR COMPOUNDING:
 
       const response = typeof data === "string" ? data : (data as any)?.response || "";
 
-      // Replace the compounded layers with a single compound layer
+      // ADD the compound as a new layer — do NOT replace existing layers
       const compoundLayer: StudyLayer = {
         roomId: "compound",
         roomName: "🧬 Compound",
         principleId: `compound-${Date.now()}`,
-        principleName: `${layersToCompound.map(l => l.principleName).join(" + ")}`,
+        principleName: `${allAcceptedLayers.map(l => l.principleName).join(" + ")}`,
         analysis: response,
         accepted: true,
       };
 
-      setLayers((prev) => [
-        compoundLayer,
-        ...prev.slice(upToIndex + 1),
-      ]);
+      setLayers((prev) => [...prev, compoundLayer]);
 
-      toast.success("Layers compounded into a unified foundation!");
+      toast.success("Entire build compounded into a unified narrative!");
     } catch (err) {
       console.error("Compound failed:", err);
       toast.error("Compounding failed — try again.");
