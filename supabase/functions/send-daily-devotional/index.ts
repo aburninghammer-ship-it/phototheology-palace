@@ -420,13 +420,25 @@ serve(async (req) => {
         const startDate = new Date(Date.UTC(startedAt.getUTCFullYear(), startedAt.getUTCMonth(), startedAt.getUTCDate()));
         const todayDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
         const daysSinceStart = Math.floor((todayDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-        const currentDayNumber = Math.min(daysSinceStart + 1, plan.duration);
+        const rawDayNumber = daysSinceStart + 1;
+        const currentDayNumber = Math.min(rawDayNumber, plan.duration);
 
         console.log(`Plan ${plan.id}: Day ${currentDayNumber} of ${plan.duration}`);
 
-        // Skip if plan is complete
-        if (currentDayNumber > plan.duration) {
-          console.log(`Plan ${plan.id} completed, skipping`);
+        // If the plan has already run its course, mark it completed once and stop sending.
+        if (rawDayNumber > plan.duration) {
+          console.log(`Plan ${plan.id} exceeded duration, marking completed and skipping`);
+
+          await supabase
+            .from('devotional_plans')
+            .update({
+              status: 'completed',
+              current_day: plan.duration,
+              completed_at: new Date().toISOString(),
+            })
+            .eq('id', plan.id)
+            .eq('status', 'active');
+
           continue;
         }
 
@@ -600,10 +612,20 @@ serve(async (req) => {
           notificationsCreated++;
         }
 
-        // Update current_day on the plan so it tracks progress
+        // Update progress and close the plan once the final devotional has been delivered.
+        const isFinalDay = currentDayNumber >= plan.duration;
+
         await supabase
           .from('devotional_plans')
-          .update({ current_day: currentDayNumber })
+          .update(
+            isFinalDay
+              ? {
+                  current_day: currentDayNumber,
+                  status: 'completed',
+                  completed_at: new Date().toISOString(),
+                }
+              : { current_day: currentDayNumber }
+          )
           .eq('id', plan.id);
 
         // Send SMS to opted-in recipients
