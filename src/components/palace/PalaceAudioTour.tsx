@@ -246,6 +246,7 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
   const [completedSegments, setCompletedSegments] = useState<Set<number>>(new Set());
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const advanceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeRequestRef = useRef(0);
   const segmentAudioCacheRef = useRef<Map<number, string>>(new Map());
   const segmentAudioRequestRef = useRef<Map<number, Promise<string>>>(new Map());
@@ -254,33 +255,64 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
   const totalSegments = allSegments.length;
   const overallProgress = (completedSegments.size / totalSegments) * 100;
 
+  const stopProgressTracking = useCallback(() => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+  }, []);
+
+  const clearAdvanceTimeout = useCallback(() => {
+    if (advanceTimeoutRef.current) {
+      clearTimeout(advanceTimeoutRef.current);
+      advanceTimeoutRef.current = null;
+    }
+  }, []);
+
   useEffect(() => {
     const audio = new Audio();
     audio.preload = "auto";
     audioRef.current = audio;
 
     return () => {
+      stopProgressTracking();
+      clearAdvanceTimeout();
+      audio.onloadedmetadata = null;
+      audio.onplay = null;
+      audio.onpause = null;
+      audio.onended = null;
+      audio.onerror = null;
       audio.pause();
-      audio.src = "";
+      audio.removeAttribute("src");
+      audio.load();
       audioRef.current = null;
       segmentAudioCacheRef.current.clear();
       segmentAudioRequestRef.current.clear();
     };
-  }, []);
+  }, [clearAdvanceTimeout, stopProgressTracking]);
 
   const cleanupAudio = useCallback(() => {
-    if (progressIntervalRef.current) {
-      clearInterval(progressIntervalRef.current);
-      progressIntervalRef.current = null;
-    }
+    activeRequestRef.current += 1;
+    stopProgressTracking();
+    clearAdvanceTimeout();
+
     if (audioRef.current) {
+      audioRef.current.onloadedmetadata = null;
+      audioRef.current.onplay = null;
+      audioRef.current.onpause = null;
+      audioRef.current.onended = null;
+      audioRef.current.onerror = null;
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
+      audioRef.current.removeAttribute("src");
+      audioRef.current.load();
     }
+
     setIsPlaying(false);
+    setIsLoading(false);
     setAudioProgress(0);
     setAudioDuration(0);
-  }, []);
+  }, [clearAdvanceTimeout, stopProgressTracking]);
 
   const fetchSegmentAudioUrl = useCallback(async (index: number, regenerate = false) => {
     if (index < 0 || index >= allSegments.length) {
@@ -331,9 +363,8 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
     cleanupAudio();
     setIsLoading(true);
     setCurrentIndex(index);
-    const requestId = activeRequestRef.current + 1;
-    activeRequestRef.current = requestId;
 
+    const requestId = activeRequestRef.current;
     const segment = allSegments[index];
     const audio = audioRef.current;
 
@@ -342,89 +373,102 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
       return;
     }
 
+    let terminalEventHandled = false;
+
+    const queueNextSegment = (delay: number) => {
+      if (index >= totalSegments - 1) return;
+
+      preloadSegment(index + 1);
+      clearAdvanceTimeout();
+      advanceTimeoutRef.current = setTimeout(() => {
+        if (activeRequestRef.current !== requestId) return;
+        void playSegment(index + 1);
+      }, delay);
+    };
+
     try {
       const audioUrl = await fetchSegmentAudioUrl(index);
 
       if (activeRequestRef.current !== requestId) return;
 
-      audio.onloadedmetadata = null;
-      audio.onplay = null;
-      audio.onended = null;
-      audio.onerror = null;
-      audio.pause();
-      audio.currentTime = 0;
       audio.src = audioUrl;
       audio.load();
 
-      audio.onloadedmetadata = () => setAudioDuration(audio.duration);
+      audio.onloadedmetadata = () => {
+        if (activeRequestRef.current !== requestId) return;
+        setAudioDuration(audio.duration || 0);
+      };
 
       audio.onplay = () => {
-        if (activeRequestRef.current !== requestId) return;
+        if (activeRequestRef.current !== requestId || terminalEventHandled) return;
         setIsPlaying(true);
         setIsLoading(false);
-        if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+        stopProgressTracking();
         progressIntervalRef.current = setInterval(() => {
           if (audioRef.current) setAudioProgress(audioRef.current.currentTime);
         }, 250);
         preloadSegment(index + 1);
       };
 
-      audio.onended = () => {
-        if (activeRequestRef.current !== requestId) return;
+      audio.onpause = () => {
+        if (activeRequestRef.current !== requestId || terminalEventHandled) return;
         setIsPlaying(false);
-        setCompletedSegments(prev => {
+        stopProgressTracking();
+      };
+
+      audio.onended = () => {
+        if (activeRequestRef.current !== requestId || terminalEventHandled) return;
+        terminalEventHandled = true;
+        setIsPlaying(false);
+        stopProgressTracking();
+        setAudioProgress(audio.duration || audio.currentTime || 0);
+        setCompletedSegments((prev) => {
           const next = new Set(prev);
           next.add(index);
           return next;
         });
-        if (progressIntervalRef.current) {
-          clearInterval(progressIntervalRef.current);
-          progressIntervalRef.current = null;
-        }
-        if (index < totalSegments - 1) {
-          preloadSegment(index + 1);
-          setTimeout(() => playSegment(index + 1), 150);
-        }
+        queueNextSegment(150);
       };
 
       audio.onerror = (e) => {
-        if (activeRequestRef.current !== requestId) return;
+        if (activeRequestRef.current !== requestId || terminalEventHandled) return;
+        terminalEventHandled = true;
         console.error("Audio playback error for segment:", segment.id, e);
         setIsPlaying(false);
         setIsLoading(false);
-        if (index < totalSegments - 1) {
-          preloadSegment(index + 1);
-          setTimeout(() => playSegment(index + 1), 500);
-        }
+        stopProgressTracking();
+        queueNextSegment(500);
       };
 
       await audio.play();
     } catch (err) {
-      if (activeRequestRef.current !== requestId) return;
+      if (activeRequestRef.current !== requestId || terminalEventHandled) return;
+      terminalEventHandled = true;
       console.error("Tour audio error for segment:", segment?.id, err);
+      setIsPlaying(false);
       setIsLoading(false);
-      if (index < totalSegments - 1) {
-        preloadSegment(index + 1);
-        setTimeout(() => playSegment(index + 1), 750);
-      }
+      stopProgressTracking();
+      queueNextSegment(750);
     }
-  }, [allSegments, cleanupAudio, fetchSegmentAudioUrl, preloadSegment, totalSegments]);
+  }, [allSegments, cleanupAudio, clearAdvanceTimeout, fetchSegmentAudioUrl, preloadSegment, stopProgressTracking, totalSegments]);
 
   const togglePlayPause = useCallback(() => {
     if (isLoading) return;
+
     if (isPlaying && audioRef.current) {
       audioRef.current.pause();
-      setIsPlaying(false);
-      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-    } else if (audioRef.current && audioRef.current.src) {
-      audioRef.current.play();
-      setIsPlaying(true);
-      progressIntervalRef.current = setInterval(() => {
-        if (audioRef.current) setAudioProgress(audioRef.current.currentTime);
-      }, 250);
-    } else {
-      playSegment(currentIndex);
+      return;
     }
+
+    if (audioRef.current?.src) {
+      void audioRef.current.play().catch((err) => {
+        console.error("Tour audio resume error:", err);
+        toast.error("Unable to resume the tour audio.");
+      });
+      return;
+    }
+
+    void playSegment(currentIndex);
   }, [isPlaying, isLoading, currentIndex, playSegment]);
 
   const skipNext = useCallback(() => {
