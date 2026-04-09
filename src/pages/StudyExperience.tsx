@@ -893,17 +893,42 @@ INSTRUCTIONS FOR RECAP:
             />
 
             {/* User-led input */}
-            {mode === "user-led" && suggestedRoomData && suggestedPrincipleData && parsedRef && (
-              <UserLedInput
-                roomName={suggestedRoomData.roomName}
-                principleName={suggestedPrincipleData.name}
-                principleId={suggestedPrincipleData.id}
-                principleDescription={suggestedPrincipleData.description}
-                userInput={userInput}
-                onChange={setUserInput}
-                onSubmit={handleUserLedSubmit}
-                loading={loadingPrinciple !== null}
-              />
+            {mode === "user-led" && parsedRef && (
+              <div className="space-y-3">
+                {/* Teach Me toggle */}
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setUserLedTeach(!userLedTeach)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-xs font-medium transition-all border",
+                      userLedTeach
+                        ? "bg-gradient-to-r from-amber-500/20 to-orange-500/20 border-amber-500/40 text-amber-400"
+                        : "bg-muted/30 border-border/50 text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    🎓 Teach Me
+                  </button>
+                  {userLedTeach && (
+                    <p className="text-[10px] text-amber-400/70">
+                      Jeeves will guide you — not give answers. Think it through!
+                    </p>
+                  )}
+                </div>
+
+                {suggestedRoomData && suggestedPrincipleData && (
+                  <UserLedInput
+                    roomName={suggestedRoomData.roomName}
+                    principleName={suggestedPrincipleData.name}
+                    principleId={suggestedPrincipleData.id}
+                    principleDescription={suggestedPrincipleData.description}
+                    userInput={userInput}
+                    onChange={setUserInput}
+                    onSubmit={handleUserLedSubmit}
+                    loading={loadingPrinciple !== null}
+                    teachMe={userLedTeach}
+                  />
+                )}
+              </div>
             )}
 
             {/* Save + Share bar */}

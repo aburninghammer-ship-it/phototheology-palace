@@ -93,6 +93,7 @@ interface UserLedInputProps {
   onChange: (val: string) => void;
   onSubmit: () => void;
   loading: boolean;
+  teachMe?: boolean;
 }
 
 export function UserLedInput({
@@ -104,6 +105,7 @@ export function UserLedInput({
   onChange,
   onSubmit,
   loading,
+  teachMe = false,
 }: UserLedInputProps) {
   const guide = PRINCIPLE_GUIDES[principleId];
 
@@ -111,24 +113,30 @@ export function UserLedInput({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-4 rounded-xl bg-card/80 border border-blue-500/30 space-y-3"
+      className={`p-4 rounded-xl bg-card/80 border space-y-3 ${teachMe ? "border-amber-500/30" : "border-blue-500/30"}`}
     >
       <p className="text-sm font-medium">
-        How does <span className="text-blue-400">{roomName}: {principleName}</span> illuminate this verse?
+        {teachMe ? (
+          <>🎓 Try applying <span className="text-amber-400">{roomName}: {principleName}</span> — Jeeves will guide your thinking</>
+        ) : (
+          <>How does <span className="text-blue-400">{roomName}: {principleName}</span> illuminate this verse?</>
+        )}
       </p>
 
       {/* Principle explanation */}
-      <div className="flex gap-2 items-start rounded-lg bg-blue-500/5 border border-blue-500/15 px-3 py-2.5">
-        <HelpCircle className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
-        <p className="text-xs text-blue-300/80 leading-relaxed">
-          {guide || principleDescription}
+      <div className={`flex gap-2 items-start rounded-lg px-3 py-2.5 ${teachMe ? "bg-amber-500/5 border border-amber-500/15" : "bg-blue-500/5 border border-blue-500/15"}`}>
+        <HelpCircle className={`w-4 h-4 mt-0.5 shrink-0 ${teachMe ? "text-amber-400" : "text-blue-400"}`} />
+        <p className={`text-xs leading-relaxed ${teachMe ? "text-amber-300/80" : "text-blue-300/80"}`}>
+          {teachMe
+            ? `Think about this: ${guide || principleDescription} Don't worry about getting it perfect — write what you see, and Jeeves will help you dig deeper.`
+            : guide || principleDescription}
         </p>
       </div>
 
       <Textarea
         value={userInput}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Write your connection here..."
+        placeholder={teachMe ? "Write what you think the connection is…" : "Write your connection here..."}
         rows={3}
         className="bg-background/50 border-border/50 resize-none"
       />
@@ -136,14 +144,14 @@ export function UserLedInput({
         onClick={onSubmit}
         disabled={!userInput.trim() || loading}
         size="sm"
-        className="w-full"
+        className={`w-full ${teachMe ? "bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500" : ""}`}
       >
         {loading ? (
           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
         ) : (
           <Send className="w-4 h-4 mr-2" />
         )}
-        {loading ? "Evaluating..." : "Submit Connection"}
+        {loading ? (teachMe ? "Jeeves is thinking…" : "Evaluating...") : (teachMe ? "Submit & Get Guidance" : "Submit Connection")}
       </Button>
     </motion.div>
   );
