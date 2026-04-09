@@ -87,15 +87,20 @@ export const ROOM_SUB_PRINCIPLES: Record<string, RoomSubPrinciples> = {
     ],
   },
 
-  // Floor 4 - Fruit Room (4 Types)
+  // Floor 4 - Fruit Room (9 Fruits of the Spirit - Galatians 5:22-23)
   frt: {
     roomId: 'frt',
     roomName: 'Fruit Room',
     subPrinciples: [
-      { id: 'frt-spiritual', name: 'Spiritual Fruit', shortName: 'Spirit', description: 'Love, joy, peace...', icon: 'Heart' },
-      { id: 'frt-doctrinal', name: 'Doctrinal Fruit', shortName: 'Doctrine', description: 'Sound doctrine', icon: 'Book' },
-      { id: 'frt-practical', name: 'Practical Fruit', shortName: 'Actions', description: 'Godly actions', icon: 'Hammer' },
-      { id: 'frt-relational', name: 'Relational Fruit', shortName: 'Relations', description: 'Building up the body', icon: 'Users' },
+      { id: 'frt-love', name: 'Love', shortName: 'Love', description: 'Agape — selfless, sacrificial love', icon: 'Heart' },
+      { id: 'frt-joy', name: 'Joy', shortName: 'Joy', description: 'Deep, abiding gladness rooted in Christ', icon: 'Smile' },
+      { id: 'frt-peace', name: 'Peace', shortName: 'Peace', description: 'Tranquility and harmony with God and others', icon: 'Cloud' },
+      { id: 'frt-longsuffering', name: 'Longsuffering', shortName: 'Patience', description: 'Patient endurance under trial', icon: 'Clock' },
+      { id: 'frt-gentleness', name: 'Gentleness', shortName: 'Gentle', description: 'Kindness and goodness toward others', icon: 'Hand' },
+      { id: 'frt-goodness', name: 'Goodness', shortName: 'Good', description: 'Moral excellence and generosity', icon: 'Star' },
+      { id: 'frt-faith', name: 'Faith', shortName: 'Faith', description: 'Trustworthiness and fidelity', icon: 'Shield' },
+      { id: 'frt-meekness', name: 'Meekness', shortName: 'Meek', description: 'Strength under control; humility', icon: 'Feather' },
+      { id: 'frt-temperance', name: 'Temperance', shortName: 'Temper', description: 'Self-control and mastery over desires', icon: 'Scale' },
     ],
   },
 
