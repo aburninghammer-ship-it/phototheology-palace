@@ -1,15 +1,14 @@
-import { useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
+import { supabase } from "@/integrations/supabase/client";
 import { MASTER_CLASSES } from "@/data/masterClassData";
-import type { MasterClassDef } from "@/data/masterClassData";
 
 /**
  * Determines which master classes a user can access based on subscription status.
  *
  * - Free / trial users: only classes 1 & 2
- * - Paid users: 1 class unlocked per day since their paid subscription started
- *   (class N is unlocked N days after subscription start, class 1 on day 0)
+ * - Paid users: 1 class unlocked per day since subscription start
  * - Creator mode (?creator=true): all classes
  */
 
@@ -30,69 +29,94 @@ function isCreatorMode(): boolean {
 }
 
 export interface MasterClassAccessInfo {
-  /** Number of classes the user can access */
   maxAccessible: number;
-  /** Whether a specific class is accessible (by classNumber, 1-indexed) */
   isAccessible: (classNumber: number) => boolean;
-  /** Whether the user is on free/trial (limited to 2) */
   isFreeOrTrial: boolean;
-  /** Whether creator override is active */
   creatorMode: boolean;
+  loading: boolean;
 }
 
 export function useMasterClassAccess(): MasterClassAccessInfo {
-  const { user, profile } = useAuth();
-  const { isOnTrial, isExpired } = useTrialStatus();
+  const { user } = useAuth();
+  const { isOnTrial } = useTrialStatus();
   const creatorMode = isCreatorMode();
+  const [profileData, setProfileData] = useState<{
+    has_lifetime_access: boolean;
+    subscription_status: string | null;
+    subscription_tier: string | null;
+    created_at: string | null;
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const result = useMemo(() => {
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    const fetchProfile = async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("has_lifetime_access, subscription_status, subscription_tier, created_at")
+        .eq("id", user.id)
+        .single();
+      setProfileData(data);
+      setLoading(false);
+    };
+    fetchProfile();
+  }, [user]);
+
+  return useMemo(() => {
     if (creatorMode) {
       return {
         maxAccessible: MASTER_CLASSES.length,
         isAccessible: () => true,
         isFreeOrTrial: false,
         creatorMode: true,
+        loading: false,
       };
     }
 
-    // Determine if user is a paid subscriber
-    const isPaid = !!(
-      profile?.has_lifetime_access ||
-      (profile?.subscription_status === "active" && profile?.subscription_tier)
-    );
-
-    if (!user || !isPaid || isOnTrial) {
-      // Free or trial: only first 2
+    if (loading || !user) {
       return {
         maxAccessible: 2,
-        isAccessible: (classNumber: number) => classNumber <= 2,
+        isAccessible: (n: number) => n <= 2,
         isFreeOrTrial: true,
         creatorMode: false,
+        loading,
       };
     }
 
-    // Paid user: drip 1 per day from subscription start
-    // Use profile created_at as proxy for subscription start if no better field
-    const subStart = profile?.subscription_start_date
-      ? new Date(profile.subscription_start_date)
-      : profile?.created_at
-      ? new Date(profile.created_at)
-      : new Date();
+    const isPaid = !!(
+      profileData?.has_lifetime_access ||
+      (profileData?.subscription_status === "active" && profileData?.subscription_tier)
+    );
 
+    if (!isPaid || isOnTrial) {
+      return {
+        maxAccessible: 2,
+        isAccessible: (n: number) => n <= 2,
+        isFreeOrTrial: true,
+        creatorMode: false,
+        loading: false,
+      };
+    }
+
+    // Paid user: drip 1 per day from profile creation (proxy for sub start)
+    const subStart = profileData?.created_at
+      ? new Date(profileData.created_at)
+      : new Date();
     const now = new Date();
     const daysSinceStart = Math.floor(
       (now.getTime() - subStart.getTime()) / (1000 * 60 * 60 * 24)
     );
-    // Day 0 = class 1, day 1 = class 2, etc.
     const maxAccessible = Math.min(daysSinceStart + 1, MASTER_CLASSES.length);
 
     return {
       maxAccessible,
-      isAccessible: (classNumber: number) => classNumber <= maxAccessible,
+      isAccessible: (n: number) => n <= maxAccessible,
       isFreeOrTrial: false,
       creatorMode: false,
+      loading: false,
     };
-  }, [user, profile, isOnTrial, creatorMode]);
-
-  return result;
+  }, [user, profileData, isOnTrial, creatorMode, loading]);
 }
