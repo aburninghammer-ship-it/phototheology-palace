@@ -15,8 +15,8 @@ const MAX_CHUNK = 4500;
 const BATCH_SIZE = 4; // Process chunks in parallel batches
 const FETCH_TIMEOUT_MS = 45_000; // 45s timeout per TTS chunk
 // Bump this version to invalidate ALL cached watch TTS audio
-// v12 = 2026-04-07 Longer inter-sentence pauses (2-4 sec between sentences)
-const WATCH_CACHE_VERSION = "v13";
+// v14 = 2026-04-09 Strip non-English characters and enforce English-only output
+const WATCH_CACHE_VERSION = "v14";
 
 
 function normalizeWatchText(text: string, watchType: string): string {
