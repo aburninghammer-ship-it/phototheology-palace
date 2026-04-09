@@ -11,6 +11,7 @@ import { ShowMeMindMap } from "@/components/show-me/ShowMeMindMap";
 import { ShowMeStudyBible } from "@/components/show-me/ShowMeStudyBible";
 import { ShowMe24FPS } from "@/components/show-me/ShowMe24FPS";
 import { ShowMeUpgradeWall } from "@/components/show-me/ShowMeUpgradeWall";
+import { FrontPagePodcastPreview } from "@/components/FrontPagePodcastPreview";
 import { useShowMeUsage } from "@/hooks/useShowMeUsage";
 import { useAuth } from "@/hooks/useAuth";
 import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
@@ -213,6 +214,16 @@ export default function ShowMe() {
             />
           </div>
           </div>
+        </motion.div>
+
+        {/* Podcast Episode 1 — free for everyone */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+          className="mb-16"
+        >
+          <FrontPagePodcastPreview />
         </motion.div>
 
         {/* Free Tier Notice */}

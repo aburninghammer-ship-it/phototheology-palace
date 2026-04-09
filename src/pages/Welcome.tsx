@@ -15,6 +15,7 @@ import { Headphones } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 import { BasicModeShell } from "@/components/basic-mode/BasicModeShell";
+import { FrontPagePodcastPreview } from "@/components/FrontPagePodcastPreview";
 import { ExplorerModeShell } from "@/components/explorer-mode/ExplorerModeShell";
 import { LoadingScreen } from "@/components/LoadingScreen";
 
@@ -124,6 +125,11 @@ const Welcome = () => {
       <PTSection showIn="immersion">
         <OsSpacesWelcome />
       </PTSection>
+
+      {/* === PODCAST EPISODE 1 === */}
+      <div className="px-4 mb-4">
+        <FrontPagePodcastPreview />
+      </div>
 
       {/* === LOWER CONTENT === */}
       <div className="px-4 space-y-4 pb-6">
