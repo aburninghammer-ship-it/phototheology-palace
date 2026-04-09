@@ -8,6 +8,7 @@ const MAX_PINS = 9;
 const DEFAULT_PINS = [
   "/bible",
   "/palace",
+  "/master-class",
   "/phototheology-course",
   "/devotionals",
   "/daily-challenges",
