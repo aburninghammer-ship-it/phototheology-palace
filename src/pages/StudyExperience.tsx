@@ -70,7 +70,7 @@ function getSyntheticPrinciple(roomId: string, roomName: string): SubPrinciple {
   };
 }
 
-type Mode = "jeeves-led" | "user-led";
+type Mode = "jeeves-led" | "user-led" | "teach";
 
 function parseVerseRef(ref: string): { book: string; chapter: string; verse: string } | null {
   // Match "Book Chapter:Verse" or "Book Chapter:Verse-Verse"
