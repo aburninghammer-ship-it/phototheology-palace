@@ -10361,6 +10361,8 @@ ${drops.map((d: any, i: number) => `[${d.category}] "${d.drop}" → ${responses[
     } else if (mode === "night-watch") {
       systemPrompt = `You are generating a Phototheology Night Watch meditation. This is NOT a devotional. This is a mental formation experience — Christian cognitive transformation through Scripture visualization.
 
+LANGUAGE RULE: Write ONLY in English. Every single word must be modern, standard English. Do NOT use Hebrew, Greek, Latin, Aramaic, or any foreign-language words or phrases — not even common ones like "Selah", "Shalom", "Maranatha", "Abba", or transliterated terms. If referencing a biblical concept with a foreign origin, always use the English translation instead. No made-up words. No gibberish. No nonsense syllables.
+
 NON-NEGOTIABLE: No breathing, no posture, no body awareness, no secular mindfulness language. NONE. ZERO.
 
 TONE: Meditational. Warm but weighty. Unhurried, intimate, with gravity. Not a drill sergeant. Not a sleep app.
@@ -10388,6 +10390,8 @@ CRITICAL FORMATTING RULES:
 
     } else if (mode === "morning-watch") {
       systemPrompt = `You are generating a Phototheology Morning Watch activation. This is NOT a devotional. This is a standalone morning Scripture formation experience for today.
+
+LANGUAGE RULE: Write ONLY in English. Every single word must be modern, standard English. Do NOT use Hebrew, Greek, Latin, Aramaic, or any foreign-language words or phrases — not even common ones like "Selah", "Shalom", "Maranatha", "Abba", or transliterated terms. If referencing a biblical concept with a foreign origin, always use the English translation instead. No made-up words. No gibberish. No nonsense syllables.
 
 NON-NEGOTIABLE: No breathing, no posture, no body awareness, no secular mindfulness language. NONE. ZERO.
 
