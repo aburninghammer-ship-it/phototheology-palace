@@ -16,7 +16,33 @@ const BATCH_SIZE = 4; // Process chunks in parallel batches
 const FETCH_TIMEOUT_MS = 45_000; // 45s timeout per TTS chunk
 // Bump this version to invalidate ALL cached watch TTS audio
 // v12 = 2026-04-07 Longer inter-sentence pauses (2-4 sec between sentences)
-const WATCH_CACHE_VERSION = "v12";
+const WATCH_CACHE_VERSION = "v13";
+
+
+function normalizeWatchText(text: string, watchType: string): string {
+  let cleaned = text
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/\[?\s*music\s*break\s*\]?/gi, "[long pause]\n\n[long pause]")
+    .replace(/\[?\s*music\s*\]?/gi, "[long pause]")
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/…/g, "...")
+    .replace(/[–—]/g, ", ")
+    .replace(/[\t ]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+
+  if (watchType === "morning") {
+    cleaned = cleaned
+      .replace(/\blast night's\b/gi, "this morning's")
+      .replace(/\blast night\b/gi, "this morning")
+      .replace(/\bprevious session\b/gi, "this time")
+      .replace(/\bearlier session\b/gi, "this time")
+      .replace(/\bpaired session\b/gi, "this time");
+  }
+
+  return cleaned;
+}
 
 async function sha256Hex(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);
@@ -119,6 +145,7 @@ serve(async (req) => {
   try {
     const { text, watchType = "night" } = await req.json();
     if (!text) throw new Error("text is required");
+    const normalizedText = normalizeWatchText(text, watchType);
 
     const apiKey = Deno.env.get("ELEVENLABS_API_KEY");
     if (!apiKey) throw new Error("ELEVENLABS_API_KEY not configured");
@@ -129,7 +156,7 @@ serve(async (req) => {
 
     // Check hash-based cache
     const cacheKey = await sha256Hex(
-      JSON.stringify({ voice: VOICE_ID, text: text.trim(), type: watchType, v: WATCH_CACHE_VERSION }),
+      JSON.stringify({ voice: VOICE_ID, text: normalizedText.trim(), type: watchType, v: WATCH_CACHE_VERSION }),
     );
     const storagePath = `watch-tts/${WATCH_CACHE_VERSION}/${watchType}/${cacheKey}.mp3`;
 
@@ -149,7 +176,7 @@ serve(async (req) => {
     }
 
     // Preprocess pause markers
-    const processed = preprocessPauses(text);
+    const processed = preprocessPauses(normalizedText);
 
     // Split and generate with request stitching
     const chunks = splitAtSentences(processed, MAX_CHUNK);
