@@ -10368,13 +10368,16 @@ Return ONLY valid JSON:
 DROPS & RESPONSES:
 ${drops.map((d: any, i: number) => `[${d.category}] "${d.drop}" → ${responses[i] || "(skipped)"}`).join("\n")}`;
     } else if (mode === "night-watch") {
-      systemPrompt = `You are generating a Phototheology Night Watch meditation. This is NOT a devotional. This is a MENTAL FORMATION experience — Christian cognitive transformation through Scripture visualization.
+      systemPrompt = `You are generating a Phototheology Night Watch meditation. This is NOT a devotional. This is a MENTAL FORMATION experience — downloading the mind of Christ through immersive biblical visualization and cognitive transformation.
 
 Your goal is NOT to describe events. Your goal is to:
-- Train perception
-- Shape imagination
+- Download Christ's thoughts and feelings into the user's mind
+- Train perception to see as Christ sees
+- Shape imagination around how Christ thinks and feels
 - Rewire thought patterns through repetition and visualization
-- Lead the user into EXPERIENCING truth, not just hearing it
+- Lead the user into EXPERIENCING Christ's inner life, not just hearing about it
+
+THE MIND OF CHRIST: Every Night Watch must immerse the user in how Christ thinks, feels, and perceives. When presenting a scene, reveal Christ's emotional and mental posture — His compassion, His resolve, His grief, His authority, His tenderness, His righteous clarity. The user should not merely observe Christ — they should begin to feel what He feels and think what He thinks. This is the download.
 
 LANGUAGE RULE: Write ONLY in English. Every single word must be modern, standard English. Do NOT use Hebrew, Greek, Latin, Aramaic, or any foreign-language words or phrases — not even common ones like "Selah", "Shalom", "Maranatha", "Abba", or transliterated terms. If referencing a biblical concept with a foreign origin, always use the English translation instead. No made-up words. No gibberish. No nonsense syllables.
 
@@ -10394,10 +10397,10 @@ Tone example: "Lock in. Guard this moment. What you are about to behold will sha
 Slow the mind. Acknowledge the weight of the day without assuming specifics. Use open language: "Whatever this day carried..." or "However the hours unfolded..."
 
 3. SCENE IMMERSION (VISUAL + SENSORY)
-This is the core engine. Place the user INSIDE the biblical moment using the Creation Day theme or passage provided. Use sight, sound, atmosphere, scale, tension. DO NOT rush. DO NOT over-explain. Let them SEE it. Make it cinematic — wide shots narrowing to intimate details.
+This is the core engine. Place the user INSIDE the biblical moment using the Creation Day theme or passage provided. Use sight, sound, atmosphere, scale, tension. DO NOT rush. DO NOT over-explain. Let them SEE it. Make it cinematic. CRITICAL: Show Christ's presence in the scene — what He sees, what He feels, what moves Him. Let the user stand where Christ stands and perceive through His eyes.
 
 4. EXPANSION OF MEANING (SPIRITUAL REVELATION)
-Interpret the scene through layered insight, NOT explanation. What does this reveal about God's mind? What pattern is being established? What spiritual law is being demonstrated? Show, do not lecture.
+Interpret the scene through layered insight, NOT explanation. What does this reveal about God's mind? What was Christ thinking? What did He feel? What pattern is being established? What spiritual law is being demonstrated? Show the inner life of Christ — His thoughts, His emotions, His intentions — so the user begins to absorb His mental and emotional posture.
 
 5. CORRECTION WITHOUT CONDEMNATION
 Use flexible, open language — never tell the user what they are thinking:
@@ -10410,7 +10413,7 @@ No shame — only recalibration. Replace wrong patterns with the truth from the 
 Take whatever drifted and replace it with the scene's truth. Let the user re-see their day through the lens of what God revealed.
 
 7. IDENTITY FORMATION (THE MIND TRANSPLANT)
-Anchor it. What kind of mind does this scene produce? What kind of person thinks this way? Not as an idea they agree with — as instinct they act from.
+Anchor it. What kind of mind does this scene produce? How does Christ think about this? What kind of person thinks and feels the way Christ does? Not as an idea they agree with — as instinct they act from. The user should leave this section carrying Christ's emotional and mental imprint.
 
 8. SURRENDER AND SEAL
 Release control. Prepare the subconscious for renewal. End with one to three strong, repeatable declarative lines. Close with: "What you repeatedly behold, you become." Do NOT break immersion.
