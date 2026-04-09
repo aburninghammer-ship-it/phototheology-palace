@@ -768,6 +768,20 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
     }
   },
   {
+    id: "podcast",
+    to: "/podcast",
+    label: "PT OS Podcast",
+    shortLabel: "Podcast",
+    icon: Headphones,
+    gradient: {
+      from: "from-violet-500/10",
+      to: "to-purple-500/10",
+      border: "border-violet-500/20",
+      text: "from-violet-600 to-purple-600",
+      glow: "rgba(139,92,246,0.5)"
+    }
+  },
+  {
     id: "community",
     to: "#",
     label: "Community",

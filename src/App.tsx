@@ -294,6 +294,7 @@ const SourceLibrary = lazy(() => import("./pages/SourceLibrary"));
 const InfographicGenerator = lazy(() => import("./pages/InfographicGenerator"));
 const StudySeriesGenerator = lazy(() => import("./pages/StudySeriesGenerator"));
 const MasterClass = lazy(() => import("./pages/MasterClass"));
+const Podcast = lazy(() => import("./pages/Podcast"));
 const MasteryDashboard = lazy(() => import("./pages/MasteryDashboard"));
 const FloorMastery = lazy(() => import("./pages/FloorMastery"));
 const FloorDetailPage = lazy(() => import("./pages/FloorDetail"));
@@ -694,6 +695,7 @@ function App() {
           <Route path="/power-of-the-lamb" element={<BasicModeGate><ProtectedRoute><PowerOfTheLamb /></ProtectedRoute></BasicModeGate>} />
           <Route path="/spiritual-training" element={<BasicModeGate><ProtectedRoute><SpiritualTraining /></ProtectedRoute></BasicModeGate>} />
           <Route path="/master-class" element={<ProtectedRoute><MasterClass /></ProtectedRoute>} />
+          <Route path="/podcast" element={<ProtectedRoute><Podcast /></ProtectedRoute>} />
           <Route path="/courses" element={<BasicModeGate><ProtectedRoute><Courses /></ProtectedRoute></BasicModeGate>} />
           <Route path="/blueprint-course" element={<ProtectedRoute><BlueprintCourse /></ProtectedRoute>} />
           <Route path="/blueprint-weight-loss" element={<ProtectedRoute><BlueprintWeightLoss /></ProtectedRoute>} />

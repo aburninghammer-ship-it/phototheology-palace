@@ -74,7 +74,7 @@ export default function MasterClass() {
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-amber-500/20 bg-amber-500/5 mb-6">
             <GraduationCap className="h-4 w-4 text-amber-500" />
             <span className="text-sm font-medium text-amber-600 dark:text-amber-400">
-              Podcast-Style Audio Training
+              Audio Training Series
             </span>
           </div>
 
