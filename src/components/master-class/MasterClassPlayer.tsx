@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Play, Pause, Loader2, RotateCcw, CheckCircle2, BookOpen } from "lucide-react";
+import { Play, Pause, Loader2, RotateCcw, CheckCircle2, BookOpen, Share2, Link2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ProfessorAvatar } from "./ProfessorAvatar";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import type { MasterClassDef } from "@/data/masterClassData";
 
 interface MasterClassPlayerProps {
@@ -330,6 +332,11 @@ export function MasterClassPlayer({ classDef, isCompleted, onComplete, onClose }
             <BookOpen className="h-3 w-3 mr-1" />
             Mark as Read
           </Button>
+        )}
+
+        {/* Share button — only for class 1 */}
+        {classDef.classNumber === 1 && (
+          <ShareClassButton audioUrl={audioUrl} />
         )}
       </div>
 
