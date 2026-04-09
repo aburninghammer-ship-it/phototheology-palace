@@ -61,7 +61,7 @@ export function FrontPagePodcastPreview() {
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-wider text-primary/70 mb-1">
-            🎧 Podcast — Episode 1
+            🎧 Phototheology Podcast Episode 1
           </p>
           <h3 className="text-lg font-bold text-foreground leading-snug">
             {episode.title}
