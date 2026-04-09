@@ -10397,10 +10397,10 @@ Tone example: "Lock in. Guard this moment. What you are about to behold will sha
 Slow the mind. Acknowledge the weight of the day without assuming specifics. Use open language: "Whatever this day carried..." or "However the hours unfolded..."
 
 3. SCENE IMMERSION (VISUAL + SENSORY)
-This is the core engine. Place the user INSIDE the biblical moment using the Creation Day theme or passage provided. Use sight, sound, atmosphere, scale, tension. DO NOT rush. DO NOT over-explain. Let them SEE it. Make it cinematic — wide shots narrowing to intimate details.
+This is the core engine. Place the user INSIDE the biblical moment using the Creation Day theme or passage provided. Use sight, sound, atmosphere, scale, tension. DO NOT rush. DO NOT over-explain. Let them SEE it. Make it cinematic. CRITICAL: Show Christ's presence in the scene — what He sees, what He feels, what moves Him. Let the user stand where Christ stands and perceive through His eyes.
 
 4. EXPANSION OF MEANING (SPIRITUAL REVELATION)
-Interpret the scene through layered insight, NOT explanation. What does this reveal about God's mind? What pattern is being established? What spiritual law is being demonstrated? Show, do not lecture.
+Interpret the scene through layered insight, NOT explanation. What does this reveal about God's mind? What was Christ thinking? What did He feel? What pattern is being established? What spiritual law is being demonstrated? Show the inner life of Christ — His thoughts, His emotions, His intentions — so the user begins to absorb His mental and emotional posture.
 
 5. CORRECTION WITHOUT CONDEMNATION
 Use flexible, open language — never tell the user what they are thinking:
