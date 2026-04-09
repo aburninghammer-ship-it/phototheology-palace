@@ -5,6 +5,7 @@ import { Eye, Blocks, Crown, Check, ChevronDown } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { useRef } from "react";
 import { SavedItemsTab } from "@/components/level-select/SavedItemsTab";
+import { FrontPagePodcastPreview } from "@/components/FrontPagePodcastPreview";
 
 interface LevelOption {
   mode: ExperienceMode;
@@ -120,6 +121,15 @@ export default function LevelSelect() {
           >
             PhototheologyOS
           </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.45 }}
+            className="w-full max-w-2xl mb-8"
+          >
+            <FrontPagePodcastPreview />
+          </motion.div>
 
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
