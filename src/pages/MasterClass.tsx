@@ -88,7 +88,11 @@ export default function MasterClass() {
             41 professors. One system. The complete training.
             <br />
             <span className="text-sm">
-              Progress through each class sequentially — up to 3 per day.
+              {access.isFreeOrTrial
+                ? "Free preview: Classes 1 & 2. Subscribe for full access (1 new class per day)."
+                : access.creatorMode
+                ? "Creator mode — all classes unlocked."
+                : `${access.maxAccessible} of ${MASTER_CLASSES.length} classes unlocked so far — 1 new class each day.`}
             </span>
           </p>
 
@@ -153,8 +157,9 @@ export default function MasterClass() {
               {group.classes.map((cls) => {
                 const completed = progress.isCompleted(cls.id);
                 const unlocked = progress.isUnlocked(cls.id);
+                const accessible = access.isAccessible(cls.classNumber);
                 const isActive = activeClass?.id === cls.id;
-                const canPlay = unlocked && (completed || progress.canStartNew);
+                const canPlay = accessible && unlocked && (completed || progress.canStartNew);
 
                 return (
                   <div
@@ -234,6 +239,11 @@ export default function MasterClass() {
                         <Button size="sm" variant="outline" className="w-full" disabled>
                           <Clock className="h-4 w-4 mr-1" />
                           Available Tomorrow
+                        </Button>
+                      ) : !accessible ? (
+                        <Button size="sm" variant="outline" className="w-full" disabled>
+                          <Lock className="h-4 w-4 mr-1" />
+                          {access.isFreeOrTrial ? "Subscribe to Unlock" : "Unlocks Soon"}
                         </Button>
                       ) : (
                         <Button size="sm" variant="outline" className="w-full" disabled>
