@@ -968,11 +968,14 @@ INSTRUCTIONS FOR RECAP:
                     key={`${layer.principleId}-${i}`}
                     layer={layer}
                     index={i}
+                    totalLayers={layers.length}
                     verseRef={verseRef}
                     verseText={verseText}
                     onRemove={handleRemoveLayer}
                     onAccept={handleAcceptLayer}
                     onRebuild={handleRebuildLayer}
+                    onCompound={handleCompound}
+                    compounding={compounding}
                     onSaveLayer={handleSaveLayer}
                   />
                 ))}
