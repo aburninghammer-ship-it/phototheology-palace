@@ -329,7 +329,15 @@ const Gatehouse = () => {
               {t('gatehouse.theChoiceIsYours')}
             </h2>
 
-            <div className="mt-8 flex justify-center">
+            <div className="mt-8 flex flex-col items-center gap-3">
+              <Button
+                onClick={() => navigate("/podcast")}
+                size="lg"
+                className="bg-gradient-to-r from-violet-500 via-purple-500 to-violet-600 hover:from-violet-600 hover:via-purple-600 hover:to-violet-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group"
+              >
+                <Headphones className="h-5 w-5 mr-2 group-hover:animate-pulse" />
+                🎙️ The Phototheology OS Podcast: Episode 1
+              </Button>
               <Button
                 onClick={() => navigate("/palace/tour")}
                 size="lg"
@@ -507,7 +515,15 @@ const Gatehouse = () => {
             <UserCountBadge />
           </motion.div>
 
-          <div className="mt-8 flex justify-center">
+          <div className="mt-8 flex flex-col items-center gap-3">
+            <Button
+              onClick={() => navigate("/podcast")}
+              size="lg"
+              className="bg-gradient-to-r from-violet-500 via-purple-500 to-violet-600 hover:from-violet-600 hover:via-purple-600 hover:to-violet-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group"
+            >
+              <Headphones className="h-5 w-5 mr-2 group-hover:animate-pulse" />
+              🎙️ The Phototheology OS Podcast: Episode 1
+            </Button>
             <Button
               onClick={() => navigate("/palace/tour")}
               size="lg"
