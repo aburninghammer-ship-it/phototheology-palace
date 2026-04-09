@@ -93,7 +93,7 @@ function parseAnalysis(text: string) {
   return sections;
 }
 
-export function AnalysisCard({ layer, index, verseRef, verseText, onRemove, onRebuild, onAccept, onSaveLayer }: AnalysisCardProps) {
+export function AnalysisCard({ layer, index, totalLayers = 0, verseRef, verseText, onRemove, onRebuild, onAccept, onCompound, compounding, onSaveLayer }: AnalysisCardProps) {
   const colors = ROOM_COLORS[layer.roomId] || DEFAULT_COLORS;
   const sections = parseAnalysis(layer.analysis);
   const [isSaved, setIsSaved] = useState(false);
