@@ -184,6 +184,7 @@ export default function MasterClass() {
                       <ProfessorAvatar name={cls.professor.name} size="sm" />
                       <div className="min-w-0">
                         <p className="text-sm font-semibold truncate">{cls.professor.name}</p>
+                        <p className="text-xs text-amber-600/70 dark:text-amber-400/70">Master Phototheologist</p>
                         <p className="text-xs text-muted-foreground">{cls.professor.title}</p>
                       </div>
                     </div>

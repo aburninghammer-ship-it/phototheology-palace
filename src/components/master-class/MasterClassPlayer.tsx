@@ -235,6 +235,7 @@ export function MasterClassPlayer({ classDef, isCompleted, onComplete, onClose }
               <CheckCircle2 className="h-5 w-5 text-emerald-500" />
             )}
           </div>
+          <p className="text-xs text-amber-600/70 dark:text-amber-400/70 font-medium">Master Phototheologist</p>
           <p className="text-sm text-muted-foreground">{professor.title}</p>
           <div className="flex items-center gap-2 mt-1">
             <Badge variant="outline" className="text-xs">Class {classDef.classNumber}</Badge>
