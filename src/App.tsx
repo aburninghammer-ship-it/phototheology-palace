@@ -454,7 +454,7 @@ function App() {
                         )}
                         <div className="flex flex-1 w-full">
                           {!isWorkspacePane && <BasicModeHide><OSDock /></BasicModeHide>}
-                          <BasicModeHide><MessagingSidebar /></BasicModeHide>
+                          <MessagingSidebar />
                           <main className="flex-1 w-full overflow-x-hidden pb-mobile-nav min-w-0">
                           <Suspense fallback={<LoadingScreen />}>
                             <KeepAliveRoutes maxCached={20} excludePaths={["/auth", "/auth/callback", "/guesthouse", "/vr"]}>
