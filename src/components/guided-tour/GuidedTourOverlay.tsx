@@ -120,6 +120,10 @@ export const GuidedTourOverlay = ({ steps, onClose, accentColor = "primary" }: G
 
         const audio = audioRef.current ?? new Audio();
         audioRef.current = audio;
+        audio.loop = false;
+        audio.onplay = null;
+        audio.onended = null;
+        audio.onerror = null;
         audio.src = data.audioUrl;
         audio.load();
         audio.onplay = () => { setIsPlaying(true); setIsLoading(false); };

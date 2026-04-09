@@ -3,7 +3,7 @@
  * 3 tabs: Ask Jeeves, Study Bible, Chapel
  * Desktop: sidebar + header. Mobile: fullscreen content + bottom tabs.
  */
-import { useState, lazy, Suspense } from "react";
+import { useState, useCallback, lazy, Suspense } from "react";
 import { BasicModeSidebar, type BasicTab } from "./BasicModeSidebar";
 import { LevelToggleChip } from "./LevelToggleChip";
 import { LoadingScreen } from "@/components/LoadingScreen";
@@ -74,6 +74,8 @@ export function BasicModeShell() {
     primeAudioForTour();
     setTourOpen(true);
   };
+
+  const closeTour = useCallback(() => setTourOpen(false), []);
 
   return (
     <div className="flex h-[100dvh] w-full bg-background text-foreground">
@@ -157,7 +159,7 @@ export function BasicModeShell() {
       {tourOpen && (
         <GuidedTourOverlay
           steps={BASIC_MODE_TOUR}
-          onClose={() => setTourOpen(false)}
+          onClose={closeTour}
           accentColor="primary"
         />
       )}
