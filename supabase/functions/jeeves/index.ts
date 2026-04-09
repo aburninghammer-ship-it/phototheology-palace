@@ -107,18 +107,27 @@ async function checkRateLimit(supabase: any, userId: string, endpoint: string): 
 }
 
 function sanitizeWatchOutput(content: string, mode: string): string {
-  let cleaned = content
-    .replace(/```json\s*/gi, '')
-    .replace(/```/g, '')
-    .replace(/\[?\s*music\s*break\s*\]?/gi, '[long pause]\n\n[long pause]')
-    .replace(/\[?\s*music\s*\]?/gi, '[long pause]')
-    .replace(/[“”]/g, '"')
-    .replace(/[‘’]/g, "'")
-    .replace(/…/g, '...')
-    .replace(/[–—]/g, ', ')
-    .replace(/[\t ]+/g, ' ')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
+  let cleaned = content;
+  // Remove code fences
+  cleaned = cleaned.replace(/```json\s*/gi, '').replace(/```/g, '');
+  // Replace music break variants with pause markers
+  cleaned = cleaned.replace(/\[?\s*music\s*break\s*\]?/gi, '[long pause]\n\n[long pause]');
+  cleaned = cleaned.replace(/\[?\s*music\s*\]?/gi, '[long pause]');
+  // Normalize smart quotes and special punctuation to ASCII
+  cleaned = cleaned.replace(/\u201C|\u201D/g, '"').replace(/\u2018|\u2019/g, "'");
+  cleaned = cleaned.replace(/\u2026/g, '...').replace(/\u2013|\u2014/g, ', ');
+  // Strip non-Latin scripts that cause TTS to produce gibberish/mixed languages
+  cleaned = cleaned.replace(/[\u0590-\u05FF]/g, '');  // Hebrew
+  cleaned = cleaned.replace(/[\u0370-\u03FF]/g, '');  // Greek
+  cleaned = cleaned.replace(/[\u0600-\u06FF]/g, '');  // Arabic
+  cleaned = cleaned.replace(/[\u0700-\u074F]/g, '');  // Syriac/Aramaic
+  cleaned = cleaned.replace(/[\u4E00-\u9FFF]/g, '');  // CJK
+  cleaned = cleaned.replace(/[\u3040-\u30FF]/g, '');  // Japanese
+  cleaned = cleaned.replace(/[\uAC00-\uD7AF]/g, '');  // Korean
+  cleaned = cleaned.replace(/[\u0900-\u097F]/g, '');  // Devanagari
+  // Strip any remaining non-ASCII characters (keep printable ASCII + newlines + brackets)
+  cleaned = cleaned.replace(/[^\x0A\x20-\x7E\[\]]/g, '');
+  cleaned = cleaned.replace(/[\t ]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
 
   if (mode === 'morning-watch') {
     cleaned = cleaned
@@ -10361,6 +10370,8 @@ ${drops.map((d: any, i: number) => `[${d.category}] "${d.drop}" → ${responses[
     } else if (mode === "night-watch") {
       systemPrompt = `You are generating a Phototheology Night Watch meditation. This is NOT a devotional. This is a mental formation experience — Christian cognitive transformation through Scripture visualization.
 
+LANGUAGE RULE: Write ONLY in English. Every single word must be modern, standard English. Do NOT use Hebrew, Greek, Latin, Aramaic, or any foreign-language words or phrases — not even common ones like "Selah", "Shalom", "Maranatha", "Abba", or transliterated terms. If referencing a biblical concept with a foreign origin, always use the English translation instead. No made-up words. No gibberish. No nonsense syllables.
+
 NON-NEGOTIABLE: No breathing, no posture, no body awareness, no secular mindfulness language. NONE. ZERO.
 
 TONE: Meditational. Warm but weighty. Unhurried, intimate, with gravity. Not a drill sergeant. Not a sleep app.
@@ -10388,6 +10399,8 @@ CRITICAL FORMATTING RULES:
 
     } else if (mode === "morning-watch") {
       systemPrompt = `You are generating a Phototheology Morning Watch activation. This is NOT a devotional. This is a standalone morning Scripture formation experience for today.
+
+LANGUAGE RULE: Write ONLY in English. Every single word must be modern, standard English. Do NOT use Hebrew, Greek, Latin, Aramaic, or any foreign-language words or phrases — not even common ones like "Selah", "Shalom", "Maranatha", "Abba", or transliterated terms. If referencing a biblical concept with a foreign origin, always use the English translation instead. No made-up words. No gibberish. No nonsense syllables.
 
 NON-NEGOTIABLE: No breathing, no posture, no body awareness, no secular mindfulness language. NONE. ZERO.
 
