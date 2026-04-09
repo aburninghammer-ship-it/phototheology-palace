@@ -19,18 +19,7 @@ export interface RoomSubPrinciples {
 export const ROOM_SUB_PRINCIPLES: Record<string, RoomSubPrinciples> = {
   // Floor 1 - Imagination Room: no sub-principles — vividly paints the scene as a whole
 
-  // Floor 2 - Observation Room (5 W's)
-  or: {
-    roomId: 'or',
-    roomName: 'Observation Room',
-    subPrinciples: [
-      { id: 'or-who', name: 'Who', shortName: 'Who', description: 'Every person mentioned', icon: 'Users' },
-      { id: 'or-what', name: 'What', shortName: 'What', description: 'Every action and event', icon: 'FileText' },
-      { id: 'or-when', name: 'When', shortName: 'When', description: 'Time markers and sequence', icon: 'Clock' },
-      { id: 'or-where', name: 'Where', shortName: 'Where', description: 'Every location', icon: 'MapPin' },
-      { id: 'or-how', name: 'How', shortName: 'How', description: 'Methods and means', icon: 'Wrench' },
-    ],
-  },
+  // Floor 2 - Observation Room — no sub-principles; gives a single rich list of observations
 
   // Floor 4 - Concentration Room (3 Offices)
   cr: {
