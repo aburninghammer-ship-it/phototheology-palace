@@ -13,22 +13,27 @@ function formatTime(seconds: number): string {
 
 export function FrontPagePodcastPreview() {
   const navigate = useNavigate();
-  const episode = PODCAST_EPISODES[0]; // Always Episode 1
+  const episode = PODCAST_EPISODES[0];
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
   useEffect(() => {
-    const audio = new Audio(`/audio/podcast/${episode.audioFile}`);
-    audio.addEventListener("timeupdate", () => setCurrentTime(audio.currentTime));
-    audio.addEventListener("loadedmetadata", () => setDuration(audio.duration));
-    audio.addEventListener("ended", () => setIsPlaying(false));
-    audioRef.current = audio;
-    return () => {
-      audio.pause();
-      audio.src = "";
-    };
+    try {
+      const audio = new Audio(`/audio/podcast/${episode.audioFile}`);
+      audio.addEventListener("timeupdate", () => setCurrentTime(audio.currentTime));
+      audio.addEventListener("loadedmetadata", () => setDuration(audio.duration));
+      audio.addEventListener("ended", () => setIsPlaying(false));
+      audio.addEventListener("error", () => console.warn("Podcast audio failed to load"));
+      audioRef.current = audio;
+      return () => {
+        audio.pause();
+        audio.src = "";
+      };
+    } catch (e) {
+      console.warn("Failed to create audio element", e);
+    }
   }, [episode.audioFile]);
 
   const handlePlayPause = useCallback(async () => {
