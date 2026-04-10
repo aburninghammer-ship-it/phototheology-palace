@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Cloud, CloudOff, Info, Lightbulb, Plus, Trash2, Edit3, X, Check, Search, Sparkles, ChevronDown, ChevronUp, Loader2, RefreshCw, BookOpen } from "lucide-react";
 import { ResearchAudioCommentary } from "@/components/audio/ResearchAudioCommentary";
+import { ResearchChatDialog } from "@/components/sermon/ResearchChatDialog";
 import { toast } from "sonner";
 
 /**
