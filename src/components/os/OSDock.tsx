@@ -27,7 +27,7 @@ export function OSDock() {
 
   const isActive = (path: string) => currentPath === path || currentPath.startsWith(path + "/");
 
-  const homePath = mode === "immersion" ? "/dashboard" : "/welcome";
+  const homePath = mode === "immersion" ? "/palace" : "/welcome";
   const showHomeButton = currentPath !== "/" && currentPath !== "/welcome" && currentPath !== "/dashboard";
 
   // Mobile: horizontal bottom dock
