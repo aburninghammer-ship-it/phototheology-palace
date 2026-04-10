@@ -60,7 +60,7 @@ export function OSTitleBar() {
   const initials = user.email?.slice(0, 2).toUpperCase() || "U";
 
   return (
-    <div className="h-11 flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border/40 shrink-0 z-50">
+    <div className="h-11 flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border/40 shrink-0 z-50 overflow-x-auto overflow-y-hidden scrollbar-hide">
       {/* Left: Brand */}
       <div className="flex items-center gap-2.5 shrink-0">
         <BackButton />
