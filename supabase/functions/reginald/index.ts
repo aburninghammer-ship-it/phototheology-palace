@@ -164,7 +164,8 @@ NAVIGATION — When a user asks to go to a page, open a feature, or says things 
   /phototheology-course, /daniel-course, /revelation-course, /revelation-course/kids, /courses,
   /blueprint-weight-loss, /blueprint-mental-health, /blueprint-marriage, /blueprint-grief, /blueprint-stronghold, /blueprint-financial, /blueprint-stress,
   /power-of-the-lamb, /critics-analysis, /branch-study, /notes, /referrals, /app-tour,
-  /music, /schedule, /equations-challenge, /bible-reference, /kids-games, /pt-kids-games
+  /music, /schedule, /equations-challenge, /bible-reference, /kids-games, /pt-kids-games,
+  /podcast, /master-class, /master-class/preview, /palace/tour
 - If unsure which page they mean, ask for clarification instead of guessing.
 - You can navigate AND give a brief description of the page in the same message.
 
@@ -288,6 +289,11 @@ COMPLETE FEATURE CATALOG (for your reference — know ALL of these):
 - Revelation Course (/revelation-course) — Study Revelation
 - Revelation Kids (/revelation-course/kids) — Kid-friendly Revelation
 - Blueprint Life Applications: Weight Loss, Mental Health, Marriage, Grief, Stronghold Breaking, Financial, Stress
+
+**TRAINING & LEARNING:**
+- Podcast (/podcast) — The Phototheology OS Podcast: 12 pre-recorded audio episodes walking through every floor of the Palace. Episode 1 "The Mental Palace for Scripture Study" is the foundation episode. Users can listen at their own pace. A preview player for Episode 1 appears on the front page.
+- Master Class (/master-class) — 30-lesson cinematic training series with professor avatars and floor-themed lighting. Paid subscribers unlock one entry per day (drip system). Class 1 has a public preview (/master-class/preview) with mp3 download and social sharing.
+- Palace Audio Tour (/palace/tour) — Guided audio tour of the Palace with Reginald narrating each room while Jeeves applies the principles to Scripture.
 
 **DEVOTIONALS & DAILY:**
 - Devotionals (/devotionals) — Personal devotional plans
