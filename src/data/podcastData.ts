@@ -13,10 +13,10 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
   {
     id: "ep-00",
     episodeNumber: 1,
-    title: "Building a Thirty-Nine Room Bible Palace",
+    title: "The Mental Palace for Scripture Study",
     description:
-      "The foundation episode — learn how to construct a thirty-nine room mental palace that maps to the entire Bible, giving you a permanent architecture for Scripture mastery.",
-    audioFile: "Building_a_thirty_nine_room_Bible_palace.m4a",
+      "The foundation episode — discover the mental palace method and how it transforms Scripture study into an immersive, unforgettable experience.",
+    audioFile: "The_mental_palace_for_scripture_study.m4a",
     duration: "40 min",
   },
   // ── Floor 1: Furnishing ──
