@@ -447,6 +447,13 @@ const SermonIdeas = () => {
                             {formatJeevesResponse(idea.jeevesResearch!)}
                           </div>
                         )}
+                        {isExpanded && (
+                          <ResearchChatDialog
+                            sermonTitle={idea.title}
+                            scripture={idea.scripture}
+                            research={idea.jeevesResearch!}
+                          />
+                        )}
                       </div>
                     )}
 
