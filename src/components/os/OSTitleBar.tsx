@@ -127,7 +127,7 @@ export function OSTitleBar() {
       </div>
 
       {/* Right: Utility Toolbar */}
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1.5 shrink-0">
         {/* Pin current page to dock */}
         <PinToDockButton path={location.pathname} variant="icon" className="hidden sm:flex" />
 
