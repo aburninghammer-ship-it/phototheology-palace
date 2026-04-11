@@ -2,14 +2,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LevelToggleChip } from "@/components/basic-mode/LevelToggleChip";
 import { BackButton } from "@/components/BackButton";
-import { Sparkles, User, LogOut, Settings, Languages, MessageCircle, Home, MoreHorizontal } from "lucide-react";
+import { Sparkles, User, LogOut, Settings, Languages, MessageCircle, Home, MoreHorizontal, Columns2 } from "lucide-react";
 import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 import { useDirectMessages } from "@/hooks/useDirectMessages";
 import { CommandPaletteTrigger } from "./CommandPalette";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ShareableProgressCard } from "@/components/ShareableProgressCard";
+
 import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { StartSessionDialog } from "@/components/session/StartSessionDialog";
 import { NavigationStyleToggle } from "@/components/NavigationStyleToggle";
@@ -144,14 +144,20 @@ export function OSTitleBar() {
           </div>
         )}
 
-        <div className="hidden xl:flex items-center gap-1.5 px-3 h-8 rounded-full border text-xs font-semibold"
+        <Button
+          variant="ghost"
+          size="sm"
+          className="hidden xl:flex items-center gap-1.5 h-8 rounded-full border text-xs font-semibold"
           style={{
             background: "hsl(210 50% 20% / 0.5)",
             borderColor: "hsl(210 60% 45% / 0.4)",
             color: "hsl(210 80% 70%)",
-          }}>
-          <ShareableProgressCard />
-        </div>
+          }}
+          onClick={() => navigate("/workspace")}
+        >
+          <Columns2 className="h-4 w-4" />
+          <span>Workshop</span>
+        </Button>
 
         <PWAInstallButton />
         <ThemeToggle />

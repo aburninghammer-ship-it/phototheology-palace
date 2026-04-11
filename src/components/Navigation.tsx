@@ -19,7 +19,7 @@ import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { FocusModeToggle } from "@/components/FocusModeToggle";
 import { GlobalSearch } from "@/components/GlobalSearch";
-import { ShareableProgressCard } from "@/components/ShareableProgressCard";
+
 import { NavigationStyleToggle } from "@/components/NavigationStyleToggle";
 
 import { SessionModeIndicator } from "@/components/session/SessionModeIndicator";
@@ -145,7 +145,14 @@ className="fixed left-0 right-0 z-40 bg-card border-b border-border shadow-sm pt
 
             <div className="flex items-center gap-2 md:gap-4 flex-1 justify-end">
               <GlobalSearch />
-              {user && <ShareableProgressCard />}
+              {user && (
+                <Button variant="ghost" size="sm" className="gap-1.5" asChild>
+                  <Link to="/workspace">
+                    <Columns2 className="h-4 w-4" />
+                    <span className="hidden md:inline">Workshop</span>
+                  </Link>
+                </Button>
+              )}
               <PWAInstallButton />
               <FocusModeToggle />
               <ThemeToggle />
