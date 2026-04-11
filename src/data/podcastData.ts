@@ -22,18 +22,8 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
   },
   // ── Floor 1: Furnishing ──
   {
-    id: "ep-01",
-    episodeNumber: 2,
-    title: "See the Bible with Phototheology OS",
-    description:
-      "An introduction to the Phototheology Operating System — learn to see Scripture through vivid mental imagery and build a visual framework for the entire Bible.",
-    audioFile: "See_the_Bible_with_Phototheology_OS.m4a",
-    duration: "45 min",
-    floor: 1,
-  },
-  {
     id: "ep-02",
-    episodeNumber: 3,
+    episodeNumber: 2,
     title: "The Eight-Floor Biblical Memory Palace",
     description:
       "Discover the architecture of the eight-floor memory palace and how each floor maps to a distinct layer of biblical study and spiritual growth.",
@@ -43,7 +33,7 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
   },
   {
     id: "ep-03",
-    episodeNumber: 4,
+    episodeNumber: 3,
     title: "Building Your Mental Story Room",
     description:
       "Step inside Floor 1's Story Room and learn how to store Bible narratives as vivid mental movies you can recall on command.",
@@ -53,7 +43,7 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
   },
   {
     id: "ep-04",
-    episodeNumber: 5,
+    episodeNumber: 4,
     title: "Inhabit the Biblical Imagination Room",
     description:
       "Enter the Imagination Room and learn to inhabit biblical scenes — placing yourself inside the text to unlock deeper understanding.",
@@ -63,7 +53,7 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
   },
   {
     id: "ep-05",
-    episodeNumber: 6,
+    episodeNumber: 5,
     title: "Turning Scripture into 24FPS Mental Movies",
     description:
       "Master the technique of converting Scripture passages into smooth, cinematic mental movies that play at 24 frames per second in your mind's eye.",
@@ -73,7 +63,7 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
   },
   {
     id: "ep-06",
-    episodeNumber: 7,
+    episodeNumber: 6,
     title: "Map the Bible in 51 Symbols",
     description:
       "Learn the 51 core biblical symbols that form a visual shorthand for the entire narrative arc of Scripture — from Genesis to Revelation.",
@@ -83,7 +73,7 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
   },
   {
     id: "ep-07",
-    episodeNumber: 8,
+    episodeNumber: 7,
     title: "Visualizing Text for a Living Library",
     description:
       "Transform written text into a living library of visual memories — techniques for long-term retention and instant recall of biblical content.",
@@ -93,7 +83,7 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
   },
   {
     id: "ep-08",
-    episodeNumber: 9,
+    episodeNumber: 8,
     title: "Archiving Sacred Insights in the Gems Room",
     description:
       "Learn to capture and archive your most precious biblical insights in the Gems Room — a personal treasury of spiritual discoveries.",
@@ -104,7 +94,7 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
   // ── Floor 2: Investigation ──
   {
     id: "ep-09",
-    episodeNumber: 10,
+    episodeNumber: 9,
     title: "Forensic Methods for Precise Scriptural Meaning",
     description:
       "Dive into Floor 2's investigative approach — learn forensic methods for extracting precise meaning from biblical texts through careful analysis.",
@@ -114,7 +104,7 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
   },
   {
     id: "ep-10",
-    episodeNumber: 11,
+    episodeNumber: 10,
     title: "Biblical Symbols and the Prophetic Blueprint",
     description:
       "Explore how biblical symbols weave together into a prophetic blueprint — connecting typology, imagery, and prophetic patterns across Scripture.",
@@ -124,7 +114,7 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
   },
   {
     id: "ep-11",
-    episodeNumber: 12,
+    episodeNumber: 11,
     title: "Building Unbreakable Logical Chains",
     description:
       "Learn to construct airtight logical chains from Scripture — linking verses, contexts, and principles into arguments that hold under scrutiny.",
@@ -134,7 +124,7 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
   },
   {
     id: "ep-12",
-    episodeNumber: 13,
+    episodeNumber: 12,
     title: "Reading Like a Crime Scene Detective",
     description:
       "Approach every passage like a crime scene — gather evidence, question assumptions, and reconstruct meaning with investigative precision.",
@@ -144,7 +134,7 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
   },
   {
     id: "ep-13",
-    episodeNumber: 14,
+    episodeNumber: 13,
     title: "Interrogate the Text Like a Hostile Witness",
     description:
       "Push past surface readings by treating every text as a hostile witness — ask hard questions, press for details, and uncover what the passage is really saying.",
