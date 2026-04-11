@@ -2211,7 +2211,7 @@ Return as JSON array: [...]`;
       
       const principleMap: Record<string, { name: string; description: string; examples: string }> = {
         // Floor 1 - Furnishing (Memory & Visualization)
-        "SR": { name: "Story Room (SR)", description: "narrative memory anchors and story patterns", examples: "Story sequences, mental movies, narrative arcs" },
+        "SR": { name: "Story Room (SR)", description: "storage through visualization — collect stories as vivid mental movies, furnishing the Palace with raw material", examples: "Scene sequences stored as mental movies, narrative collection, story furnishing" },
         "IR": { name: "Imagination Room (IR)", description: "immersive visualization and sensory engagement", examples: "Step inside the scene, feel the emotions, sensory details" },
         "24F": { name: "24FPS Room (24F)", description: "chapter-by-chapter symbolic frames", examples: "One image per chapter, symbolic film strips" },
         "BR": { name: "Bible Rendered (BR)", description: "24-chapter block symbolization", examples: "Master images for book sections, panoramic memory" },
@@ -3111,7 +3111,7 @@ Ellen G. White does not appear to have written specific commentary on ${book} ${
         }
       }
       if (!storyRoomHint) {
-        storyRoomHint = `The Phototheology Palace "Story Room" lens suggests: "Recall the narrative sequence as a vivid mental movie." Weave this perspective naturally into your devotional thought.`;
+        storyRoomHint = `The Phototheology Palace "Story Room" lens suggests: "Store the story through visualization — collect scenes as vivid mental movies that furnish the Palace." Weave this perspective naturally into your devotional thought.`;
       }
 
       systemPrompt = `You are a warm, friendly Bible guide explaining Scripture to someone who may be new to faith. Your job is to make the text come alive AND leave the listener with something to carry in their heart.
@@ -4426,7 +4426,7 @@ FEEDBACK STYLE:
 - Use the student's name if provided, otherwise say "friend"
 
 ROOM-SPECIFIC GRADING:
-- Story Room (SR): Look for accurate recall, vivid details, emotional engagement
+- Story Room (SR): Look for vivid scene storage, concrete visualization, ability to replay the mental movie
 - Imagination Room (IR): Look for sensory details, personal engagement, creative visualization
 - Translation Room (#TR): Look for original/unique imagery (NOT copying suggested visuals), concrete details
 - Observation Room (OR): Look for specific details noticed, thoroughness
@@ -4981,7 +4981,7 @@ Your role is to make insightful biblical connections using PT Rooms, Biblical Bo
 ${difficultyContext}
 
 **PT ROOMS you can challenge with:**
-- Story Room (SR): Transform biblical events into memorable scenes
+- Story Room (SR): Store biblical stories as vivid mental movies — collect scenes before interpreting
 - Imagination Room (IR): Experience Scripture with all five senses
 - Concentration Room (CR): Find Christ in every text
 - Questions Room (QR): Three-tiered interrogation method
@@ -5141,7 +5141,7 @@ ${difficultyContext}
 **Available Challenge Types for this game:** ${availableTypes.join(", ")}
 
 **PT ROOMS (if enabled):**
-- Story Room (SR): Transform biblical events into memorable scenes
+- Story Room (SR): Store biblical stories as vivid mental movies — collect scenes before interpreting
 - Imagination Room (IR): Experience Scripture with all five senses
 - Concentration Room (CR): Find Christ in every text
 - Questions Room (QR): Three-tiered interrogation method
@@ -6189,7 +6189,7 @@ Return JSON: { "coherent": true/false, "feedback": "brief comment" }`;
       
       const gameTypeInstructions: Record<string, string> = {
         "sequence": "Check if the Bible stories are in correct chronological order and transitions are logical.",
-        "beats": "Check if story beats capture key plot points and flow naturally.",
+        "beats": "Check if stored scenes capture key moments vividly and flow as a mental movie.",
         "senses": "Check if all 5 senses are genuinely represented with vivid, biblically-grounded details.",
         "empathy": "Check if the character perspective is biblically accurate and emotionally authentic.",
         "observations": "Check if observations are pure facts from the text (no interpretations).",
@@ -9515,7 +9515,7 @@ For the given theme/topic/idea/text, you will:
    - ptTags: 1-3 relevant PT room codes (e.g., ["SR", "ST", "CEC"])
 
 PT Room codes reference:
-- SR: Story Room (narrative/story elements)
+- SR: Story Room (storage through visualization — collect stories as vivid mental movies)
 - IR: Imagination Room (vivid imagery)
 - 24: 24FPS Room (chapter themes)
 - TR: Translation Room (word meanings)
@@ -9601,15 +9601,16 @@ Before answering ANY question, you MUST silently run the passage/topic through A
 
 ## YOUR OUTPUT RULES
 
-1. **NEVER name rooms, floors, codes, or the Palace system.** The user should feel like they're talking to the most insightful Bible scholar alive — not reading a textbook.
-2. **Go DEEP.** Your answers should be 5-10 paragraphs minimum for substantive questions. Surface-level answers are FORBIDDEN.
-3. **Show the FRUIT of the engine, not the engine itself.** Instead of saying "the Dimensions Room reveals five layers," just naturally present those layers as insight.
-4. **Christ must be found in EVERY answer.** Not as a tagged-on devotional thought, but as the structural center of the analysis. Show typological connections, sanctuary parallels, prophetic threads — all woven naturally.
-5. **Use specific details.** Quote KJV Scripture extensively. Reference Greek/Hebrew meanings. Cite historical context. Show cross-references.
-6. **Build theological architecture.** Don't just list observations — construct a thesis. Show how details connect, how patterns repeat, how types fulfill.
-7. **Make it feel alive.** Use vivid language, immersive descriptions, and emotional weight where appropriate — but never fluffy. Every sentence should carry theological freight.
-8. **When the user asks to "go deeper," you MUST go deeper.** Activate additional floors, find new connections, trace new threads. Never ask "what do you want to study?" — just GO DEEPER on what they already asked about.
-9. **Maintain conversation context.** Build on previous exchanges, reference earlier insights, develop threads across messages.
+1. **ANSWER THE ACTUAL QUESTION FIRST, DIRECTLY.** Before anything else, give a plain, specific answer to what the user literally asked. If they ask "why X?", your very first sentences must say WHY X. No preamble like "What an insightful question". No meta-framing. No compliments. Get to the answer in sentence one.
+2. **Match depth to the question.** A direct factual question deserves a direct factual answer (2-4 paragraphs). A deep study request deserves extended analysis (5-10 paragraphs). Do NOT force long answers onto simple questions — that is how you LOSE the user's trust.
+3. **NEVER name rooms, floors, codes, or the Palace system.** The user should feel like they're talking to the most insightful Bible scholar alive — not reading a textbook.
+4. **Show the FRUIT of the engine, not the engine itself.** Instead of labelling sections "Literal / Christ-Centered / Personal / Church / Heavenly" like a template, just weave insight naturally. Never use those five labels as section headers. If you cover multiple layers, let them flow as paragraphs.
+5. **Christ-centering must be organic, not forced.** When the text legitimately points to Christ, show it. When the user asks a narrow factual question (e.g. "who was Potiphar?"), answer the fact — don't shoehorn typology into every reply.
+6. **Use specific details.** Quote KJV Scripture where it helps. Reference Hebrew/Greek when it clarifies. Cite historical and narrative context. Show cross-references when they illuminate.
+7. **If the user says "that's not my question" or pushes back, STOP and pivot.** Acknowledge the correction in one sentence, then answer the actual question they asked — no repeat of the previous material, no padding.
+8. **No theatrical preambles.** Forbidden opening phrases: "That's an exceptional question", "What a profound question", "Let us explore", "Let us delve", "Indeed", "Ah". Just start with the answer.
+9. **Maintain conversation context.** Build on previous exchanges, but never repeat yourself when the user has already heard something.
+10. **When the user asks to "go deeper," you MUST go deeper** on the SPECIFIC thread they named — never pivot to a generic overview.
 
 ## EXAMPLE: Joseph, Butler, Baker (Genesis 40)
 
@@ -9680,7 +9681,7 @@ For each room, write a focused, practical application showing HOW that room's te
 
 CRITICAL FORMAT: Wrap each room's content in [ROOM_CODE] tags. Example:
 [SR]
-**Jeeves here.** Let's break "${verse}" into story beats...
+**Jeeves here.** Let's store "${verse}" as a vivid mental movie — scene by scene...
 [IR]
 **Reginald stepping in.** Close your eyes and imagine...
 
@@ -9729,7 +9730,7 @@ CATEGORY-SPECIFIC GUIDANCE:
 - "Defense Mode": Test apologetics reasoning — present a doctrinal challenge and the PT principle that resolves it
 - "Sanctuary Room": Test sanctuary furniture symbolism, services, feasts, and their Christ-fulfillment
 - "Christ-Centered": Test Concentration Room thinking — finding Christ in unexpected texts
-- "Story Room": Test typological depth WITHIN narratives, not surface-level plot recall
+- "Story Room": Test story storage depth — vivid scene collection, not surface-level plot recall
 - "Symbols Library": Test symbol recognition AND their multi-layered prophetic meaning
 - "Connect 6": Test cross-genre, cross-testament connections
 - "Freestyle": Test spontaneous PT application — nature, history, or personal life mapped to Scripture
