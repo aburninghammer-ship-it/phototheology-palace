@@ -72,7 +72,7 @@ const FEATURE_REGISTRY: Array<{ path: string; minMode: ExperienceMode }> = [
 
   // ── Explorer features (Level 2) ──
   { path: "/master-class", minMode: "basic" },
-  { path: "/podcast", minMode: "explorer" },
+  { path: "/podcast", minMode: "basic" },
   // Study Experience
   { path: "/study-experience", minMode: "explorer" },
   // Study Space

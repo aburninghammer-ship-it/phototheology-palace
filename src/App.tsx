@@ -697,7 +697,7 @@ function App() {
           <Route path="/spiritual-training" element={<BasicModeGate><ProtectedRoute><SpiritualTraining /></ProtectedRoute></BasicModeGate>} />
           <Route path="/master-class" element={<ProtectedRoute><MasterClass /></ProtectedRoute>} />
           <Route path="/master-class/preview" element={<MasterClassPreview />} />
-          <Route path="/podcast" element={<ProtectedRoute><Podcast /></ProtectedRoute>} />
+          <Route path="/podcast" element={<Podcast />} />
           <Route path="/courses" element={<BasicModeGate><ProtectedRoute><Courses /></ProtectedRoute></BasicModeGate>} />
           <Route path="/blueprint-course" element={<ProtectedRoute><BlueprintCourse /></ProtectedRoute>} />
           <Route path="/blueprint-weight-loss" element={<ProtectedRoute><BlueprintWeightLoss /></ProtectedRoute>} />
