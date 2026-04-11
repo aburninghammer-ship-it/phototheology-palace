@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LevelToggleChip } from "@/components/basic-mode/LevelToggleChip";
 import { BackButton } from "@/components/BackButton";
-import { Sparkles, User, LogOut, Settings, Languages, MessageCircle, Home } from "lucide-react";
+import { Sparkles, User, LogOut, Settings, Languages, MessageCircle, Home, MoreHorizontal } from "lucide-react";
 import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 import { useDirectMessages } from "@/hooks/useDirectMessages";
 import { CommandPaletteTrigger } from "./CommandPalette";
@@ -53,14 +53,12 @@ export function OSTitleBar() {
   if (!user || isPublicPage || isWorkspacePane) return null;
 
   // Hide on mobile for non-basic levels (OSDock handles navigation)
-  // Keep the full title bar visible on all three levels for desktop
   if (isMobile && !isBasic) return null;
-
 
   const initials = user.email?.slice(0, 2).toUpperCase() || "U";
 
   return (
-    <div className="h-11 flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border/40 shrink-0 z-50 overflow-x-auto overflow-y-hidden scrollbar-hide">
+    <div className="h-11 flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border/40 shrink-0 z-50">
       {/* Left: Brand */}
       <div className="flex items-center gap-2.5 shrink-0">
         <BackButton />
@@ -128,11 +126,10 @@ export function OSTitleBar() {
 
       {/* Right: Utility Toolbar */}
       <div className="flex items-center gap-1.5 shrink-0">
-        {/* Pin current page to dock */}
         <PinToDockButton path={location.pathname} variant="icon" className="hidden sm:flex" />
 
         {activeCount > 0 && (
-          <div className="hidden lg:flex items-center gap-2 px-3 h-8 rounded-full border text-xs font-semibold"
+          <div className="hidden xl:flex items-center gap-2 px-3 h-8 rounded-full border text-xs font-semibold"
             style={{
               background: "hsl(140 50% 20% / 0.5)",
               borderColor: "hsl(140 60% 40% / 0.4)",
@@ -147,7 +144,7 @@ export function OSTitleBar() {
           </div>
         )}
 
-        <div className="hidden lg:flex items-center gap-1.5 px-3 h-8 rounded-full border text-xs font-semibold"
+        <div className="hidden xl:flex items-center gap-1.5 px-3 h-8 rounded-full border text-xs font-semibold"
           style={{
             background: "hsl(210 50% 20% / 0.5)",
             borderColor: "hsl(210 60% 45% / 0.4)",
@@ -158,36 +155,6 @@ export function OSTitleBar() {
 
         <PWAInstallButton />
         <ThemeToggle />
-
-        <Button asChild variant="ghost" size="sm" className="hidden lg:flex gap-1.5 h-8 px-3 rounded-full text-xs font-semibold border"
-          style={{
-            background: "hsl(0 50% 20% / 0.5)",
-            borderColor: "hsl(0 60% 45% / 0.4)",
-            color: "hsl(0 80% 70%)",
-          }}>
-          <Link to="/live-demo">
-            <Radio className="h-3.5 w-3.5" style={{ color: "hsl(0 80% 65%)" }} />
-            Live
-          </Link>
-        </Button>
-
-
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="ghost" size="sm" className="hidden lg:flex gap-1.5 h-8 px-3 rounded-full text-xs font-semibold border"
-              style={{
-                background: "hsl(270 50% 20% / 0.5)",
-                borderColor: "hsl(270 60% 45% / 0.4)",
-                color: "hsl(270 75% 70%)",
-              }}>
-              <Languages className="h-3.5 w-3.5" style={{ color: "hsl(270 75% 65%)" }} />
-              Language
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-48 p-2" align="end">
-            <LanguageSelector showLabel={false} />
-          </PopoverContent>
-        </Popover>
 
         <Button
           variant="ghost"
@@ -208,6 +175,36 @@ export function OSTitleBar() {
         <NotificationCenter />
         <StartSessionDialog />
         <NavigationStyleToggle />
+
+        {/* Overflow menu for Live, Language */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="hidden lg:flex h-8 w-8">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-52">
+            <DropdownMenuItem asChild>
+              <Link to="/live-demo" className="flex items-center gap-2">
+                <Radio className="h-4 w-4" style={{ color: "hsl(0 80% 65%)" }} />
+                Live
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="p-0">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="flex items-center gap-2 w-full px-2 py-1.5 text-sm">
+                    <Languages className="h-4 w-4" />
+                    Language
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48 p-2" align="end" side="left">
+                  <LanguageSelector showLabel={false} />
+                </PopoverContent>
+              </Popover>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
