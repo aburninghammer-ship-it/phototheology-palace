@@ -8,14 +8,14 @@ import { useStreamingAudio } from '../hooks/useStreamingAudio';
 import { getSoftCircleTexture, getNebulaBlobTexture } from '../utils/softTextures';
 import { BackToLobbyButton } from '../components/BackToLobbyButton';
 
-// Backdrop images
-import hdCreation from '@/assets/vr/hd-creation.jpg';
-import hdGarden from '@/assets/vr/hd-garden.jpg';
-import hdCross from '@/assets/vr/hd-cross.jpg';
-import hdResurrection from '@/assets/vr/hd-resurrection.jpg';
-import hdThrone from '@/assets/vr/hd-throne.jpg';
-import hdNewJerusalem from '@/assets/vr/hd-new-jerusalem.jpg';
-import hdNewJerusalem2 from '@/assets/vr/hd-new-jerusalem-2.png';
+// Backdrop images served from /public/vr/
+const hdCreation = '/vr/hd-creation.jpg';
+const hdGarden = '/vr/hd-garden.jpg';
+const hdCross = '/vr/hd-cross.jpg';
+const hdResurrection = '/vr/hd-resurrection.jpg';
+const hdThrone = '/vr/hd-throne.jpg';
+const hdNewJerusalem = '/vr/hd-new-jerusalem.jpg';
+const hdNewJerusalem2 = '/vr/hd-new-jerusalem-2.png';
 
 const AUDIO_SRC = '/audio/heavens-diary.m4a';
 

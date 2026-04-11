@@ -250,80 +250,39 @@ const GuidedStep = ({ step, title, description, link, time }: GuidedStepProps) =
   </Link>
 );
 
-// Import unique room images
-// Floor 1 - Furnishing
-import srImg from "@/assets/rooms/sr-story-room.jpg";
-import irImg from "@/assets/rooms/ir-imagination-room.jpg";
-import f24Img from "@/assets/rooms/24fps-room.jpg";
-import brImg from "@/assets/rooms/br-bible-rendered.jpg";
-import trImg from "@/assets/rooms/tr-translation-room.jpg";
-import grImg from "@/assets/rooms/gr-gems-room.jpg";
-// Floor 2 - Investigation
-import orImg from "@/assets/rooms/or-observation-room.jpg";
-import dcImg from "@/assets/rooms/dc-defcom-room.jpg";
-import stImg from "@/assets/rooms/st-symbols-room.jpg";
-import qrImg from "@/assets/rooms/qr-questions-room.jpg";
-import qaImg from "@/assets/rooms/qa-answers-room.jpg";
-// Floor 3 - Freestyle
-import nfImg from "@/assets/rooms/nf-nature-room.jpg";
-import pfImg from "@/assets/rooms/pf-personal-room.jpg";
-import bfImg from "@/assets/rooms/bf-bible-freestyle.jpg";
-import hfImg from "@/assets/rooms/hf-history-room.jpg";
-import lrImg from "@/assets/rooms/lr-listening-room.jpg";
-// Floor 4 - Next Level
-import crImg from "@/assets/rooms/cr-concentration-room.jpg";
-import drImg from "@/assets/rooms/dr-dimensions-room.jpg";
-import c6Img from "@/assets/rooms/c6-connect-room.jpg";
-import trmImg from "@/assets/rooms/trm-theme-room.jpg";
-import tzImg from "@/assets/rooms/tz-timezone-room.jpg";
-import prmImg from "@/assets/rooms/prm-patterns-room.jpg";
-import pImg from "@/assets/rooms/p-parallels-room.jpg";
-import frtImg from "@/assets/rooms/frt-fruit-room.jpg";
-import cecImg from "@/assets/rooms/cec-christ-chapter.jpg";
-import r66Img from "@/assets/rooms/r66-room.jpg";
-// Floor 5 - Vision
-import blImg from "@/assets/rooms/bl-sanctuary-room.jpg";
-import prImg from "@/assets/rooms/pr-prophecy-room.jpg";
-import a3Img from "@/assets/rooms/3a-angels-room.jpg";
-import feImg from "@/assets/rooms/fe-feasts-room.jpg";
-// Floor 6 - Three Heavens
-import h123Img from "@/assets/rooms/123h-heavens-room.jpg";
-import cyclesImg from "@/assets/rooms/cycles-room.jpg";
-import jrImg from "@/assets/rooms/jr-juice-room.jpg";
-import mathImg from "@/assets/rooms/math-room.jpg";
-// Floor 7 - Spiritual
-import frmImg from "@/assets/rooms/frm-fire-room.jpg";
-import mrImg from "@/assets/rooms/mr-meditation-room.jpg";
-import srmImg from "@/assets/rooms/srm-speed-room.jpg";
-// Floor 8 - Master
-import infinityImg from "@/assets/rooms/infinity-room.jpg";
-// Fallback
-import storyRoomImg from "@/assets/rooms/story-room.jpg";
+// Room images served from /public/rooms/ — no Vite processing
+const r = (name: string) => `/rooms/${name}.jpg`;
 
-// Room image mappings by room ID for unique visuals
 const roomImageMap: Record<string, string> = {
   // Floor 1
-  sr: srImg, ir: irImg, "24fps": f24Img, br: brImg, tr: trImg, gr: grImg,
+  sr: r("sr-story-room"), ir: r("ir-imagination-room"), "24fps": r("24fps-room"),
+  br: r("br-bible-rendered"), tr: r("tr-translation-room"), gr: r("gr-gems-room"),
   // Floor 2
-  or: orImg, dc: dcImg, st: stImg, qr: qrImg, qa: qaImg,
+  or: r("or-observation-room"), dc: r("dc-defcom-room"), st: r("st-symbols-room"),
+  qr: r("qr-questions-room"), qa: r("qa-answers-room"),
   // Floor 3
-  nf: nfImg, pf: pfImg, bf: bfImg, hf: hfImg, lr: lrImg,
+  nf: r("nf-nature-room"), pf: r("pf-personal-room"), bf: r("bf-bible-freestyle"),
+  hf: r("hf-history-room"), lr: r("lr-listening-room"),
   // Floor 4
-  cr: crImg, dr: drImg, c6: c6Img, trm: trmImg, tz: tzImg, prm: prmImg,
-  "p||": pImg, frt: frtImg, cec: cecImg, r66: r66Img,
+  cr: r("cr-concentration-room"), dr: r("dr-dimensions-room"), c6: r("c6-connect-room"),
+  trm: r("trm-theme-room"), tz: r("tz-timezone-room"), prm: r("prm-patterns-room"),
+  "p||": r("p-parallels-room"), frt: r("frt-fruit-room"), cec: r("cec-christ-chapter"),
+  r66: r("r66-room"),
   // Floor 5
-  bl: blImg, pr: prImg, "3a": a3Img, fe: feImg,
+  bl: r("bl-sanctuary-room"), pr: r("pr-prophecy-room"), "3a": r("3a-angels-room"),
+  fe: r("fe-feasts-room"),
   // Floor 6
-  "123h": h123Img, cycles: cyclesImg, jr: jrImg, math: mathImg,
+  "123h": r("123h-heavens-room"), cycles: r("cycles-room"), jr: r("jr-juice-room"),
+  math: r("math-room"),
   // Floor 7
-  frm: frmImg, mr: mrImg, srm: srmImg,
+  frm: r("frm-fire-room"), mr: r("mr-meditation-room"), srm: r("srm-speed-room"),
   // Floor 8
-  infinity: infinityImg,
+  infinity: r("infinity-room"),
 };
 
 // Get unique room image by room ID
 const getRoomImage = (roomId: string, floorNumber: number): string => {
-  return roomImageMap[roomId] || storyRoomImg;
+  return roomImageMap[roomId] || r("story-room");
 };
 
 // Room Card Component
