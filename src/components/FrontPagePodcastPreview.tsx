@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Play, Pause, Headphones } from "lucide-react";
+import { Play, Pause, Headphones, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { PODCAST_EPISODES } from "@/data/podcastData";
