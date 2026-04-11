@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { Headphones, Play, Lock } from "lucide-react";
+import { useState, useMemo, useCallback } from "react";
+import { Headphones, Play, Lock, Share2 } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
