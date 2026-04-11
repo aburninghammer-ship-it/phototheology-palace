@@ -1,47 +1,5 @@
 import { cn } from "@/lib/utils";
 
-// Professor avatar imports
-import eliasImg from "@/assets/professors/elias.jpg";
-import ashworthImg from "@/assets/professors/ashworth.jpg";
-import danversImg from "@/assets/professors/danvers.jpg";
-import kingsleyImg from "@/assets/professors/kingsley.jpg";
-import mercerImg from "@/assets/professors/mercer.jpg";
-import thorneImg from "@/assets/professors/thorne.jpg";
-import jewelImg from "@/assets/professors/jewel.jpg";
-import haleImg from "@/assets/professors/hale.jpg";
-import lexisImg from "@/assets/professors/lexis.jpg";
-import whitfieldImg from "@/assets/professors/whitfield.jpg";
-import queryImg from "@/assets/professors/query.jpg";
-import crossImg from "@/assets/professors/cross.jpg";
-import riversImg from "@/assets/professors/rivers.jpg";
-import hartImg from "@/assets/professors/hart.jpg";
-import strandImg from "@/assets/professors/strand.jpg";
-import archfordImg from "@/assets/professors/archford.jpg";
-import keeneImg from "@/assets/professors/keene.jpg";
-import whitmoreImg from "@/assets/professors/whitmore.jpg";
-import prismImg from "@/assets/professors/prism.jpg";
-import reedmanImg from "@/assets/professors/reedman.jpg";
-import magnusImg from "@/assets/professors/magnus.jpg";
-import epochImg from "@/assets/professors/epoch.jpg";
-import weaverImg from "@/assets/professors/weaver.jpg";
-import mirrorImg from "@/assets/professors/mirror.jpg";
-import bloomImg from "@/assets/professors/bloom.jpg";
-import templeImg from "@/assets/professors/temple.jpg";
-import blackwellImg from "@/assets/professors/blackwell.jpg";
-import heraldImg from "@/assets/professors/herald.jpg";
-import moadimImg from "@/assets/professors/moadim.jpg";
-import babylonImg from "@/assets/professors/babylon.jpg";
-import romanImg from "@/assets/professors/roman.jpg";
-import novusImg from "@/assets/professors/novus.jpg";
-import covenantImg from "@/assets/professors/covenant.jpg";
-import squeezeImg from "@/assets/professors/squeeze.jpg";
-import chronosImg from "@/assets/professors/chronos.jpg";
-import flameImg from "@/assets/professors/flame.jpg";
-import stillwaterImg from "@/assets/professors/stillwater.jpg";
-import flashImg from "@/assets/professors/flash.jpg";
-import zenithImg from "@/assets/professors/zenith.jpg";
-import axiomImg from "@/assets/professors/axiom.jpg";
-
 interface ProfessorAvatarProps {
   name: string;
   size?: "sm" | "lg";
@@ -101,52 +59,15 @@ const DEFAULT_STYLE: ProfessorStyle = {
   accentColor: "#F59E0B", bgGradient: "from-amber-800 to-amber-950", initials: "??",
 };
 
-const PROFESSOR_IMAGES: Record<string, string> = {
-  "Professor Elias": eliasImg,
-  "Professor Ashworth": ashworthImg,
-  "Professor Danvers": danversImg,
-  "Professor Kingsley": kingsleyImg,
-  "Professor Mercer": mercerImg,
-  "Professor Thorne": thorneImg,
-  "Professor Jewel": jewelImg,
-  "Professor Hale": haleImg,
-  "Professor Lexis": lexisImg,
-  "Professor Whitfield": whitfieldImg,
-  "Professor Query": queryImg,
-  "Professor Cross": crossImg,
-  "Professor Rivers": riversImg,
-  "Professor Hart": hartImg,
-  "Professor Strand": strandImg,
-  "Professor Archford": archfordImg,
-  "Professor Keene": keeneImg,
-  "Professor Whitmore": whitmoreImg,
-  "Professor Prism": prismImg,
-  "Professor Reedman": reedmanImg,
-  "Professor Magnus": magnusImg,
-  "Professor Epoch": epochImg,
-  "Professor Weaver": weaverImg,
-  "Professor Mirror": mirrorImg,
-  "Professor Bloom": bloomImg,
-  "Professor Temple": templeImg,
-  "Professor Blackwell": blackwellImg,
-  "Professor Herald": heraldImg,
-  "Professor Moadim": moadimImg,
-  "Professor Babylon": babylonImg,
-  "Professor Roman": romanImg,
-  "Professor Novus": novusImg,
-  "Professor Covenant": covenantImg,
-  "Professor Squeeze": squeezeImg,
-  "Professor Chronos": chronosImg,
-  "Professor Flame": flameImg,
-  "Professor Stillwater": stillwaterImg,
-  "Professor Flash": flashImg,
-  "Professor Zenith": zenithImg,
-  "Professor Axiom": axiomImg,
-};
+// Images served from /public/professors/ — no Vite processing
+function getProfessorImage(name: string): string | undefined {
+  const slug = name.replace("Professor ", "").toLowerCase();
+  return `/professors/${slug}.jpg`;
+}
 
 export function ProfessorAvatar({ name, size = "sm", className }: ProfessorAvatarProps) {
   const style = PROFESSOR_STYLES[name] || DEFAULT_STYLE;
-  const image = PROFESSOR_IMAGES[name];
+  const image = getProfessorImage(name);
   const sizeClasses = size === "lg" ? "w-20 h-20" : "w-10 h-10";
   const textSize = size === "lg" ? "text-xl" : "text-xs";
 
