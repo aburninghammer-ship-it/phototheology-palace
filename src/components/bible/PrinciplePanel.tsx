@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getVerseAnnotations } from "@/services/bibleApi";
 import { VerseAnnotation } from "@/types/bible";
@@ -425,7 +424,7 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose, onHig
   }
 
   return (
-    <Card className="lg:sticky lg:top-24 shadow-elegant hover:shadow-hover transition-smooth animate-scale-in overflow-hidden flex flex-col">
+    <Card className="lg:sticky lg:top-24 shadow-elegant hover:shadow-hover transition-smooth animate-scale-in flex flex-col lg:max-h-[calc(100vh-7rem)]">
       <CardHeader className="pb-2 sm:pb-4 flex-shrink-0">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
@@ -452,8 +451,8 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose, onHig
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1 overflow-hidden flex flex-col pt-0 sm:pt-2">
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex-1 flex flex-col overflow-hidden">
+      <CardContent className="flex-1 min-h-0 flex flex-col pt-0 sm:pt-2">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex-1 min-h-0 flex flex-col">
           {/* Mobile: horizontal scroll tabs, Desktop: wrapped tabs */}
           <div className="flex-shrink-0 -mx-2 px-2 overflow-x-auto scrollbar-hide">
             <TabsList className="inline-flex w-max sm:w-full sm:flex-wrap gap-1 h-auto p-1 min-w-full">
@@ -483,8 +482,8 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose, onHig
             </TabsList>
           </div>
 
-          {/* Scrollable content area - fills remaining card space */}
-          <ScrollArea className="flex-1 min-h-[200px] max-h-[70vh] mt-2 sm:mt-4">
+          {/* Scrollable content area - native overflow, fills remaining card space */}
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden mt-2 sm:mt-4 pr-1">
             <TabsContent value="lenses" className="space-y-4 mt-0">
               {/* Room Analysis Summary */}
               {annotation.roomsUsed && annotation.roomsUsed.length > 0 && (
@@ -822,7 +821,7 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose, onHig
                 </div>
               )}
             </TabsContent>
-          </ScrollArea>
+          </div>
         </Tabs>
 
         {/* Bottom action buttons - responsive layout */}
