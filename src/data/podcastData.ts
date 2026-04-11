@@ -1,3 +1,4 @@
+// Podcast episode data
 export interface PodcastEpisode {
   id: string;
   episodeNumber: number;
