@@ -1,30 +1,32 @@
 // Defense Mode — Theological Combat Simulator Data
 // 7 AI opponents, 7 topics, 3 difficulty levels
 
-import atheistAvatar from "@/assets/defense/atheist.jpg";
-import scientistAvatar from "@/assets/avatars/scientist-avatar.png";
-import muslimAvatar from "@/assets/defense/muslim.jpg";
-import mormonAvatar from "@/assets/defense/mormon.jpg";
-import jwAvatar from "@/assets/defense/jw-female.jpg";
-import evangelicalAvatar from "@/assets/defense/evangelical.jpg";
-import catholicAvatar from "@/assets/defense/catholic.jpg";
-import bhiAvatar from "@/assets/defense/bhi.jpg";
-import formerSdaAvatar from "@/assets/defense/former-sda.jpg";
-import offshotSdaAvatar from "@/assets/defense/offshoot-sda.jpg";
-import jewishAvatar from "@/assets/defense/jewish.jpg";
-import goliathAvatar from "@/assets/defense/goliath.jpg";
-import preteristAvatar from "@/assets/defense/preterist.jpg";
-import futuristAvatar from "@/assets/defense/futurist.jpg";
-import secularScholarAvatar from "@/assets/defense/secular-scholar.jpg";
-import progressiveChristianAvatar from "@/assets/defense/progressive-christian.jpg";
-import skepticalExsdaAvatar from "@/assets/defense/skeptical-exsda.jpg";
-import philosopherAvatar from "@/assets/defense/philosopher.jpg";
-import newAgeAvatar from "@/assets/defense/new-age.jpg";
-import antiProphetAvatar from "@/assets/defense/anti-prophet.jpg";
-import internetSkepticAvatar from "@/assets/defense/internet-skeptic.jpg";
-import agnosticAvatar from "@/assets/defense/agnostic.jpg";
-import pentecostalAvatar from "@/assets/defense/pentecostal.jpg";
-import antiTrinitarianAvatar from "@/assets/defense/anti-trinitarian.jpg";
+// Images served from /public/defense/ — no Vite processing
+const d = (name: string) => `/defense/${name}.jpg`;
+const atheistAvatar = d("atheist");
+const scientistAvatar = "/avatars/scientist-avatar.png";
+const muslimAvatar = d("muslim");
+const mormonAvatar = d("mormon");
+const jwAvatar = d("jw-female");
+const evangelicalAvatar = d("evangelical");
+const catholicAvatar = d("catholic");
+const bhiAvatar = d("bhi");
+const formerSdaAvatar = d("former-sda");
+const offshotSdaAvatar = d("offshoot-sda");
+const jewishAvatar = d("jewish");
+const goliathAvatar = d("goliath");
+const preteristAvatar = d("preterist");
+const futuristAvatar = d("futurist");
+const secularScholarAvatar = d("secular-scholar");
+const progressiveChristianAvatar = d("progressive-christian");
+const skepticalExsdaAvatar = d("skeptical-exsda");
+const philosopherAvatar = d("philosopher");
+const newAgeAvatar = d("new-age");
+const antiProphetAvatar = d("anti-prophet");
+const internetSkepticAvatar = d("internet-skeptic");
+const agnosticAvatar = d("agnostic");
+const pentecostalAvatar = d("pentecostal");
+const antiTrinitarianAvatar = d("anti-trinitarian");
 export interface DefenseOpponent {
   id: string;
   name: string;

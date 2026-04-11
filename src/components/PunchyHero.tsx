@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronRight, Sparkles, CheckCircle2, LogIn, Castle, Compass } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import heroCardsDisplay from "@/assets/branding/hero-cards-display.png";
+const heroCardsDisplay = "/branding/hero-cards-display.png";
 import { UserCountBadge } from "@/components/UserCountBadge";
 import { useAuth } from "@/hooks/useAuth";
 import { useMemo } from "react";
