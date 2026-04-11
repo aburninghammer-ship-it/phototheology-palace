@@ -2,14 +2,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LevelToggleChip } from "@/components/basic-mode/LevelToggleChip";
 import { BackButton } from "@/components/BackButton";
-import { Sparkles, User, LogOut, Settings, Languages, MessageCircle, Home, MoreHorizontal } from "lucide-react";
+import { Sparkles, User, LogOut, Settings, Languages, MessageCircle, Home, MoreHorizontal, Columns2 } from "lucide-react";
 import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 import { useDirectMessages } from "@/hooks/useDirectMessages";
 import { CommandPaletteTrigger } from "./CommandPalette";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ShareableProgressCard } from "@/components/ShareableProgressCard";
+
 import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { StartSessionDialog } from "@/components/session/StartSessionDialog";
 import { NavigationStyleToggle } from "@/components/NavigationStyleToggle";
