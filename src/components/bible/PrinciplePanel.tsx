@@ -453,29 +453,28 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose, onHig
 
       <CardContent className="flex-1 min-h-0 flex flex-col pt-0 sm:pt-2">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex-1 min-h-0 flex flex-col">
-          {/* Mobile: horizontal scroll tabs, Desktop: wrapped tabs */}
-          <div className="flex-shrink-0 -mx-2 px-2 overflow-x-auto scrollbar-hide">
-            <TabsList className="inline-flex w-max sm:w-full sm:flex-wrap gap-1 h-auto p-1 min-w-full">
-              <TabsTrigger value="lenses" className="flex-shrink-0 sm:flex-1 px-2 sm:px-3 text-xs sm:text-sm">
+          {/* TabsList has its own horizontal scroll + arrow buttons built in */}
+          <div className="flex-shrink-0">
+            <TabsList>
+              <TabsTrigger value="lenses" className="px-3 text-xs sm:text-sm">
                 <Layers className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                <span className="hidden xs:inline">Lenses</span>
-                <span className="xs:hidden">🔍</span>
+                Lenses
               </TabsTrigger>
-              <TabsTrigger value="raw" className="flex-shrink-0 sm:flex-1 px-2 sm:px-3 text-xs sm:text-sm">
+              <TabsTrigger value="raw" className="px-3 text-xs sm:text-sm">
                 <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 Raw
               </TabsTrigger>
-              <TabsTrigger value="scripture-links" className="flex-shrink-0 sm:flex-1 px-2 sm:px-3 text-xs sm:text-sm">
+              <TabsTrigger value="scripture-links" className="px-3 text-xs sm:text-sm">
                 <LinkIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 <span className="hidden sm:inline">Scripture Link</span>
                 <span className="sm:hidden">Links</span>
               </TabsTrigger>
-              <TabsTrigger value="principle-links" className="flex-shrink-0 sm:flex-1 px-2 sm:px-3 text-xs sm:text-sm">
+              <TabsTrigger value="principle-links" className="px-3 text-xs sm:text-sm">
                 <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 <span className="hidden sm:inline">Principle Links</span>
                 <span className="sm:hidden">Scan</span>
               </TabsTrigger>
-              <TabsTrigger value="christ" className="flex-shrink-0 sm:flex-1 px-2 sm:px-3 text-xs sm:text-sm">
+              <TabsTrigger value="christ" className="px-3 text-xs sm:text-sm">
                 <Heart className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 Christ
               </TabsTrigger>
