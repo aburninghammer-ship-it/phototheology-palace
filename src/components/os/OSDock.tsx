@@ -119,13 +119,13 @@ export function OSDock() {
               <button
                 onClick={() => navigate(homePath)}
                 className="p-2.5 rounded-xl transition-all backdrop-blur-md border border-white/10 bg-primary/10 hover:bg-primary/20 text-primary hover:border-primary/30"
-                title={mode === "immersion" ? "Back to Spaces" : "Home"}
+                title="Home"
               >
                 <LayoutGrid className="h-4 w-4" />
               </button>
             </TooltipTrigger>
             <TooltipContent side="right" sideOffset={8} className="font-medium backdrop-blur-xl bg-popover/90 border-white/10 z-50">
-              {mode === "immersion" ? "Back to Spaces" : "Home"}
+              {mode === "immersion" ? "Spaces" : "Home"}
             </TooltipContent>
           </Tooltip>
         </div>
