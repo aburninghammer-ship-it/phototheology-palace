@@ -16,7 +16,7 @@ export const PODCAST_EPISODES: PodcastEpisode[] = [
     title: "The Mental Palace for Scripture Study",
     description:
       "The foundation episode — discover the mental palace method and how it transforms Scripture study into an immersive, unforgettable experience.",
-    audioFile: "The_mental_palace_for_scripture_study.m4a",
+    audioFile: "The_Phototheology_OS_Podcast_Episode_1.mp3",
     duration: "40 min",
   },
   // ── Floor 1: Furnishing ──
