@@ -20,19 +20,22 @@ export function LiveChatToggle() {
       transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.5 }}
       drag
       dragMomentum={false}
-      onDragStart={() => { dragDistance.current = 0; }}
+      dragListener={true}
+      onDragStart={() => { dragDistance.current = 0; hasDragged.current = false; }}
       onDrag={(_e, info) => { dragDistance.current = Math.abs(info.offset.x) + Math.abs(info.offset.y); }}
       onDragEnd={() => {
-        if (dragDistance.current > 5) {
+        if (dragDistance.current > 8) {
           hasDragged.current = true;
-          setTimeout(() => { hasDragged.current = false; }, 200);
+          setTimeout(() => { hasDragged.current = false; }, 400);
         }
       }}
       className="fixed bottom-[88px] right-4 z-[55] md:bottom-6 select-none cursor-grab active:cursor-grabbing"
     >
       <Button
-        onClick={() => {
-          if (!hasDragged.current) setIsOpen(true);
+        onPointerUp={() => {
+          setTimeout(() => {
+            if (!hasDragged.current) setIsOpen(true);
+          }, 10);
         }}
         size="icon"
         className="relative h-14 w-14 rounded-full shadow-xl shadow-primary/25 bg-gradient-to-br from-primary to-primary/80 hover:shadow-2xl hover:shadow-primary/35 transition-all duration-300 hover:scale-105"
