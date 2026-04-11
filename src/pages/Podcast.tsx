@@ -87,6 +87,28 @@ export default function Podcast() {
             </span>
           </p>
 
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-4 border-violet-500/30 text-violet-500 hover:bg-violet-500/10"
+            onClick={async () => {
+              const shareData = {
+                title: "The Phototheology OS Podcast",
+                text: "Deep dives into every floor of the Phototheology Palace. Listen free!",
+                url: window.location.href,
+              };
+              if (navigator.share) {
+                try { await navigator.share(shareData); } catch {}
+              } else {
+                await navigator.clipboard.writeText(window.location.href);
+                alert("Link copied to clipboard!");
+              }
+            }}
+          >
+            <Share2 className="h-4 w-4 mr-2" />
+            Share this Podcast
+          </Button>
+
           {isFreeOrTrial && (
             <p className="text-sm text-muted-foreground">
               🔓 Episode 1 is free for everyone.{" "}
