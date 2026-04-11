@@ -193,28 +193,30 @@ export default function Podcast() {
                           <Badge className="text-xs bg-green-600/20 text-green-500 border-green-500/30">Free</Badge>
                         )}
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-muted-foreground hover:text-primary"
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          const url = `${window.location.origin}/podcast`;
-                          const shareData = {
-                            title: ep.title,
-                            text: ep.description,
-                            url,
-                          };
-                          if (navigator.share) {
-                            try { await navigator.share(shareData); } catch {}
-                          } else {
-                            await navigator.clipboard.writeText(url);
-                            alert("Link copied to clipboard!");
-                          }
-                        }}
-                      >
-                        <Share2 className="h-3.5 w-3.5" />
-                      </Button>
+                      {ep.episodeNumber === 1 && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-primary"
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            const url = `${window.location.origin}/podcast`;
+                            const shareData = {
+                              title: ep.title,
+                              text: ep.description,
+                              url,
+                            };
+                            if (navigator.share) {
+                              try { await navigator.share(shareData); } catch {}
+                            } else {
+                              await navigator.clipboard.writeText(url);
+                              alert("Link copied to clipboard!");
+                            }
+                          }}
+                        >
+                          <Share2 className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
                     </div>
 
                     <div className="mt-3">
