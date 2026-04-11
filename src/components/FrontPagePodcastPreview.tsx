@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Play, Pause, Headphones } from "lucide-react";
+import { Play, Pause, Headphones, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { PODCAST_EPISODES } from "@/data/podcastData";
@@ -103,14 +103,37 @@ export function FrontPagePodcastPreview() {
           </div>
         </div>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-xs text-muted-foreground hover:text-foreground"
-          onClick={() => navigate("/podcast")}
-        >
-          View all episodes →
-        </Button>
+        <div className="flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs text-muted-foreground hover:text-foreground"
+            onClick={() => navigate("/podcast")}
+          >
+            View all episodes →
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-muted-foreground hover:text-primary"
+            onClick={async () => {
+              const url = `${window.location.origin}/podcast`;
+              const shareData = {
+                title: "The Phototheology OS Podcast",
+                text: episode.description,
+                url,
+              };
+              if (navigator.share) {
+                try { await navigator.share(shareData); } catch {}
+              } else {
+                await navigator.clipboard.writeText(url);
+                alert("Link copied to clipboard!");
+              }
+            }}
+          >
+            <Share2 className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );
