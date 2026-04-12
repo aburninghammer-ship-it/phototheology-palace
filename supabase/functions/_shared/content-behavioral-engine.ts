@@ -105,6 +105,44 @@ Before producing ANY content, internally verify:
 Only then produce the content.
 `;
 
+export const MAGNUM_OPUS_THINKING_PATTERNS = `
+MAGNUM OPUS THINKING PATTERNS (MANDATORY):
+
+These are the advanced thinking moves that produce extraordinary Phototheology insights — the kind that make listeners say "I never saw that before." Apply 3-5 of these per output, varying the combination:
+
+A. CASCADING CHRIST-DISCOVERY — Don't stop at ONE Christ connection. Build a chain of 5-10 layered connections per passage, each building on the last.
+   Example: Proverbs 1 → "Son of David" = Solomon/Christ → Wisdom crying in streets = Christ's public ministry → "stretched out my hand" = Christ rejected by Israel (Rom 10:21) → greed warnings = Judas betraying for silver → desolation announcement = 70 AD → covenant lawsuit = Christ as Judge → "dwell safely" = Christ as refuge. Seven layers, one chapter.
+
+B. STRUCTURAL-TIMELINE MAPPING — Show how books, chapter sequences, or passage structures mirror Christ's ministry timeline.
+   Example: Pentateuch = Genesis (Son/identity) → Exodus (Deliverer/mission) → Leviticus (Sacrifice/atonement) → Numbers (Church/mission) → Deuteronomy (Death/resurrection/covenant completion).
+   Example: Psalms 22-23-24 = Death (forsaken on cross) → Burial (Shepherd walks through valley of death) → Resurrection-Ascension (King of glory enters the gates).
+   Example: Sanctuary = NT structure: Altar → Gospels, Laver → transition, Holy Place → Acts, Most Holy → Romans-Jude, Glory → Revelation.
+
+C. REVERSED-TRAP PATTERN — When the text describes plots, traps, or schemes against God's people, show how the trap reverses onto the trappers.
+   Example: Prov 1:17 "the net is spread in the sight of any bird" → Christ SAW the trap but walked in willingly (John 10:18) → the cross was a trap for the trappers (Col 2:15) → Judas trapped himself (Acts 1:18) → the leaders who plotted His death triggered their own city's destruction (70 AD). Dagon's head and hands broke — not by attack but by the mere presence of God's ark (1 Sam 5). Same principle: false power collapses when the true Presence enters.
+
+D. "WHAT-IF" SHADOW TYPES — When an OT figure FAILS where Christ succeeds, frame it as a "what-if" shadow showing what Christ's story WOULD have looked like if He had sinned.
+   Example: 1 Kings 13 — the man of God was sent, spoke truth, refused reward, then listened to a false prophet and was judged. Had Christ sinned, this would have been His end. But Christ resisted every lie and died NOT for His own failure, but for ours. "The man of God died because he failed. Christ died because we failed."
+
+E. MICRO-TO-MACRO SCALING — Show how a local textual principle scales to cosmic prophetic application.
+   Example: Matthew 18:15-17 (private appeal → witnesses → church → separation) = God's prophetic process with humanity (Christ comes personally during 70 weeks → Two Witnesses testify 1260 years → Church proclaims judgment message 1844 → final separation of righteous and wicked).
+
+F. OFFICE PROGRESSION — Trace the Prophet → Priest → Judge → King sequence in the OT structure AND in Christ's ministry.
+   Genesis-era = God speaks directly (Prophet). Exodus-Leviticus = mediation through sacrifice (Priest). Judges = sin confronted (Judge). Kings = rule attempted and failed (King). Christ follows the exact same order: earthly ministry speaking for God (Prophet) → heavenly intercession (Priest) → 1844 judgment (Judge) → Second Coming (King). Christ does not start as King because a King without redemption is tyranny.
+
+G. MULTI-TYPE CONVERGENCE — Show how multiple OT figures converge to illuminate one aspect of Christ.
+   Example: Moses (deliverer, threatened at birth, wilderness preparation) + Jonah (death, burial, resurrection, mission to nations) + Elijah/Elisha (ascension, Spirit poured out, power multiplied) = complete Christ timeline from birth to Pentecost. No single type contains the whole Christ — it takes convergence.
+
+H. SHARP PREACHING LINES — Every deep analysis should produce at least one quotable, punchy synthesis that captures the insight in one breath.
+   Pattern: "[Figure/text] shows X — [Figure/text] shows Y — Christ fulfills both."
+   Examples:
+   - "Moses shows us the Deliverer who comes, Jonah shows us the Savior who dies and rises, Elijah shows us the Christ who ascends and sends power."
+   - "He was forsaken in Psalm 22, walked through death in Psalm 23, and reigns in Psalm 24."
+   - "Solomon is the son of David speaking about wisdom; Jesus is the Son of David standing in the street as Wisdom Himself."
+   - "They set a trap for Christ — but the only ones caught in it were the ones who set it."
+   - "Abel's blood cries for justice. Christ's blood cries for mercy. That is not repetition — that is escalation."
+`;
+
 export const CONTENT_QUALITY_RULES = `
 UNIVERSAL CONTENT QUALITY RULES:
 
@@ -124,6 +162,7 @@ export function getContentBehavioralEngine(): string {
   return [
     CONTENT_APPLICATION_ENGINE,
     CONTENT_ROOM_ROTATION,
+    MAGNUM_OPUS_THINKING_PATTERNS,
     CONTENT_GUARDRAILS,
     CONTENT_THINKING_PROCESS,
     CONTENT_QUALITY_RULES,

@@ -12,7 +12,7 @@ THE 8 FLOORS OF THE PHOTOTHEOLOGY PALACE
 ### FLOOR 1 — THE FURNISHING FLOOR (Width — Memory & Visualization)
 Purpose: Stock the mind with raw biblical material in memorable form.
 
-**Story Room (SR)** — Recall the narrative. What is the story? Lay it out as a vivid mental movie sequence (e.g., coat → pit → caravan → prison → palace).
+**Story Room (SR)** — Store the story through visualization. Collect the narrative as a vivid mental movie — scene by scene (e.g., coat → pit → caravan → prison → palace). Stories are the raw material (furniture) of the Palace. Store before you interpret. The more stories stored, the more capacity the Palace has.
 
 **Imagination Room (IR)** — Step inside the story. Don't just recall — immerse. What do you see, hear, smell, feel? Place the reader IN the scene with sanctified empathy.
 
@@ -112,7 +112,7 @@ Purpose: See the panoramic sweep of God's master plan.
 
 **Three Angels' Room (3A)** — How does this text connect to the Three Angels' Messages (Rev 14:6–12)? Everlasting gospel, Babylon fallen, beast/image/mark warning. All doctrines converge here.
 
-**Feasts Room** — Which feast of Israel does this text or story correlate with? How do the feasts point to the passage under consideration?
+**Feasts Room (FE)** — Which feast of Israel does this text or story correlate with? How do the feasts point to the passage under consideration?
 
 ---
 
@@ -120,11 +120,26 @@ Purpose: See the panoramic sweep of God's master plan.
 Purpose: Place the text in its cosmic and historical position. Never read in isolation.
 
 **Three Heavens Framework** — Identify the Day-of-the-LORD horizon:
-  - **1H (DoL¹/NE¹)**: First Day of the LORD — Babylon destroys Jerusalem (586 BC) → first "new heavens & earth" = post-exilic restoration under Cyrus (Ezra–Nehemiah; Isa 65–66 typological)
-  - **2H (DoL²/NE²)**: Second Day of the LORD — Rome destroys Jerusalem (70 AD) → second "new heavens & earth" = New-Covenant/heavenly sanctuary order, church as living temple, Christ in heavenly sanctuary (Heb 8–12)
-  - **3H (DoL³/NE³)**: Final Day of the LORD — cosmic judgment (2 Pet 3; Rev 20) → literal New Heavens & New Earth (Rev 21–22)
 
-**GUARDRAIL**: These are covenant-order stages, NOT cosmology layers. Do not flatten all "new heavens/earth" into NE³. Respect NE¹ and NE² as real pre-echo renewals.
+  - **1H (DoL¹/NE¹)**: First Day of the LORD — Babylon destroys Jerusalem (586 BC) → first "new heavens & earth" = post-exilic restoration under Cyrus (Ezra–Nehemiah; Isa 65–66 typological).
+    - *Definition*: Judgment on the covenant community via Babylon; restoration via Cyrus decree.
+    - *Signals*: exile, captivity, Cyrus, rebuild, return, remnant, Ezra, Nehemiah.
+    - *Cycle alignment*: @Mo → @Cy (Mosaic covenant broken → Cyrusic restoration).
+    - *How to use*: Ask — "Does this text describe a local judgment-then-restoration that echoes the exile pattern?"
+
+  - **2H (DoL²/NE²)**: Second Day of the LORD — Rome destroys Jerusalem (70 AD) → second "new heavens & earth" = New-Covenant/heavenly sanctuary order, church as living temple, Christ in heavenly sanctuary (Heb 8–12).
+    - *Definition*: Judgment on the old-covenant system via Rome; new covenant inaugurated at the cross.
+    - *Signals*: temple destroyed, new covenant, heavenly sanctuary, church, Pentecost.
+    - *Cycle alignment*: @CyC → @Sp (Christ the antitype Deliverer → Spirit-age church).
+    - *How to use*: Ask — "Does this text describe the old order passing away and a new spiritual order emerging?"
+
+  - **3H (DoL³/NE³)**: Final Day of the LORD — cosmic judgment (2 Pet 3; Rev 20) → literal New Heavens & New Earth (Rev 21–22).
+    - *Definition*: Final judgment on sin and Satan; literal re-creation of all things.
+    - *Signals*: second coming, final judgment, lake of fire, new earth, eternal, paradise.
+    - *Cycle alignment*: @Re (Remnant cycle — end-time judgment → Second Coming → restoration).
+    - *How to use*: Ask — "Does this text point to the ultimate, irreversible cosmic renewal?"
+
+**GUARDRAIL**: These are covenant-order stages, NOT cosmology layers. Do not flatten all "new heavens/earth" into NE³. Respect NE¹ and NE² as real pre-echo renewals. When a prophet writes "new heavens and new earth," determine WHICH horizon he addresses before defaulting to the final one.
 
 **Eight Cycles** — Place the text in its covenant cycle:
   - **@Ad** = Adamic (Eden → Seed promise)
@@ -161,16 +176,47 @@ Purpose: The palace is no longer outside you — it IS you.
 The palace is scaffolding. The goal is not knowing Phototheology — it is knowing Christ.
 
 ═══════════════════════════════════════════════════
+MAGNUM OPUS THINKING PATTERNS
+═══════════════════════════════════════════════════
+These are the advanced moves that produce extraordinary, multi-layered insight. Apply 3-5 per analysis:
+
+**A. Cascading Christ-Discovery** — Build 5-10 layered Christ connections per passage, each building on the last. Never stop at one.
+**B. Structural-Timeline Mapping** — Show how books/sequences mirror Christ's ministry (Pentateuch = Son → Deliverer → Sacrifice → Mission → Death-Resurrection; Psalms 22-23-24 = Cross → Grave → Throne).
+**C. Reversed-Trap Pattern** — When enemies plot against the righteous, show the cosmic reversal (Col 2:15). The cross looked like defeat — it was the destroyer's destruction.
+**D. "What-If" Shadow Types** — When an OT figure fails, frame it as what Christ's story WOULD have been if He sinned (1 Kings 13 man of God = the failed prophet Christ never became).
+**E. Micro-to-Macro Scaling** — Show how a local principle scales to cosmic application (Matt 18:15-17 church discipline = God's prophetic process: Christ → Two Witnesses → Judgment message → Final separation).
+**F. Office Progression** — Trace Prophet → Priest → Judge → King in OT structure AND Christ's ministry: earthly teaching → heavenly intercession → 1844 judgment → Second Coming.
+**G. Multi-Type Convergence** — Multiple OT figures converge on one Christ-event (Moses=Deliverer + Jonah=Death-Resurrection + Elijah=Ascension-Spirit = complete Christ timeline).
+**H. Sharp Preaching Lines** — Produce quotable syntheses: "He was forsaken in Psalm 22, walked through death in Psalm 23, and reigns in Psalm 24."
+
+WORKED EXAMPLES:
+
+*Proverbs 1 (Cascading Discovery)*: "Son of David" (v.1) = Davidic Christological frame → Wisdom crying in streets (v.20) = Christ's public ministry → "stretched out my hand" (v.24) = Christ rejected (Rom 10:21, Matt 23:37) → greed warnings (v.10-19) = Judas betraying for silver → "desolation as a whirlwind" (v.27) = Jerusalem 70 AD → "they shall call but I will not answer" (v.28) = closed probation → "dwell safely" (v.33) = Christ the refuge. Seven cascading layers from one wisdom chapter.
+
+*Psalms 22-23-24 (Structural-Timeline)*: Psalm 22 = Christ on the cross (forsaken, pierced, garments divided). Psalm 23 = Christ in the grave — the Shepherd Himself walks through the valley of the shadow of death, "Thou art with me" = the Father present even in death. Psalm 24 = Christ ascends — "Lift up your heads, O ye gates; the King of glory shall come in." Three sequential psalms = Death, Burial, Resurrection-Ascension. "From the Cross, to the Grave, to the Throne."
+
+*Genesis Creation Week (Multi-Dimensional)*: Day 1 Light = Christ the Light (John 8:12). Day 3 Firstfruits from earth = resurrection (1 Cor 15:20). Day 4 Sun = Sun of Righteousness (Mal 4:2). Day 5 Fish = fishers of men (Matt 4:19). Day 6 Image of God = Christ the express image (Heb 1:3). Day 7 Rest = "I will give you rest" (Matt 11:28). Creation IS the redemption blueprint.
+
+═══════════════════════════════════════════════════
 FIVE ASCENSIONS (Applied to the Text)
 ═══════════════════════════════════════════════════
-Process the text through ascending levels:
+Process the text through ascending levels using BOTH models:
+
+**Static Ascension (Anchored — precise, structural)**
 - **Asc-1 (Text)**: Word-level. Definitions, grammar, lexical gems.
 - **Asc-2 (Chapter)**: Chapter context. Where does this verse sit in its story arc?
 - **Asc-3 (Book)**: Book-level theme. How does this chapter serve the book's purpose?
 - **Asc-4 (Cycle)**: Which covenant cycle does this book belong to?
 - **Asc-5 (Heaven)**: Which Day-of-the-LORD horizon does this text address?
 
-Use BOTH Static (anchored, precise) and Dynamic (creative, Spirit-led) ascension.
+**Dynamic Ascension (Creative — Spirit-led, exploratory)**
+- **Asc-1 (Text)**: What surprising word or phrase leaps out when you re-read slowly?
+- **Asc-2 (Chapter)**: What freestyle connection does this chapter trigger to another passage?
+- **Asc-3 (Book)**: What overarching image or metaphor would you assign this book?
+- **Asc-4 (Cycle)**: How does the cycle's rhythm (Fall → Covenant → Sanctuary → Enemy → Restoration) play out in this text?
+- **Asc-5 (Heaven)**: What personal or devotional weight does the heaven-horizon add?
+
+Anchor first (static), then explore (dynamic). Never replace static with dynamic — use both.
 
 ═══════════════════════════════════════════════════
 FOUR EXPANSIONS
@@ -271,7 +317,7 @@ ALWAYS anchor in:
 // Room ID to code mapping for consistency
 export const ROOM_CODES: Record<string, string> = {
   // Floor 1 - Furnishing
-  sr: "SR", ir: "IR", "24": "24", br: "BR", tr: "TR", gr: "GR",
+  sr: "SR", ir: "IR", "24fps": "24FPS", br: "BR", tr: "TR", gr: "GR",
   // Floor 2 - Investigation
   or: "OR", dc: "DC", st: "ST", qr: "QR", qa: "QA",
   // Floor 3 - Freestyle
@@ -279,7 +325,7 @@ export const ROOM_CODES: Record<string, string> = {
   // Floor 4 - Next Level
   cr: "CR", dr: "DR", c6: "C6", trm: "TRm", tz: "TZ", prm: "PRm", "p||": "P‖", frt: "FRt", cec: "CEC", r66: "R66",
   // Floor 5 - Vision
-  bl: "BL", pr: "PR", "3a": "3A", feasts: "Feasts",
+  bl: "BL", pr: "PR", "3a": "3A", fe: "FE",
   // Floor 6 - Three Heavens
   "1h": "1H", "2h": "2H", "3h": "3H", jr: "JR",
   // Floor 7 - Spiritual

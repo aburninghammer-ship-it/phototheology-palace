@@ -16,10 +16,10 @@ export const CANONICAL_ROOMS: Record<string, CanonicalRoom> = {
   // Floor 1 - Furnishing
   "sr": {
     code: "sr", name: "Story Room", floor: 1, floorName: "Furnishing",
-    method: "Recall the narrative sequence as a vivid mental movie",
+    method: "Store the story as a vivid mental movie — collect scenes before you interpret them",
     signalKeywords: ["story", "narrative", "journey", "traveled", "went", "came to", "said to"],
     genreAffinity: ["narrative", "gospel"],
-    promptTemplate: "How does the narrative sequence in this passage reveal a deeper theological movement?",
+    promptTemplate: "What scenes would you store from this passage? Picture the mental movie — who is there, what happens, what is said, what is felt?",
   },
   "ir": {
     code: "ir", name: "Imagination Room", floor: 1, floorName: "Furnishing",
@@ -254,6 +254,13 @@ export const CANONICAL_ROOMS: Record<string, CanonicalRoom> = {
     signalKeywords: ["new earth", "new creation", "judgment", "second coming", "eternal", "paradise"],
     genreAffinity: ["prophecy", "apocalyptic"],
     promptTemplate: "How does the final judgment and new creation lens transform this passage's meaning?",
+  },
+  "jr": {
+    code: "jr", name: "Juice Room", floor: 6, floorName: "Three Heavens",
+    method: "Squeeze text through ALL Palace principles",
+    signalKeywords: ["juice", "squeeze", "comprehensive", "every room", "all principles"],
+    genreAffinity: ["narrative", "gospel", "epistle", "poetry", "prophecy", "apocalyptic", "wisdom", "law", "doctrinal"],
+    promptTemplate: "Squeeze this passage through every Palace room — extract every drop of meaning like an orange under a juicer.",
   },
 
   // Floor 7 - Transformation

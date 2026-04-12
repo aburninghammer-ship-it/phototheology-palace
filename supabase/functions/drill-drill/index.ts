@@ -118,7 +118,18 @@ In EACH variation, generate EXACTLY 15 questions with different focus:
 - Variation 3 QR: Emphasize cosmic/historical cycle questions
 Label each: 5 INTRA, 5 INTER, 5 PALACE.
 
-REMEMBER: "Gather up the fragments that remain, that nothing be lost." - Different principle combinations reveal different facets of truth.`;
+REMEMBER: "Gather up the fragments that remain, that nothing be lost." - Different principle combinations reveal different facets of truth.
+
+MAGNUM OPUS DEPTH (MANDATORY FOR ALL VARIATIONS):
+Every drill output must demonstrate at least 2 of these advanced Phototheology thinking patterns:
+- **Cascading Christ-discovery**: Don't stop at ONE Christ connection. Build 5+ layered connections per passage that cascade — each building on the last. Example: Proverbs 1 yields "Son of David" → Wisdom as Christ → rejected Messiah → Judas → 70 AD → covenant lawsuit → Christ as refuge. Seven layers from one chapter.
+- **Structural-timeline mapping**: Show how passage/book structures mirror Christ's ministry timeline. Pentateuch = Son → Deliverer → Sacrifice → Mission → Death-Resurrection. Psalms 22-23-24 = Death → Burial → Resurrection.
+- **Reversed-trap pattern**: When plots or schemes appear in the text, show the cosmic reversal — the cross was a trap for the trappers (Col 2:15).
+- **"What-if" shadow types**: When an OT figure fails where Christ succeeded, frame it as what Christ's story WOULD have been if He sinned.
+- **Multi-type convergence**: Show how multiple OT figures converge on one Christ-event (Moses + Jonah + Elijah = complete Christ timeline from birth to Pentecost).
+- **Sharp preaching line**: Produce at least one quotable synthesis per variation. Pattern: "He was forsaken in Psalm 22, walked through death in Psalm 23, and reigns in Psalm 24."
+
+Each variation should showcase DIFFERENT patterns from this list. These patterns should produce stunning "I never saw that before" moments.`;
       
       userPrompt = `Run a complete Drill Drill with 3 VARIATIONS on this ${subjectLabel}: "${subjectContent}"
 ${!isThoughtDrill && verseText ? `\nVerse text: "${verseText}"` : ""}

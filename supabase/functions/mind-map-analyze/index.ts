@@ -33,12 +33,12 @@ YOUR TASK: Analyze the provided text and map it comprehensively to ALL applicabl
 THE 8-FLOOR PALACE STRUCTURE (use exact IDs shown):
 
 FLOOR 1 - FURNISHING (Memory & Visualization):
-- sr (Story Room): Break the text into MEMORABLE STORY BEATS. For EACH beat show:
-  * Scene Setting: Where/when does this moment happen?
-  * Characters: Who is present and what are they doing?
-  * Tension: What conflict or question drives this moment?
-  * Resolution: How does the beat conclude or transition?
-  * Memory Hook: What vivid detail makes this unforgettable?
+- sr (Story Room): STORE the narrative as a vivid mental movie — collect scenes before interpreting. For EACH scene show:
+  * Scene Setting: Where/when does this moment happen? (Picture it vividly)
+  * Characters: Who is there and what are they doing/saying/feeling?
+  * Action: What happens in this scene? (Concrete, visual moment)
+  * Transition: How does this scene flow into the next?
+  * Memory Hook: What vivid detail makes this scene unforgettable furniture in the Palace?
 
 - ir (Imagination Room): IMMERSE in the sensory world of the text. Apply the seed to ALL 5 SENSES:
   * SIGHT: What colors, shapes, movements, facial expressions do you see in THIS text?
@@ -85,7 +85,7 @@ FLOOR 2 - INVESTIGATION (Detective Work):
   * Commentary Insight: What scholars say about this term
   Define at least 3-5 significant words!
 
-- st (Symbols/Types Room): Track SYMBOLS through Scripture using the 3-S method:
+- st (Symbols/Types Room): Track SYMBOLS through Scripture using the 3-S method. MAGNUM OPUS: Include "WHAT-IF" SHADOW TYPES — when an OT figure FAILS where Christ succeeds, frame it as what Christ's story WOULD have been if He sinned (e.g., 1 Kings 13 man of God = failed prophet, showing by contrast why Christ's obedience was essential). Also look for REVERSED-TRAP types where symbols of defeat become symbols of victory (bronze serpent on a pole = curse becoming salvation; Dagon falling before the ark = false power collapsing at mere divine presence).
   * SCOPE: Where does this symbol appear elsewhere in Scripture?
   * SIGN: What does the symbol consistently represent?
   * CHRIST-LOCUS: How does this symbol ultimately point to Christ?
@@ -134,6 +134,7 @@ FLOOR 4 - NEXT LEVEL (Christ-Centered Structure):
   * PRIEST: How is Christ interceding/mediating/atoning in THIS text?
   * KING: How is Christ ruling/judging/conquering in THIS text?
   REQUIRED: Show how Christ functions in ALL 3 offices in this text!
+  MAGNUM OPUS: Don't stop at 3 connections. Build a CASCADING CHAIN of 5-10 layered Christ connections that build on each other. Example: Proverbs 1 yields "Son of David" → Wisdom as Christ → rejected Messiah → Judas → 70 AD → covenant lawsuit → Christ as refuge. Each layer deepens the last. Dig until you produce "I never saw that before" moments.
 
 - dr (Dimensions Room): Read the text through ALL FIVE DIMENSIONS. Apply the seed to EACH:
   * LITERAL: What is the plain, historical meaning of THIS text?
@@ -180,6 +181,7 @@ FLOOR 4 - NEXT LEVEL (Christ-Centered Structure):
   * Event B: The second parallel event
   * Echoes: What similarities exist?
   * Escalations: What intensifies in the later event?
+  MAGNUM OPUS: Include STRUCTURAL-TIMELINE parallels (how books/chapter sequences mirror Christ's ministry), REVERSED-TRAP patterns (plots that backfire onto the plotters, cf. Col 2:15), and MULTI-TYPE CONVERGENCE (multiple OT figures converging on one Christ-event). Example: Moses (deliverer) + Jonah (death/resurrection) + Elijah (ascension/Spirit) = complete Christ timeline from birth to Pentecost.
 
 - frt (Fruit Room): Evaluate ALL 4 types of FRUIT from THIS text:
   * Spiritual Fruit: What love, joy, peace, patience, etc. does THIS text produce in the believer?
@@ -261,6 +263,8 @@ FLOOR 6 - THREE HEAVENS (Cycles & Horizons):
   * The Juice: What is the CORE truth in one sentence?
   * Why Essential: Why is this the irreducible heart?
   * Memorize This: What phrase captures it for memory?
+  * Sharp Preaching Line: Produce a quotable, punchy synthesis that captures the passage's deepest insight in one breath. Pattern: "[Figure/text] shows X — [Figure/text] shows Y — Christ fulfills both." Examples: "He was forsaken in Psalm 22, walked through death in Psalm 23, and reigns in Psalm 24." | "Abel's blood cries for justice. Christ's blood cries for mercy. That is escalation, not repetition."
+  REQUIRED: The preaching line must be a Magnum Opus-quality synthesis — the kind of statement a preacher remembers for years.
 
 - math (Math Room): Find NUMERICAL PATTERNS:
   * Numbers Present: What numbers appear in the text?

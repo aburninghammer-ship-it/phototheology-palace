@@ -378,9 +378,9 @@ export const ROOM_DEFINITIONS: Record<string, RoomDefinition> = {
     methodology: "Everlasting gospel, Babylon fallen, beast/image/mark warning. All doctrines converge here.",
     example: "Passover: Fear God (first angel), come out of Egypt/Babylon (second angel), don't receive the mark of the beast—receive the blood-mark of the Lamb (third angel)."
   },
-  feasts: {
-    id: "feasts",
-    code: "Feasts",
+  fe: {
+    id: "fe",
+    code: "FE",
     name: "Feasts Room",
     floor: 5,
     floorName: "Vision",
@@ -555,7 +555,7 @@ export const OUTPUT_TYPES: Record<string, OutputTypeDefinition> = {
       "Prefer UNEXPECTED angles—don't give the insight everyone knows",
       "Use one vivid image or analogy to make it stick"
     ],
-    qualityBar: "David didn't pick up five stones because he doubted—Goliath had four brothers (2 Sam 21:22). David wasn't preparing for failure. He was planning to finish the whole family."
+    qualityBar: "David didn't pick up five stones because he doubted—Goliath had four brothers (2 Sam 21:22). David wasn't preparing for failure. He was planning to finish the whole family. | Proverbs 1:17: 'No bird walks into a trap it can see — but men walked into judgment while staring directly at Wisdom Himself.' The cross was a trap for the trappers (Col 2:15). | Abel's blood cries for justice; Christ's blood cries for mercy. That is not repetition — that is escalation (Heb 12:24)."
   },
 
   commentary: {
@@ -574,7 +574,7 @@ export const OUTPUT_TYPES: Record<string, OutputTypeDefinition> = {
       "Always land on Christ (CR)—commentary that ends in history or moral advice has stopped short",
       "Don't moralize without first gospelizing—imperative follows indicative"
     ],
-    qualityBar: "See the Exodus 12:21-23 sample commentary with verse-by-verse room-tagged insights."
+    qualityBar: "Cascading Christ-discovery: Proverbs 1 yields 7+ layered connections — Son of David → Wisdom as Christ → rejected Messiah → Judas → 70 AD → covenant lawsuit → Christ as refuge. Each layer builds on the last. EVERY passage has this depth when you dig. | Commentary that stops at one Christ-mention has stopped short."
   },
 
   devotional: {
@@ -593,7 +593,7 @@ export const OUTPUT_TYPES: Record<string, OutputTypeDefinition> = {
       "Every devotional must pass the Fire Room test (moves the heart)",
       "Every devotional must pass the Fruit Room test (produces gospel fruit, not guilt)"
     ],
-    qualityBar: "See the Exodus 12 'He Sees What You Can't' devotional sample."
+    qualityBar: "'The man of God in 1 Kings 13 was sent by God, spoke truth, refused reward — then listened to a false prophet and was judged. Had Christ sinned, this would have been His end. But Christ resisted every lie — and died for us instead.' What-if shadow types make Christ's perfection vivid by contrast."
   },
 
   sparks: {
@@ -610,7 +610,7 @@ export const OUTPUT_TYPES: Record<string, OutputTypeDefinition> = {
       "Can be: cross-reference pairing, typological link, pattern, 'what if' question, sanctuary connection",
       "One spark that genuinely ignites is worth ten that fizzle"
     ],
-    qualityBar: "(ST + P‖) Hyssop applied the blood in Exodus 12. Hyssop delivered the vinegar in John 19. Same plant, two lambs. What does that say about God's attention to detail across fifteen centuries?"
+    qualityBar: "(ST + P‖) Hyssop applied the blood in Exodus 12. Hyssop delivered the vinegar in John 19. Same plant, two lambs. What does that say about God's attention to detail across fifteen centuries? | (PRm + P‖) Psalms 22-23-24 = Death → Burial → Resurrection. 'He was forsaken in Psalm 22, walked through death in Psalm 23, and reigns in Psalm 24.' Three psalms, one journey. | (C6 + TRm) The Pentateuch IS Christ's ministry timeline: Genesis=Son, Exodus=Deliverer, Leviticus=Sacrifice, Numbers=Mission, Deuteronomy=Death-Resurrection."
   },
 
   studyBuddy: {
@@ -769,6 +769,19 @@ export const QUALITY_TESTS: QualityTest[] = [
       "Intellectually interesting but emotionally flat",
       "Information without transformation",
       "Head knowledge that never descends to the heart"
+    ]
+  },
+  {
+    id: "cascade",
+    name: "The Cascade Test",
+    room: "CR + ST + P‖",
+    question: "Does this output contain multiple layered Christ connections that build on each other?",
+    passCondition: "At least 3 cascading connections where each insight opens the door to the next — not isolated mentions, but a chain of discovery.",
+    failIndicators: [
+      "Only one surface-level Christ mention",
+      "Christ connections that don't build on each other",
+      "Generic typology without specific textual grounding",
+      "Missing the 'I never saw that before' factor"
     ]
   },
   {

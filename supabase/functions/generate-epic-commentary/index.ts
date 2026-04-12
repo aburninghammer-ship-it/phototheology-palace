@@ -133,6 +133,22 @@ F. GREAT CONTROVERSY DIMENSION: Show how the passage reveals the cosmic conflict
 
 G. CHRIST IN FOUR OFFICES: Identify where in the passage Christ appears as Prophet (earthly ministry), Priest (heavenly intercession), Judge (investigative judgment from 1844), or King (second coming and eternal reign).
 
+H. CASCADING CHRIST-DISCOVERY (MAGNUM OPUS LEVEL):
+   Don't stop at one Christ connection per chapter. Build chains of 5-10 layered Christ connections that CASCADE, each building on the last. Example: Proverbs 1 yields "Son of David" (v.1) → Wisdom as Christ crying publicly (v.20) → "stretched out my hand" = Christ rejected by Israel (v.24, cf. Rom 10:21) → greed warnings = Judas betraying for silver (v.10-19) → "desolation as a whirlwind" = Jerusalem 70 AD (v.27) → covenant lawsuit = Christ as Judge → "dwell safely" = Christ as refuge (v.33). Seven layers, one chapter. EVERY chapter has this depth. Dig until you find it.
+
+I. STRUCTURAL-TIMELINE PARALLELS:
+   Show how OT books, chapter sequences, or passage structures mirror Christ's ministry timeline. The Pentateuch IS Christ: Genesis = Son (identity), Exodus = Deliverer (mission), Leviticus = Sacrifice (atonement), Numbers = Church (mission expansion), Deuteronomy = Death and Resurrection (covenant completion). The Sanctuary IS the New Testament: Altar = Gospels (death), Laver = transition (baptism), Holy Place = Acts (church mission), Most Holy = Romans–Jude (judgment/theology), Glory = Revelation (God dwelling with man). Psalms 22-23-24 = Death → Burial → Resurrection-Ascension. The Feasts = the NT calendar: Passover–Firstfruits = Gospels, Pentecost = Acts, Trumpets = Epistles, Atonement = Revelation 1–20, Tabernacles = Revelation 21–22.
+
+J. REVERSED-TRAP PATTERN:
+   When enemies plot against God's people in the passage, show the cosmic reversal. Every trap set for the righteous becomes the destroyer's own snare. The cross looked like Satan's victory — it was his destruction (Col 2:15). Dagon's head and hands broke not by attack but by the mere presence of God's ark (1 Sam 5). Haman built gallows for Mordecai and was hanged on them himself. Weave these reversals into the narration as stunning reveals.
+
+K. "WHAT-IF" SHADOW TYPES:
+   When an OT figure fails where Christ succeeds, frame it as what Christ's story WOULD have been if He had sinned. The man of God in 1 Kings 13 (sent, obedient, then deceived by a false prophet, then judged by a lion) is a shadow of the death of a failed prophet — Christ's perfect obedience means He died NOT for His own failure, but for ours. Abel is slain and his blood cries for justice; Christ is slain and His blood cries for mercy — "that is not repetition, that is escalation" (Heb 12:24).
+
+L. SHARP PREACHING LINES:
+   Produce at least one quotable synthesis per major narrative section. These should feel like the kind of line a listener remembers for years.
+   Examples: "The man of God died because he failed. Christ died because we failed." | "He was forsaken in Psalm 22, walked through death in Psalm 23, and reigns in Psalm 24." | "Solomon is the son of David speaking about wisdom; Jesus is the Son of David standing in the street as Wisdom Himself." | "They set a trap for Christ — but the only ones caught in it were the ones who set it."
+
 CRITICAL: These parallels must be woven DIRECTLY INTO the flowing cinematic narration — never gathered into a separate section, summary, or "deeper currents" block. They should feel like natural revelations arising mid-narration, creating those "I never saw that before!" moments that distinguish this commentary from all others.
 `;
 
