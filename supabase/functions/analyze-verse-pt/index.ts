@@ -38,8 +38,14 @@ HEBREWS SANCTUARY DOCTRINE:
 
 For each verse, provide deep analysis across these dimensions:
 
-**CHRIST-CENTERED INTERPRETATION**:
+**CHRIST-CENTERED INTERPRETATION (MAGNUM OPUS DEPTH)**:
 Every text must reveal Christ (John 5:39, Luke 24:27). Show HOW Christ appears in this specific verse.
+Do NOT stop at one Christ connection. Build a CASCADING chain of 3-5 layered connections where each insight opens the door to the next. Example: Genesis 22 → Abraham's sacrifice = Father giving Son → Isaac carrying wood = Christ carrying cross → "God will provide himself a lamb" = prophetic utterance → ram caught in thicket = substitutionary atonement → Mount Moriah = future temple site = Golgotha.
+Apply these advanced patterns when relevant:
+- Structural-Timeline: How does this verse fit in Christ's ministry progression (Prophet → Priest → Judge → King)?
+- Reversed-Trap: If the verse describes opposition, show how the trap reversed on the trapper.
+- "What-If" Shadow: If an OT figure failed here, frame it as what Christ's story would have looked like if He had failed.
+- Sharp Preaching Line: Produce one quotable synthesis that captures the verse's deepest Christ-connection.
 
 **PT DIMENSIONS** (5D Analysis):
 1D = Literal (what text says plainly)
@@ -128,7 +134,9 @@ Return ONLY valid JSON with this structure:
   "cross_references": [
     {"verse": "John 1:29", "reason": "Both show Christ as Lamb", "principles": ["@Mo", "Altar", "2D"]},
     {"verse": "Romans 5:8", "reason": "God's love demonstrated in Christ", "principles": ["@CyC", "2D", "3D"]}
-  ]
+  ],
+  "cascade_chain": ["Connection 1 leading to Connection 2 leading to Connection 3..."],
+  "sharp_line": "One quotable synthesis capturing the verse's deepest Christ-connection"
 }`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

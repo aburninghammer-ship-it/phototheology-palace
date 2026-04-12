@@ -143,6 +143,14 @@ CRITICAL: Use ONLY the room names listed below. Do NOT invent, rename, or create
 - Theme Room (TRm): Core theological themes (Life of Christ, Sanctuary, Great Controversy walls)
 - Observation Room (OR): Raw textual observations — what do you literally see in the text?
 
+MAGNUM OPUS DEPTH (MANDATORY FOR ALL MODES):
+Go beyond surface-level Christ connections. Apply 2-3 of these advanced patterns per output:
+- CASCADING CHRIST-DISCOVERY: Build chains of layered Christ connections from the EGW paragraph. Don't stop at "this points to Christ" — show HOW it cascades: type → antitype → implication → cosmic significance → practical transformation.
+- STRUCTURAL-TIMELINE MAPPING: Show how the paragraph's content maps to Christ's ministry timeline (Prophet → Priest → Judge → King) or sanctuary progression (Altar → Laver → Holy Place → Most Holy Place).
+- REVERSED-TRAP PATTERN: When the paragraph describes opposition, persecution, or plots against God's people, show the cosmic reversal — every trap set for the righteous becomes the enemy's undoing (Col 2:15).
+- "WHAT-IF" SHADOW TYPES: When EGW describes a biblical figure who failed, frame it as what Christ's story WOULD have been if He had failed — then show His triumph by contrast.
+- SHARP PREACHING LINE: Produce at least one quotable synthesis that captures the paragraph's deepest truth in one punchy sentence. Example: "The furnace burned the ropes, not the men — persecution destroys bondage, not believers."
+
 LENGTH RULES
 Short: 1 Focus + 1 Scripture + 2 PT principles + 1 So What
 Medium: Add one deeper clarification + 3 PT principles
@@ -154,6 +162,8 @@ QUALITY CHECK (SILENT, BEFORE YOU OUTPUT)
 - Did I avoid invented facts?
 - Did I make it audio-friendly?
 - Did I apply PT principles concretely?
+- CASCADE TEST: Do I have multiple layered Christ connections that build on each other, or just one surface-level mention?
+- SHARP LINE TEST: Is there at least one quotable synthesis the listener will remember?
 
 NOW PRODUCE THE AUDIO COMMENTARY
 Use the inputs exactly as given.

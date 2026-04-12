@@ -10,47 +10,55 @@ export const SCRIPT_STORY_ROOM = `Welcome to the Story Room. I am Professor Ashw
 
 [pause]
 
-Before we go any further, I need you to understand something that will reshape the way you approach the Bible for the rest of your life. The Bible is primarily a book of stories. Before it is a book of doctrines, before it is a book of prophecies, before it is a book of commandments, it is a collection of narratives. Creation, fall, flood, exodus, kingdom, exile, incarnation, crucifixion, resurrection, and restoration. These are not decorations on the surface of theology. They are theology itself. God chose to reveal Himself through stories because stories are the most powerful delivery system for truth that has ever existed.
+Before we go any further, I need you to understand something that will reshape the way you approach the Bible for the rest of your life. The Story Room is FIRST because story is the FOUNDATION. The Bible is primarily a book of stories. Before it is a book of doctrines, before it is a book of prophecies, before it is a book of commandments, it is a collection of narratives. Creation, fall, flood, exodus, kingdom, exile, incarnation, crucifixion, resurrection, and restoration. These are not decorations on the surface of theology. They are theology itself. God chose to reveal Himself through stories because stories are the most powerful delivery system for truth that has ever existed.
 
 [long pause]
 
-Think about it. When Jesus wanted to teach the deepest truths about the Kingdom of God, He did not hand out a systematic theology textbook. He told stories. A sower went out to sow. A man had two sons. A king prepared a wedding feast. A woman lost a coin. A merchant found a pearl. Why? Because stories bypass the intellect and land in the soul. They carry doctrine inside them the way a seed carries a tree. And the Story Room is where you learn to collect those seeds.
+Think about it. When Jesus wanted to teach the deepest truths about the Kingdom of God, He did not hand out a systematic theology textbook. He told stories. A sower went out to sow. A man had two sons. A king prepared a wedding feast. A woman lost a coin. A merchant found a pearl. Why? Because stories bypass the intellect and land in the soul. They carry doctrine inside them the way a seed carries a tree. And the Story Room is where you learn to collect those seeds and store them.
 
 [pause]
 
-Now here is the principle that governs everything we do in this room. What you can see, you can remember. And what you can remember, you can teach. The human mind does not naturally retain abstract information. But it retains vivid images with extraordinary power. You may have forgotten the grocery list you wrote last week, but you can still describe the plot of a movie you saw ten years ago. Why? Because the movie played as a sequence of images, and images stick. The Story Room takes that truth and applies it to Scripture. You are going to turn every Bible story into a vivid mental movie, a sequence of concrete, visual scenes that play in your mind on command.
+Now here is the principle that governs everything we do in this room. The purpose of the Story Room is storage through visualization. Let me say that again. Storage through visualization. You are here to collect biblical stories and store them as vivid mental movies in your permanent memory. You are not here to interpret. You are not here to theologize. You are here to collect and store. Think of the entire Palace as a great house. The stories you collect here are the furniture. A sparsely furnished Palace limits you. There is nothing to work with in the rooms above. But a richly furnished Palace expands you exponentially. The more stories you store, the more connections form naturally between them, and the more raw material you have for every technique on every floor.
+
+[pause]
+
+Here is the critical rule. Store stories BEFORE you understand them. Collect first, interpret later. Like a detective gathering witness statements at a crime scene, you log each testimony without cross-examining it. You preserve it in vivid detail. Later, in higher rooms, you will pull these stories out, compare them, and link them to Christ. But you cannot analyze what you cannot recall. And you cannot recall what you never stored.
 
 [long pause]
 
-Let me show you how this works with a story most people think they know but have never truly seen. The story of Joseph. Now, most people could tell you the basics. Joseph had a colorful coat, his brothers were jealous, he ended up in Egypt, he interpreted dreams, he became powerful. But that is a summary, not a movie. A movie has scenes. Each scene has a dominant image. And those images are what lock the story into your permanent memory.
-
-[pause]
-
-Scene one. Picture a young man standing in a field, and his father drapes across his shoulders a coat that blazes with color. Not just any coat. This is a coat so vivid it practically glows. Red, purple, gold, blue. See the brothers standing at a distance, their faces dark with envy. That is Genesis chapter thirty-seven, verses three and four: Now Israel loved Joseph more than all his children, because he was the son of his old age, and he made him a coat of many colors. And when his brethren saw that their father loved him more than all his brethren, they hated him, and could not speak peaceably unto him.
-
-[pause]
-
-Scene two. A dark pit. Joseph has been stripped of his coat and thrown into an empty cistern. Picture him at the bottom, looking up at a circle of sky, hearing his brothers arguing above about what to do with him. Feel the cold stone walls. Smell the damp earth. Genesis chapter thirty-seven verse twenty-four: And they took him, and cast him into a pit, and the pit was empty, there was no water in it.
-
-[pause]
-
-Scene three. A caravan of Ishmaelite traders moving across the desert, camels loaded with spices. Joseph is pulled from the pit and sold. Coins change hands. Twenty pieces of silver. The brothers hold the money while Joseph disappears into the dust of the horizon. Genesis thirty-seven verse twenty-eight: Then there passed by Midianites merchantmen, and they drew and lifted up Joseph out of the pit, and sold Joseph to the Ishmaelites for twenty pieces of silver, and they brought Joseph into Egypt.
-
-[pause]
-
-Scene four. A prison cell. Joseph has been falsely accused by Potiphar's wife. He sits in chains. But even here, notice the detail the Bible gives us. Genesis chapter thirty-nine verse twenty-one: But the Lord was with Joseph, and shewed him mercy, and gave him favour in the sight of the keeper of the prison. The prison is dark, but God's presence is there. See a faint glow around Joseph in that cell. That is the visual.
-
-[pause]
-
-Scene five. A palace throne room. Joseph stands before Pharaoh in royal garments, a gold chain around his neck, a signet ring on his finger. The man who was in the pit is now second in command of the most powerful nation on earth. Genesis chapter forty-one verses forty-one through forty-two: And Pharaoh said unto Joseph, See, I have set thee over all the land of Egypt. And Pharaoh took off his ring from his hand, and put it upon Joseph's hand, and arrayed him in vestures of fine linen, and put a gold chain about his neck.
-
-[pause]
-
-Five scenes. Coat, pit, caravan, prison, palace. That is the entire arc of Joseph's life compressed into five vivid images. You can now recall the story of Joseph by simply playing those five frames in your mind, like flipping through a photo album. And here is why this matters. Later, in rooms higher up in the Palace, you will pull this story out and examine it for Christological meaning. You will see that Joseph's betrayal by his brothers foreshadows Christ's betrayal. The twenty pieces of silver echo the thirty pieces Judas received. The false accusation mirrors the false accusations at Christ's trial. The prison represents the tomb. The exaltation to Pharaoh's right hand points to Christ seated at the right hand of the Father. But you cannot make those connections if you do not have the story stored first. The Story Room comes before the interpretation rooms because you cannot analyze what you cannot recall.
+What you can see, you can remember. And what you can remember, you can teach. The human mind does not naturally retain abstract information. But it retains vivid images with extraordinary power. You may have forgotten the grocery list you wrote last week, but you can still describe the plot of a movie you saw ten years ago. Why? Because the movie played as a sequence of scenes, and scenes stick. The Story Room takes that truth and applies it to Scripture. You are going to turn every Bible story into a vivid mental movie, a sequence of concrete visual scenes that play in your mind on command. Each scene captures who was there, what happened, what was said, and what was felt.
 
 [long pause]
 
-Now let me walk you through another story with the same technique. David and Goliath. This story lives in First Samuel chapter seventeen, and most people reduce it to a single moment: a boy throws a rock at a giant. But the movie has far more frames than that.
+Let me show you how this works with a story most people think they know but have never truly stored. The story of Joseph. Now, most people could tell you the basics. Joseph had a colorful coat, his brothers were jealous, he ended up in Egypt, he interpreted dreams, he became powerful. But that is a summary, not a movie. A movie has scenes. Each scene has a dominant image. And those images are what lock the story into your permanent memory. You are about to furnish your Palace with the Joseph story.
+
+[pause]
+
+Scene one. Picture a young man standing in a field, and his father drapes across his shoulders a coat that blazes with color. Not just any coat. This is a coat so vivid it practically glows. Red, purple, gold, blue. See the brothers standing at a distance, their faces dark with envy. That is Genesis chapter thirty-seven, verses three and four: Now Israel loved Joseph more than all his children, because he was the son of his old age, and he made him a coat of many colors. And when his brethren saw that their father loved him more than all his brethren, they hated him, and could not speak peaceably unto him. Store that scene. See the colors. Feel the jealousy.
+
+[pause]
+
+Scene two. A dark pit. Joseph has been stripped of his coat and thrown into an empty cistern. Picture him at the bottom, looking up at a circle of sky, hearing his brothers arguing above about what to do with him. Feel the cold stone walls. Smell the damp earth. Genesis chapter thirty-seven verse twenty-four: And they took him, and cast him into a pit, and the pit was empty, there was no water in it. Store that scene. The circle of sky. The cold walls.
+
+[pause]
+
+Scene three. A caravan of Ishmaelite traders moving across the desert, camels loaded with spices. Joseph is pulled from the pit and sold. Coins change hands. Twenty pieces of silver. The brothers hold the money while Joseph disappears into the dust of the horizon. Genesis thirty-seven verse twenty-eight: Then there passed by Midianites merchantmen, and they drew and lifted up Joseph out of the pit, and sold Joseph to the Ishmaelites for twenty pieces of silver, and they brought Joseph into Egypt. Store that scene. The dust. The coins. The disappearing figure.
+
+[pause]
+
+Scene four. A prison cell. Joseph has been falsely accused by Potiphar's wife. He sits in chains. But even here, notice the detail the Bible gives us. Genesis chapter thirty-nine verse twenty-one: But the Lord was with Joseph, and shewed him mercy, and gave him favour in the sight of the keeper of the prison. The prison is dark, but God's presence is there. See a faint glow around Joseph in that cell. Store that scene. Darkness, chains, and yet a glow.
+
+[pause]
+
+Scene five. A palace throne room. Joseph stands before Pharaoh in royal garments, a gold chain around his neck, a signet ring on his finger. The man who was in the pit is now second in command of the most powerful nation on earth. Genesis chapter forty-one verses forty-one through forty-two: And Pharaoh said unto Joseph, See, I have set thee over all the land of Egypt. And Pharaoh took off his ring from his hand, and put it upon Joseph's hand, and arrayed him in vestures of fine linen, and put a gold chain about his neck. Store that final scene. Gold chain. Signet ring. Total exaltation.
+
+[pause]
+
+Five scenes. Coat, pit, caravan, prison, palace. That is the entire arc of Joseph's life stored as five vivid images. You can now replay the story of Joseph by simply running those five frames in your mind, like flipping through a photo album. And here is why this matters. Later, in rooms higher up in the Palace, you will pull this story out and examine it for Christological meaning. You will see that Joseph's betrayal by his brothers foreshadows Christ's betrayal. The twenty pieces of silver echo the thirty pieces Judas received. The false accusation mirrors the false accusations at Christ's trial. The prison represents the tomb. The exaltation to Pharaoh's right hand points to Christ seated at the right hand of the Father. But you cannot make those connections if you do not have the story stored first. The Story Room comes before the interpretation rooms because the stories are the raw material. No furniture, no Palace.
+
+[long pause]
+
+Now let me walk you through another story to store. David and Goliath. This story lives in First Samuel chapter seventeen, and most people reduce it to a single moment: a boy throws a rock at a giant. But the movie has far more scenes than that. Let us furnish the Palace with all of them.
 
 [pause]
 
@@ -66,7 +74,7 @@ Scene three. David stands before King Saul, who tries to dress him in royal armo
 
 [pause]
 
-Scene four. A brook. David kneels beside it and selects five smooth stones. Not one. Five. Why five? We will talk about that in the Gems Room, but for now, see the image. David's hand reaching into cool running water, fingers closing around five flat stones, and placing them in his shepherd's bag. First Samuel seventeen verse forty.
+Scene four. A brook. David kneels beside it and selects five smooth stones. Not one. Five. Why five? We will talk about that in the Gems Room, but for now, store the image. David's hand reaching into cool running water, fingers closing around five flat stones, and placing them in his shepherd's bag. First Samuel seventeen verse forty.
 
 [pause]
 
@@ -78,19 +86,19 @@ Scene six. David standing over the fallen giant, drawing Goliath's own sword, an
 
 [pause]
 
-Six scenes. Valley, shepherd arriving, armor refused, brook, sling, triumph. The entire story plays like a film in your mind. You own it now. It is not information. It is experience stored as images.
+Six scenes stored. Valley, shepherd arriving, armor refused, brook, sling, triumph. The entire story now lives in your Palace as a piece of furniture you can pull out anytime. It is not information sitting in a book. It is experience stored as vivid images, ready to be used by every room above.
 
 [long pause]
 
-Let me give you one more walkthrough, because I want you to see how this technique works across different types of stories. Let us take the story of Daniel. Not just one episode, but the whole sweep of the book.
+Let me give you one more walkthrough, because I want you to see how this works across different types of stories. Let us store the story of Daniel. Not just one episode, but the whole sweep of the book.
 
 [pause]
 
-Scene one. A royal banquet table in Babylon. Rich food, wine, delicacies. A young Hebrew man pushes the plate away. Daniel chapter one verse eight: But Daniel purposed in his heart that he would not defile himself with the portion of the king's meat, nor with the wine which he drank. See the refusal. See the resolve in his face. The first thing you know about Daniel is that he draws a line.
+Scene one. A royal banquet table in Babylon. Rich food, wine, delicacies. A young Hebrew man pushes the plate away. Daniel chapter one verse eight: But Daniel purposed in his heart that he would not defile himself with the portion of the king's meat, nor with the wine which he drank. See the refusal. See the resolve in his face. The first thing you store about Daniel is that he draws a line.
 
 [pause]
 
-Scene two. A furnace. Not Daniel this time, but his three friends. The fire is so intense that the soldiers who throw them in are killed by the heat. But look inside the furnace. Daniel chapter three verse twenty-five: Lo, I see four men loose, walking in the midst of the fire, and they have no hurt, and the form of the fourth is like the Son of God. Four figures walking calmly in an inferno. The fire has burned their ropes but not their skin. That fourth figure is unmistakable.
+Scene two. A furnace. Not Daniel this time, but his three friends. The fire is so intense that the soldiers who throw them in are killed by the heat. But look inside the furnace. Daniel chapter three verse twenty-five: Lo, I see four men loose, walking in the midst of the fire, and they have no hurt, and the form of the fourth is like the Son of God. Four figures walking calmly in an inferno. The fire has burned their ropes but not their skin. That fourth figure is unmistakable. Store that scene.
 
 [pause]
 
@@ -106,15 +114,15 @@ Scene five. A throne room in heaven. Daniel chapter seven verses nine and ten: I
 
 [pause]
 
-Five scenes. Refusal at the table, furnace with four figures, lions' den, beasts from the sea, and the heavenly throne. The entire book of Daniel compressed into a mental film. And every one of those scenes will be activated again when you reach the higher floors. The furnace scene will become a Christological study. The beast vision will become a prophetic map. The throne scene will connect to Revelation chapters four and five. But first, you collect the stories. You store the films. You furnish the palace.
+Five scenes stored. Refusal at the table, furnace with four figures, lions' den, beasts from the sea, and the heavenly throne. The entire book of Daniel now sits in your Palace as furniture. And every one of those scenes will be activated again when you reach the higher floors. The furnace scene will become a Christological study. The beast vision will become a prophetic map. The throne scene will connect to Revelation chapters four and five. But first, you collect the stories. You store the scenes. You furnish the Palace. That is always the order.
 
 [long pause]
 
-Now I want to give you a practical framework for building your story library across the entire Bible. Think of the Bible as having ten major story arcs. I call them the Ten Reels.
+Now I want to give you a practical framework for building your story library across the entire Bible. Think of the Bible as having ten major story arcs. I call them the Ten Reels. Each reel is a section of your Palace that needs to be furnished with vivid scenes. The more reels you fill, the more capacity your Palace has. And here is the exponential secret: as the furniture accumulates, connections between stories begin forming naturally. You do not force them. They emerge. A richly furnished Palace thinks for you.
 
 [pause]
 
-Reel one. Creation to the Fall. Genesis one through three. The movie starts with light exploding over dark water, a garden planted, a man and woman made in God's image, a serpent whispering, a bite of fruit, and a flaming sword barring the gate. Five or six frames.
+Reel one. Creation to the Fall. Genesis one through three. The movie starts with light exploding over dark water, a garden planted, a man and woman made in God's image, a serpent whispering, a bite of fruit, and a flaming sword barring the gate. Five or six scenes to store.
 
 [pause]
 
@@ -154,47 +162,47 @@ Reel ten. The Epistles and Revelation. Letters carried by runners to scattered c
 
 [pause]
 
-Ten Reels. The entire Bible. Each reel contains dozens of individual stories, and each story contains multiple scenes. Your job in the Story Room is to populate every reel with vivid, precise, visual frames until you can play the entire Bible as a mental movie from Genesis to Revelation.
+Ten Reels. The entire Bible. Each reel contains dozens of individual stories, and each story contains multiple scenes. Your job in the Story Room is to populate every reel with vivid, precise, visual scenes until your Palace is richly furnished from Genesis to Revelation. And remember: the more furniture you store, the more capacity you gain. More stories equals exponentially more connections. A Palace furnished with ten stories can do a little. A Palace furnished with a hundred stories can do wonders. A Palace furnished with a thousand scenes becomes a living, breathing library that practically thinks for itself.
 
 [long pause]
 
-Now let me give you your training exercises. Exercise one. Pick one reel from the ten I just described. Start with Reel one if you like, Creation to Fall. Go through each chapter and create one vivid image per major story. For Genesis one, picture an explosion of light over dark water. For Genesis two, picture a garden with a river splitting into four branches and a man being formed from dust, God breathing into his nostrils. For Genesis three, picture a serpent coiled around a tree, the fruit in a woman's hand, a man eating beside her, fig leaves being sewn together, and a flaming sword barring a gate. Write down each image. Describe it in one or two sentences. Then close your eyes and play the sequence. If you can see it, you will remember it.
+Now let me give you your training exercises. Exercise one. Pick one reel from the ten I just described. Start with Reel one if you like, Creation to Fall. Go through each chapter and store one vivid scene per major story. For Genesis one, picture an explosion of light over dark water. For Genesis two, picture a garden with a river splitting into four branches and a man being formed from dust, God breathing into his nostrils. For Genesis three, picture a serpent coiled around a tree, the fruit in a woman's hand, a man eating beside her, fig leaves being sewn together, and a flaming sword barring a gate. Write down each scene. Describe it in one or two sentences. Then close your eyes and replay the sequence. If you can see it, you own it. It is now furniture in your Palace.
 
 [pause]
 
-Exercise two. The Ten-Story Sprint. Pick ten Bible stories you already know reasonably well. Close your eyes and play each one as a mental film, from first scene to last, in order. Creation, Fall, Flood, Abraham's call, the binding of Isaac, Jacob's ladder, Joseph's rise, the Exodus, David and Goliath, the crucifixion. Ten films. Sprint through them as fast as you can while keeping the images vivid. Time yourself. The first time it might take you five minutes. With practice, you should be able to sprint through ten stories in two minutes.
+Exercise two. The Ten-Story Sprint. Pick ten Bible stories you already know reasonably well. Close your eyes and replay each one as a mental film, from first scene to last, in order. Creation, Fall, Flood, Abraham's call, the binding of Isaac, Jacob's ladder, Joseph's rise, the Exodus, David and Goliath, the crucifixion. Ten films. Sprint through them as fast as you can while keeping the scenes vivid. Time yourself. The first time it might take you five minutes. With practice, you should be able to sprint through ten stories in two minutes. Every sprint adds furniture to your Palace.
 
 [pause]
 
-Exercise three. Use the Training Drills feature in the Phototheology app. The app will prompt you with a story name, and you recall it as a sequence of scenes. The app tracks your speed and accuracy over time. You will see your recall time drop as your mental movie library expands. The goal is to make story recall automatic. When someone says Joseph, your mind should instantly start playing the coat, pit, caravan, prison, palace sequence without conscious effort.
+Exercise three. Use the Training Drills feature in the Phototheology app. The app will prompt you with a story name, and you recall it as a sequence of scenes. The app tracks your speed and accuracy over time. You will see your recall time drop as your mental movie library expands. The goal is to make story recall automatic. When someone says Joseph, your mind should instantly start replaying the coat, pit, caravan, prison, palace sequence without conscious effort. That is a well-furnished Palace at work.
 
 [pause]
 
-Exercise four. The Retell Challenge. This is where the Story Room connects to real life. Take one story you have filmed in your mind and retell it to someone, a friend, a child, a study group member. Do not read from the Bible. Tell the story from the movie in your head. Describe what you see. Make them see it. If your listener's eyes widen, if they lean in, if they say tell me what happened next, you know your mental film is working. The ability to retell Bible stories vividly from memory is one of the most powerful teaching tools you will ever possess.
+Exercise four. The Retell Challenge. This is where the Story Room connects to real life. Take one story you have stored in your Palace and retell it to someone, a friend, a child, a study group member. Do not read from the Bible. Tell the story from the movie in your head. Describe what you see. Make them see it. If your listener's eyes widen, if they lean in, if they say tell me what happened next, you know your mental film is working. The ability to retell Bible stories vividly from memory is one of the most powerful teaching tools you will ever possess.
 
 [pause]
 
-Exercise five. The Study Buddy AI in the app can quiz you on story sequences and help you identify gaps in your mental library. Tell it which reel you are working on, and it will ask you questions like, What happened between Joseph being sold and Joseph being imprisoned? Or, What are the five major scenes of the Exodus story? Use it as your training partner.
+Exercise five. The Study Buddy AI in the app can quiz you on story sequences and help you identify gaps in your mental library. Tell it which reel you are working on, and it will ask you questions like, What happened between Joseph being sold and Joseph being imprisoned? Or, What are the five major scenes of the Exodus story? Use it as your training partner to find the empty shelves in your Palace and fill them.
 
 [long pause]
 
-Let me close with something important. The Story Room is not glamorous. It is not the room where you make brilliant theological discoveries or uncover hidden prophetic patterns. That comes later, in higher rooms on higher floors. The Story Room is the foundation. It is the raw material. It is the brick and mortar. And if you skip it, if you rush past the stories to get to the advanced techniques, your palace will be built on sand.
+Let me close with something important. The Story Room is not glamorous. It is not the room where you make brilliant theological discoveries or uncover hidden prophetic patterns. That comes later, in higher rooms on higher floors. The Story Room is the foundation. It is the raw material. The stories you store here are the furniture of your Palace. And if you skip this room, if you rush past the stories to get to the advanced techniques, your Palace will be empty. You will have rooms full of methods but nothing to apply them to.
 
 [pause]
 
-Think of it this way. A detective cannot build a case without witness statements. A film director cannot edit a movie without footage. A chef cannot cook a meal without ingredients. The stories of Scripture are your witness statements, your footage, your ingredients. Collect them. Film them. Store them. Because every single room above this one will reach down into the Story Room and pull out what you have stored here.
+Think of it this way. A detective cannot build a case without witness statements. A film director cannot edit a movie without footage. A chef cannot cook a meal without ingredients. The stories of Scripture are your witness statements, your footage, your ingredients. Collect them. Store them as vivid scenes. Furnish every corner of the Palace. Because every single room above this one will reach down and pull out what you have stored here.
 
 [pause]
 
-The Bible has over one thousand one hundred and eighty-nine chapters. It contains hundreds of stories, ranging from massive multi-chapter epics to single-verse vignettes. Your goal is not to memorize every word. Your goal is to have a mental movie for every significant narrative in Scripture. A movie you can play, pause, rewind, and retell at any time.
+The Bible has over one thousand one hundred and eighty-nine chapters. It contains hundreds of stories, ranging from massive multi-chapter epics to single-verse vignettes. Your goal is not to memorize every word. Your goal is to store a vivid mental movie for every significant narrative in Scripture. A movie you can replay, pause, rewind, and retell at any time. Each story you store is another piece of furniture. And the more furniture your Palace holds, the more capacity it has for everything that follows.
 
 [pause]
 
-That is the power of the Story Room. It turns the Bible from a book you occasionally read into a film library you permanently carry. The stories live in you. They are available on demand, for teaching, for encouragement, for worship, and for every room that awaits you in the floors above.
+That is the power of the Story Room. Storage through visualization. It turns the Bible from a book you occasionally read into a film library you permanently carry. The stories live in you. They are available on demand, for teaching, for encouragement, for worship, and as the raw material for every room that awaits you in the floors above.
 
 [pause]
 
-I am Professor Ashworth. This has been the Story Room. Now go and build your library.`;
+I am Professor Ashworth. This has been the Story Room. Now go and furnish your Palace.`;
 
 export const SCRIPT_IMAGINATION_ROOM = `Welcome to the Imagination Room. I am Professor Danvers, and today I am going to teach you how to step inside the Bible.
 
@@ -2538,9 +2546,53 @@ In the book of Esther, God's name is never mentioned. Not once in the entire boo
 
 I want to leave you with this principle. When you read any passage of Scripture and you cannot find Christ, do not conclude that He is absent. Conclude that you have not looked deep enough. Go back. Read it again. Ask the Holy Spirit to open your eyes. He is there. He is always there. The Concentration Room is not about clever tricks or theological acrobatics. It is about seeing what was always intended to be seen.
 
+[long pause]
+
+Now let me teach you the advanced technique that separates good Bible students from masters. I call it Cascading Christ-Discovery, and it is the Magnum Opus level of the Concentration Room.
+
 [pause]
 
-Every time you open your Bible, before you analyze genre, before you check the timeline, before you look for patterns, before you do anything else, ask one question: Where is Christ in this passage? Start there. Always start there. Because if you find Christ, everything else falls into place. And if you miss Christ, nothing else matters.
+Most students find one Christ connection in a passage and stop. That is good. But it is not mastery. Mastery is finding five, ten, even fifteen Christ connections in a single passage, each one building on the last like links in a golden chain. Let me show you how this works with Proverbs chapter one, a passage most people would never think to search for Christ.
+
+[pause]
+
+Start with the very first verse. The Proverbs of Solomon, the son of David, king of Israel. Son of David. That is a Messianic title. Matthew opens his Gospel by calling Jesus the Son of David. Solomon is the wise king, but Christ is the Wisdom of God incarnate. That is your first link.
+
+[pause]
+
+Now verse twenty. Wisdom cries aloud in the streets. She raises her voice in the open squares. That is Christ. John chapter seven, verse thirty-seven: Jesus stood and cried out, saying, If any man thirst, let him come unto me, and drink. Wisdom crying in public is Christ's public ministry. Second link, built on the first.
+
+[pause]
+
+Verse twenty-four. Because I have called, and ye refused. I have stretched out my hand, and no man regarded. Stretched out my hand. That is the language of the rejected Messiah. Christ stretched out His hands on the cross, and Israel refused. Third link.
+
+[pause]
+
+Verse nineteen. The greed and treachery described in the chapter points to Judas, who betrayed Christ for thirty pieces of silver. Fourth link. Verse twenty-six. The desolation that follows rejection points to 70 AD, when Jerusalem was destroyed because they rejected Wisdom incarnate. Fifth link.
+
+[pause]
+
+Verse thirty-three. But whoso hearkeneth unto me shall dwell safely. Christ as the ultimate refuge. Psalm ninety-one. He that dwelleth in the secret place of the most High. Sixth link.
+
+[pause]
+
+Six cascading Christ connections from Proverbs chapter one. A passage most people read as generic wisdom advice. That is Cascading Christ-Discovery. Each insight opens the door to the next.
+
+[pause]
+
+Here is another advanced pattern. I call it Structural-Timeline Mapping. The Pentateuch is not just five books. It is Christ's ministry timeline. Genesis reveals His identity as the Son. Exodus shows Him as the Deliverer on mission. Leviticus presents Him as the Sacrifice making atonement. Numbers pictures the church age and mission. Deuteronomy dramatizes His death and resurrection, the covenant completed. When you see the Pentateuch this way, the Old Testament stops being ancient history and becomes a five-act portrait of Christ.
+
+[pause]
+
+One more. Psalms twenty-two, twenty-three, and twenty-four. Read them in sequence. Psalm twenty-two is the cross. My God, My God, why hast thou forsaken me. Psalm twenty-three is the journey through death. Yea, though I walk through the valley of the shadow of death. Psalm twenty-four is the resurrection and ascension. Lift up your heads, O ye gates, and the King of glory shall come in. Death, burial, resurrection. Three consecutive Psalms telling one story. He was forsaken in Psalm twenty-two, walked through death in Psalm twenty-three, and reigns in Psalm twenty-four.
+
+[pause]
+
+That last sentence is what I call a Sharp Preaching Line. Every deep study should produce at least one sentence so precise, so vivid, that the listener could repeat it from memory a week later. He was forsaken in twenty-two, walked through death in twenty-three, and reigns in twenty-four. That is a sentence worth owning.
+
+[long pause]
+
+Every time you open your Bible, before you analyze genre, before you check the timeline, before you look for patterns, before you do anything else, ask one question: Where is Christ in this passage? Start there. Always start there. Because if you find Christ, everything else falls into place. And if you miss Christ, nothing else matters. And once you find Him, do not stop. Cascade. Build the chain. Let each discovery open the next door. That is the Magnum Opus level of Bible study.
 
 [pause]
 
@@ -3659,1051 +3711,1420 @@ I am Professor Bloom. This has been the Fruit Room, the final room on Floor Four
 
 // ─── FLOOR 5: VISION ─────────────────────────────────────────────────────
 
-export const SCRIPT_BLUE_ROOM = `Welcome to the Blue Room. I am Professor Temple, your Sanctuary Guide, and this room is the architectural blueprint of all salvation history. Everything you have learned in the Palace so far, every story, every symbol, every pattern, every Christ-centered connection, finds its structural home here. The sanctuary is not a piece of ancient furniture trivia. It is the single most comprehensive visual model of the plan of redemption in the entire Bible.
+export const SCRIPT_BLUE_ROOM = `Welcome to the Blue Room. I am Professor Temple, Sanctuary Scholar, and you have just stepped into the most architecturally significant room in the entire Phototheology Palace.
 
 [pause]
 
-Let me ground this with authority. Hebrews chapter eight verse five says that Moses was admonished of God when he was about to make the tabernacle, for, See, saith he, that thou make all things according to the pattern showed to thee in the mount. God did not give Moses a suggestion. He gave him a pattern. A blueprint. An exact architectural rendering of something that already existed in heaven. Every measurement, every material, every color, every piece of furniture was deliberately chosen to communicate theological truth. Nothing was decorative. Nothing was accidental. The sanctuary is heaven's curriculum made visible on earth.
-
-[long pause]
-
-Now I want to walk you through this structure piece by piece, and I want you to see not just furniture but Christ. Because Colossians chapter two verse seventeen tells us that these things are a shadow of things to come, but the body is of Christ. The sanctuary is a shadow. Christ is the substance. And when you understand the shadow, the substance becomes breathtakingly vivid.
-
-[pause]
-
-We begin at the gate. The outer courtyard has one entrance. Not two. Not four. One. And that gate faced east, so that anyone entering had to walk westward, toward the setting sun, symbolically moving away from sun worship and toward the true God. Jesus said in John chapter fourteen verse six: I am the way, the truth, and the life. No man cometh unto the Father but by me. One gate. One way. One entrance into the presence of God. The gate was made of blue, purple, scarlet, and white linen, four colors representing, respectively, Christ's divinity, His royalty, His blood sacrifice, and His righteousness. You have not even stepped inside yet, and already the sanctuary is preaching Christ.
-
-[pause]
-
-The first piece of furniture you encounter inside the courtyard is the Altar of Burnt Offering. This was the largest piece of furniture in the entire sanctuary complex. It was made of acacia wood overlaid with bronze. It had four horns on its corners. And upon it, the sacrificial animals were slain and burned. Every morning and every evening, a lamb was offered on this altar. Every single day, without exception, blood was shed here.
-
-[pause]
-
-What does this represent? The cross. This is Calvary. First Corinthians chapter five verse seven makes it explicit: For even Christ our passover is sacrificed for us. The altar is the place of substitutionary death. The animal died so the sinner could live. Christ died so you could live. Without this altar, you cannot proceed further into the sanctuary. Without the cross, you cannot proceed further into salvation. The altar is the non-negotiable starting point.
-
-[pause]
-
-Notice the placement. It is the first thing you encounter. Not the last. Not somewhere in the middle. The first. This tells you that the cross is not an advanced doctrine for mature Christians. It is the entry point. It is where everyone begins. Romans chapter five verse eight: But God commendeth his love toward us, in that, while we were yet sinners, Christ died for us. Before you were cleaned up, before you understood theology, before you memorized a single verse, the altar was already burning. The cross was already established. Grace meets you at the door.
+If you remember, Floor Five is called the Vision Floor. This is where we lift the telescope and see how local texts fit into God's master plan. And there is no better place to begin than the sanctuary, because the sanctuary is not just a room in the Palace. It is the Rosetta Stone of theology. It is the single structure that unlocks every doctrine, every prophecy, every cycle, and every hope in Scripture. If you understand the sanctuary, you understand the Bible. If you miss the sanctuary, you will wander through theology like a person in a dark building, bumping into truths but never seeing how they connect.
 
 [long pause]
 
-After the altar, you come to the Laver. This was a large bronze basin filled with water. The priests were required to wash their hands and feet here before entering the Holy Place. Exodus chapter thirty verses nineteen through twenty-one says they shall wash their hands and their feet thereat, when they go into the tabernacle of the congregation, they shall wash with water, that they die not. This was not optional hygiene. This was a life-or-death requirement.
+Let me begin with the foundational command. In Exodus chapter twenty-five, verse eight, God says to Moses: Let them make me a sanctuary, that I may dwell among them. Notice the purpose. The sanctuary is not primarily about rituals or rules. It is about God's desire to live with His people. The entire redemptive plan from Genesis to Revelation is the story of God closing the distance between Himself and the human family. In Eden, God walked with Adam in the cool of the day. Sin broke that intimacy. The sanctuary was God's architectural declaration that He would not give up. He would build a structure that mapped the journey back to His presence.
 
 [pause]
 
-The Laver represents baptism and ongoing sanctification. Titus chapter three verse five says: Not by works of righteousness which we have done, but according to his mercy he saved us, by the washing of regeneration, and renewing of the Holy Ghost. The washing of regeneration. That is the Laver. You come to the altar first, the cross, where your guilt is dealt with. Then you come to the Laver, where your life is cleansed. Justification at the altar. Sanctification at the Laver. The order matters. You do not clean yourself up to come to the cross. You come to the cross, and then the washing begins.
-
-[pause]
-
-Ephesians chapter five verse twenty-six adds another dimension: That he might sanctify and cleanse it with the washing of water by the word. The Laver is not just baptismal water. It is also the Word of God that continually cleanses the believer. Every time you open your Bible, you are standing at the Laver. Every time Scripture convicts and corrects you, you are being washed.
-
-[pause]
-
-And here is something remarkable about the Laver. Exodus chapter thirty-eight verse eight tells us it was made from the looking glasses of the women who assembled at the door of the tabernacle. Looking glasses. Mirrors. The Laver was made from mirrors. James chapter one verse twenty-three says that anyone who hears the Word and does not do it is like a man beholding his natural face in a glass. The Word is a mirror. And the Laver, made of mirrors filled with water, is where you see yourself truly and are cleansed truly. The Word shows you what you are. The water of the Spirit makes you what you should be.
+Now, the writer of Hebrews confirms something remarkable. Hebrews chapter eight, verse five, says that the earthly priests serve unto the example and shadow of heavenly things, as Moses was admonished of God when he was about to make the tabernacle: for, See, saith he, that thou make all things according to the pattern shown to thee in the mount. The earthly sanctuary was a copy, a scale model, of something that already exists in heaven. Moses did not invent the blueprint. He received it. The heavenly sanctuary is the original. The wilderness tabernacle is the replica. And Christ ministers in the original right now.
 
 [long pause]
 
-Now you step through the first curtain into the Holy Place. The atmosphere changes. You leave the open sky of the courtyard and enter an enclosed, lamplit chamber. There are three pieces of furniture in here, and each one represents a distinct aspect of the Christian's ongoing experience with God.
+Let us walk through the furniture. And I want you to pay close attention, because each piece is not just an object. Each piece is a doctrine. Each piece is a stage in the believer's journey. Each piece points to Christ.
 
 [pause]
 
-On the south side, to your left, stands the Golden Lampstand, the Menorah. It had seven branches, beaten from a single piece of pure gold, and it burned continually. The priests trimmed the wicks every morning and every evening. This was the only source of light in the Holy Place. There were no windows.
+We begin at the entrance of the courtyard. The first thing you encounter is the Altar of Burnt Offering. This is the largest piece of furniture in the entire complex, and it stands right at the gate. You cannot go around it. You cannot skip it. You must pass by the altar before anything else in the sanctuary becomes accessible to you.
 
 [pause]
 
-What does this represent? Multiple realities converging into one image. First, Christ Himself. John chapter eight verse twelve: I am the light of the world. He that followeth me shall not walk in darkness, but shall have the light of life. Second, the Holy Spirit. Revelation chapter four verse five: And there were seven lamps of fire burning before the throne, which are the seven Spirits of God. The seven branches represent the fullness of the Spirit's work. Third, the believer. Matthew chapter five verse fourteen: Ye are the light of the world. The lampstand burns because oil is supplied to it, and that oil is the Holy Spirit. You do not generate your own light. You receive it. You are a vessel, not a source.
+The Altar of Burnt Offering is the cross of Jesus Christ. This is where the sacrifice is made. In the Old Testament, the sinner would bring a lamb, place his hands on its head, confess his sins, and then watch as the innocent animal's throat was cut and its blood was shed. The wages of sin is death, Romans chapter six, verse twenty-three. The altar screams this truth. Without the shedding of blood, there is no remission, Hebrews chapter nine, verse twenty-two. Every morning and every evening, a lamb was offered on this altar. It was called the continual burnt offering. The smoke rose continually, day and night, year after year, century after century, until the Lamb of God Himself appeared and John the Baptist declared in John chapter one verse twenty-nine: Behold the Lamb of God, which taketh away the sin of the world.
 
 [pause]
 
-Zechariah chapter four verses two through six gives you the Old Testament connection. The prophet sees a golden candlestick with a bowl upon the top of it, and two olive trees feeding oil directly into it. Then comes the famous declaration: Not by might, nor by power, but by my spirit, saith the Lord of hosts. The lampstand burns by Spirit power, not human effort. Your witness in the world is not sustained by your education, your eloquence, or your energy. It is sustained by the oil of the Spirit flowing into you.
+Think about the sheer volume of blood shed at this altar over the centuries. Thousands upon thousands of lambs. Rivers of blood. And every single one of those sacrifices pointed forward to one sacrifice, one Lamb, one cross. The entire sacrificial system was a fifteen-hundred-year sermon, preached in blood, saying: the Messiah is coming, and He will die for you.
 
 [pause]
 
-On the north side, to your right, sits the Table of Showbread. Twelve loaves of bread were placed on this table every Sabbath, arranged in two rows of six. The bread was called the bread of the Presence, because it sat continually before the face of God. Only the priests could eat it, and they ate it in the Holy Place.
-
-[pause]
-
-What does this represent? The Word of God as daily sustenance. Jesus said in Matthew chapter four verse four: Man shall not live by bread alone, but by every word that proceedeth out of the mouth of God. And in John chapter six verse thirty-five: I am the bread of life. He that cometh to me shall never hunger. The twelve loaves correspond to the twelve tribes of Israel and later the twelve apostles, suggesting that the Word is given to and through the covenant community. The bread was replaced every Sabbath, meaning there was always fresh bread. God's Word is never stale. There is always a fresh supply of truth for the hungry soul.
-
-[pause]
-
-And notice the Sabbath connection. The bread was changed on the Sabbath. The Sabbath is the day specifically designated for feeding on the Presence of God. This is not coincidence. The Table of Showbread teaches that Sabbath-keeping is not merely rest from labor. It is feasting on the Word. It is sitting in the Presence. It is being nourished by the Bread of Life.
+The doctrine at the altar is justification. This is where the sinner is declared righteous, not because of anything he has done, but because of the sacrifice. Romans chapter five, verse one: Therefore being justified by faith, we have peace with God through our Lord Jesus Christ. If you want to understand justification, do not start with a theological dictionary. Start at the altar. Stand there. Watch the lamb die. Feel the weight of what that death means. That is justification. Innocent blood covering guilty sinners.
 
 [long pause]
 
-Directly in front of the veil, between the lampstand and the table, stands the Altar of Incense. This was a small golden altar, and the priest burned fragrant incense upon it every morning and every evening, at the same time the lamps were trimmed and the daily sacrifice was offered on the outer altar. The smoke of the incense rose continually, filling the Holy Place with a sweet aroma that drifted over the veil into the Most Holy Place where God's Shekinah glory dwelt.
+Now step past the altar and you come to the Laver. This was a large bronze basin filled with water where the priests washed their hands and feet before entering the Holy Place. Exodus chapter thirty, verses nineteen and twenty: For Aaron and his sons shall wash their hands and their feet thereat: when they go into the tabernacle of the congregation, they shall wash with water, that they die not. Notice the severity. If they did not wash, they would die. Cleansing was not optional. It was a matter of life and death.
 
 [pause]
 
-What does this represent? Prayer and intercession. Psalm one hundred forty-one verse two: Let my prayer be set forth before thee as incense, and the lifting up of my hands as the evening sacrifice. Revelation chapter eight verse three through four makes it explicit: And another angel came and stood at the altar, having a golden censer, and there was given unto him much incense, that he should offer it with the prayers of all saints upon the golden altar which was before the throne. And the smoke of the incense, which came with the prayers of the saints, ascended up before God out of the angel's hand.
+The Laver is baptism and ongoing sanctification. It is the washing of regeneration. Titus chapter three, verse five: Not by works of righteousness which we have done, but according to his mercy he saved us, by the washing of regeneration, and renewing of the Holy Ghost. Ephesians chapter five, verse twenty-six, says Christ sanctifies the church with the washing of water by the Word. The Laver tells you that after the cross comes cleansing. After justification comes the beginning of sanctification. You do not stay at the altar forever. The blood covers you, and then the water cleanses you. This is the order. This is the divine path.
 
 [pause]
 
-Your prayers are incense. They rise before the throne of God, mixed with the intercession of Christ Himself. Romans chapter eight verse thirty-four says: It is Christ that died, yea rather, that is risen again, who is even at the right hand of God, who also maketh intercession for us. The Altar of Incense is the picture of Christ's mediatorial work. Right now, in the heavenly sanctuary, your prayers ascend before the Father, mingled with the merit of your Savior. You never pray alone. Your prayers are never unattended. They rise as sweet-smelling fragrance before the throne because Christ adds His righteousness to your feeble petitions.
+Notice also that the Laver was made from the bronze mirrors of the women of Israel, Exodus chapter thirty-eight, verse eight. The mirrors that once reflected self now become the instrument of cleansing. There is a sermon in that detail alone. When you come to Christ, the instruments of vanity are melted down and reformed into instruments of purification. The thing that once fed your pride now becomes the thing that washes you clean.
 
 [pause]
 
-Notice where the Altar of Incense sits. Right in front of the veil. It is the piece of furniture closest to the Most Holy Place. It is the last station before the throne. This tells you that prayer is the closest you can get to God's immediate presence this side of the veil. The Lampstand gives you light. The Showbread gives you nourishment. But the Altar of Incense brings you near.
-
-[long pause]
-
-And now, the veil. A thick curtain, embroidered with cherubim, separated the Holy Place from the Most Holy Place. Only the high priest could pass through this veil, and only once a year, on the Day of Atonement, and only with blood. Hebrews chapter ten verse nineteen through twenty tells us what the veil means: Having therefore, brethren, boldness to enter into the holiest by the blood of Jesus, by a new and living way, which he hath consecrated for us, through the veil, that is to say, his flesh. The veil is Christ's flesh. When He died on the cross, Matthew chapter twenty-seven verse fifty-one records that the veil of the temple was rent in twain from the top to the bottom. From the top to the bottom. God tore it. Not from the bottom up, as a man would tear it. From the top down. God Himself opened the way.
-
-[pause]
-
-Behind the veil, in the Most Holy Place, sits the Ark of the Covenant. This was a rectangular box of acacia wood overlaid with pure gold, inside and out. Its lid was called the Mercy Seat, and two golden cherubim stretched their wings over it, facing each other, looking down upon the Mercy Seat. Between the cherubim, above the Mercy Seat, the Shekinah glory of God visibly dwelt. This was the throne room of the universe in miniature.
-
-[pause]
-
-Inside the Ark were three items. The two tables of stone containing the Ten Commandments. Aaron's rod that budded. And a golden pot of manna. The law, the priesthood, and the provision. All three contained in one box, covered by mercy, overshadowed by the glory of God. Think about that. The law says you are guilty. The rod says God has chosen a priest to represent you. The manna says God will sustain you through the wilderness. And the Mercy Seat says all of this is covered by grace.
-
-[pause]
-
-Romans chapter three verse twenty-five says: Whom God hath set forth to be a propitiation through faith in his blood. That word propitiation in the Greek is hilasterion, and it is the same word used in the Septuagint for the Mercy Seat. Christ is the Mercy Seat. He is the place where God's justice and God's mercy meet. The law beneath demands death. The Mercy Seat above offers life. And the blood sprinkled upon it satisfies both.
+And the Laver had no specified measurements in the Bible. Every other piece of furniture has exact dimensions. But the Laver does not. Why? Because there is no limit to the cleansing power of God. You cannot exhaust the water. You cannot outsin the grace that flows from the Laver. His mercy is without measure.
 
 [long pause]
 
-Now here is the breathtaking picture when you stand back and see the whole thing. The sanctuary maps the entire journey of salvation. You enter through one gate: Christ, the Way. You come to the altar: the cross, where your sin is dealt with. You move to the laver: baptism and daily cleansing by the Word. You enter the Holy Place and find light from the lampstand, the Holy Spirit illuminating your path. You find nourishment from the showbread, the Word of God feeding your soul. You find access through the altar of incense, prayer and intercession carrying you toward God's presence. And finally, behind the veil, you stand before the Ark, before the throne of God, where law and mercy embrace, where judgment and grace kiss, where the glory of God dwells above His covenant promises.
+Now we step inside the Holy Place. The outer curtain parts, and we enter a room lit by golden light. There are three pieces of furniture in this room, and each one teaches a distinct aspect of the Christian walk.
 
 [pause]
 
-This is not ancient history. Hebrews chapter eight verses one and two tells us: We have such an high priest, who is set on the right hand of the throne of the Majesty in the heavens, a minister of the sanctuary, and of the true tabernacle, which the Lord pitched, and not man. Right now, Christ is ministering in the heavenly sanctuary. The earthly tabernacle was a copy. The heavenly one is the original. And your salvation journey, from the cross to the cleansing to the light to the bread to the intercession to the throne, is mapped by that original.
+On the left stands the Golden Lampstand, the Menorah. Seven branches, seven lamps, burning continually. Exodus chapter twenty-five, verses thirty-one through forty, describes its construction: pure gold, hammered from a single piece, with almond blossom decorations on every branch. The priest was responsible for trimming the wicks and ensuring the lamps never went out. Morning and evening, the priest attended to those flames.
 
 [pause]
 
-The sanctuary also maps salvation history. The courtyard represents the work of Christ on earth: His sacrifice and the cleansing He provides. The Holy Place represents the era of the church: walking by the light of the Spirit, feeding on the Word, sustained by prayer. The Most Holy Place represents the final phase of Christ's ministry: the investigative judgment, the Day of Atonement, the cleansing of the heavenly sanctuary that began in eighteen forty-four according to Daniel chapter eight verse fourteen.
+The Lampstand is the Holy Spirit and the light of Christ. Jesus said in John chapter eight, verse twelve: I am the light of the world. He that followeth me shall not walk in darkness, but shall have the light of life. Revelation chapter four, verse five, identifies the seven lamps before the throne as the seven Spirits of God. The Lampstand tells you that the Christian life is illuminated. You do not walk in darkness. The Spirit lights your path. The Word is a lamp unto your feet and a light unto your path, Psalm one hundred nineteen, verse one hundred and five. Without the Lampstand, the Holy Place is pitch black. Without the Spirit, the believer is spiritually blind.
+
+[pause]
+
+The almond blossoms on the Lampstand are significant too. The almond tree in Hebrew is called the shaqed, which means the watcher or the wakeful one, because it is the first tree to blossom in spring. God told Jeremiah in chapter one, verses eleven and twelve: I will hasten my word to perform it. The word hasten is a play on shaqed. The Lampstand with almond blossoms says: God is awake. God is watching. God's light never sleeps. And when you connect this to Aaron's rod that budded, which produced almond blossoms overnight, you see the resurrection principle embedded in the very decoration of the Lampstand. Life from death. Light from darkness. God's power working through what appears to be dead wood.
+
+[pause]
+
+The Lampstand was also hammered from a single piece of gold. Not assembled from parts. Beaten into shape. Christ, the Light of the world, was beaten, bruised, and struck, and from that suffering, the light of salvation shone forth. The construction method preaches the gospel.
 
 [long pause]
 
-Let me show you how the sanctuary becomes a study tool in the Phototheology system. When you encounter any doctrine, any text, any theological question, ask yourself: where does this fit in the sanctuary? Is this an altar truth, dealing with justification and the cross? Is this a laver truth, dealing with baptism and cleansing? Is this a lampstand truth, dealing with the Holy Spirit's work? Is this a showbread truth, dealing with the Word and its nourishment? Is this an incense truth, dealing with prayer and intercession? Is this a Most Holy Place truth, dealing with judgment, law, mercy, and the presence of God?
+On the right side of the Holy Place stands the Table of Showbread. Twelve loaves of bread, one for each tribe of Israel, arranged in two rows of six. Fresh loaves were placed every Sabbath, and the old loaves were eaten by the priests. Leviticus chapter twenty-four, verses five through nine.
 
 [pause]
 
-Every doctrine in the Bible fits somewhere in that structure. The Sabbath? It is embedded in the showbread replaced every Sabbath and in the law inside the Ark. Baptism? The Laver. The state of the dead? The altar, where death is the penalty for sin, and the Most Holy Place, where final judgment determines destiny. The second coming? The Day of Atonement, when the high priest emerged from the Most Holy Place and the people knew the work was finished.
+The Table of Showbread is the Word of God and Christ Himself as the Bread of Life. Jesus said in Matthew chapter four, verse four: Man shall not live by bread alone, but by every word that proceedeth out of the mouth of God. And in John chapter six, verse thirty-five: I am the bread of life. He that cometh to me shall never hunger. The twelve loaves represent the complete Word of God given to all twelve tribes, to the entire people of God. You feed on this bread daily. You do not live on yesterday's bread. The loaves were replaced every Sabbath, fresh and new. God's Word is living and active, Hebrews chapter four, verse twelve. It is always fresh. It never goes stale.
 
 [pause]
 
-In the Phototheology app, the Training Drills for the Blue Room will give you passages and ask you to assign them to sanctuary stations. Where does Romans chapter three verse twenty-four fit? At the altar, justification through the blood. Where does Ephesians chapter five verse twenty-six fit? At the Laver, washing by the Word. Where does Revelation chapter eight verse three fit? At the Altar of Incense, prayers ascending with merit. This drill builds an instinct. Eventually, every passage you read will automatically snap into its sanctuary station in your mind, and the entire plan of salvation will be a visual, architectural reality you can walk through at will.
+The Showbread was also called the bread of the Presence, lechem panim in Hebrew, literally bread of the face, because it sat continually before the face of God. When you read Scripture, you are not just reading a book. You are sitting at a table in God's presence, eating bread that has been in His company. There is a communion that happens in Bible study that goes beyond information. It is presence. It is face-to-face fellowship with the God who speaks through His Word.
 
 [pause]
 
-And the Study Buddy can take you even deeper. Ask it to show you how the Day of Atonement service in Leviticus sixteen maps to the heavenly ministry described in Hebrews nine. Ask it to trace the two goats of the Day of Atonement, the Lord's goat and the scapegoat, and show you how one represents Christ's substitutionary death and the other represents the final removal of sin placed upon Satan. The sanctuary is inexhaustible. You will never finish mining it.
+And the Showbread was arranged in two rows of six, totaling twelve. Twelve tribes. Twelve apostles. Twelve foundations of the New Jerusalem. The number twelve represents God's complete covenant community. The Table is God's provision for all His people, not just a select few.
 
 [long pause]
 
-Let me leave you with this picture. Imagine you are an Israelite camped in the wilderness. Your tent faces the tabernacle. Every morning, you see the smoke of the morning sacrifice rising from the altar. You smell the incense. You see the pillar of cloud by day, the pillar of fire by night, hovering above the Most Holy Place. The entire camp is oriented around the sanctuary. It is the center of everything.
+At the far end of the Holy Place, directly in front of the veil, stands the Altar of Incense. This small golden altar was where the priest burned a special blend of incense every morning and every evening, filling the Holy Place with fragrant smoke. Exodus chapter thirty, verses one through ten. The incense was a unique blend of four spices: stacte, onycha, galbanum, and pure frankincense. It was holy. No one was allowed to make this formula for personal use, on penalty of being cut off from the congregation.
 
 [pause]
 
-Now translate that into your life. The sanctuary is still the center. Christ's sacrifice is still the foundation. His cleansing Word is still washing you. His Spirit is still lighting your path. His bread is still feeding your soul. His intercession is still carrying your prayers to the throne. And behind the veil, in the Most Holy Place, the judgment is underway, and the Mercy Seat still stands between you and condemnation.
+The Altar of Incense is prayer and intercession. Revelation chapter eight, verses three and four: And another angel came and stood at the altar, having a golden censer; and there was given unto him much incense, that he should offer it with the prayers of all the saints upon the golden altar which was before the throne. And the smoke of the incense, which came with the prayers of the saints, ascended up before God out of the angel's hand. Your prayers rise like incense. They do not disappear into the ceiling. They ascend into the heavenly sanctuary and mingle with Christ's intercession before the throne.
 
 [pause]
 
-Hebrews chapter four verse sixteen: Let us therefore come boldly unto the throne of grace, that we may obtain mercy, and find grace to help in time of need. The throne of grace. That is the Mercy Seat. That is the Ark. That is the Most Holy Place. And you are invited to come boldly.
+Psalm one hundred forty-one, verse two: Let my prayer be set forth before thee as incense, and the lifting up of my hands as the evening sacrifice. The Altar of Incense stood directly before the veil, as close to the Most Holy Place as you could get without entering. Prayer brings you to the threshold of God's immediate presence. It is the closest point of approach in daily ministry.
 
 [pause]
 
-I am Professor Temple. This has been the Blue Room. Now follow the blueprint from the gate to the glory.`;
-
-export const SCRIPT_PROPHECY_ROOM = `Welcome to the Prophecy Room. I am Professor Blackwell, and this room is the telescope of the Phototheology Palace. If the Blue Room gave you the architectural blueprint of salvation, this room gives you the timeline. Here, you learn to look through the prophetic lens and see history laid out from the prophet's own day to the very end of time, all mapped in advance by the God who declares the end from the beginning.
-
-[pause]
-
-Isaiah chapter forty-six verses nine and ten sets the foundation: Remember the former things of old, for I am God, and there is none else. I am God, and there is none like me, declaring the end from the beginning, and from ancient times the things that are not yet done, saying, My counsel shall stand, and I will do all my pleasure. God is not reacting to history. He is declaring it. He is not guessing at the future. He is announcing it centuries before it happens. And biblical prophecy is the proof.
+And Romans chapter eight, verse thirty-four, tells us that Christ is at the right hand of God, making intercession for us. He is our High Priest at the heavenly Altar of Incense right now, blending His perfect prayers with our imperfect ones, and presenting them before the Father as a fragrant offering. Your stammering, half-formed prayers arrive in heaven perfumed with the intercession of Christ. That is what the Altar of Incense teaches.
 
 [long pause]
 
-The Prophecy Room uses the historicist method of prophetic interpretation. This is critical, so let me define it clearly. Historicism holds that the major prophetic timelines of Daniel and Revelation unfold progressively through history, from the prophet's time, through the centuries, and on to the end of the age. Prophecy is not sealed shut in the past, as the preterist claims. It is not delayed entirely to a future seven-year tribulation, as the futurist claims. It unfolds in real time across real empires, real centuries, real events. And you can track it.
+Now we come to the veil. The heavy curtain separating the Holy Place from the Most Holy Place. This veil was a thick, ornate tapestry embroidered with cherubim in blue, purple, and scarlet. It represented the separation between God's holiness and human sinfulness. Once a year, and only once, the high priest passed through this veil on the Day of Atonement.
 
 [pause]
 
-Think of it like this. The Prophecy Room is a telescope. When you look through a telescope at the night sky, you do not see a random scattering of stars. You see constellations, patterns, groupings that ancient astronomers mapped and named. Prophecy works the same way. Each individual prophecy looks like a single star, but when you view them through the prophetic telescope, they form constellations, repeat-and-enlarge patterns that span centuries and tell one coherent story.
+When Jesus died on the cross, Matthew chapter twenty-seven, verse fifty-one tells us: And behold, the veil of the temple was rent in twain from the top to the bottom. From the top to the bottom. God tore it. Not man. God opened the way into His presence. Hebrews chapter ten, verses nineteen and twenty: Having therefore, brethren, boldness to enter into the holiest by the blood of Jesus, by a new and living way, which he hath consecrated for us, through the veil, that is to say, his flesh. The veil is Christ's flesh. His body was torn so the way could be opened. His death ripped the barrier between God and man from top to bottom.
+
+[pause]
+
+Behind the veil, in the Most Holy Place, stands the Ark of the Covenant. This is the throne room. This is the center of everything.
+
+[pause]
+
+Inside the Ark were three items. The two tablets of the law, the Ten Commandments, God's moral standard that defines righteousness and exposes sin. Aaron's rod that budded, confirming God's chosen leadership and the resurrection principle of life from death. And the golden pot of manna, God's provision, the bread from heaven that sustained Israel for forty years in the wilderness.
+
+[pause]
+
+Each item inside the Ark points to Christ. The law points to Christ as the righteous one who fulfilled every commandment. Aaron's rod points to Christ as the resurrected priest, life from death. The manna points to Christ as the bread that came down from heaven, John chapter six, verse fifty-one.
+
+[pause]
+
+On top of the Ark rested the Mercy Seat, a solid gold lid with two cherubim facing each other, wings outstretched, looking down at the Mercy Seat. God said in Exodus chapter twenty-five, verse twenty-two: And there I will meet with thee, and I will commune with thee from above the mercy seat, from between the two cherubim which are upon the ark of the testimony.
+
+[pause]
+
+This is where law and mercy meet. The law is inside the Ark, declaring the standard. The Mercy Seat is above the law, covering it with grace. On the Day of Atonement, the high priest sprinkled blood on the Mercy Seat, and that blood satisfied the claims of the broken law. Justice and mercy kissed. Psalm eighty-five, verse ten: Mercy and truth are met together; righteousness and peace have kissed each other. The blood does not destroy the law. The blood satisfies the law. The law still stands. Mercy covers the transgression. This is the gospel in furniture form.
 
 [long pause]
 
-Let us start with Daniel chapter two. Nebuchadnezzar, king of Babylon, the most powerful man on earth, has a dream he cannot remember. His wise men fail to reproduce it. Daniel, a Hebrew captive, is brought before the king and tells him both the dream and its meaning. Here is the dream.
+Now let me show you the Day of Atonement, because this is where the sanctuary reaches its annual climax.
 
 [pause]
 
-Daniel chapter two verses thirty-one through thirty-five: Thou, O king, sawest, and behold a great image. This great image, whose brightness was excellent, stood before thee, and the form thereof was terrible. This image's head was of fine gold, his breast and his arms of silver, his belly and his thighs of brass, his legs of iron, his feet part of iron and part of clay. Thou sawest till that a stone was cut out without hands, which smote the image upon his feet that were of iron and clay, and brake them to pieces. Then was the iron, the clay, the brass, the silver, and the gold, broken to pieces together, and became like the chaff of the summer threshingfloors, and the wind carried them away, that no place was found for them. And the stone that smote the image became a great mountain, and filled the whole earth.
+Leviticus chapter sixteen describes the Yom Kippur service in extraordinary detail. On this one day each year, the high priest removed his ornate robes and dressed in simple white linen. He entered the Most Holy Place with the blood of a bull for his own sins, then returned for the blood of the Lord's goat to make atonement for the people. He sprinkled blood on the Mercy Seat and before the Mercy Seat seven times. Then he came out and performed the scapegoat ritual.
 
 [pause]
 
-Now the interpretation. Daniel tells Nebuchadnezzar plainly in verse thirty-eight: Thou art this head of gold. Babylon is the head. The greatest empire of the ancient world, ruling from 605 to 539 BC. But after thee, Daniel says, shall arise another kingdom inferior to thee. The chest and arms of silver represent Medo-Persia, which conquered Babylon in 539 BC. Then a third kingdom of brass, which shall bear rule over all the earth. That is Greece under Alexander the Great, conquering Persia in 331 BC. And the fourth kingdom shall be strong as iron. Rome, the iron monarchy that crushed everything in its path from 168 BC onward. And the feet of iron mixed with clay? The divided nations of Europe after Rome's fall, which have never been reunited into one empire despite every attempt from Charlemagne to Napoleon to Hitler.
+Two goats were presented before the Lord. One was selected by lot as the Lord's goat, and one was designated as the scapegoat, the azazel. The Lord's goat was slain and its blood was brought into the Most Holy Place to cleanse the sanctuary of all the accumulated sins that had been symbolically transferred there throughout the year. Then the high priest came out, laid his hands on the head of the live goat, confessed all the sins of Israel over it, and the goat was led by a fit man into the wilderness, never to return.
 
 [pause]
 
-And then the stone. Daniel chapter two verse forty-four: And in the days of these kings shall the God of heaven set up a kingdom, which shall never be destroyed, and the kingdom shall not be left to other people, but it shall break in pieces and consume all these kingdoms, and it shall stand for ever. The stone is the kingdom of God. It is not a human empire. It is cut without hands. It is divine. And it fills the whole earth. That is the second coming of Christ and the establishment of His eternal kingdom.
+The theology here is staggering. Throughout the year, when sinners confessed their sins and sacrificed lambs at the altar, those sins were symbolically transferred into the sanctuary via the blood. The sanctuary absorbed the record of sin. The sinner went home forgiven, but the sin was now in the sanctuary. The sanctuary carried the burden. But once a year, the Day of Atonement cleansed the sanctuary itself. The record was cleared. The sins were placed on the scapegoat and removed permanently from the camp.
+
+[pause]
+
+The Lord's goat represents Christ, whose blood cleanses the heavenly sanctuary. The scapegoat represents Satan, who will ultimately bear the responsibility for originating sin. Christ's blood pays the price. Satan bears the blame. Both goats are needed to complete the picture.
+
+[pause]
+
+Now Hebrews chapters eight through ten draws the connection. Hebrews chapter nine, verses twenty-three and twenty-four: It was therefore necessary that the patterns of things in the heavens should be purified with these, but the heavenly things themselves with better sacrifices than these. For Christ is not entered into the holy places made with hands, which are the figures of the true, but into heaven itself, now to appear in the presence of God for us. There is a real heavenly sanctuary. There is a real Day of Atonement. There is a real cleansing happening right now.
+
+[pause]
+
+Daniel chapter eight, verse fourteen, says: Unto two thousand and three hundred days, then shall the sanctuary be cleansed. This is the heavenly Day of Atonement, which the Mathematics Room will explore in precise chronological detail. The sanctuary is not ancient history. It is present reality. Christ is ministering in the heavenly sanctuary right now, and the final phase of that ministry, the anti-typical Day of Atonement, is underway.
 
 [long pause]
 
-Now here is the principle you must grasp. Daniel two is the skeleton. It gives you the bare outline: Babylon, Persia, Greece, Rome, divided nations, God's kingdom. But God does not stop there. He takes the same timeline and enlarges it with additional detail in Daniel chapter seven. And then He enlarges it again in Daniel chapter eight. This is the repeat-and-enlarge pattern, and it is the key to prophetic interpretation.
+Now let me show you why the sanctuary is the Rosetta Stone of theology. Every major Christian doctrine maps to a piece of sanctuary furniture or a sanctuary service.
 
 [pause]
 
-Daniel chapter seven. Daniel himself has a vision. Four beasts rise from the sea. The first beast is a lion with eagle's wings. That is Babylon, the lion of the ancient world, swift as an eagle in conquest. The second beast is a bear raised on one side with three ribs in its mouth. That is Medo-Persia, with the Persian side dominant, having conquered three major kingdoms: Lydia, Babylon, and Egypt. The third beast is a leopard with four wings and four heads. That is Greece. The four wings represent the blinding speed of Alexander's conquests. The four heads represent the four generals who divided his empire after his death: Cassander, Lysimachus, Seleucus, and Ptolemy.
+Justification? The Altar of Burnt Offering. Baptism and regeneration? The Laver. The Holy Spirit's illumination? The Lampstand. The Word of God as daily bread? The Table of Showbread. Prayer and intercession? The Altar of Incense. The moral law? Inside the Ark. Grace and mercy? The Mercy Seat. The judgment? The Day of Atonement. Christ's priesthood? His ministry in the Holy and Most Holy Places. The second coming? The high priest emerging from the sanctuary after the Day of Atonement service, when the people waiting outside finally see him come out.
 
 [pause]
 
-The fourth beast is different from all the others. Daniel chapter seven verse seven: After this I saw in the night visions, and behold a fourth beast, dreadful and terrible, and strong exceedingly. And it had great iron teeth. It devoured and brake in pieces, and stamped the residue with the feet of it. And it was diverse from all the beasts that were before it, and it had ten horns. That is Rome. Iron teeth, matching the iron legs of Daniel two. Ten horns matching the ten toes. Rome and its divided successors.
+You can take any doctrine in the Bible, any doctrine, and locate it on the sanctuary map. Soteriology, ecclesiology, eschatology, pneumatology, Christology, they all have an address in the sanctuary. That is why I call this the Rosetta Stone. Just as the Rosetta Stone decoded Egyptian hieroglyphics by providing a key that connected three languages, the sanctuary decodes theology by providing a structure that connects all doctrines.
 
 [pause]
 
-But now something new appears that was not in Daniel two. Daniel chapter seven verse eight: I considered the horns, and, behold, there came up among them another little horn, before whom there were three of the first horns plucked up by the roots. And, behold, in this horn were eyes like the eyes of man, and a mouth speaking great things. The little horn. This is the enlargement. Daniel two showed four empires and a divided phase. Daniel seven shows the same four empires, the same division, but now adds a power that rises among the divided nations, uproots three of them, has eyes of intelligence and a mouth of authority, and speaks great words against the Most High.
-
-[pause]
-
-Daniel chapter seven verse twenty-five describes this power further: And he shall speak great words against the most High, and shall wear out the saints of the most High, and think to change times and laws, and they shall be given into his hand until a time and times and the dividing of time. This little horn power persecutes God's people, attempts to change God's times and laws, and rules for a prophetic period of time, times, and half a time, which equals twelve hundred and sixty prophetic days, which under the year-day principle equals twelve hundred and sixty literal years.
+And here is a thought that should stop you in your tracks. The sanctuary was given to Israel over a thousand years before the systematic theology of the church fathers. God did not wait for theologians to organize doctrine into categories. He built it into a building. He gave the system to shepherds and slaves fresh out of Egypt, and He said: walk through this structure, and you will understand everything I am doing to save you.
 
 [long pause]
 
-Let me pause here and explain the year-day principle, because it is foundational to everything in this room. Numbers chapter fourteen verse thirty-four: After the number of the days in which ye searched the land, even forty days, each day for a year, shall ye bear your iniquities, even forty years. Ezekiel chapter four verse six: I have appointed thee each day for a year. In symbolic prophecy, when God gives a time period in days, each prophetic day represents one literal year. This is not an arbitrary rule. It is established by Scripture itself. And it is the key that unlocks every major time prophecy in Daniel and Revelation.
+Now, if you have the Sanctuary Run game in your Phototheology OS app, I want you to use it this week. Sanctuary Run is designed to walk you through each station of the sanctuary in sequence. As you move from the Altar to the Laver to the Holy Place furniture to the Most Holy Place, you are not just playing a game. You are rehearsing the plan of salvation. You are training your mind to see the path from justification to glorification as a literal journey through a physical structure. Every time you play Sanctuary Run, you reinforce the blueprint. The sanctuary ceases to be abstract theology and becomes a place you have walked through, a place you know by heart.
 
 [pause]
 
-Apply this to the little horn. Twelve hundred and sixty prophetic days equals twelve hundred and sixty literal years. Historicist scholars have identified this period as running from 538 AD, when the last of the three opposing Arian kingdoms was uprooted and the Bishop of Rome received civil authority, to 1798 AD, when Napoleon's general Berthier took the pope captive. That is exactly twelve hundred and sixty years. The prophecy was fulfilled with mathematical precision.
+Let me also connect this to the broader Palace. Everything you learned on Floor One through Floor Four prepares you for this room. The Story Room gave you the narrative of the Exodus and the wilderness. The Imagination Room let you step inside the tabernacle and smell the incense. The Translation Room turned abstract doctrines into visual images. The Observation Room trained you to notice the details, like the almond blossoms or the missing measurements of the Laver. The Concentration Room showed you Christ in every chapter. And now the Blue Room shows you that the sanctuary is the master structure holding everything together.
 
 [pause]
 
-Now Daniel chapter eight adds yet another enlargement. Here the vision begins with a ram with two horns, representing Medo-Persia. A goat with a notable horn charges from the west and shatters the ram. That is Greece, and the notable horn is Alexander. The notable horn breaks and four horns replace it, the four divisions of Alexander's empire. Then, from one of the four, a little horn grows exceedingly great. This little horn of Daniel eight represents Rome in both its pagan and papal phases. It casts down the place of God's sanctuary and takes away the daily, meaning it obscures the priestly ministry of Christ in the heavenly sanctuary.
-
-[pause]
-
-And then comes the pivotal question. Daniel chapter eight verse thirteen: How long shall be the vision concerning the daily sacrifice, and the transgression of desolation, to give both the sanctuary and the host to be trodden under foot? The answer, verse fourteen: Unto two thousand and three hundred days, then shall the sanctuary be cleansed. Twenty-three hundred prophetic days. Under the year-day principle, twenty-three hundred literal years. This is the longest time prophecy in the Bible, and it leads to the cleansing of the sanctuary, the beginning of the investigative judgment in heaven.
+Every room in the Palace has a sanctuary address. The Story Room is like the courtyard, where the raw material of narrative is brought in. The Imagination Room is like the Laver, where stories are washed into clarity. The Concentration Room is like the Lampstand, illuminating Christ. The Theme Room is like the Table of Showbread, feeding you on systematic truth. The Fruit Room is like the Altar of Incense, testing whether your study ascends as a fragrant offering. And the Three Heavens and Cycles of Floor Six? Those are the Day of Atonement, the final sweeping view of God's cosmic plan.
 
 [long pause]
 
-Daniel chapter nine provides the key to calculating this prophecy. The angel Gabriel returns and gives Daniel the seventy-week prophecy, which is a subset of the twenty-three hundred days. Seventy weeks are determined upon thy people, Daniel nine verse twenty-four says. Determined. The Hebrew word is chathak, meaning cut off. The seventy weeks are cut off from the larger twenty-three hundred day prophecy. Both begin at the same starting point: the decree to restore and rebuild Jerusalem.
+Here is your training exercise, and I want you to take this seriously. Take the six major pieces of sanctuary furniture: the Altar of Burnt Offering, the Laver, the Lampstand, the Table of Showbread, the Altar of Incense, and the Ark of the Covenant with its Mercy Seat. For each one, write down three things. First, the Old Testament reality, what it was and how it functioned. Second, the New Testament fulfillment in Christ, how Jesus fulfilled that piece of furniture. Third, the personal application, what that piece means for your daily walk with God. The altar equals the cross equals my acceptance of Christ's sacrifice. The Laver equals baptism equals my daily cleansing by the Word. The Lampstand equals the Holy Spirit equals my dependence on divine illumination. The Table equals the Word of God equals my daily feeding on Scripture. The Incense Altar equals prayer equals my rising intercession mingled with Christ's. The Ark and Mercy Seat equal the law covered by grace equals God's throne where justice and mercy embrace. Complete all six.
 
 [pause]
 
-That decree was issued by Artaxerxes in 457 BC, as recorded in Ezra chapter seven. From 457 BC, count four hundred and ninety years, the seventy weeks, and you arrive at 34 AD, the stoning of Stephen and the gospel going to the Gentiles. Within that seventy weeks, the Messiah is baptized in 27 AD, exactly on schedule. He is cut off, crucified, in the midst of the final week, in 31 AD. Every date confirmed by history. Every calculation verified by the calendar.
+Then, if you want to go further, open the Sanctuary Run game and walk the entire sanctuary from gate to glory. Time yourself. See how quickly you can identify each station and its doctrine. Repeat until the map is burned into your memory. Because once you carry the sanctuary in your mind, you carry the key to every doctrine in Scripture.
 
 [pause]
 
-Now take the full twenty-three hundred years from 457 BC. Subtract 457 from 2300, add one year because there is no year zero, and you arrive at 1844 AD. In that year, according to the prophecy, the sanctuary was to be cleansed. Since the earthly sanctuary no longer existed, this must refer to the heavenly sanctuary. The investigative judgment, the antitypical Day of Atonement, began in 1844. Christ moved from the Holy Place ministry to the Most Holy Place ministry in the heavenly sanctuary, just as the high priest moved on the Day of Atonement.
+I am Professor Temple. This has been the Blue Room. Now follow the blueprint, and you will never lose your way in the Bible again.`;
+
+export const SCRIPT_PROPHECY_ROOM = `Welcome to the Prophecy Room. I am Professor Blackwell, Prophecy Historian, and this room is the telescope of the Phototheology Palace.
+
+[pause]
+
+If the Blue Room gave you the blueprint, a structure in space, the Prophecy Room gives you the timeline, a structure in time. Here you will learn to line up the prophetic visions of Daniel and Revelation and see how they form a coherent, interlocking panorama of world history from the prophet's day all the way to the establishment of God's eternal kingdom. This is not speculation. This is not guesswork. This is the historicist method of prophetic interpretation, the method used by the Protestant Reformers, the method confirmed by the unfolding of history itself.
 
 [long pause]
 
-Revelation picks up where Daniel ends. Revelation chapter thirteen shows the beast rising from the sea, receiving a wound, and being healed. Revelation chapter fourteen responds with three angels carrying the final messages to earth, which we will study in the next room. The prophetic timeline of Daniel flows directly into the prophetic timeline of Revelation. They are not separate books with separate subjects. They are two volumes of one prophetic library.
+Before we dive into the prophecies, let me explain the method. There are four main approaches to Bible prophecy. The preterist method says all prophecy was fulfilled in the ancient past. The futurist method says most prophecy is postponed to a short period at the end of time. The idealist method says prophecy is just symbolic moral teaching with no historical referents. And then there is the historicist method, which says prophecy unfolds progressively through history, from the prophet's time through our own and beyond. The historicist method is the one that Daniel and Revelation themselves demand, because the prophecies explicitly span centuries, naming successive kingdoms and tracking them through real, verifiable time.
 
 [pause]
 
-In the Phototheology app, the Training Drills for the Prophecy Room will ask you to map Daniel two, Daniel seven, and Daniel eight side by side. You will see how each prophecy covers the same empires but with enlarging detail. Babylon is a head of gold in chapter two, a lion in chapter seven. Persia is a chest of silver in chapter two, a bear in chapter seven, a ram in chapter eight. Greece is a belly of bronze in chapter two, a leopard in chapter seven, a goat in chapter eight. The repeat-and-enlarge pattern becomes unmistakable.
-
-[pause]
-
-The Study Buddy can walk you through the year-day calculations step by step. Feed it any prophetic time period, the twelve hundred and sixty days, the twenty-three hundred days, the seventy weeks, and it will help you trace the arithmetic from starting event to fulfillment. Prophecy is not vague mysticism. It is divine mathematics.
-
-[pause]
-
-Here is your takeaway from the Prophecy Room. History is not random. Empires rise and fall on a divine schedule. And the God who accurately predicted Babylon, Persia, Greece, and Rome, who pinpointed the year of Christ's baptism and crucifixion, who measured the duration of papal supremacy to the exact year, that same God has declared that a stone cut without hands will fill the whole earth. The kingdom is coming. The timeline proves it. And you are living in the toes of the statue, in the final divided phase before the stone strikes.
-
-[pause]
-
-I am Professor Blackwell. This has been the Prophecy Room. Now look through the telescope and see where you stand.`;
-
-export const SCRIPT_THREE_ANGELS = `Welcome to the Three Angels Room. I am Professor Herald, and this room is the capstone of the entire Phototheology Palace. Every floor you have climbed, every room you have entered, every skill you have developed, converges here. The Three Angels Messages of Revelation chapter fourteen are not just three announcements. They are the final synthesis of all biblical truth, compressed into the last gospel proclamation the world will ever hear before Christ returns.
-
-[pause]
-
-Let me read the passage in full, because these words carry the weight of eternity. Revelation chapter fourteen verses six through twelve.
-
-[pause]
-
-And I saw another angel fly in the midst of heaven, having the everlasting gospel to preach unto them that dwell on the earth, and to every nation, and kindred, and tongue, and people, saying with a loud voice, Fear God, and give glory to him, for the hour of his judgment is come, and worship him that made heaven, and earth, and the sea, and the fountains of waters.
-
-[pause]
-
-And there followed another angel, saying, Babylon is fallen, is fallen, that great city, because she made all nations drink of the wine of the wrath of her fornication.
-
-[pause]
-
-And the third angel followed them, saying with a loud voice, If any man worship the beast and his image, and receive his mark in his forehead, or in his hand, the same shall drink of the wine of the wrath of God, which is poured out without mixture into the cup of his indignation, and he shall be tormented with fire and brimstone in the presence of the holy angels, and in the presence of the Lamb. And the smoke of their torment ascendeth up for ever and ever, and they have no rest day nor night, who worship the beast and his image, and whosoever receiveth the mark of his name. Here is the patience of the saints: here are they that keep the commandments of God, and the faith of Jesus.
+The historicist method was the unanimous view of the Protestant Reformers. Martin Luther, John Calvin, John Knox, the Wesley brothers, Isaac Newton, and scores of others all read Daniel and Revelation as historical timelines. It was the historicist reading that identified the papal system as the little horn and the sea beast, and it was this reading that powered the Reformation itself. When we use this method, we are standing in the oldest and most battle-tested Protestant tradition of prophetic study.
 
 [long pause]
 
-Now let us unpack each angel. The first angel carries the everlasting gospel. Notice that word: everlasting. Not a new gospel. Not a modified gospel. Not a gospel adapted to the modern age. The same gospel that was preached to Abraham when God told him, In thy seed shall all the nations of the earth be blessed. The same gospel that was preached in the sacrifice of every lamb on the altar. The same gospel that Paul declared in Romans chapter one verse sixteen: For I am not ashamed of the gospel of Christ, for it is the power of God unto salvation to every one that believeth. The everlasting gospel is justification by faith in the blood of Christ. It has never changed. It will never change.
+Now let us open Daniel chapter two. This is the foundation prophecy, the one that all other prophecies build upon.
 
 [pause]
 
-But this everlasting gospel comes with three specific imperatives. First: fear God. This is not terror. This is reverence. Ecclesiastes chapter twelve verse thirteen: Fear God, and keep his commandments, for this is the whole duty of man. In an age that has forgotten reverence, that treats God as a cosmic buddy or a spiritual accessory, the first angel calls humanity back to awe. Proverbs chapter nine verse ten: The fear of the Lord is the beginning of wisdom. You cannot properly understand anything in the Bible, in theology, in life itself, until you stand in awe of the Creator.
+King Nebuchadnezzar of Babylon has a dream. He sees a great image, a massive metallic statue standing before him. The head is made of fine gold. The chest and arms are silver. The belly and thighs are bronze. The legs are iron. And the feet are a strange mixture of iron and clay. Then a stone cut out without human hands strikes the statue on the feet, and the entire image crumbles into dust. The wind carries the dust away so that no place is found for it. The stone then grows into a great mountain that fills the whole earth.
 
 [pause]
 
-Second: give glory to him. First Corinthians chapter ten verse thirty-one: Whether therefore ye eat, or drink, or whatsoever ye do, do all to the glory of God. Giving glory to God is not just singing songs on Sabbath morning. It is a total life orientation. Your body is the temple of the Holy Spirit, as First Corinthians chapter six verse nineteen declares. How you eat, how you drink, how you treat your body, how you conduct your business, how you spend your time, all of it is a statement about whether you glorify God or glorify self.
+Daniel interprets. He says to the king in Daniel chapter two, verse thirty-eight: Thou art this head of gold. Babylon is the gold. The golden age of world empire. Nebuchadnezzar ruled the most magnificent kingdom the ancient world had ever seen. The hanging gardens, the Ishtar Gate, the massive ziggurats. Gold was fitting.
 
 [pause]
 
-Third: the hour of his judgment is come. Not will come. Is come. Present tense. The judgment has begun. This connects directly to Daniel chapter seven verses nine and ten, the judgment scene: I beheld till the thrones were cast down, and the Ancient of days did sit. His garment was white as snow, and the hair of his head like the pure wool. His throne was like the fiery flame, and his wheels as burning fire. A fiery stream issued and came forth from before him. Thousand thousands ministered unto him, and ten thousand times ten thousand stood before him. The judgment was set, and the books were opened.
+Then, Daniel says, after thee shall arise another kingdom inferior to thee. This is Medo-Persia, the silver. Silver is less valuable than gold. The Persian empire was vast but lacked the unified brilliance of Babylon. It was a dual monarchy, the Medes and the Persians, which is why the statue has two arms.
 
 [pause]
 
-And it connects to Daniel chapter eight verse fourteen: Unto two thousand and three hundred days, then shall the sanctuary be cleansed. The cleansing of the sanctuary is the judgment. The first angel is announcing what the Prophecy Room mapped: the investigative judgment that began in 1844 is underway. We are living in the judgment hour. This is not future. This is now.
+Then a third kingdom of brass, which shall bear rule over all the earth. This is Greece under Alexander the Great, the bronze. Alexander conquered the known world by the age of thirty. Bronze is appropriate for Greece. Greek soldiers were famous for their bronze armor and helmets.
+
+[pause]
+
+And the fourth kingdom shall be strong as iron: forasmuch as iron breaketh in pieces and subdueth all things: and as iron that breaketh all these, shall it break in pieces and bruise. This is Rome, the iron monarchy that crushed everything in its path, exactly as iron breaks all things. Rome's legions were the most disciplined fighting force in the ancient world. They broke Greece. They broke Carthage. They broke everything.
+
+[pause]
+
+Finally, the feet of iron and clay represent the divided kingdoms of Europe that emerged after Rome's collapse. Daniel chapter two, verse forty-three: They shall mingle themselves with the seed of men: but they shall not cleave one to another, even as iron is not mixed with clay. The nations of Europe intermarried, formed alliances, and fought wars for fifteen hundred years, but no one ever succeeded in reuniting Rome. Charlemagne tried. Charles the Fifth tried. Napoleon tried. Kaiser Wilhelm tried. Hitler tried. They all failed. They shall not cleave one to another. The prophecy holds. Europe remains divided to this day.
+
+[pause]
+
+And the stone? Daniel chapter two, verse forty-four: And in the days of these kings shall the God of heaven set up a kingdom, which shall never be destroyed: and the kingdom shall not be left to other people, but it shall break in pieces and consume all these kingdoms, and it shall stand for ever. The stone is the kingdom of God, established at Christ's return, which destroys all earthly powers and fills the entire earth.
 
 [long pause]
 
-And then the first angel adds one more phrase that most readers gloss over but that carries immense weight: worship him that made heaven, and earth, and the sea, and the fountains of waters. Read that again carefully. Where have you heard that language before? Exodus chapter twenty verses eight through eleven: Remember the sabbath day, to keep it holy. For in six days the Lord made heaven and earth, the sea, and all that in them is, and rested the seventh day. Wherefore the Lord blessed the sabbath day, and hallowed it. The first angel is quoting the fourth commandment. The call to worship the Creator is a call to honor the memorial of creation: the seventh-day Sabbath. In the final conflict, the Sabbath becomes the definitive test of allegiance. Do you worship the Creator on His day, or do you follow a substitute institution established by human tradition?
-
-[pause]
-
-This is where every room in the Palace activates. The Blue Room taught you the sanctuary, which houses the law, which includes the Sabbath commandment, inside the Ark. The Prophecy Room taught you the little horn power that thought to change times and laws. The Concentration Room taught you to find Christ in every text, and Christ is the Lord of the Sabbath, as He declared in Mark chapter two verse twenty-eight. The Patterns Room showed you how the Sabbath pattern runs from creation through Israel through the New Testament through the end. Everything converges.
+Now here is what is breathtaking about Daniel two. It was written approximately six hundred years before Christ. At that time, Babylon was the supreme world power. No human analyst could have predicted the exact sequence of empires that would follow. But the prophecy names them: Babylon, Persia, Greece, Rome, divided Europe, and then God's kingdom. And history has confirmed every single transition with perfect accuracy. This is not coincidence. This is God declaring the end from the beginning, Isaiah chapter forty-six, verse ten.
 
 [long pause]
 
-The second angel declares: Babylon is fallen, is fallen. The repetition indicates certainty and completeness. The name Babylon comes from Babel, which means confusion. Genesis chapter eleven records the Tower of Babel, where humanity attempted to build its own way to heaven and God confused their languages. Spiritual Babylon is any religious system that mixes truth with error, divine commands with human traditions, the gospel with works-based salvation, the worship of God with the worship of images and saints and human authorities.
+Now here is where the repeat-and-enlarge principle comes in. This is one of the most important interpretive keys in all of prophetic study. Daniel two gives the basic outline, the skeleton. Daniel seven covers the same ground but adds flesh, new details, new characters, and a climactic judgment scene. Daniel eight then narrows the focus and adds the sanctuary timeline. Each vision repeats the same historical sequence but enlarges it with additional information. It is like watching the same movie three times, each time with a wider screen, more characters, and a deeper plot.
 
 [pause]
 
-Revelation chapter seventeen verses four and five expands this: And the woman was arrayed in purple and scarlet color, and decked with gold and precious stones and pearls, having a golden cup in her hand full of abominations and filthiness of her fornication. And upon her forehead was a name written, Mystery, Babylon the Great, the Mother of Harlots and Abominations of the Earth. Babylon is not just one institution. She is a mother. She has daughters. The confusion has spread. The wine of her false doctrines has been drunk by all nations. And the second angel declares that this entire system is fallen, exposed, unmasked.
+Let us move to Daniel chapter seven. Daniel himself now has a vision. He sees four great beasts rising from the sea. The sea in prophecy represents peoples, multitudes, nations, and tongues, Revelation chapter seventeen, verse fifteen. These beasts are kingdoms rising from the turmoil of human civilization.
 
 [pause]
 
-Isaiah chapter twenty-one verse nine predicted it centuries earlier: Babylon is fallen, is fallen, and all the graven images of her gods he hath broken unto the ground. What was true of literal Babylon is now true of spiritual Babylon. Her false gods, her counterfeit systems, her substituted truths are being exposed and broken.
+The first beast is a lion with eagle's wings. This is Babylon. The lion was the national symbol of Babylon, and the Ishtar Gate was decorated with winged lions. As Daniel watches, the wings are plucked and the lion is made to stand on two feet like a man and given a man's heart. This describes Nebuchadnezzar's humbling in Daniel chapter four, when his pride was broken during seven years of madness and he was given the heart of a humbled man who acknowledged God's sovereignty.
 
 [pause]
 
-The call to God's people is clear. Revelation chapter eighteen verse four: Come out of her, my people, that ye be not partakers of her sins, and that ye receive not of her plagues. God has people in Babylon. They are sincere. They love God. But they are in a system of confusion, and the second angel's message calls them out. This is not an attack on individuals. It is a diagnosis of a system. And it is a rescue mission.
+The second beast is a bear raised up on one side, with three ribs in its mouth. This is Medo-Persia. The bear is raised on one side because the Persian element was dominant over the Median element in the dual monarchy. The three ribs represent the three major conquests: Lydia in 547 BC, Babylon in 539 BC, and Egypt in 525 BC. The command devour much flesh describes the massive scale of Persian military campaigns.
+
+[pause]
+
+The third beast is a leopard with four wings of a bird and four heads. This is Greece. Alexander the Great conquered the known world with leopard-like speed, faster than any conqueror before him. The four wings, doubling the normal two wings of Daniel seven's lion, represent supernatural speed of conquest. Alexander built an empire stretching from Greece to India in just ten years. The four heads represent the four generals who divided the empire after Alexander's death at age thirty-two: Cassander took Macedonia and Greece, Lysimachus took Thrace and much of Asia Minor, Seleucus took Syria, Babylon, and the eastern territories, and Ptolemy took Egypt and Palestine.
+
+[pause]
+
+The fourth beast is dreadful and terrible, exceedingly strong, with great iron teeth and ten horns. This is Rome. Daniel says it devoured, broke in pieces, and stamped the residue with its feet. The iron teeth match the iron legs of Daniel two. Rome was not compared to any known animal because no animal was terrible enough to represent it. The ten horns represent the ten tribal kingdoms that divided the Roman Empire when it fell in the fifth century: the Franks, the Alemanni, the Burgundians, the Suevi, the Vandals, the Visigoths, the Anglo-Saxons, the Ostrogoths, the Lombards, and the Heruli.
 
 [long pause]
 
-The third angel delivers the most solemn warning in all of Scripture. If any man worship the beast and his image and receive his mark, the consequences are total and irreversible. The language is terrifyingly precise: the wine of the wrath of God, poured out without mixture. In every previous act of divine judgment, mercy was mixed in. Even during the plagues on Egypt, God gave warnings. Even during the flood, there was a hundred and twenty years of preaching. But this cup is poured out without mixture. Pure, undiluted consequence.
+But here is the enlargement that Daniel seven adds. Among the ten horns, a little horn rises. Daniel chapter seven, verses eight and twenty through twenty-five describe this power in precise detail. It comes up among the ten horns, meaning it arises in Western Europe. It is little at first but grows to dominate. It uproots three of the ten horns. It has eyes like the eyes of a man, indicating human intelligence and political shrewdness. It has a mouth speaking great things, meaning it makes grand claims and pronouncements.
 
 [pause]
 
-Now, what is the mark of the beast? You cannot understand it without the Prophecy Room and the Blue Room working together. The beast of Revelation thirteen is the same power as the little horn of Daniel seven. It rose from the divided Roman Empire. It spoke great things against the Most High. It wore out the saints. It thought to change times and laws. The mark of this beast is the sign of its authority, the counterfeit sign that stands opposite to the seal of God.
+Verses twenty-five gives the full identification: And he shall speak great words against the most High, and shall wear out the saints of the most High, and think to change times and laws: and they shall be given into his hand until a time and times and the dividing of time. Five identifying marks. First, it speaks against God, claiming prerogatives that belong only to God. Second, it persecutes God's people. Third, it thinks to change times, specifically prophetic time, and laws, specifically God's law. Fourth, it has its period of dominance measured in prophetic time. Fifth, the duration is time, times, and the dividing of time, which equals three and a half prophetic years, or twelve hundred and sixty prophetic days, or twelve hundred and sixty literal years using the day-year principle.
 
 [pause]
 
-Revelation chapter seven verse two shows the seal of God placed in the foreheads of the servants of God. A seal contains three elements: the name, the title, and the territory of the authority. The fourth commandment contains all three: the Lord, your God, Creator, of heaven and earth. The Sabbath is God's seal. The mark of the beast is the counterfeit: a day of worship instituted by human authority, enforced by civil legislation, standing in direct opposition to God's commanded day of rest.
-
-[pause]
-
-But notice how the passage ends. Verse twelve: Here is the patience of the saints. Here are they that keep the commandments of God and the faith of Jesus. Two characteristics define God's end-time people. They keep the commandments of God, all ten, including the fourth. And they have the faith of Jesus, not just faith in Jesus, but the very quality of faith that Jesus Himself demonstrated: total dependence on the Father, obedience unto death, trust that does not waver even when the sky goes dark.
+The Protestant Reformers unanimously identified the little horn as the papal system. The three horns uprooted were the Heruli in 493 AD, the Vandals in 534 AD, and the Ostrogoths in 538 AD, all Arian powers that opposed papal authority. The great words against the Most High correspond to claims of papal infallibility and the title Vicar of Christ, which means substitute for Christ on earth. The wearing out of the saints corresponds to the centuries of persecution during the medieval period, including the Inquisition. The changing of times and laws corresponds to the transfer of Sabbath observance from the seventh day to the first day and the alteration of the second commandment regarding images. And the twelve hundred and sixty years run from 538 AD, when the last of the three opposing Arian powers was defeated and papal supremacy was established, to 1798 AD, when Napoleon's general Berthier marched into Rome, took the pope captive, and dealt the papacy a deadly wound.
 
 [long pause]
 
-This is why the Three Angels Room is the capstone. It is where the gospel meets the law. Where grace meets obedience. Where prophecy meets present truth. Where the sanctuary meets the final crisis. Where Christ-centered study meets missional urgency. Every room you have walked through in the Palace has been preparing you for this moment. The Story Room gave you the narratives that illustrate these truths. The Observation Room taught you to see details that others miss. The Concentration Room taught you to find Christ, and Christ is the center of all three messages. The Theme Room placed these truths on the prophetic and sanctuary walls. The Blue Room showed you the blueprint. The Prophecy Room showed you the timeline. And now the Three Angels Room shows you the mission.
+But Daniel seven does not end with the little horn. It ends with the most glorious judgment scene in all of Scripture. Daniel chapter seven, verses nine and ten: I beheld till the thrones were cast down, and the Ancient of days did sit, whose garment was white as snow, and the hair of his head like the pure wool: his throne was like the fiery flame, and his wheels as burning fire. A fiery stream issued and came forth from before him: thousand thousands ministered unto him, and ten thousand times ten thousand stood before him: the judgment was set, and the books were opened.
 
 [pause]
 
-In the Phototheology app, the Training Drills for this room will ask you to map each of the three messages back to specific rooms in the Palace. Which rooms does the first angel activate? The Blue Room, because the judgment is rooted in the sanctuary. The Prophecy Room, because the judgment hour is a prophetic fulfillment. The Patterns Room, because the Sabbath pattern runs through Scripture. Keep going for all three messages and you will discover that every single room contributes.
+And then, verses thirteen and fourteen: I saw in the night visions, and, behold, one like the Son of man came with the clouds of heaven, and came to the Ancient of days, and they brought him near before him. And there was given him dominion, and glory, and a kingdom, that all people, nations, and languages, should serve him: his dominion is an everlasting dominion, which shall not pass away, and his kingdom that which shall not be destroyed.
 
 [pause]
 
-The Study Buddy can help you trace how the three messages answer the three deceptions of the beast. The beast offers a false gospel: salvation by works and human merit. The first angel counters with the everlasting gospel: salvation by grace through faith. The beast offers a false system of worship: Babylon's confusion. The second angel exposes it. The beast demands allegiance through a mark enforced by economic pressure: buy and sell. The third angel warns against it and presents the alternative: the patience of the saints.
-
-[pause]
-
-You are not just a student of the Bible. You are a herald. The angels fly in the midst of heaven, and their messages are carried by human voices, your voice. Phototheology has not been training you merely to admire Scripture. It has been training you to proclaim it. Everything you have learned, every skill you have built, every connection you have traced, exists so that you can carry these three messages to every nation, kindred, tongue, and people.
-
-[pause]
-
-I am Professor Herald. This has been the Three Angels Room. Now carry the message to the world.`;
-
-export const SCRIPT_FEASTS_ROOM = `Welcome to the Feasts Room. I am Professor Moadim, and I am named after the Hebrew word for God's appointed times. The word moadim appears in Leviticus chapter twenty-three verse two, where God says, Speak unto the children of Israel, and say unto them, Concerning the feasts of the Lord, which ye shall proclaim to be holy convocations, even these are my feasts. Notice: God calls them my feasts. Not Israel's feasts. Not Jewish feasts in the cultural sense. These are divine appointments, scheduled by heaven, encoded with prophetic meaning, and fulfilled with breathtaking precision.
-
-[pause]
-
-There are seven feasts, and they fall into two groups. The spring feasts, which were fulfilled at Christ's first coming. And the fall feasts, which connect to Christ's second coming and the events leading up to it. Together, the seven feasts form a prophetic calendar that spans the entire plan of redemption from Calvary to the New Creation.
+The little horn dominates for a time. But the judgment sits. The books are opened. And Christ receives the kingdom. That is the message of Daniel seven. Evil is real, powerful, and long-lasting, but it is temporary. The judgment of God is coming, and the Son of Man wins. The courtroom of heaven overrules the throne rooms of earth.
 
 [long pause]
 
-The first feast is Passover. Leviticus chapter twenty-three verse five: In the fourteenth day of the first month at even is the Lord's passover. The original Passover occurred in Egypt, the night before Israel's deliverance. Every family was to take a lamb, a male of the first year without blemish, kill it in the evening, and put the blood on the doorposts and lintel of their house. Exodus chapter twelve verses twelve and thirteen: For I will pass through the land of Egypt this night, and will smite all the firstborn in the land of Egypt, both man and beast, and against all the gods of Egypt I will execute judgment. I am the Lord. And the blood shall be to you for a token upon the houses where ye are, and when I see the blood, I will pass over you, and the plague shall not be upon you to destroy you.
+Now Daniel chapter eight narrows the lens further. Instead of four empires, Daniel eight shows only two beasts: a ram and a goat. The ram with two horns is explicitly identified as Medo-Persia in Daniel chapter eight, verse twenty. The goat with a notable horn is explicitly identified as Greece in verse twenty-one, with the notable horn being the first king, Alexander. The notable horn is broken at the height of its power, just as Alexander died at thirty-two. Four horns come up in its place, the four divisions of the Greek empire.
 
 [pause]
 
-When was this fulfilled? On the exact day. First Corinthians chapter five verse seven: For even Christ our passover is sacrificed for us. Jesus was crucified on the fourteenth day of Nisan, the very day of Passover. He is the Lamb without blemish. His blood covers our household. When the Father sees the blood, judgment passes over us. John chapter one verse twenty-nine confirms it through the mouth of John the Baptist: Behold the Lamb of God, which taketh away the sin of the world. The first feast, fulfilled on its exact calendar day. Not a day early. Not a day late.
+Then from one of the four horns, a little horn arises that grows exceedingly great toward the south, toward the east, and toward the pleasant land. This little horn is Rome in both its pagan and papal phases. It begins as pagan Rome expanding toward Egypt in the south, toward Syria in the east, and toward Palestine, the pleasant land. It then transitions into papal Rome, which magnifies itself against the Prince of the host, Christ Himself, takes away the daily, meaning it obscures the continual ministry of Christ in the heavenly sanctuary by substituting an earthly priesthood and an earthly sacrifice, the mass, and it casts down the place of his sanctuary by redirecting worship away from the heavenly temple to an earthly system.
 
 [pause]
 
-The second feast is Unleavened Bread. Leviticus chapter twenty-three verse six: And on the fifteenth day of the same month is the feast of unleavened bread unto the Lord. Seven days ye must eat unleavened bread. Leaven in Scripture represents sin and corruption. First Corinthians chapter five verse eight: Therefore let us keep the feast, not with old leaven, neither with the leaven of malice and wickedness, but with the unleavened bread of sincerity and truth.
+Then comes the question that echoes through the centuries. Daniel chapter eight, verse thirteen: How long shall be the vision concerning the daily sacrifice, and the transgression of desolation, to give both the sanctuary and the host to be trodden under foot? How long will this horror last? How long will truth be trampled? And the answer, verse fourteen: Unto two thousand and three hundred days; then shall the sanctuary be cleansed.
 
 [pause]
 
-When was this fulfilled? The day after the crucifixion, the fifteenth of Nisan, Christ's body lay in the tomb. He was the sinless, unleavened bread of life. Second Corinthians chapter five verse twenty-one: For he hath made him to be sin for us, who knew no sin, that we might be made the righteousness of God in him. His burial was the placing of the unleavened loaf into the earth. No corruption touched His body. Psalm sixteen verse ten, quoted by Peter at Pentecost: Thou wilt not leave my soul in hell, neither wilt thou suffer thine Holy One to see corruption. The body of Jesus did not decay. He was the truly unleavened bread.
-
-[pause]
-
-The third feast is Firstfruits. Leviticus chapter twenty-three verses ten and eleven: When ye be come into the land which I give unto you, and shall reap the harvest thereof, then ye shall bring a sheaf of the firstfruits of your harvest unto the priest. And he shall wave the sheaf before the Lord, to be accepted for you. On the morrow after the sabbath the priest shall wave it. This was celebrated on the first day of the week following Passover.
-
-[pause]
-
-When was this fulfilled? On the exact day. First Corinthians chapter fifteen verses twenty and twenty-three: But now is Christ risen from the dead, and become the firstfruits of them that slept. Christ the firstfruits, afterward they that are Christ's at his coming. Jesus rose from the dead on the day of Firstfruits, the first day of the week following Passover Sabbath. He is the first sheaf waved before the Father, the guarantee that the full harvest of resurrection will follow. His resurrection is not just a miracle. It is a prophetic fulfillment, occurring on the exact feast day that predicted it.
+Twenty-three hundred prophetic days. Using the day-year principle established in Numbers chapter fourteen, verse thirty-four, and Ezekiel chapter four, verse six, each prophetic day equals one literal year. These are twenty-three hundred literal years. The starting point is the decree of Artaxerxes to restore and rebuild Jerusalem, issued in 457 BC, as established by the seventy-week prophecy of Daniel chapter nine. The seventy weeks, four hundred and ninety years, are cut off from the twenty-three hundred days. Both begin at 457 BC. The seventy weeks end in 34 AD with the stoning of Stephen and the gospel going to the Gentiles. The remaining eighteen hundred and ten years of the twenty-three hundred extend from 34 AD to 1844 AD. In 1844, the cleansing of the heavenly sanctuary began, the anti-typical Day of Atonement, the investigative judgment.
 
 [long pause]
 
-The fourth feast is Pentecost, also called the Feast of Weeks. Leviticus chapter twenty-three verses fifteen and sixteen: And ye shall count unto you from the morrow after the sabbath, from the day that ye brought the sheaf of the wave offering, seven sabbaths shall be complete. Even unto the morrow after the seventh sabbath shall ye number fifty days. Pentecost means fiftieth. It was a harvest festival, celebrated fifty days after Firstfruits.
+Now Revelation picks up exactly where Daniel leaves off. Daniel was told in chapter twelve, verse four, to shut up the words and seal the book to the time of the end. Revelation is the unsealing. Revelation chapter five shows the Lamb who is worthy to open the sealed scroll. Revelation chapter twelve traces the great controversy from the war in heaven through the persecution of the church through the twelve hundred and sixty years. Revelation chapter thirteen introduces the sea beast, the same papal power as Daniel seven's little horn and Daniel eight's horn, and adds a second beast, the lamb-like beast from the earth, which has two horns like a lamb but speaks as a dragon.
 
 [pause]
 
-When was this fulfilled? Acts chapter two verses one through four: And when the day of Pentecost was fully come, they were all with one accord in one place. And suddenly there came a sound from heaven as of a rushing mighty wind, and it filled all the house where they were sitting. And there appeared unto them cloven tongues like as of fire, and it sat upon each of them. And they were all filled with the Holy Ghost, and began to speak with other tongues, as the Spirit gave them utterance. On the exact day of the Feast of Pentecost, the Holy Spirit was poured out. The harvest of three thousand souls was gathered that day. The church was born on the feast day that prophetically pointed to it.
+This second beast arises from the earth, meaning from a relatively unpopulated territory, in contrast to the sea beasts that arise from the densely populated regions of Europe and Asia. It rises around the time the first beast receives its deadly wound in 1798. It starts with lamb-like qualities, republican government and Protestant Christianity, symbolized by its two horns. But eventually it speaks as a dragon. It exercises all the power of the first beast before him. It tells the inhabitants of the earth to make an image to the beast, a church-state union that mirrors medieval papal Europe. And it causes all to receive a mark in their right hand or in their forehead.
 
 [pause]
 
-Stop and consider this. Four spring feasts. Four fulfillments. Each on the exact calendar day. Passover equals Calvary. Unleavened Bread equals burial. Firstfruits equals resurrection. Pentecost equals the pouring out of the Spirit. This is not coincidence. This is not human planning. This is divine choreography of the highest order. And it raises an unavoidable question: if the four spring feasts were fulfilled on their exact days, what does that say about the three fall feasts?
+The identification is the United States of America. A nation arising in the late eighteenth century from a relatively unpopulated continent, founded on principles of religious liberty and civil freedom, the two lamb-like horns, but prophesied to eventually abandon those principles and enforce a system of coerced worship. The image of the beast is the replication of church-state union. The mark of the beast is the enforcement of false worship in opposition to the seal of God.
 
 [long pause]
 
-The fifth feast is the Feast of Trumpets. Leviticus chapter twenty-three verse twenty-four: In the seventh month, in the first day of the month, shall ye have a sabbath, a memorial of blowing of trumpets, a holy convocation. This feast came after a long gap between the spring and fall festivals. The trumpets were a wake-up call, an alarm, a summons to prepare for the solemn events to follow.
+Let me pull all of this together. Daniel two gives you the skeleton: five empires and then God's kingdom. Daniel seven adds the little horn, the persecution of the saints, the judgment scene, and the Son of Man receiving dominion. Daniel eight adds the sanctuary timeline and the twenty-three hundred days leading to the cleansing of the sanctuary. Daniel nine cuts out the seventy weeks and pinpoints the Messiah's baptism, crucifixion, and the end of the Jewish probationary period. Revelation expands the drama into the cosmic great controversy, introduces the two-beast system, and climaxes with the three angels' messages and the second coming.
 
 [pause]
 
-What does this represent prophetically? The announcement and preparation for the judgment. The great Second Advent movement of the eighteen thirties and eighteen forties, when preachers like William Miller proclaimed across the world that the judgment hour was near, corresponds to the Feast of Trumpets. It was a wake-up call to a sleeping Christendom. Revelation chapter fourteen verse seven: Fear God, and give glory to him, for the hour of his judgment is come. The trumpet was sounding. The world was being warned. Prepare, for the Day of Atonement is approaching.
+Each prophecy repeats and enlarges. Same ground, more detail, deeper significance. This is the pattern. And once you see it, you can never unsee it.
 
 [pause]
 
-The sixth feast is the Day of Atonement, Yom Kippur. Leviticus chapter twenty-three verse twenty-seven: Also on the tenth day of this seventh month there shall be a day of atonement. It shall be a holy convocation unto you, and ye shall afflict your souls. Leviticus chapter sixteen describes the service in detail. The high priest entered the Most Holy Place with blood, once a year, to cleanse the sanctuary from the accumulated sins of the people. Two goats were involved: the Lord's goat, which was slain, and the scapegoat, upon which the sins were placed and which was led into the wilderness.
+If you have access to the Bible Timeline feature in the Phototheology OS, I strongly encourage you to use it this week. Lay out Daniel two, Daniel seven, and Daniel eight in parallel columns. Align the empires across all three visions. Mark the points of enlargement. See how each vision adds new information without contradicting what came before. This visual exercise will cement the repeat-and-enlarge pattern in your mind and give you a prophetic framework that you can carry into any study of Daniel or Revelation.
 
 [pause]
 
-What does this represent? The investigative judgment in the heavenly sanctuary. Daniel chapter eight verse fourteen: Unto two thousand and three hundred days, then shall the sanctuary be cleansed. Beginning in 1844, Christ entered the Most Holy Place of the heavenly sanctuary to perform the antitypical Day of Atonement, the work of judgment, review, and final cleansing. Hebrews chapter nine verse twenty-three tells us it was necessary that the patterns of things in the heavens should be purified with these, but the heavenly things themselves with better sacrifices than these. The heavenly sanctuary requires a cleansing, and that cleansing is the Day of Atonement in its cosmic, antitypical reality.
+Your training exercise is this. Get a piece of paper or open your Bible Timeline. Draw three columns, one for Daniel two, one for Daniel seven, and one for Daniel eight. In each column, list the empires and powers in order. Then draw horizontal lines connecting the parallel elements across all three visions. Finally, note what new information each vision adds that the previous one did not include. When you finish, you will have a visual map of the repeat-and-enlarge principle, and you will never read these prophecies the same way again.
 
 [pause]
 
-The scapegoat represents Satan, who bears ultimate responsibility for originating sin. After the judgment, the sins are placed upon him, and he is destroyed. This is not about Satan atoning for sin. Christ alone atones. But Satan, as the originator of evil, bears the final weight of blame and is removed from the universe permanently.
+I am Professor Blackwell. This has been the Prophecy Room. Now look through the telescope, and see history as God sees it.`;
+
+export const SCRIPT_THREE_ANGELS = `Welcome to the Three Angels Room. I am Professor Herald, Message Bearer, and this room is the capstone of the entire Phototheology Palace.
+
+[pause]
+
+If the Blue Room gave you the sanctuary blueprint and the Prophecy Room gave you the historical timeline, the Three Angels Room gives you the message for this very hour. Everything you have studied, every room you have walked through, every skill you have developed, converges here. The three angels' messages of Revelation chapter fourteen are not a footnote in prophecy. They are the climax. They are God's final appeal to the human race before Jesus Christ returns. And understanding them is not optional for the serious student of Scripture. It is essential.
 
 [long pause]
 
-The seventh feast is the Feast of Tabernacles, also called Sukkot or the Feast of Booths. Leviticus chapter twenty-three verse thirty-four: The fifteenth day of this seventh month shall be the feast of tabernacles for seven days unto the Lord. During this feast, Israel dwelt in temporary booths, reminding them of God's faithfulness during the wilderness wandering. But it was also the most joyful feast, a celebration of the completed harvest, a time of dwelling with God in peace and abundance.
+Let us open Revelation chapter fourteen and walk through it verse by verse. I want you to feel the weight of every phrase, because these are not ordinary words. These are the last words of warning and invitation that heaven will ever speak to a fallen world.
 
 [pause]
 
-What does this represent? The ultimate fulfillment: the new creation, the new earth, where God dwells with His people forever. Revelation chapter twenty-one verses three and four: And I heard a great voice out of heaven saying, Behold, the tabernacle of God is with men, and he will dwell with them, and they shall be his people, and God himself shall be with them, and be their God. And God shall wipe away all tears from their eyes, and there shall be no more death, neither sorrow, nor crying, neither shall there be any more pain, for the former things are passed away.
+Verse six: And I saw another angel fly in the midst of heaven, having the everlasting gospel to preach unto them that dwell on the earth, and to every nation, and kindred, and tongue, and people.
 
 [pause]
 
-The Feast of Tabernacles is the grand finale. God tabernacling with His people. The harvest completed. The wilderness over. The booths of temporary dwelling replaced by an eternal home. Zechariah chapter fourteen verse sixteen even prophesies that in the kingdom age, the nations shall go up to worship the King, the Lord of hosts, and to keep the feast of tabernacles. The feast that celebrated God's faithfulness in the wilderness becomes the feast that celebrates God's faithfulness through all of redemption history.
+Stop right there. Notice three things about this single verse. First, the angel flies in the midst of heaven. This is not a private, local message whispered in a corner. It is broadcast from the highest possible vantage point, like a signal transmitted from orbit. It is global. It reaches every nation, every language group, every tribe, every people. No one is excluded from its scope. The universality of this message is staggering. Before the internet, before satellites, before global communications, God described a message that would reach every human being on the planet. That is the scope of the first angel.
+
+[pause]
+
+Second, the content is the everlasting gospel. Not a new gospel. Not a modified gospel. Not a gospel adapted to modern sensibilities. The same gospel that was promised in Eden when God said the seed of the woman would crush the serpent's head, Genesis chapter three, verse fifteen. The same gospel that Abraham believed when he was counted as righteous by faith, Genesis chapter fifteen, verse six. The same gospel that the apostle Paul preached in First Corinthians chapter fifteen: Christ died for our sins according to the scriptures, was buried, and rose again the third day according to the scriptures. This gospel is everlasting because it has been the same from Genesis to Revelation. It never changes. It never needs updating. It is the eternal good news that God saves sinners through the sacrifice of His Son.
+
+[pause]
+
+Third, notice that the angel preaches. The word in Greek carries the force of a herald announcing a royal decree. This is not a suggestion. This is not a polite invitation. This is a proclamation from the throne of the universe. The King has spoken, and the message must be delivered with urgency and authority. The first angel does not whisper. He flies. He does not suggest. He preaches with a loud voice. This message demands to be heard.
 
 [long pause]
 
-Now here is the picture that the Feasts Room gives you. The seven feasts are a prophetic calendar stretching from Calvary to the New Earth. Passover is the cross. Unleavened Bread is the burial. Firstfruits is the resurrection. Pentecost is the Holy Spirit. Trumpets is the judgment warning. Atonement is the heavenly judgment. Tabernacles is eternity with God. You can hold the entire plan of redemption in seven appointed times. And four of them are already fulfilled with mathematical precision, giving you absolute confidence that the remaining three will be fulfilled with equal precision.
+Verse seven: Saying with a loud voice, Fear God, and give glory to him; for the hour of his judgment is come; and worship him that made heaven, and earth, and the sea, and the fountains of waters.
 
 [pause]
 
-In the Phototheology app, the Training Drills for this room will present you with feast names and ask you to match them with their prophetic fulfillment. Then they will reverse it: they will give you events, Calvary, resurrection, Pentecost, judgment, Second Coming, and ask you to name the feast. This drill builds bidirectional fluency so that every time you read about a feast in the Old Testament, you instantly see its New Testament fulfillment, and every time you read a New Testament event, you instantly see its feast-day origin.
+This verse contains four distinct commands, and each one unpacks into an entire theology. Let me take them one by one.
 
 [pause]
 
-The Study Buddy can walk you through the calendar math, showing you how the fifty days from Firstfruits to Pentecost line up with the fifty days from Christ's resurrection to the outpouring of the Spirit. It can help you trace how the gap between the spring and fall feasts corresponds to the long gap in history between the apostolic era and the end-time judgment. The feasts are not random rituals. They are divine appointments kept on heaven's schedule.
+First: Fear God. This is not terror. This is not cowering dread. This is the reverent awe and trembling respect that a creature owes to the infinite Creator. Proverbs chapter one, verse seven: The fear of the Lord is the beginning of knowledge. Ecclesiastes chapter twelve, verse thirteen: Fear God, and keep his commandments: for this is the whole duty of man. The fear of the Lord is the foundation of all true religion. It is the recognition that God is God and you are not. It is the acknowledgment that His authority is absolute, His judgments are righteous, and His commands are not negotiable. In an age that has trivialized God, reduced Him to a cosmic therapist or a convenience-store deity who exists to serve human desires, the first angel restores the proper posture: reverent, humble, awe-filled fear before the Creator of the universe.
 
 [pause]
 
-I am Professor Moadim. This has been the Feasts Room. Now study God's calendar and see that He is always on time.`;
+Second: Give glory to Him. First Corinthians chapter ten, verse thirty-one: Whether therefore ye eat, or drink, or whatsoever ye do, do all to the glory of God. Giving glory to God means reflecting His character in every area of life. It includes how you treat your body, which is the temple of the Holy Spirit. It includes what you put into your mind, the media you consume, the thoughts you nurture. It includes how you relate to others, your integrity, your compassion, your honesty. It includes how you represent God to the watching universe. This is total lifestyle surrender. Not just Sunday religion. Not just church attendance. Every meal, every conversation, every business decision, every private thought, all to the glory of God.
+
+[pause]
+
+Third: The hour of His judgment is come. This is present tense. It has come. It has arrived. It is happening. The judgment is not entirely future. It has already begun. Daniel chapter seven showed us the judgment scene with thrones set and books opened. The twenty-three hundred day prophecy of Daniel chapter eight pointed to 1844 as the beginning of the cleansing of the heavenly sanctuary, the investigative judgment. Since 1844, the heavenly court has been in session. The books are open. The cases of every person who has professed the name of Christ are being reviewed. The first angel announces this reality to the world. The judgment hour has arrived. We are living in it. This is not future prophecy. This is present reality.
+
+[pause]
+
+Fourth: Worship Him that made heaven and earth and the sea and the fountains of waters. Now listen to this language very carefully. Heaven, earth, the sea, and the fountains of waters. Where have you heard this before? Exodus chapter twenty, verses eight through eleven: Remember the sabbath day, to keep it holy. Six days shalt thou labour, and do all thy work: but the seventh day is the sabbath of the Lord thy God. For in six days the Lord made heaven and earth, the sea, and all that in them is, and rested the seventh day: wherefore the Lord blessed the sabbath day, and hallowed it.
+
+[pause]
+
+The first angel's message quotes the fourth commandment. It is a deliberate, unmistakable, verbatim allusion to the Sabbath commandment. This is not accidental. This is not a loose connection. The angel uses the exact language of Exodus twenty, verse eleven, to call the world back to Creator worship. And the sign of Creator worship, the memorial of creation, the seal of the living God, is the seventh-day Sabbath. In a world that has largely abandoned the Creator's memorial and substituted a humanly instituted day, the first angel calls humanity back to the original. Worship the Creator. Remember His day. Honor His sign.
+
+[pause]
+
+And here is the deeper layer. The Sabbath is not just a day. It is a declaration of loyalty. It says: I worship the God who made me, not a human institution that changed His law. It says: I rest in His finished work, not in my own efforts. It says: I submit to His authority, not to the authority of any earthly power that presumes to alter His commandments. The Sabbath, in the context of the first angel's message, becomes the line in the sand. It is the seal of God, as opposed to the mark of the beast.
+
+[long pause]
+
+Now let me show you how the first angel's message connects to every floor of the Phototheology Palace. The everlasting gospel activates the Fruit Room, because the gospel must produce transformation. The judgment hour activates the Blue Room, because judgment happens in the Most Holy Place of the sanctuary on the Day of Atonement. The call to worship the Creator activates the Concentration Room, because Christ is the Creator: all things were made by Him, John chapter one; by Him were all things created, Colossians chapter one; through whom also He made the worlds, Hebrews chapter one. The Sabbath connection activates the Patterns Room, because Sabbath is a pattern woven through all of Scripture from Genesis chapter two to the new earth. The global scope activates the Prophecy Room, because this message goes to the whole world in the time of the end. Do you see? Every room feeds into the first angel.
+
+[long pause]
+
+Now the Second Angel. Verse eight: And there followed another angel, saying, Babylon is fallen, is fallen, that great city, because she made all nations drink of the wine of the wrath of her fornication.
+
+[pause]
+
+Babylon. The name itself is a theological sermon. It comes from Genesis chapter eleven, the Tower of Babel, where God confused the languages because humanity tried to build a tower to heaven by their own effort, through their own works, under their own authority. The Hebrew root word means confusion. In prophecy, Babylon represents any religious system that mixes truth with error, that substitutes human authority for divine authority, that confuses the gospel with human tradition.
+
+[pause]
+
+The original Babylon was the golden head of Daniel chapter two. It was the empire that destroyed Jerusalem and carried God's people into exile. It was the system that set up a golden image sixty cubits high and six cubits wide in Daniel chapter three and demanded universal worship under penalty of death. That pattern, a religious-political power demanding false worship through civil enforcement, repeats throughout history and reaches its climax in the end times.
+
+[pause]
+
+Revelation chapter seventeen describes end-time Babylon as a woman sitting on a scarlet beast, holding a golden cup full of abominations and filthiness of her fornication, and on her forehead is written: Mystery, Babylon the Great, the Mother of Harlots and Abominations of the Earth. A woman in prophecy represents a church, Jeremiah chapter six, verse two. A pure woman is a faithful church. A harlot is an apostate church. This woman is not just a harlot. She is the Mother of Harlots. She has daughters. This is not one single false church. It is an entire family of false religious systems, all sharing the same DNA of confusion: human tradition elevated over divine command, outward form substituted for inward transformation, political power wedded to religious authority.
+
+[pause]
+
+She made all nations drink of the wine of the wrath of her fornication. The wine represents false doctrines. Think about what happens when you are drunk. You cannot think clearly. You cannot distinguish truth from error. Your judgment is impaired. Your reflexes are dulled. Babylon's wine does the same thing to spiritual judgment. Natural immortality of the soul, which obscures the truth about death and opens the door to spiritualism. Sunday sacredness, which replaces the Creator's Sabbath with a humanly instituted day. Eternal hellfire, which misrepresents the character of a loving God as a cosmic torturer. Salvation by works mixed with grace, which undermines the pure gospel. Secret rapture, which creates false security. These false doctrines have intoxicated the nations.
+
+[pause]
+
+And the angel says Babylon is fallen, is fallen. The double declaration emphasizes certainty and completeness. This is not a prediction that Babylon might fall. It is an announcement that Babylon's fall is an accomplished fact in the eyes of heaven. The verdict is in. The system is condemned. And God's people who are still within Babylon are called to come out. Revelation chapter eighteen, verse four: Come out of her, my people, that ye be not partakers of her sins, and that ye receive not of her plagues. God has sincere people in every denomination, in every religious system. But when the issues become clear, when the choice between the seal of God and the mark of the beast is presented, His people are called to leave Babylon and take their stand with truth.
+
+[long pause]
+
+Now the Third Angel. Verses nine through twelve. And this is the most solemn warning in all of Scripture. There is nothing else like it in the entire Bible.
+
+[pause]
+
+Verse nine: And the third angel followed them, saying with a loud voice, If any man worship the beast and his image, and receive his mark in his forehead, or in his hand.
+
+[pause]
+
+Verse ten: The same shall drink of the wine of the wrath of God, which is poured out without mixture into the cup of his indignation; and he shall be tormented with fire and brimstone in the presence of the holy angels, and in the presence of the Lamb.
+
+[pause]
+
+Verse eleven: And the smoke of their torment ascendeth up for ever and ever: and they have no rest day nor night, who worship the beast and his image, and whosoever receiveth the mark of his name.
+
+[pause]
+
+This is the most severe language God uses anywhere in the Bible. Without mixture means unmixed with mercy. Throughout history, God's judgments have always been mixed with mercy. Even in the plagues of Egypt, there were pauses between plagues, opportunities to repent, moments of grace. Even in the destruction of Jerusalem, Jesus warned His followers and gave them a way of escape. But the seven last plagues described in Revelation chapter sixteen are poured out without mixture, without any tempering of mercy. This is final, unmingled, undiluted wrath. The cup of His indignation. This is not language to be taken lightly. This is God's final word to those who knowingly, deliberately choose to worship a false system when the truth has been made clear.
+
+[pause]
+
+Now, what is the beast? We covered this in the Prophecy Room. Revelation chapter thirteen describes a composite beast rising from the sea, combining features of the leopard, bear, and lion from Daniel chapter seven. This is the papal system that received power, a seat, and great authority from the dragon, which is Satan working through pagan Rome. It rules for forty-two months, the twelve hundred and sixty years from 538 to 1798. It receives a deadly wound, which happened in 1798. And the deadly wound is healed, which is happening before our eyes as papal influence returns to global prominence.
+
+[pause]
+
+What is the image of the beast? Revelation chapter thirteen, verses fourteen and fifteen, describe the second beast, the lamb-like beast from the earth, telling the inhabitants of the earth to make an image to the first beast. An image is a copy, a replica. The image of the beast is a system that replicates what the papacy was at its height: the union of church and state, religious legislation enforced by civil power. When Protestant America creates a system that mirrors medieval papal authority, compelling worship and conscience by law, the image of the beast has been formed. And the prophecy says it will cause all, both small and great, rich and poor, free and bond, to receive a mark. This is universal enforcement.
+
+[pause]
+
+What is the mark? It is the opposite of the seal of God. The seal of God is connected to the Sabbath, the sign of allegiance to the Creator, the fourth commandment that identifies who God is, what He did, and what territory He governs. The mark of the beast is the counterfeit: a coerced act of worship that replaces God's authorized day with a humanly instituted day. It is received in the forehead, representing intellectual assent and genuine conviction, or in the hand, representing practical compliance even without personal conviction. You either believe the lie or you go along with it for convenience. Either way, you receive the mark.
+
+[pause]
+
+I want to be very clear about something. The mark of the beast is not primarily about a physical technology, a chip, a barcode, or a digital ID. It is about worship. It is about allegiance. It is about who you obey when the world demands that you disobey God. The technology may be the enforcement mechanism, but the mark itself is the act of choosing a human-instituted worship over God-commanded worship when the issue is clearly presented.
+
+[long pause]
+
+Now verse twelve. This is the relief after the warning. This is the hope in the midst of the crisis.
+
+[pause]
+
+Here is the patience of the saints: here are they that keep the commandments of God, and the faith of Jesus.
+
+[pause]
+
+Two identifying marks of God's final people. First, they keep the commandments of God. All ten. Including the fourth. They do not pick and choose. They do not claim that the law was abolished while living as if nine of the ten still apply. They keep all of God's commandments, not as a means of earning salvation, but as the fruit of a faith relationship with Jesus. Obedience is the evidence of love. If ye love me, keep my commandments, John chapter fourteen, verse fifteen.
+
+[pause]
+
+Second, they have the faith of Jesus. Notice: the faith of Jesus, not just faith in Jesus. This is the same quality of faith that Jesus demonstrated during His earthly life. It is a trusting, obedient, self-surrendering faith that says not my will but thine be done. It is a faith that endures trial, that perseveres under persecution, that holds firm when the whole world opposes. In the garden of Gethsemane, Jesus sweat drops of blood, but He did not back down. That is the faith of Jesus. And that is the faith that God's last-day people will demonstrate.
+
+[pause]
+
+The patience of the saints. The Greek word is hupomone, which means endurance under trial. It is not passive waiting. It is not sitting on a couch hoping for the rapture. It is active, deliberate perseverance in the face of opposition. These saints endure the economic boycott of Revelation chapter thirteen, verse seventeen, where no man might buy or sell unless he has the mark. They endure the social ostracism of being called rebels and troublemakers. They endure the death decree of Revelation chapter thirteen, verse fifteen. And they do not compromise. They keep God's commandments and hold to the faith of Jesus, even if it costs them everything.
+
+[long pause]
+
+Now let me show you how all of Phototheology converges in the three angels' messages. This is the single most important paragraph in this entire lecture, so listen carefully.
+
+[pause]
+
+The everlasting gospel, the root of the first angel, that is the Fruit Room. True gospel transformation is the root of everything we do. The judgment hour, that is the Blue Room and the Day of Atonement in the Most Holy Place. The call to worship the Creator, that is the Concentration Room, seeing Christ as Creator in every chapter, and the Sabbath commandment that seals that recognition. Babylon's fall, that is the Symbols and Types Room and the Def-Com Room, understanding the historical and contextual background of false religious systems. The beast, the image, and the mark, that is the Prophecy Room and the Parallels Room, tracing the same patterns across Daniel and Revelation. The commandments of God, that is the Patterns Room, the consistent moral law woven through every cycle of redemption history. The faith of Jesus, that is the Fire Room and the Meditation Room, where knowledge becomes conviction and conviction becomes Christlike character.
+
+[pause]
+
+Every room, every floor, every skill you have developed in the Phototheology Palace feeds into the three angels' messages. This is not coincidental. The Palace was designed this way because the three angels' messages are the reason the Palace exists. You do not study the Bible just to accumulate knowledge. You study the Bible to be equipped to carry this message to the world. This is the great commission of the last days. This is why you have trained. This is the mission.
+
+[pause]
+
+Now, if you have access to the Phototheology GPT in the OS app, I encourage you to use it for message study this week. Ask the GPT to help you unpack each phrase of Revelation fourteen, verses six through twelve. Ask it to show you cross-references. Ask it to help you articulate each angel's message in your own words, in language that a friend, a neighbor, a coworker, or a family member could understand. The three angels' messages are meant to be shared, not just studied. They are a message for the world, and you are the messenger.
+
+[pause]
+
+Your training exercise is this. Take a sheet of paper and divide it into three columns, one for each angel. In each column, write the exact biblical text of that angel's message at the top. Then below the text, list every Phototheology room that connects to that message and write one sentence explaining why. For the first angel: Blue Room, because the judgment happens in the sanctuary. Prophecy Room, because the judgment hour was predicted in Daniel eight fourteen. Concentration Room, because the Creator is Christ. Patterns Room, because the Sabbath is the creation memorial. For the second angel: Def-Com Room, because understanding Babylon requires historical context. Symbols and Types, because Babylon is a symbol of false worship. Parallels Room, because the pattern of Babel repeats in Revelation. For the third angel: Fruit Room, because faith produces obedience. Fire Room, because conviction sustains endurance. Meditation Room, because the faith of Jesus is cultivated in deep communion with God. Map every connection. When you finish, you will see that the three angels' messages are not an appendix to the Palace. They are the reason the Palace was built.
+
+[pause]
+
+I am Professor Herald. This has been the Three Angels Room. Now carry the message to every nation, kindred, tongue, and people.`;
+
+export const SCRIPT_FEASTS_ROOM = `Welcome to the Feasts Room. I am Professor Moadim, Feast Calendar Scholar, and I am named after the Hebrew word moadim, which means appointed times or divine appointments.
+
+[pause]
+
+This room reveals one of the most extraordinary features of the Bible. God has a calendar. Not a human calendar. Not a cultural calendar. A prophetic calendar. And He encoded it in the seven feasts of Leviticus chapter twenty-three. Each feast is not merely a celebration or a memorial. Each feast is a prophetic appointment, a date on God's cosmic schedule when something specific would happen in the plan of redemption. The spring feasts have already been fulfilled with breathtaking precision. The fall feasts await their final fulfillment. And when you see the pattern, you will never read your Bible the same way again.
+
+[long pause]
+
+Let us begin at the beginning. Leviticus chapter twenty-three, verse two: Speak unto the children of Israel, and say unto them, Concerning the feasts of the Lord, which ye shall proclaim to be holy convocations, even these are my feasts. Notice carefully: these are my feasts, God says. Not Israel's feasts. Not Jewish feasts. Not optional celebrations. God's feasts. They belong to Him. He set the dates. He determined the meaning. He controls the fulfillment.
+
+[pause]
+
+The Hebrew word moadim comes from the root moed, which means an appointed meeting, a scheduled rendezvous. It is the same word used in the phrase tent of meeting, the ohel moed, referring to the tabernacle itself. The feasts are meetings with God, scheduled in advance, each one a prophetic rendezvous where heaven and earth intersect at a specific moment in history. When you keep a feast, you are not performing a ritual. You are showing up to an appointment that God made before the foundation of the world.
+
+[pause]
+
+There are seven feasts in total. Four spring feasts and three fall feasts. Between the spring and fall groups, there is a long agricultural gap, the summer harvest season. This gap is itself prophetically significant. It represents the church age, the time between Christ's first coming, which the spring feasts mark, and His second coming, which the fall feasts mark. We are living in this gap right now. We are harvesters in the field, between the fulfilled appointments and the appointments yet to come.
+
+[long pause]
+
+Let us walk through the spring feasts one by one, with all the detail they deserve.
+
+[pause]
+
+Feast number one: Passover, Pesach. Leviticus chapter twenty-three, verse five: In the fourteenth day of the first month at even is the Lord's passover. The Passover was instituted on the night of Israel's deliverance from Egypt, described in Exodus chapter twelve. Each family was to take a lamb without blemish on the tenth day of the first month, keep it in the household for four days so it became a known, loved animal, and then kill it at twilight on the fourteenth day. The blood was to be applied to the doorposts and lintel of the house. When the angel of death passed through Egypt at midnight, he would pass over every house marked with the blood. The firstborn inside was protected. The lamb died so the son could live.
+
+[pause]
+
+Now let me show you the prophetic fulfillment, and the precision will take your breath away. First Corinthians chapter five, verse seven: For even Christ our passover is sacrificed for us. Jesus was crucified on the fourteenth day of the first month of the Jewish calendar, Nisan fourteen, the exact day of Passover. He was not crucified a day early or a day late. The exact day.
+
+[pause]
+
+The Passover lambs were being slain in the temple at the ninth hour, approximately three in the afternoon. At that exact moment, Jesus cried out on the cross: It is finished. And He died. The Lamb of God expired at the same hour as the Passover lambs. John chapter nineteen, verse thirty-six, confirms that not a bone of His body was broken, fulfilling the Passover requirement of Exodus chapter twelve, verse forty-six: neither shall ye break a bone thereof. The soldiers broke the legs of the two thieves beside Jesus, but when they came to Him, He was already dead, so they did not break His legs. The Passover law was obeyed to the letter, not by human planning, but by divine orchestration.
+
+[pause]
+
+And here is a detail that will stop you cold. The blood on the doorposts in Egypt formed the shape of a cross. Blood on the top of the lintel, dripping down. Blood on the left doorpost. Blood on the right doorpost. If you stood facing the door, you would see a cross outlined in blood. Fourteen centuries before Calvary, God was painting a picture of the cross on every Israelite door in the land of Goshen. The Passover was not just a memorial of the Exodus. It was a prophecy of Calvary written in blood on wood.
+
+[pause]
+
+The lamb was selected on the tenth day and kept until the fourteenth day. Jesus entered Jerusalem on the tenth of Nisan, what we call Palm Sunday, and was examined by the authorities for four days, questioned by the Pharisees, the Sadducees, the Herodians, and Pilate. He was found without fault. Without blemish. Then on the fourteenth of Nisan, He was slain. The Passover lamb was examined for four days and then sacrificed. The Lamb of God was examined for four days and then crucified. The precision is supernatural.
+
+[long pause]
+
+Feast number two: Unleavened Bread. Leviticus chapter twenty-three, verses six and seven: And on the fifteenth day of the same month is the feast of unleavened bread unto the Lord: seven days ye must eat unleavened bread. In the first day ye shall have an holy convocation. This feast began the day after Passover and lasted seven days. All leaven was removed from the homes of Israel. Every cupboard was searched. Every corner was swept. Leaven, which in Scripture represents sin and corruption, was completely purged. First Corinthians chapter five, verse eight: Therefore let us keep the feast, not with old leaven, neither with the leaven of malice and wickedness; but with the unleavened bread of sincerity and truth.
+
+[pause]
+
+Jesus was buried on the fifteenth of Nisan, the first day of Unleavened Bread. His sinless body lay in the tomb. He was the unleavened bread, the one in whom there was no sin, no corruption, no leaven of any kind. Second Corinthians chapter five, verse twenty-one: For he hath made him to be sin for us, who knew no sin; that we might be made the righteousness of God in him. Psalm sixteen, verse ten: For thou wilt not leave my soul in hell; neither wilt thou suffer thine Holy One to see corruption. While Israel was eating bread without leaven, the Bread of Life lay in the grave without corruption. His body did not decay. It could not decay. Because there was no leaven in Him.
+
+[pause]
+
+The seven days of the feast represent the completeness of the sinless life. Jesus was without leaven not just for a day or a week but for His entire existence. He was the sinless one from conception to resurrection and beyond. The feast that commanded seven days of unleavened eating pointed to the one who was unleavened for all eternity.
+
+[long pause]
+
+Feast number three: Firstfruits. Leviticus chapter twenty-three, verses ten and eleven: When ye be come into the land which I give unto you, and shall reap the harvest thereof, then ye shall bring a sheaf of the firstfruits of your harvest unto the priest: and he shall wave the sheaf before the Lord, to be accepted for you: on the morrow after the sabbath the priest shall wave it. Firstfruits was celebrated on the day after the weekly Sabbath that fell during the Feast of Unleavened Bread. The first sheaf of the barley harvest was cut at sunset on the Sabbath, brought to the temple, and waved before the Lord the next morning as a promise and guarantee that the full harvest would follow. The firstfruits sheaf was the down payment. If the firstfruits are holy, the whole lump is holy, Romans chapter eleven, verse sixteen.
+
+[pause]
+
+First Corinthians chapter fifteen, verse twenty: But now is Christ risen from the dead, and become the firstfruits of them that slept. Jesus rose from the dead on the exact day of the Feast of Firstfruits. On the morning after the Sabbath. On the day when the priest was waving the barley sheaf in the temple, Jesus rose from the tomb and presented Himself before the Father in heaven. He is the first sheaf, the guarantee that the full harvest of resurrection will follow. Because He rose, we will rise. His resurrection is the down payment on ours.
+
+[pause]
+
+And consider this detail. When Mary tried to touch Him in the garden on resurrection morning, John chapter twenty, verse seventeen, He said: Touch me not, for I am not yet ascended to my Father. He had to be presented first, waved before the Lord, just as the sheaf of firstfruits was presented before the Lord. Later that same day, He allowed the disciples to touch Him, because the presentation was complete. He had ascended to the Father, been accepted, and returned. The wave offering was fulfilled.
+
+[pause]
+
+And Matthew chapter twenty-seven, verses fifty-two and fifty-three, records something extraordinary. At the moment of Christ's resurrection, the graves were opened, and many bodies of the saints which slept arose, and came out of the graves after his resurrection, and went into the holy city, and appeared unto many. These risen saints were the firstfruits sheaf. Not a single stalk, but a sheaf, a bundle. Christ did not ascend alone. He brought a sample of the harvest with Him. He presented them before the Father as the proof, the evidence, that His death had accomplished its purpose. The full harvest is guaranteed. Every believer who sleeps in the dust will one day rise, because the firstfruits have already been accepted.
+
+[long pause]
+
+Feast number four: Pentecost, Shavuot, the Feast of Weeks. Leviticus chapter twenty-three, verses fifteen and sixteen: And ye shall count unto you from the morrow after the sabbath, from the day that ye brought the sheaf of the wave offering; seven sabbaths shall be complete: even unto the morrow after the seventh sabbath shall ye number fifty days; and ye shall offer a new meat offering unto the Lord. Pentecost means fiftieth. It falls exactly fifty days after Firstfruits. Seven weeks of seven days, plus one. In the Old Testament, it celebrated the wheat harvest and was also associated with the giving of the law at Sinai, since tradition held that Israel arrived at Sinai fifty days after leaving Egypt.
+
+[pause]
+
+Acts chapter two: And when the day of Pentecost was fully come, they were all with one accord in one place. And suddenly there came a sound from heaven as of a rushing mighty wind, and it filled all the house where they were sitting. And there appeared unto them cloven tongues like as of fire, and it sat upon each of them. And they were all filled with the Holy Ghost, and began to speak with other tongues, as the Spirit gave them utterance.
+
+[pause]
+
+On the exact day of Pentecost, fifty days after the resurrection, the Holy Spirit was poured out upon the early church. The precision is flawless. Just as the law was given at Sinai on the fiftieth day after the Exodus from Egypt, the Spirit was given on the fiftieth day after the resurrection. But notice the contrast. At Sinai, the law was written on stone tablets by the finger of God. At Pentecost, the law was written on human hearts by the Spirit of God, fulfilling Jeremiah chapter thirty-one, verse thirty-three: I will put my law in their inward parts, and write it in their hearts. At Sinai, there was fire on the mountain. At Pentecost, there was fire on the people. At Sinai, three thousand died for worshipping the golden calf, Exodus chapter thirty-two, verse twenty-eight. At Pentecost, three thousand were saved through Peter's preaching, Acts chapter two, verse forty-one. The old covenant wrote the law externally and produced death. The new covenant writes the law internally and produces life. Pentecost is the mirror image of Sinai, and both happened on the same feast day.
+
+[pause]
+
+The wheat harvest connection is beautiful too. At Pentecost in Acts chapter two, the first great harvest of souls was gathered. Three thousand in one day. The Holy Spirit is the harvester, and Pentecost was the day the spiritual wheat harvest began. The firstfruits had been presented, Christ and the risen saints. Now the main harvest commences. And it has been continuing ever since. Every soul won to Christ since Pentecost is part of the wheat harvest that began on that feast day.
+
+[long pause]
+
+Now stop and consider the mathematical precision of what we have just seen. Four spring feasts. Four events. Four exact calendar-day fulfillments.
+
+[pause]
+
+Passover: the fourteenth of Nisan. Christ crucified on the fourteenth of Nisan. Unleavened Bread: the fifteenth of Nisan. Christ buried on the fifteenth of Nisan. Firstfruits: the day after the Sabbath. Christ rose on the day after the Sabbath. Pentecost: the fiftieth day after Firstfruits. The Spirit poured out on the fiftieth day after the resurrection.
+
+[pause]
+
+The probability of four events lining up with four specific calendar dates by coincidence is astronomically small. This is not coincidence. This is divine engineering. God set these dates in Leviticus fifteen centuries before Christ, and then fulfilled them to the exact day. He did not miss a single appointment. He was not a day early or a day late for any of them. This is the God who declares the end from the beginning, and nothing escapes His calendar.
+
+[pause]
+
+And if the spring feasts were fulfilled with this level of supernatural precision at Christ's first coming, what does that tell us about the fall feasts? It tells us that the fall feasts will also be fulfilled with the same level of precision at events connected to Christ's second coming. The spring feasts are the proof, the guarantee, the evidence that the fall feasts are not metaphor, not allegory, not optional. They are appointments. And God keeps His appointments.
+
+[long pause]
+
+Now we enter the long gap between the spring and fall feasts. In the agricultural calendar, this was the harvest season, the hot summer months of gathering grain. In the prophetic calendar, this is the church age, the time of the gospel harvest. We are living in this gap right now. The spring feasts are behind us. Calvary, the burial, the resurrection, and Pentecost are accomplished facts. The fall feasts are ahead. The judgment, the cleansing, and the final dwelling of God with His people are still unfolding or yet to come. And we are workers in the field, gathering the harvest between the fulfilled and the unfulfilled.
+
+[pause]
+
+Now the fall feasts. And these deserve the same careful attention.
+
+[pause]
+
+Feast number five: the Feast of Trumpets, Yom Teruah. Leviticus chapter twenty-three, verses twenty-three through twenty-five: In the seventh month, in the first day of the month, shall ye have a sabbath, a memorial of blowing of trumpets, an holy convocation. The Feast of Trumpets was a day of loud, sustained trumpet blasts. Shofars, ram's horn trumpets, were blown repeatedly throughout the day. It was a wake-up call. It announced the beginning of the seventh month, the most sacred month of the Jewish calendar, and it served as a ten-day countdown to the solemn Day of Atonement.
+
+[pause]
+
+In Jewish tradition, the ten days between Trumpets and the Day of Atonement were called the Days of Awe. They were a time of intense self-examination, repentance, and preparation. You knew the judgment day was coming. You had ten days to get your heart right.
+
+[pause]
+
+Prophetically, the Feast of Trumpets represents the great awakening and the announcement of approaching judgment. The Millerite movement of the early 1840s, which proclaimed the soon coming of Christ and the imminent commencement of the judgment, was the anti-typical Feast of Trumpets. Thousands of people across the world were awakened by the preaching of William Miller and others who studied the twenty-three hundred day prophecy and concluded that a great event connected to the sanctuary was about to occur. Trumpets are associated throughout Scripture with warning, assembly, and the announcement of the King's approach. Joel chapter two, verse one: Blow ye the trumpet in Zion, and sound an alarm in my holy mountain: let all the inhabitants of the land tremble: for the day of the Lord cometh, for it is nigh at hand. The Feast of Trumpets says: wake up. Get ready. Judgment is near. The King is coming. Search your heart. Prepare to meet your God.
+
+[long pause]
+
+Feast number six: the Day of Atonement, Yom Kippur. Leviticus chapter twenty-three, verse twenty-seven: Also on the tenth day of this seventh month there shall be a day of atonement: it shall be an holy convocation unto you; and ye shall afflict your souls. We explored the Day of Atonement ceremony in detail in the Blue Room, but here we see it on the prophetic calendar.
+
+[pause]
+
+The Day of Atonement was the most solemn day of the entire Jewish year. It was the only day the high priest entered the Most Holy Place with blood. It was the day when the sanctuary was cleansed of the accumulated record of sin. It was the day when judgment was rendered. Anyone who did not afflict their soul on that day was cut off from the congregation, Leviticus chapter twenty-three, verse twenty-nine. There was no room for indifference. You either participated fully or you were excluded completely.
+
+[pause]
+
+The Day of Atonement is the anti-typical cleansing of the heavenly sanctuary that began in 1844 according to Daniel chapter eight, verse fourteen. Christ our High Priest entered the Most Holy Place of the heavenly sanctuary to begin the final phase of His ministry, the investigative judgment, the review of every case, the cleansing of the heavenly record. This is happening right now. We are living in the anti-typical Day of Atonement. The books are open. The character of every professed believer is being examined. And the third angel describes the result: the patience of the saints who keep the commandments of God and the faith of Jesus. This is Day of Atonement living. This is the time for deep self-examination, for confessing every known sin, for putting away everything that is not in harmony with God's character.
+
+[long pause]
+
+Feast number seven: the Feast of Tabernacles, Sukkot. Leviticus chapter twenty-three, verses thirty-four and forty-two through forty-three: The fifteenth day of this seventh month shall be the feast of tabernacles for seven days unto the Lord. Ye shall dwell in booths seven days; all that are Israelites born shall dwell in booths: that your generations may know that I made the children of Israel to dwell in booths, when I brought them out of the land of Egypt.
+
+[pause]
+
+The Feast of Tabernacles was the most joyful of all the feasts. It came after the Day of Atonement, after the judgment, after the cleansing. The heavy, solemn work was done. Now came celebration. The people built temporary shelters, booths of branches and leaves, and lived in them for seven days. They remembered their pilgrim journey through the wilderness, celebrated the completed harvest, and rejoiced in God's faithful provision.
+
+[pause]
+
+The water ceremony at Tabernacles was particularly dramatic. On the last day, the great day of the feast, the priest would draw water from the Pool of Siloam, carry it in a golden pitcher in a joyful procession up to the temple, and pour it out at the base of the altar while the choir sang from the Hallel psalms. And it was on that exact day, the last and great day of the feast, that Jesus stood up and cried out in John chapter seven, verses thirty-seven and thirty-eight: If any man thirst, let him come unto me, and drink. He that believeth on me, as the scripture hath said, out of his belly shall flow rivers of living water. At the very moment the priest was pouring physical water, Jesus offered spiritual water. He was the fulfillment standing in the midst of the shadow.
+
+[pause]
+
+Prophetically, the Feast of Tabernacles points to the ultimate fulfillment: God dwelling with His people in the new creation. Revelation chapter twenty-one, verse three: And I heard a great voice out of heaven saying, Behold, the tabernacle of God is with men, and he will dwell with them, and they shall be his people, and God himself shall be with them, and be their God. The tabernacle of God is with men. The Feast of Tabernacles is the final feast, the last appointment. When it is fulfilled, the pilgrimage is over. The harvest is complete. The wilderness is behind us. And God dwells with His people face to face, not behind a veil, not through a priesthood, not in a temporary booth, but forever.
+
+[pause]
+
+John chapter one, verse fourteen, uses Tabernacles language: And the Word was made flesh, and dwelt among us. The word dwelt is the Greek word skenoo, which literally means tabernacled. The Word tabernacled among us. Jesus was the fulfillment of Tabernacles at His first coming, God dwelling in human flesh. He will be the ultimate fulfillment at the second coming and beyond, God dwelling with His people for eternity. The Feast of Tabernacles bookends the entire plan of redemption.
+
+[long pause]
+
+Now let me pull all seven feasts together into a single panoramic view. You need to see this as one picture.
+
+[pause]
+
+Passover: Christ's death. The Lamb is slain. Unleavened Bread: Christ's burial. The sinless one rests in the grave. Firstfruits: Christ's resurrection. The first sheaf is waved before the Father. Pentecost: the Holy Spirit poured out. The harvest begins. Then the long harvest gap: the church age, where we are now, gathering souls. Then Trumpets: the judgment is announced. Wake up. Prepare. Day of Atonement: the heavenly sanctuary is cleansed. The judgment is underway. Tabernacles: God dwells with His people forever. The pilgrimage ends. The joy is eternal.
+
+[pause]
+
+Seven feasts. Seven appointments. Four fulfilled with precision. Three in process or soon to be fulfilled. The feasts are the backbone of prophetic time. They are the rhythm of redemption. They are the pulse of God's calendar.
+
+[pause]
+
+If you have access to the Bible Timeline in the Phototheology OS, I want you to plot all seven feasts on a single timeline this week. Mark the fulfillment dates for the spring feasts: Passover at Calvary, Unleavened Bread at the burial, Firstfruits at the resurrection, Pentecost at Acts chapter two. Mark 1844 as the beginning of the anti-typical Day of Atonement. And mark the second coming and the new creation for the final fulfillment of Tabernacles. When you see all seven feasts on one timeline, you will see that God's plan is not a collection of random events. It is a precisely scheduled, divinely orchestrated calendar that spans from Calvary to the New Jerusalem. And the God who kept the first four appointments will keep the last three.
+
+[pause]
+
+Your training exercise is this. List all seven feasts in order. For each one, write the Leviticus reference, the Old Testament practice, the Christological fulfillment or prophetic significance, and one personal application. Make it a chart. Spring feasts on one side, fall feasts on the other, and the harvest gap in the middle. See the symmetry. See the precision. And let it build your confidence that every appointment God has ever made, He has kept or will keep.
+
+[pause]
+
+I am Professor Moadim. This has been the Feasts Room. Now study God's calendar, and live as someone who knows the appointed times.`;
 
 // ─── FLOOR 6: THREE HEAVENS & CYCLES ─────────────────────────────────────
 
-export const SCRIPT_FIRST_HEAVEN = `Welcome to the First Heaven Room. I am Professor Babylon, and I am going to introduce you to a framework that will transform the way you read every prophetic text in the Bible. It is called the Three Heavens framework, and this room covers the first of the three: the First Heaven, coded in Phototheology as 1H, with its Day of the Lord event, DoL one, and its corresponding New Heavens and New Earth, NE one.
+export const SCRIPT_FIRST_HEAVEN = `Welcome to the First Heaven Room. I am Professor Babylon, Exile Historian, and I am going to introduce you to one of the most powerful interpretive frameworks in all of Phototheology: the Three Heavens.
 
 [pause]
 
-Most Christians read the phrases new heavens and new earth in Isaiah or Revelation and assume they always refer to the same event: the final cosmic renewal at the very end of time. That assumption creates enormous confusion in Bible interpretation. Because when you read Isaiah chapter sixty-five verse seventeen, which says, For, behold, I create new heavens and a new earth, and the former shall not be remembered, nor come into mind, and you assume it must be talking about the event described in Revelation chapter twenty-one, you skip over the context, you miss the historical horizon, and you flatten a multi-layered prophecy into a single event.
-
-[long pause]
-
-The Three Heavens framework teaches that Scripture describes multiple Day of the Lord events, each with its own destruction and renewal cycle. Think of them as three crescendos in the same symphony. The first crescendo is historical and typological, rooted in the Old Testament. The second crescendo is covenantal and ecclesial, centered on the first century. The third crescendo is the final eschatological climax at the end of all things. Same pattern. Escalating intensity. Different horizons.
-
-[pause]
-
-The First Heaven corresponds to the Babylonian crisis and its aftermath. Let me walk you through it.
-
-[pause]
-
-In 586 BC, Nebuchadnezzar's armies broke through the walls of Jerusalem, burned Solomon's temple to the ground, and carried the surviving population into exile in Babylon. For Israel, this was the end of the world. Their city was destroyed. Their temple was ashes. Their king was blinded and chained. Their priesthood was scattered. Their covenant community was shattered. Everything they had built since Moses was gone.
-
-[pause]
-
-And the prophets described it in language that sounds like the end of the cosmos. Jeremiah chapter four verses twenty-three through twenty-six: I beheld the earth, and, lo, it was without form, and void, and the heavens, and they had no light. I beheld the mountains, and, lo, they trembled, and all the hills moved lightly. I beheld, and, lo, there was no man, and all the birds of the heavens were fled. I beheld, and, lo, the fruitful place was a wilderness, and all the cities thereof were broken down at the presence of the Lord, and by his fierce anger.
-
-[pause]
-
-Without form and void. That is the same phrase used in Genesis chapter one verse two to describe the earth before creation. Jeremiah is saying that the Babylonian destruction reduced Judah to a pre-creation state. The heavens had no light. The mountains trembled. No man was left. The cities were broken. This is Day of the Lord language. It sounds cosmic. It sounds final. But it describes a historical event: the fall of Jerusalem in 586 BC.
+Most Christians, when they read the phrase new heavens and new earth in the Bible, immediately think of one thing: the end of the world, the final recreation described in Revelation chapters twenty-one and twenty-two. And that is indeed one of the meanings. But it is not the only meaning. And if you flatten every occurrence of this language into one single end-time event, you will misread dozens of prophetic passages. You will misplace texts. You will confuse cycles. And you will miss the breathtaking pattern that God has woven through the entire story of redemption.
 
 [long pause]
 
-Now here is the critical point. After every Day of the Lord comes a renewal. After every destruction comes a new beginning. And that is exactly what happened. God had already announced it through Isaiah. Isaiah chapter forty-four verse twenty-eight: That saith of Cyrus, He is my shepherd, and shall perform all my pleasure: even saying to Jerusalem, Thou shalt be built; and to the temple, Thy foundation shall be laid. God named Cyrus by name over a century before he was born. And in 539 BC, Cyrus conquered Babylon, and in 538 BC, he issued the decree allowing the Jews to return home.
+The Three Heavens framework reveals that Scripture describes not one but three major Day of the Lord events, each with its own cycle of destruction and renewal, each producing its own new heavens and new earth. These three cycles are layered on top of each other like geological strata. The first is the Babylonian crisis and post-exilic restoration. The second is the Roman destruction of Jerusalem and the New Covenant order. The third is the final cosmic judgment and the literal new creation. Each cycle follows the same pattern: an old order is judged, an old world is destroyed, and a new order emerges from the ashes.
 
 [pause]
 
-Ezra chapter one verses two and three record it: Thus saith Cyrus king of Persia, The Lord God of heaven hath given me all the kingdoms of the earth, and he hath charged me to build him an house at Jerusalem, which is in Judah. Who is there among you of all his people? His God be with him, and let him go up to Jerusalem, which is in Judah, and build the house of the Lord God of Israel. The return from Babylon. The rebuilding of the temple. The restoration of the covenant community. This was the first new heavens and new earth. Not the final cosmic renewal, but a genuine, historical renewal within the covenant framework.
-
-[pause]
-
-Go back to Isaiah chapter sixty-five now with this framework. Verse seventeen says: For, behold, I create new heavens and a new earth. But verse twenty says: There shall be no more thence an infant of days, nor an old man that hath not filled his days, for the child shall die an hundred years old. Wait. Death? In the new heavens and new earth? If this is the final new creation of Revelation twenty-one, there should be no death at all. Revelation chapter twenty-one verse four says there shall be no more death. So how can Isaiah sixty-five describe death continuing?
-
-[pause]
-
-Because Isaiah sixty-five is describing NE one, the post-exilic renewal, not NE three, the final new creation. The language overlaps because the pattern is the same, destruction followed by renewal, but the scale is different. NE one is a restoration within history. NE three is the transformation beyond history. The First Heaven framework helps you navigate that distinction and prevents you from forcing all new heavens and new earth language into one single future event.
+In the Phototheology system, we label these as follows. The First Heaven, or 1H, equals DoL one slash NE one, meaning the first Day of the Lord and the first New Earth. The cycle alignment runs from at-sign Mo, the Mosaic cycle, to at-sign Cy, the Cyrusic cycle. The destruction is the Babylonian exile of 586 BC. The renewal is the return under Cyrus the Great. That is what this room is about.
 
 [long pause]
 
-Let me show you how this framework functions practically. When you encounter a prophetic text that threatens Jerusalem with destruction, that describes the earth shaking and the heavens going dark, your first question should be: which Day of the Lord is this describing? If the context points to Babylon as the instrument of judgment, if the surrounding chapters discuss the exile and the return, if the promises of restoration involve Cyrus and the rebuilding of the temple, then you are in 1H territory. You are in the First Heaven. The Day of the Lord being described is DoL one, the Babylonian destruction, and the new heavens and new earth being promised is NE one, the post-exilic restoration.
+The story begins in 586 BC. Nebuchadnezzar, king of Babylon, besieges Jerusalem for the final time. Second Kings chapter twenty-five describes the horror in meticulous detail. The city walls are breached on the ninth day of the fourth month. The temple of Solomon, the glory of Israel, the house where God's Shekinah presence had dwelt, is burned to the ground. The sacred vessels, the golden lampstand, the table of showbread, the altar of incense, all of it is carried off to Babylon. The leading citizens, the priests, the craftsmen, the nobility, are dragged in chains across the desert into exile. The Davidic monarchy, through which the Messiah was promised, collapses. The land is left desolate. Jackals roam through the ruins of the temple courts.
 
 [pause]
 
-This does not diminish the text. It enriches it. Because NE one is a type of NE three. The post-exilic restoration is a miniature preview of the final restoration. Cyrus liberating Israel from Babylon foreshadows Christ liberating humanity from spiritual Babylon. The rebuilding of the temple foreshadows the establishment of the heavenly sanctuary ministry. The return to the promised land foreshadows the entrance into the new earth. The First Heaven is not a lesser event. It is a prophetic dress rehearsal for the final event.
+For Israel, this was not just a military defeat. It was the end of the world. Literally. Their entire religious, political, and social order was annihilated in a single campaign. The temple, where God's presence dwelt between the cherubim, was reduced to rubble. The throne of David, through which the Messiah was promised, was vacant. The covenant community was scattered across a pagan empire. Everything that defined Israel as a nation, their land, their temple, their king, their covenant identity, was gone.
 
 [pause]
 
-Let me trace this through specific passages. Ezekiel chapters eight through eleven describe God's glory departing from the temple before the Babylonian destruction. The Shekinah glory leaves the Holy of Holies, moves to the threshold, moves to the east gate, and finally ascends from the Mount of Olives and departs. This is DoL one. God's presence withdrawing because of covenant unfaithfulness.
+And the prophets described this event in the most extreme language imaginable. They used Day of the Lord language, the same cosmic, apocalyptic imagery that we normally associate with the end of time. Listen to Jeremiah's description of the aftermath. Jeremiah chapter four, verses twenty-three through twenty-six: I beheld the earth, and, lo, it was without form, and void; and the heavens, and they had no light. I beheld the mountains, and, lo, they trembled, and all the hills moved lightly. I beheld, and, lo, there was no man, and all the birds of the heavens were fled. I beheld, and, lo, the fruitful place was a wilderness, and all the cities thereof were broken down at the presence of the Lord, and by his fierce anger.
 
 [pause]
 
-But Ezekiel chapter forty-three verses one through five describe the glory returning: And, behold, the glory of the God of Israel came from the way of the east, and his voice was like a noise of many waters, and the earth shined with his glory. The glory returns from the east, through the same gate, back to the temple. This is NE one, the restoration. The glory that departed because of sin returns because of repentance and divine faithfulness.
+Listen to those words. Without form and void. Tohu va-vohu. That is Genesis chapter one, verse two language. The same Hebrew phrase used to describe the pre-creation state of the earth. Jeremiah is saying that the Babylonian destruction reduced the land to a pre-creation state. The heavens had no light. The mountains trembled. There was no man. The birds had fled. The cities were broken. This is apocalyptic language applied to a historical event. This is Day of the Lord language describing the fall of Jerusalem in 586 BC. And once you see it, you realize that Day of the Lord language is not reserved exclusively for the end of the world. It is used every time God brings a decisive, world-ending judgment on a covenant-breaking people.
 
 [pause]
 
-And notice: the glory departed from the Mount of Olives and returns from the east. Where does Jesus ascend in Acts chapter one? From the Mount of Olives. Where do the angels say He will return? The same way. Acts chapter one verse eleven: This same Jesus, which is taken up from you into heaven, shall so come in like manner as ye have seen him go into heaven. The First Heaven pattern is echoed in the Second and Third Heavens. The departure-and-return pattern repeats with escalating fulfillment.
-
-[long pause]
-
-In the Phototheology system, when you are studying a passage and you identify it as belonging to the First Heaven cycle, you code it as 1H. You note the cycle alignment, which is the Mosaic to Cyrusic arc, @Mo to @Cy. The fall is covenant infidelity leading to exile. The covenant is the promises through Isaiah, Jeremiah, and Ezekiel. The sanctuary element is the altar and temple rebuilt under Ezra, the walls restored under Nehemiah. The enemy is Samaritan opposition and internal compromise. The restoration is the public reading of the Torah, the renewal of worship, and the reconstitution of the covenant community.
-
-[pause]
-
-The Training Drills for this room in the Phototheology app will present you with Old Testament passages and ask you to identify their Day of the Lord horizon. Is this 1H, 2H, or 3H? You will learn to recognize the textual signals: references to Babylon as the instrument, references to Cyrus as the deliverer, restoration language involving temple rebuilding and return from exile. Over time, this becomes instinctive, and you will never again flatten all prophetic language into one end-time event.
-
-[pause]
-
-The Study Buddy can walk you through Isaiah chapters forty through sixty-six and help you sort which passages belong primarily to the First Heaven horizon and which extend typologically to the Second and Third. Many passages have dual or triple fulfillment, and the Three Heavens framework gives you the tools to track each layer without losing any of them.
-
-[pause]
-
-I am Professor Babylon. This has been the First Heaven Room. Now locate yourself in history and learn to read prophecy in three dimensions.`;
-
-export const SCRIPT_SECOND_HEAVEN = `Welcome to the Second Heaven Room. I am Professor Roman, and I am going to walk you through the second great Day of the Lord cycle, coded in Phototheology as 2H, with its Day of the Lord event, DoL two, and its corresponding New Heavens and New Earth, NE two.
-
-[pause]
-
-If the First Heaven was centered on Babylon's destruction of Jerusalem in 586 BC, the Second Heaven is centered on Rome's destruction of Jerusalem in 70 AD. And if NE one was the post-exilic restoration under Cyrus, NE two is the New Covenant order established by the risen Christ and poured out through the Holy Spirit. This is the covenantal and ecclesial crescendo, the second great movement in God's symphony of judgment and renewal.
+Isaiah uses similar language. Isaiah chapter thirteen, verses nine and ten, in a prophecy against Babylon itself: Behold, the day of the Lord cometh, cruel both with wrath and fierce anger, to lay the land desolate: and he shall destroy the sinners thereof out of it. For the stars of heaven and the constellations thereof shall not give their light: the sun shall be darkened in his going forth, and the moon shall not cause her light to shine. Stars falling. Sun darkened. Moon darkened. This sounds like the end of the world. But it is describing the fall of historical Babylon. The cosmic language describes the collapse of a world order, not the collapse of the physical cosmos.
 
 [long pause]
 
-Let me set the scene. It is 70 AD. The Roman legions under Titus have surrounded Jerusalem. The city is under siege. Famine ravages the inhabitants. Factional violence within the walls kills thousands before the Romans even breach them. And then the soldiers break through, and the unthinkable happens: the temple of Herod, one of the most magnificent structures in the ancient world, is burned to the ground. Not one stone is left upon another.
+But here is where the framework becomes powerful and hopeful. After every Day of the Lord, there is a new heavens and new earth. Destruction is not the end of the story. Renewal follows. Every time. Without exception. And the first renewal cycle is one of the most glorious stories in the Old Testament: the return from Babylonian exile under Cyrus the Great.
 
 [pause]
 
-Jesus had predicted it. Matthew chapter twenty-four verses one and two: And Jesus went out, and departed from the temple, and his disciples came to him for to shew him the buildings of the temple. And Jesus said unto them, See ye not all these things? Verily I say unto you, There shall not be left here one stone upon another, that shall not be thrown down. Forty years before it happened, Jesus spoke it. And it came to pass exactly as He said.
+Isaiah chapters forty-four and forty-five contain one of the most astonishing prophecies in all of Scripture. God names Cyrus by name approximately one hundred and fifty years before he is born. Isaiah chapter forty-four, verse twenty-eight: That saith of Cyrus, He is my shepherd, and shall perform all my pleasure: even saying to Jerusalem, Thou shalt be built; and to the temple, Thy foundation shall be laid. And Isaiah chapter forty-five, verse one: Thus saith the Lord to his anointed, to Cyrus, whose right hand I have holden, to subdue nations before him. God calls Cyrus, a pagan Persian king, His anointed, His mashiach. The same Hebrew word used for Messiah. Cyrus is a type of Christ. The liberator from Babylon is a shadow of the Liberator from sin.
 
 [pause]
 
-Now here is why the Three Heavens framework matters so much for this passage. The Olivet Discourse in Matthew chapter twenty-four is one of the most debated chapters in the Bible. Some scholars say it is entirely about the fall of Jerusalem. Others say it is entirely about the second coming. The truth is that it addresses both, because both are Day of the Lord events, and Jesus is using the near event as a type of the far event. The destruction of Jerusalem in 70 AD, DoL two, is a type of the final destruction at Christ's return, DoL three. The same language applies to both because the same pattern is at work.
-
-[long pause]
-
-Let me show you the textual signals. Luke chapter twenty-one verse twenty: And when ye shall see Jerusalem compassed with armies, then know that the desolation thereof is nigh. This is clearly about 70 AD. Armies surrounding Jerusalem. A localized, historical event. But then Matthew chapter twenty-four verse twenty-nine says: Immediately after the tribulation of those days shall the sun be darkened, and the moon shall not give her light, and the stars shall fall from heaven, and the powers of the heavens shall be shaken. This sounds cosmic. This sounds like the end of the world.
+Jeremiah predicted the exact duration of the exile. Jeremiah chapter twenty-five, verse eleven: And this whole land shall be a desolation, and an astonishment; and these nations shall serve the king of Babylon seventy years. Seventy years. Not approximately seventy years. Not roughly three generations. Exactly seventy years. And in 539 BC, seventy years after the first deportation in 605 BC, Babylon fell to Cyrus in a single night. Daniel chapter five records the handwriting on the wall: Mene, Mene, Tekel, Upharsin. Thy kingdom is divided and given to the Medes and Persians. That very night, Belshazzar was slain. The empire fell without a prolonged siege. The seventy years were complete.
 
 [pause]
 
-Both are Day of the Lord language. In 2H, the sun going dark and the powers of heaven shaking describes the collapse of the old covenant order. The temple system, the priesthood, the sacrificial economy, the entire religious infrastructure that had defined Israel for over a thousand years was shaken and destroyed. For the Jewish world, the heavens did fall. The sun did go dark. Everything they had oriented their spiritual lives around was gone.
+Ezra chapter one records the decree of Cyrus: The Lord God of heaven hath given me all the kingdoms of the earth; and he hath charged me to build him an house at Jerusalem, which is in Judah. Who is there among you of all his people? His God be with him, and let him go up to Jerusalem, which is in Judah, and build the house of the Lord God of Israel. The first wave of exiles returned under Zerubbabel. The foundations of the new temple were laid, and the old men who remembered Solomon's temple wept when they saw the new one, Ezra chapter three, verses twelve and thirteen. The young men shouted for joy. Tears and shouts mingled together.
 
 [pause]
 
-But this same language also extends forward to 3H, the actual cosmic disruption at Christ's second coming. Jesus layers both horizons into one discourse because the pattern is the same: judgment on covenant breakers, destruction of the old order, establishment of something new. The Second Heaven framework allows you to read Matthew twenty-four with both eyes open: one eye on 70 AD, one eye on the second coming.
+The return was described as a new exodus. Isaiah chapter forty-three, verses eighteen and nineteen: Remember ye not the former things, neither consider the things of old. Behold, I will do a new thing; now it shall spring forth; shall ye not know it? I will even make a way in the wilderness, and rivers in the desert. God is saying: the first exodus from Egypt was great, but I am doing something new. I am bringing you out of Babylon. This is exodus two point zero. Same God. Same pattern. New chapter.
 
 [pause]
 
-Matthew chapter twenty-four verse thirty-four is the key verse that many people stumble over: Verily I say unto you, This generation shall not pass, till all these things be fulfilled. If all these things includes the second coming, then Jesus was wrong, because that generation did pass without the second coming. But if all these things refers primarily to the 2H events, the fall of Jerusalem and the end of the old covenant order, then the prophecy was fulfilled exactly within that generation, approximately forty years from Christ's prediction to 70 AD.
+Nehemiah chapters one through six describe the rebuilding of the walls of Jerusalem under Nehemiah, completed in just fifty-two days despite intense opposition. Ezra chapters seven through ten describe the spiritual reformation, the reading of the law, the renewed covenant, the separation from pagan practices. A new order was established. The old had been destroyed. The new had emerged. This was NE one, the first new heavens and new earth. Not a new planet. But a new order. A renewed people. A rebuilt temple. A restored covenant.
 
 [long pause]
 
-Now let us look at what emerged from this destruction. NE two. The New Covenant order. The old covenant system, with its earthly temple, its animal sacrifices, its Levitical priesthood, and its geographic center in Jerusalem, was terminated. Not by accident. Not by Roman whim. By divine appointment. God used Rome as the instrument of DoL two, just as He had used Babylon as the instrument of DoL one.
+And here is the key textual evidence. Isaiah chapters sixty-five and sixty-six describe this restoration using new heavens and new earth language. Isaiah chapter sixty-five, verses seventeen through nineteen: For, behold, I create new heavens and a new earth: and the former shall not be remembered, nor come into mind. But be ye glad and rejoice for ever in that which I create: for, behold, I create Jerusalem a rejoicing, and her people a joy. And I will rejoice in Jerusalem, and joy in my people: and the voice of weeping shall be no more heard in her, nor the voice of crying.
 
 [pause]
 
-And what replaced it? Something infinitely greater. Hebrews chapter eight verses one and two: Now of the things which we have spoken this is the sum: We have such an high priest, who is set on the right hand of the throne of the Majesty in the heavens, a minister of the sanctuary, and of the true tabernacle, which the Lord pitched, and not man. The earthly sanctuary was a shadow. The heavenly sanctuary is the reality. The Levitical priests served a copy. Christ serves in the original. The stone temple was destroyed so that attention could shift permanently to the true temple in heaven.
+That sounds like the final new creation, does it not? But then, in the very next verse, verse twenty, Isaiah says something that absolutely does not fit the final new creation: There shall be no more thence an infant of days, nor an old man that hath not filled his days: for the child shall die an hundred years old; but the sinner being an hundred years old shall be accursed. Death still exists in this new heavens and new earth. Sinners still exist. Children still die, even if they live to a hundred. This is not the Revelation twenty-one reality where there is no more death, neither sorrow, nor crying, neither shall there be any more pain. This is a new heavens and new earth within history. This is NE one, the post-exilic restoration, a renewed order that is dramatically better than the exile but still falls short of the ultimate renewal.
 
 [pause]
 
-Hebrews chapter twelve verses twenty-six through twenty-eight drives this home: Whose voice then shook the earth, but now he hath promised, saying, Yet once more I shake not the earth only, but also heaven. And this word, Yet once more, signifieth the removing of those things that are shaken, as of things that are made, that those things which cannot be shaken may remain. Wherefore we receiving a kingdom which cannot be moved, let us have grace, whereby we may serve God acceptably with reverence and godly fear. The things that were shaken were the old covenant structures. The thing that cannot be shaken is the New Covenant kingdom. NE two is an unshakable kingdom, rooted not in earthly Jerusalem but in the heavenly reality.
+Isaiah chapter sixty-six continues with mixed language. Some verses clearly describe a historical restoration. Verse ten: Rejoice ye with Jerusalem, and be glad with her, all ye that love her. Verse twenty: And they shall bring all your brethren for an offering unto the Lord out of all nations upon horses, and in chariots. Horses and chariots. These are historical details, not eternal-state realities. But then verse twenty-two: For as the new heavens and the new earth, which I will make, shall remain before me, saith the Lord, so shall your seed and your name remain. This language telescopes forward, beyond the immediate restoration, toward the final NE three.
 
 [pause]
 
-John chapter two verses nineteen through twenty-one foreshadowed this transfer: Jesus answered and said unto them, Destroy this temple, and in three days I will raise it up. Then said the Jews, Forty and six years was this temple in building, and wilt thou rear it up in three days? But he spake of the temple of his body. Christ's body is the new temple. And First Corinthians chapter three verse sixteen extends it: Know ye not that ye are the temple of God, and that the Spirit of God dwelleth in you? The church, the body of believers, is the living temple. First Peter chapter two verse five: Ye also, as lively stones, are built up a spiritual house, a holy priesthood, to offer up spiritual sacrifices, acceptable to God by Jesus Christ.
-
-[long pause]
-
-The cycle alignment for the Second Heaven is the Cyrus-to-Christ arc, @CyC, flowing into the Spirit cycle, @Sp. In the @CyC cycle, the type is the imperial liberator Cyrus, and the antitype is Christ, the true Anointed. Cyrus freed Israel from Babylon. Christ frees humanity from spiritual bondage. Cyrus issued a decree to rebuild the temple. Christ declared, Destroy this temple, and in three days I will raise it up. Cyrus restored the covenant community to the land. Christ establishes the covenant community in the Spirit.
-
-[pause]
-
-In the @Sp cycle, Pentecost lights the lampstands. Acts chapter two: the Spirit descends like fire, languages are given, three thousand are baptized, and the global mission begins. Homes become micro-sanctuaries. The Spirit dwells not in a building but in people. The worship of God is decentralized from Jerusalem to the whole earth. Jesus had told the Samaritan woman in John chapter four verse twenty-three: The hour cometh, and now is, when the true worshippers shall worship the Father in spirit and in truth, for the Father seeketh such to worship him. NE two is Spirit-worship, heaven-anchored, globally accessible.
-
-[pause]
-
-The practical study implication is this: when you encounter a passage in the Gospels or Epistles that speaks of the temple being destroyed, the old order passing away, a new covenant being established, or a kingdom that cannot be shaken, test it against the 2H framework. Ask: is this describing the transition from the old covenant to the new? Is this NE two language? If so, do not push it forward to the final cosmic renewal unless the text itself demands cosmic scope.
-
-[pause]
-
-For example, Hebrews chapter eight verse thirteen: In that he saith, A new covenant, he hath made the first old. Now that which decayeth and waxeth old is ready to vanish away. The old covenant is vanishing. The new is established. This is NE two. It is not talking about the end of the physical universe. It is talking about the end of the old covenant economy and the establishment of the new.
-
-[pause]
-
-But here is the beautiful connection. Just as NE one, the post-exilic restoration, was a type of NE two, the New Covenant order, so NE two is itself a type of NE three, the final new creation. The church as a living temple foreshadows the eternal reality of Revelation twenty-one, where God dwells with His people forever. The heavenly sanctuary ministry of Christ foreshadows the day when the sanctuary work is complete and God's presence fills all things. Each renewal builds on the one before, each more glorious than the last, each pointing forward to the ultimate.
+The Three Heavens framework explains this layering. Prophetic passages often describe the immediate historical fulfillment, the first or second new earth, and simultaneously contain language that telescopes forward to later fulfillments. The prophet sees multiple fulfillments through the same lens, like looking at mountain ranges where the nearest peak and the farthest peak appear to be side by side from a distance, until you draw closer and realize the vast distance between them. This is called prophetic telescoping, and the Three Heavens framework is your depth-perception tool for navigating it.
 
 [long pause]
 
-In the Phototheology app, the Training Drills for this room will present you with New Testament passages and ask you to determine whether they describe 2H events or 3H events or both. Matthew twenty-four is the classic test case, and you will learn to sort its verses with precision. The Study Buddy can walk you through the Olivet Discourse verse by verse, helping you identify which phrases point to 70 AD and which extend to the second coming.
+Now let me give you practical guidance for identifying First Heaven texts. When you encounter a passage that uses Day of the Lord or new heavens and earth language, ask these diagnostic questions. First, does the passage reference events clearly belonging to the Babylonian period? References to Babylon, Cyrus, the temple rebuilding, the return from exile, the seventy years, the fall of Nebuchadnezzar's kingdom, these are markers of the First Heaven cycle. Second, does the passage describe conditions that include death, sin, and ordinary human life? If people still die, if sinners are still present, if agriculture and commerce still function, it is not describing the final new creation. It is describing a historical renewal, NE one or NE two. Third, does the passage align with the cycle movement from at-sign Mo, the Mosaic covenant order, to at-sign Cy, the Cyrusic restoration? If the old order being judged is the Mosaic temple system corrupted by apostasy, and the new order emerging is the post-exilic community rebuilt under Cyrus, you are in the First Heaven.
 
 [pause]
 
-I am Professor Roman. This has been the Second Heaven Room. Now see the pattern repeating and understand that the God who judged and renewed once, and then judged and renewed again, will judge and renew one final time.`;
-
-export const SCRIPT_THIRD_HEAVEN = `Welcome to the Third Heaven Room. I am Professor Novus, and this is the room of final hope. Everything in the Phototheology Palace has been building toward this moment. Every story, every symbol, every prophecy, every cycle, every sanctuary service, every feast day, every Day of the Lord event has been pointing forward to what happens here: the final judgment, the ultimate destruction of evil, and the literal, physical, eternal new creation.
-
-[pause]
-
-The Third Heaven, coded as 3H, represents the final Day of the Lord, DoL three, and the final New Heavens and New Earth, NE three. This is not a typological renewal within history, like NE one after Babylon. This is not a covenantal transition within the church age, like NE two after 70 AD. This is the end of history as we know it and the beginning of eternity.
+Key texts for the First Heaven cycle include: Jeremiah chapters twenty-five through twenty-nine, the seventy-year prophecy. Isaiah chapters thirteen and fourteen, the fall of Babylon. Isaiah chapters forty through forty-five, the comfort prophecies and the Cyrus declaration. Isaiah chapters sixty-five and sixty-six, the new heavens and earth with historical markers. Jeremiah chapter four, verses twenty-three through twenty-six, the de-creation language. Ezra chapters one through six, the return and temple rebuilding. Nehemiah chapters one through thirteen, the wall rebuilding and covenant renewal. Daniel chapter nine, verses one through nineteen, Daniel's prayer of confession during the exile. Haggai and Zechariah, the prophets of the restoration period.
 
 [long pause]
 
-Second Peter chapter three verses ten through thirteen lays it out with stunning clarity: But the day of the Lord will come as a thief in the night, in the which the heavens shall pass away with a great noise, and the elements shall melt with fervent heat, the earth also and the works that are therein shall be burned up. Seeing then that all these things shall be dissolved, what manner of persons ought ye to be in all holy conversation and godliness, looking for and hasting unto the coming of the day of God, wherein the heavens being on fire shall be dissolved, and the elements shall melt with fervent heat? Nevertheless we, according to his promise, look for new heavens and a new earth, wherein dwelleth righteousness.
+Understanding the First Heaven prevents one of the most common errors in Bible interpretation: what I call prophetic flattening. Prophetic flattening happens when you take every dramatic, cosmic, apocalyptic passage and dump it all into one bucket labeled end times. When you do that, you lose the richness of God's repeated pattern. You miss the fact that God has already accomplished two cycles of judgment and renewal within history, and those historical cycles are the proof, the down payment, the guarantee that the final cycle will also be completed. If God kept His word when He said seventy years and Babylon will fall, He will keep His word when He says I make all things new.
 
 [pause]
 
-Notice the scope. This is not the fall of one city. This is not the end of one covenant order. The elements themselves melt. The heavens pass away with a great noise. The earth and everything built upon it is consumed. This is cosmic. This is universal. This is final. And then, verse thirteen, the promise: new heavens and a new earth, wherein dwelleth righteousness. Not a partial restoration. Not a renewal that still contains death and decay, as in NE one. Not a spiritual reality accessed by faith while the physical world continues, as in NE two. But a literal, physical, eternal new creation where righteousness dwells permanently. No more sin. No more death. No more tears. No more curse.
-
-[long pause]
-
-Let me walk you through the sequence as Revelation lays it out. Revelation chapter nineteen: Christ returns. The heavens open and He rides a white horse, called Faithful and True. The beast and the false prophet are captured and cast into the lake of fire. The armies of the wicked are destroyed. The second coming is not a quiet spiritual event. It is the most visible, audible, dramatic event in the history of the universe. First Thessalonians chapter four verses sixteen and seventeen: For the Lord himself shall descend from heaven with a shout, with the voice of the archangel, and with the trump of God, and the dead in Christ shall rise first. Then we which are alive and remain shall be caught up together with them in the clouds, to meet the Lord in the air.
+The First Heaven teaches you to read the Bible with depth perception. Instead of seeing a flat wall of end-time prophecy, you learn to see layers: foreground, middle ground, and background. The Babylonian cycle is the foreground. The Roman cycle is the middle ground. The final cosmic cycle is the background. All three use the same language. All three follow the same pattern. But they occur at different points in history, and knowing which layer you are looking at changes everything about your interpretation.
 
 [pause]
 
-Revelation chapter twenty: the millennium. Satan is bound for a thousand years. The righteous are in heaven, participating in the judgment. Verse four: And I saw thrones, and they sat upon them, and judgment was given unto them. First Corinthians chapter six verse two confirms: Do ye not know that the saints shall judge the world? During the millennium, the saved review the records. Every question is answered. Every case is examined. God's justice is vindicated not by hiding His decisions but by opening them for inspection. This is transparency on a cosmic scale.
+Your training exercise is this. Read Isaiah chapters sixty-five and sixty-six carefully, verse by verse. For each verse, ask: is this describing the post-Babylonian restoration, NE one? Or is this telescoping forward to the final new creation, NE three? Or could it apply to both, a near and far fulfillment? Mark each verse accordingly. Notice where the language overlaps. Notice where it diverges. And notice how the Three Heavens framework gives you a tool to navigate what would otherwise be a confusing mix of historical and eschatological language.
 
 [pause]
 
-At the end of the thousand years, the wicked are resurrected, the second resurrection. Revelation chapter twenty verse five: But the rest of the dead lived not again until the thousand years were finished. Satan is loosed. The wicked are gathered for one final assault against the Holy City, which has descended from heaven to earth. And then, verses eleven through fifteen: the great white throne judgment. The books are opened. Every person is judged according to their works. And whosoever was not found written in the book of life was cast into the lake of fire. This is the second death, the permanent, irreversible end of sin and sinners. Not eternal conscious torment. Malachi chapter four verse one says: For, behold, the day cometh, that shall burn as an oven, and all the proud, yea, and all that do wickedly, shall be stubble. And the day that cometh shall burn them up, saith the Lord of hosts, that it shall leave them neither root nor branch. The fire consumes completely. Root and branch. Nothing remains.
-
-[long pause]
-
-And then. The greatest words in all of Scripture. Revelation chapter twenty-one verses one through five: And I saw a new heaven and a new earth, for the first heaven and the first earth were passed away, and there was no more sea. And I John saw the holy city, new Jerusalem, coming down from God out of heaven, prepared as a bride adorned for her husband. And I heard a great voice out of heaven saying, Behold, the tabernacle of God is with men, and he will dwell with them, and they shall be his people, and God himself shall be with them, and be their God. And God shall wipe away all tears from their eyes, and there shall be no more death, neither sorrow, nor crying, neither shall there be any more pain, for the former things are passed away. And he that sat upon the throne said, Behold, I make all things new.
+Then, if you want to go further, read Jeremiah chapter four, verses twenty-three through twenty-six, alongside Genesis chapter one, verses one and two, and Revelation chapter twenty-one, verses one through four. Compare the language. Genesis shows creation. Jeremiah shows de-creation. Revelation shows re-creation. They are three acts of the same drama. And the Three Heavens framework is the playbill that tells you which act you are watching.
 
 [pause]
 
-Behold, I make all things new. Not some things. All things. The entire created order is remade. The curse of Genesis three is reversed. The tree of life, barred since Eden, is restored. Revelation chapter twenty-two verses one through three: And he shewed me a pure river of water of life, clear as crystal, proceeding out of the throne of God and of the Lamb. In the midst of the street of it, and on either side of the river, was there the tree of life, which bare twelve manner of fruits, and yielded her fruit every month, and the leaves of the tree were for the healing of the nations. And there shall be no more curse.
+I am Professor Babylon. This has been the First Heaven Room. Now locate yourself in history, and learn to read the layers.`;
+
+export const SCRIPT_SECOND_HEAVEN = `Welcome to the Second Heaven Room. I am Professor Roman, New Covenant Scholar, and I am going to walk you through the second great Day of the Lord cycle, the pivot point of all sacred history.
 
 [pause]
 
-The tree of life from Genesis two. The river of water from Eden. The absence of the curse that entered in Genesis three. The story that began in a garden ends in a garden-city. Everything lost in Adam is restored in Christ, and then some. The new creation is not just a return to Eden. It is Eden amplified, Eden expanded, Eden glorified beyond anything the first creation contained.
+If the First Heaven was centered on Babylon's destruction of Jerusalem in 586 BC and the post-exilic restoration under Cyrus, the Second Heaven is centered on Rome's destruction of Jerusalem in 70 AD and the establishment of the New Covenant order in the heavenly sanctuary. This is DoL two slash NE two, the second Day of the Lord producing the second New Earth. The cycle alignment runs from at-sign CyC, the Cyrus-to-Christ transition, to at-sign Sp, the Holy Spirit cycle. And understanding this second cycle is absolutely critical, because it is the hinge on which the entire Bible swings from Old Covenant to New Covenant, from earthly temple to heavenly temple, from shadow to substance.
 
 [long pause]
 
-Now here is how the Three Heavens framework amplifies your hope rather than diminishing it. Some people worry that recognizing NE one and NE two might weaken the force of NE three. The opposite is true. The fact that God has already accomplished two cycles of destruction and renewal in history gives you concrete, historical evidence that He will complete the third. He did it with Babylon: He judged, He restored, He created a new order. He did it with Rome: He judged, He restored, He created a new covenant reality. The same God, working the same pattern, with the same faithfulness, will do it one final time, and this time permanently, with no more death, no more sin, no more tears.
+Let us begin with the event itself. In the spring of 70 AD, the Roman general Titus besieged Jerusalem with four legions, approximately sixty thousand soldiers. The city was torn apart from within by warring Jewish factions before the Romans even broke through the walls. Josephus, the Jewish historian who witnessed the siege firsthand, records horrors beyond description: famine so severe that a mother roasted her own child, streets choked with corpses, rivers of blood flowing through the temple courts. By August, the city was breached. The temple, one of the most magnificent structures in the ancient world, was set ablaze. Titus reportedly wanted to save the temple, but a soldier threw a torch through a golden window, and the fire consumed it. The gold leaf melted between the stones, and when the soldiers pried the stones apart to recover the gold, Jesus' prophecy in Matthew chapter twenty-four, verse two was fulfilled to the letter: There shall not be left here one stone upon another, that shall not be thrown down. According to Josephus, over one million people perished during the siege, and nearly one hundred thousand were taken captive.
 
 [pause]
 
-Notice the escalation across the three heavens. In NE one, death still existed. Isaiah sixty-five spoke of people dying at a hundred years old. In NE two, death is defeated in principle but still experienced physically by believers. In NE three, death is eliminated permanently. Revelation twenty-one four: there shall be no more death. Each renewal is more complete, more glorious, more permanent than the last. The pattern does not just repeat. It builds. It escalates. It culminates.
-
-[pause]
-
-In NE one, God's presence returned to a stone temple. In NE two, God's presence dwells in the body of believers by the Spirit. In NE three, God's presence fills all things. Revelation chapter twenty-one verse twenty-two: And I saw no temple therein, for the Lord God Almighty and the Lamb are the temple of it. No temple needed. Because God Himself is everywhere, visible, accessible, tangible. The sanctuary system that served as a mediator between God and humanity is no longer necessary because there is no longer any barrier. Face to face. Direct. Eternal.
+For the Jewish world, this was the end. The sacrificial system, which had been the beating heart of Old Covenant worship since Sinai, was permanently terminated. There could be no more burnt offerings without the temple altar. There could be no more Day of Atonement without the Most Holy Place. There could be no more priestly ministry without the sacred furniture. The entire ceremonial system that God had instituted through Moses came to an abrupt, violent, and permanent end. The old heavens and earth of the Mosaic order were dissolved in fire and blood.
 
 [long pause]
 
-The cycle alignment for the Third Heaven is the Remnant cycle, @Re. The fall is the final apostasy, the beast, image, and mark crisis described in Revelation thirteen and fourteen. The covenant is the remnant's fidelity described in Revelation twelve verse seventeen: the dragon was wroth with the woman, and went to make war with the remnant of her seed, which keep the commandments of God, and have the testimony of Jesus Christ. The sanctuary element is the closing of the heavenly ministry, the verdict rendered. The enemy is the dragon, beast, and false prophet, the final confederacy against truth. And the restoration is NE three: the eternal kingdom, the new earth, the Lamb on the throne, God with His people.
+The key text for understanding the Second Heaven is the Olivet Discourse, Jesus' extended prophecy in Matthew chapter twenty-four, Mark chapter thirteen, and Luke chapter twenty-one. Let me set the scene. The disciples have just pointed with pride to the magnificent temple buildings. Herod's temple was a wonder of the ancient world, sheathed in white marble and gold, glittering in the afternoon sun. And Jesus responds with the staggering prediction: See ye not all these things? Verily I say unto you, there shall not be left here one stone upon another, that shall not be thrown down.
 
 [pause]
 
-In the Phototheology app, the Training Drills for this room will ask you to map all three Day of the Lord events side by side. For each one, you will identify the crisis, the destruction, the renewal, and the new order that emerged. You will see the escalation pattern: each cycle is bigger, more complete, and more permanent than the last. The Study Buddy can help you trace how specific promises that appear to be fulfilled in NE one or NE two actually have their ultimate fulfillment in NE three.
+The disciples, stunned, ask two questions that they assume have one answer: When shall these things be? And what shall be the sign of thy coming, and of the end of the world? In the minds of the disciples, the destruction of the temple and the end of the world were the same event. They could not conceive of a world without the temple. But Jesus knew that these were two separate events, two different Day of the Lord cycles, the second and the third. And His response in Matthew twenty-four addresses both, weaving back and forth between them, which is precisely why this chapter has been so challenging for interpreters who do not have the Three Heavens framework.
 
 [pause]
 
-Here is your assignment from the Third Heaven Room. Read Revelation chapters twenty-one and twenty-two slowly. Read them not as distant future fantasy but as the inevitable conclusion of a pattern you have now seen repeated twice in history. The God who restored Israel from Babylon, the God who established the church from the ashes of the old covenant, that God will make all things new. And He who sat upon the throne said it Himself: Behold, I make all things new. And He said, Write, for these words are true and faithful.
+Luke chapter twenty-one gives us the clearest markers for the 70 AD fulfillment. Luke chapter twenty-one, verse twenty: And when ye shall see Jerusalem compassed with armies, then know that the desolation thereof is nigh. This is explicitly about the Roman siege. Armies surrounding a specific city. A geographically identifiable event. Verse twenty-one: Then let them which are in Judaea flee to the mountains; and let them which are in the midst of it depart out; and let not them that are in the countries enter thereinto. The early Christians obeyed this command. When the Roman general Cestius Gallus inexplicably withdrew his forces in 66 AD after nearly breaching the city, the Christians recognized this as the sign Jesus had given and fled to the town of Pella across the Jordan River. Not a single Christian perished in the destruction of 70 AD because they heeded Christ's words. The prophecy saved their lives.
 
 [pause]
 
-I am Professor Novus. This has been the Third Heaven Room. Now look up. The final renewal is coming, and it is more glorious than anything you can imagine.`;
-
-export const SCRIPT_EIGHT_CYCLES = `Welcome to the Eight Cycles Room. I am Professor Covenant, and I am going to show you the backbone of redemption history. If the Three Heavens are the three acts of God's great drama, the Eight Cycles are the individual scenes within those acts. They are the recurring seasons of a series that has been running from Eden to the end of time, and every single season follows the same five-part rhythm.
+Verse twenty-two: For these be the days of vengeance, that all things which are written may be fulfilled. The days of vengeance. Daniel chapter nine, verse twenty-six had prophesied: The people of the prince that shall come shall destroy the city and the sanctuary. Five hundred years before the event. And Jesus confirmed it forty years before it happened. The destruction of Jerusalem was not a random catastrophe. It was prophetically scheduled and divinely executed through Roman hands.
 
 [pause]
 
-That rhythm is: Fall, Covenant, Sanctuary, Enemy, Restoration. Fall: humanity fails, rebels, or enters crisis. Covenant: God responds with a promise of restoration. Sanctuary: God establishes a form of His presence and mediation. Enemy: opposition rises against God's people and plan. Restoration: God intervenes, preserves a faithful seed, and the story advances.
-
-[pause]
-
-Think of it like the structure of a television series. Each season has its own cast, its own setting, its own specific crisis. But the arc is always the same: the problem appears, the characters fail, divine help arrives, enemies fight back, and the resolution closes the arc. Then the next season begins. Different cast, same pattern. Different century, same God.
+Verse twenty-four: And they shall fall by the edge of the sword, and shall be led away captive into all nations: and Jerusalem shall be trodden down of the Gentiles, until the times of the Gentiles be fulfilled. Precisely fulfilled. The Jews were scattered among the nations for centuries. Jerusalem was occupied by Roman, Byzantine, Arab, Crusader, Ottoman, and British powers. The treading down of Jerusalem by the Gentiles is historical fact, and it belongs to the Second Heaven framework.
 
 [long pause]
 
-Cycle one: the Adamic cycle. This is the pilot episode. Every theme that will recur throughout the rest of Scripture appears here in seed form.
+Now here is where the this generation marker becomes crucial for the Three Heavens framework. Matthew chapter twenty-four, verse thirty-four: Verily I say unto you, This generation shall not pass, till all these things be fulfilled. Critics have used this verse to claim that Jesus was wrong about the second coming, because that generation passed away without the second coming occurring. But Jesus was not talking about the second coming in the immediate context of this verse. He was talking about the destruction of Jerusalem, the DoL two events. And that generation did not pass away before every single detail about the siege, the tribulation, and the scattering was fulfilled in 70 AD, exactly within the forty-year generation that heard Jesus speak.
 
 [pause]
 
-Fall: humanity rebels in Eden. Genesis chapter three verse six: And when the woman saw that the tree was good for food, and that it was pleasant to the eyes, and a tree to be desired to make one wise, she took of the fruit thereof, and did eat, and gave also unto her husband with her, and he did eat. Sin enters. Exile begins. Genesis chapter three verse twenty-three: Therefore the Lord God sent him forth from the garden of Eden.
-
-[pause]
-
-Covenant: Genesis chapter three verse fifteen, the protoevangelium, the first gospel: And I will put enmity between thee and the woman, and between thy seed and her seed. It shall bruise thy head, and thou shalt bruise his heel. In the very moment of the fall, God announces the plan of redemption. A Seed is coming who will crush the serpent's head. This single verse is the foundation of every covenant that follows.
-
-[pause]
-
-Sanctuary: God Himself performs the first sacrifice. Genesis chapter three verse twenty-one: Unto Adam also and to his wife did the Lord God make coats of skins, and clothed them. An animal died to cover human shame. Substitutionary death. Blood shed to clothe the guilty. The sanctuary principle, innocent life given for guilty life, appears before there is a tabernacle, before there is an altar, before there is a priesthood. Abel's offering in Genesis chapter four picks it up: he brings of the firstlings of his flock, a blood sacrifice that God accepts. The principle of mediation through sacrifice is established from the very beginning.
-
-[pause]
-
-Enemy: the serpent continues his work. Cain murders Abel in Genesis chapter four. The two seeds theme is born immediately. The seed of the woman, Abel, and the seed of the serpent, Cain, stand in opposition. This conflict will persist through every cycle. There will always be a faithful seed and an opposing force trying to destroy it.
-
-[pause]
-
-Restoration: God raises up Seth. Genesis chapter four verse twenty-five: And Adam knew his wife again, and she bare a son, and called his name Seth. For God, said she, hath appointed me another seed instead of Abel, whom Cain slew. The faithful line continues. Worship continues. Genesis chapter four verse twenty-six: Then began men to call upon the name of the Lord. The seed is preserved. The story advances.
+The Three Heavens framework resolves the Matthew twenty-four puzzle completely. The portions describing the siege of Jerusalem, the flight to the mountains, the days of vengeance, the abomination of desolation standing in the holy place, and the this generation marker, these belong to the Second Heaven, DoL two. The portions describing the cosmic signs, the darkening of the sun and moon, the stars falling, the sign of the Son of Man in heaven, the coming on the clouds with power and great glory, and the gathering of the elect from the four winds, these belong to the Third Heaven, DoL three. Jesus is prophesying two Day of the Lord events in a single discourse because both follow the same divine pattern: covenant unfaithfulness, judgment, destruction, and renewal. The Second Heaven is a type, a rehearsal, a preview of the Third.
 
 [long pause]
 
-Cycle two: the Noahic cycle.
+Now, what emerged from the destruction of 70 AD? What is NE two, the second new heavens and new earth?
 
 [pause]
 
-Fall: Genesis chapter six verse five: And God saw that the wickedness of man was great in the earth, and that every imagination of the thoughts of his heart was only evil continually. Violence fills the earth. Corruption is total.
+The answer is the New Covenant heavenly order. This is what the entire book of Hebrews describes. Hebrews is the atlas of the Second Heaven. It maps the transition from the old order to the new, from the earthly sanctuary to the heavenly one, from the Levitical priesthood to the Melchizedek priesthood of Christ.
 
 [pause]
 
-Covenant: Genesis chapter six verse eighteen: But with thee will I establish my covenant, and thou shalt come into the ark. God promises Noah salvation through the ark.
+Hebrews chapter eight, verses one and two: Now of the things which we have spoken this is the sum: We have such an high priest, who is set on the right hand of the throne of the Majesty in the heavens; a minister of the sanctuary, and of the true tabernacle, which the Lord pitched, and not man. Christ is our High Priest right now. He ministers in the heavenly sanctuary right now. Not the earthly copy. The heavenly original. The true tabernacle. The one that Moses' tabernacle was merely a shadow of.
 
 [pause]
 
-Sanctuary: the ark itself is the sanctuary of this cycle. One door. One refuge. One family. It is a floating temple. Every person inside is saved. Every person outside perishes. The ark is Christ in wood and pitch. You are either in Him or you are not. There is no middle ground.
+Hebrews chapter eight, verse thirteen: In that he saith, A new covenant, he hath made the first old. Now that which decayeth and waxeth old is ready to vanish away. The old covenant was decaying. It was ready to vanish. And in 70 AD, it did vanish. The temple was destroyed. The priesthood ended. The sacrificial system ceased. Everything that belonged to the old order was removed so that the new order could be fully manifested.
 
 [pause]
 
-Enemy: mockery, unbelief, and then the judgment waters. Second Peter chapter two verse five calls Noah a preacher of righteousness. For a hundred and twenty years, Noah preached. And the world laughed. Until the rain started.
+Hebrews chapter nine, verses eleven and twelve: But Christ being come an high priest of good things to come, by a greater and more perfect tabernacle, not made with hands, that is to say, not of this building; neither by the blood of goats and calves, but by his own blood he entered in once into the holy place, having obtained eternal redemption for us. Christ entered the heavenly sanctuary with His own blood. Not annually, like the earthly high priest. Once. And that once was sufficient for all time and all people.
 
 [pause]
 
-Restoration: the rainbow covenant. Genesis chapter nine verses twelve through thirteen: And God said, This is the token of the covenant which I make between me and you and every living creature that is with you, for perpetual generations. I do set my bow in the cloud, and it shall be for a token of a covenant between me and the earth. A new start. A new world. But sin survives in human hearts. The Noahic cycle shows that external cleansing cannot solve the internal problem. The flood washed the earth, but it could not wash the heart.
-
-[long pause]
-
-Cycle three: the Abrahamic cycle.
-
-[pause]
-
-Fall: nations scatter at Babel. Genesis chapter eleven. Idolatry spreads across the earth. Humanity has forgotten God again.
-
-[pause]
-
-Covenant: Genesis chapter twelve verse three: And I will bless them that bless thee, and curse him that curseth thee, and in thee shall all families of the earth be blessed. God narrows the focus from the whole world to one man, one family, through whom the promised Seed will come.
-
-[pause]
-
-Sanctuary: altars everywhere Abraham goes. Genesis chapter twelve verse seven: he built there an altar unto the Lord. Genesis chapter thirteen verse eighteen: he built there an altar unto the Lord. Abraham's life is a trail of altars, each one a point of worship, a place where heaven meets earth. And then Moriah. Genesis chapter twenty-two verse eight: Abraham said, My son, God will provide himself a lamb. Two thousand years before Calvary, on the very mountain where the temple would later stand, Abraham prophesied the substitutionary sacrifice of Christ.
-
-[pause]
-
-Enemy: Pharaoh, famine, foreign kings, and even Abraham's own impatience. Ishmael is the product of trying to fulfill God's promise by human effort.
-
-[pause]
-
-Restoration: Isaac's birth. Genesis chapter twenty-one verse one through three: And the Lord visited Sarah as he had said, and the Lord did unto Sarah as he had spoken. For Sarah conceived, and bare Abraham a son in his old age. The covenant child is born. The promise rests on miracle, not human strength. This is the lesson of the Abrahamic cycle: God's plan cannot be manufactured by human engineering. It requires faith.
+Hebrews chapter ten, verses nineteen through twenty-two: Having therefore, brethren, boldness to enter into the holiest by the blood of Jesus, by a new and living way, which he hath consecrated for us, through the veil, that is to say, his flesh; and having an high priest over the house of God; let us draw near with a true heart in full assurance of faith, having our hearts sprinkled from an evil conscience, and our bodies washed with pure water. The veil is torn. The way is open. The new and living way is consecrated. The new order is established. This is NE two.
 
 [long pause]
 
-Cycle four: the Mosaic cycle.
+Now let me connect this to the shift from stone temple to body temple. This is one of the most profound theological transitions in all of Scripture, and it belongs squarely to the Second Heaven.
 
 [pause]
 
-Fall: Israel enslaved in Egypt. Bondage as a parable of sin. Every brick they made without straw is a picture of the futility of works-based religion.
+John chapter two, verses nineteen through twenty-one: Jesus answered and said unto them, Destroy this temple, and in three days I will raise it up. Then said the Jews, Forty and six years was this temple in building, and wilt thou rear it up in three days? But he spake of the temple of his body. The Jews thought He was talking about Herod's temple. He was talking about His own body. His body is the new temple. His death is the destruction. His resurrection is the rebuilding. In three days.
 
 [pause]
 
-Covenant: Exodus chapter six verse seven: And I will take you to me for a people, and I will be to you a God. The Sinai covenant formalized. The Ten Commandments given. The terms of the relationship spelled out.
+And by extension, the church, His body, becomes the new temple. First Corinthians chapter three, verse sixteen: Know ye not that ye are the temple of God, and that the Spirit of God dwelleth in you? First Corinthians chapter six, verse nineteen: Know ye not that your body is the temple of the Holy Ghost which is in you, which ye have of God, and ye are not your own? First Peter chapter two, verse five: Ye also, as lively stones, are built up a spiritual house, an holy priesthood, to offer up spiritual sacrifices, acceptable to God by Jesus Christ.
 
 [pause]
 
-Sanctuary: the tabernacle built according to the pattern shown on the mount. Exodus chapter twenty-five verse eight: And let them make me a sanctuary, that I may dwell among them. For the first time, God's presence has a physical address. The entire sacrificial system, the priesthood, the feasts, the calendar of worship is established.
+The stone temple was destroyed in 70 AD. But the body temple had already been established at the cross, the resurrection, and Pentecost. The destruction of the physical temple was not a catastrophe for the church. It was a confirmation. It proved that the shadow had served its purpose and the substance had arrived. You do not mourn the disappearance of a shadow when the person casting it is standing in front of you.
 
 [pause]
 
-Enemy: Pharaoh's army, wilderness unbelief, hostile nations, and the golden calf. Even at the foot of the mountain where God's voice had just thundered, the people built an idol.
-
-[pause]
-
-Restoration: the conquest of Canaan. Sanctuary worship established in the promised land. The covenant renewed under Joshua. Joshua chapter twenty-four verse fifteen: Choose you this day whom ye will serve. But as for me and my house, we will serve the Lord.
+Hebrews chapter twelve, verses twenty-two through twenty-four: But ye are come unto mount Sion, and unto the city of the living God, the heavenly Jerusalem, and to an innumerable company of angels, to the general assembly and church of the firstborn, which are written in heaven, and to God the Judge of all, and to the spirits of just men made perfect, and to Jesus the mediator of the new covenant, and to the blood of sprinkling, that speaketh better things than that of Abel. You are come. Present tense. You have already arrived at the heavenly Jerusalem. You already have access to the mediator of the new covenant. You already benefit from the blood that speaks. This is not future hope. This is present reality. This is NE two. You are living in it.
 
 [long pause]
 
-Cycle five: the Cyrusic cycle. Fall: Babylon destroys the temple and Israel goes into exile. Covenant: the prophets promise return. Isaiah chapter forty-four verse twenty-eight: Cyrus, He is my shepherd. Sanctuary: the altar rebuilt, the temple foundations laid, worship restored under Ezra and Nehemiah. Enemy: local opposition, imperial decrees, internal spiritual compromise. Restoration: Ezra reads the law publicly. The people weep. The walls are rebuilt. The covenant is renewed.
+The cycle alignment for the Second Heaven is at-sign CyC flowing into at-sign Sp. In the CyC arc, Cyrus, the Persian liberator, is the type. Christ is the antitype. Cyrus freed Israel from Babylonian captivity. Christ frees humanity from spiritual bondage. Cyrus issued a decree to rebuild the temple. Christ declared, Destroy this temple and in three days I will raise it up. Cyrus restored the covenant community to the physical land. Christ establishes the covenant community in the Spirit, a kingdom not of this world.
 
 [pause]
 
-Cycle six: Cyrus to Christ. Fall: the post-exilic nation is spiritually weak. Roman occupation looms. The intertestamental period is marked by silence from heaven. Covenant: the true Anointed appears. Christ, the covenant embodied. John chapter one verse fourteen: And the Word was made flesh, and dwelt among us. Sanctuary: Christ Himself is the temple. John chapter two verse nineteen: Destroy this temple, and in three days I will raise it up. The cross is the true altar. The resurrection is the cornerstone. Enemy: Herod, Caesar, Pharisees, Satan, sin, and death itself. Restoration: resurrection, ascension, heavenly ministry. God's presence with humanity is restored not in a building but in a Person.
+In the at-sign Sp cycle, Pentecost lights the lampstands. Acts chapter two: the Spirit descends, languages are given, three thousand are baptized, and the global mission begins. Homes become micro-sanctuaries. Believers become living temples. The worship of God is decentralized from Jerusalem to every corner of the earth. Jesus told the Samaritan woman in John chapter four, verse twenty-three: The hour cometh, and now is, when the true worshippers shall worship the Father in spirit and in truth: for the Father seeketh such to worship him. NE two is Spirit-worship. Heaven-anchored. Globally accessible. Not confined to a building or a city, but poured out wherever two or three gather in His name.
 
 [pause]
 
-Cycle seven: the Spirit cycle. Fall: even after the resurrection, the disciples doubt, fear, and scatter. Covenant: Jesus promises, I am with you always, even unto the end of the world, Matthew chapter twenty-eight verse twenty. And the promise of the Spirit in Acts chapter one verse eight: Ye shall receive power after that the Holy Ghost is come upon you. Sanctuary: Pentecost turns homes into micro-sanctuaries. The Spirit lights the lampstand in every believer. The church becomes the temple, collectively and individually. Enemy: persecution, heresies, corruption, imperial pressure, centuries of apostasy. Restoration: revivals, the Reformation, missionary movements, Spirit-led renewal across the ages.
-
-[pause]
-
-Cycle eight: the Remnant cycle. Fall: apostasy deepens. False worship rises. The beast, his image, and his mark dominate. Revelation chapter thirteen describes a global system of false worship backed by economic coercion. Covenant: Revelation chapter twelve verse seventeen: And the dragon was wroth with the woman, and went to make war with the remnant of her seed, which keep the commandments of God, and have the testimony of Jesus Christ. The remnant covenant is commandment-keeping and Jesus-faithful. Sanctuary: the heavenly judgment in the Most Holy Place. Daniel chapter eight verse fourteen. The sanctuary truth explains the last conflict. Enemy: the dragon, the beast, the false prophet, the final confederacy against truth described in Revelation chapter sixteen. Restoration: the second coming. God's people vindicated. New heaven and new earth. Genesis chapter three verse fifteen is fully fulfilled. The Seed crushes the serpent's head permanently.
+Hebrews chapter thirteen, verse fourteen: For here have we no continuing city, but we seek one to come. The earthly Jerusalem is gone. The temple is rubble. But the heavenly Jerusalem endures. And the NE two reality is not a lesser reality. It is a greater one. The earthly was the copy. The heavenly is the original. We have traded the shadow for the substance.
 
 [long pause]
 
-Now step back and see the pattern. Eight cycles. Eight seasons. Every one follows the same five-part rhythm: Fall, Covenant, Sanctuary, Enemy, Restoration. The cast changes. The centuries change. The geography changes. But the structure never changes. Because the God behind the structure never changes. Hebrews chapter thirteen verse eight: Jesus Christ the same yesterday, and today, and forever.
+In the Phototheology OS app, the Training Drills for this room will present you with New Testament passages and ask you to determine whether they describe 2H events or 3H events or both. The Study Buddy can walk you through the Olivet Discourse verse by verse, helping you identify which phrases point to 70 AD and which extend to the second coming. This is one of the most practical and immediately useful exercises in the entire Palace, because Matthew twenty-four is one of the most frequently discussed and most frequently misunderstood chapters in the Bible. With the Three Heavens framework, you will read it with clarity that most commentators lack.
 
 [pause]
 
-The practical application is enormous. Every passage in the Bible belongs to one of these eight cycles. When you study a text, one of your first questions should be: which cycle does this belong to? Is this Adamic, Noahic, Abrahamic, Mosaic, Cyrusic, Cyrus-to-Christ, Spirit, or Remnant? Misplacing a text in the wrong cycle leads to distorted interpretation. If you read a Mosaic-cycle passage as if it belongs to the Remnant cycle, you will misapply its instructions. If you read a Spirit-cycle passage as if it belongs to the Cyrusic cycle, you will miss its New Covenant implications.
+Your training exercise is this. Read Matthew chapter twenty-four straight through. As you read each section, mark it with a two or a three. Two means it primarily describes the Second Heaven, the fall of Jerusalem in 70 AD. Three means it primarily describes the Third Heaven, the final second coming. Some sections may carry dual application, and you can mark those with both numbers. When you finish, you will see how the Olivet Discourse is not a confused jumble of predictions but a carefully layered prophecy addressing two distinct Day of the Lord events that follow the same divine pattern.
 
 [pause]
 
-In the Phototheology app, the Training Drills for this room will present passages and ask you to assign them to their correct cycle. Genesis chapter six belongs to @No. Exodus chapter twelve belongs to @Mo. Ezra chapter one belongs to @Cy. John chapter one belongs to @CyC. Acts chapter two belongs to @Sp. Revelation chapter fourteen belongs to @Re. You will build this instinct until cycle identification becomes as automatic as recognizing which chapter you are reading.
+Then read Hebrews chapters eight through twelve as the theological atlas of NE two. Mark every verse that describes the transition from old to new, from shadow to substance, from earthly to heavenly. Ask yourself: do I live as though NE two is real? Do I access the heavenly sanctuary in prayer? Do I feed on the Word as living bread? Do I function as a living stone in the spiritual house? Because the Second Heaven is not a theological abstraction. It is the reality you inhabit every moment of every day.
 
 [pause]
 
-The Study Buddy can help you trace a single theme across all eight cycles. Take the theme of covenant. In the Adamic cycle, it is the seed promise. In the Noahic cycle, it is the rainbow promise. In the Abrahamic cycle, it is the blessing promise. In the Mosaic cycle, it is the law covenant. In the Cyrusic cycle, it is the restoration promise. In the Cyrus-to-Christ cycle, it is the incarnation. In the Spirit cycle, it is the promise of presence. In the Remnant cycle, it is the commandment-keeping fidelity of the final people. One theme, eight expressions, one God.
+I am Professor Roman. This has been the Second Heaven Room. Now see the pattern repeating, and know that the God who brought a new order from the ashes of 70 AD will bring the final new order from the ashes of this present world.`;
+
+export const SCRIPT_THIRD_HEAVEN = `Welcome to the Third Heaven Room. I am Professor Novus, Eschatology Guide, and this is the room of final hope.
 
 [pause]
 
-I am Professor Covenant. This has been the Eight Cycles Room. Now trace the thread from Eden to eternity and see that God has never abandoned His plan.`;
-
-export const SCRIPT_JUICE_ROOM = `Welcome to the Juice Room. I am Professor Squeeze, and this is where you take everything you have learned in the entire Phototheology Palace and apply it to a single passage until you have extracted every last drop of meaning. The name says it all. You put the passage under a juicer. You twist. You press. You squeeze. And what comes out is not a single insight but a multi-dimensional, multi-floor, multi-room understanding that connects across the entire system.
-
-[pause]
-
-The Juice Room is the exercise lab of the sixth floor. Every room you have visited has given you a specific tool. The Story Room gave you narrative recall. The Imagination Room gave you sensory immersion. The Observation Room gave you forensic eyes. The Definition Room gave you word-level precision. The Translation Room taught you to convert abstract truth into visual images. The Concentration Room taught you to find Christ at the center. The Theme Room placed texts on prophetic and sanctuary walls. The Time Zone Room sorted past, present, and future. The Patterns Room showed you recurring motifs. The Parallels Room showed you mirrored events. The Fruit Room tested the output. The Blue Room gave you the sanctuary blueprint. The Prophecy Room gave you the timeline. The Three Angels Room gave you the mission. The Feasts Room gave you the calendar. The Three Heavens gave you the cosmic stage. The Eight Cycles gave you the historical backbone.
-
-[pause]
-
-Now, in the Juice Room, you use all of them on one passage. At the same time. In one sitting. Until the passage is squeezed dry.
+Everything in the Phototheology Palace has been building toward this moment. Every story, every symbol, every prophecy, every cycle, every sanctuary service, every feast day, every Day of the Lord event has been pointing forward to what we study here: the final judgment, the ultimate destruction of evil, and the literal, physical, eternal new creation. This is 3H, the Third Heaven. This is DoL three slash NE three. This is the last act. This is the cycle alignment at-sign Re, the Remnant cycle. And this is where every thread in the tapestry of redemption is finally tied together.
 
 [long pause]
 
-Let me demonstrate with Psalm twenty-three. Six verses. The most familiar psalm in the Bible. Most people read it in thirty seconds and feel comforted. But when you put it through the Phototheology juicer, thirty seconds becomes thirty pages. Let us begin.
+Let me be very clear about what makes the Third Heaven different from the first two. In the First Heaven, the destruction was regional, Babylon destroying Jerusalem, and the renewal was partial, a rebuilt temple, a restored community, but death and sin still continued. In the Second Heaven, the destruction was covenantal, the old covenant order ending, and the renewal was spiritual, a heavenly sanctuary, a Spirit-filled church, but again, death and sin continue. In the Third Heaven, the destruction is cosmic, the entire physical universe is purged by fire, and the renewal is total, a brand new heaven and earth where death, sin, sorrow, pain, and the curse are eradicated forever. The Third Heaven is not a type. It is the antitype. It is not a shadow. It is the substance. It is not a preview. It is the main event.
 
 [pause]
 
-Story Room. Recall the narrative context. David wrote this psalm. He was a shepherd before he was a king. He spent years in the wilderness of Judea watching sheep, protecting them from lions and bears, leading them to water, carrying the injured ones, sleeping under the stars with his flock. This is not abstract poetry. This is autobiography translated into theology. When David says the Lord is my shepherd, he is speaking from lived experience as a literal shepherd.
-
-[pause]
-
-Imagination Room. Engage your senses. Verse two: He maketh me to lie down in green pastures. He leadeth me beside the still waters. Close your eyes. See the green hillside. Feel the grass under your body. Hear the quiet stream, not a rushing torrent but still waters, calm waters, waters that do not frighten the sheep. Smell the earth and the wool. Feel the warmth of the sun. You are not reading a poem. You are in a pasture. The Imagination Room makes the psalm three-dimensional.
-
-[pause]
-
-Observation Room. Look at the details others miss. Verse one: I shall not want. That is a complete sentence. Four words that declare total sufficiency. If the Lord is your shepherd, there is nothing you lack. Not something you lack. Nothing. Then verse two: He maketh me to lie down. Notice: He makes the sheep lie down. Sheep do not naturally lie down when they are anxious, hungry, or in conflict with other sheep. A shepherd can only make sheep lie down when all disturbances have been removed. This tells you that God actively removes the obstacles to your rest. He does not just offer rest. He creates the conditions for it.
-
-[pause]
-
-Verse three: He restoreth my soul. The Hebrew word for restoreth is shub, which means to turn back, to bring back. This is the language of repentance and recovery. When the sheep has wandered, the shepherd goes after it and brings it back. This is Luke chapter fifteen: What man of you, having an hundred sheep, if he lose one of them, doth not leave the ninety and nine in the wilderness, and go after that which is lost, until he find it? Psalm twenty-three and the parable of the lost sheep are family.
-
-[pause]
-
-Definition Room. Verse four: Yea, though I walk through the valley of the shadow of death. The Hebrew phrase is ge tsalmavet, which can mean the valley of deep darkness. The word tsalmavet may be a compound of tsel, meaning shadow, and mavet, meaning death. But it can also be a single word meaning deep gloom. Either way, the emphasis is on shadow. A shadow cannot hurt you. A shadow has no substance. It is the image of something real, but it is not the real thing. The shadow of death is frightening, but it is only a shadow. The reality of death has been conquered by the Shepherd who Himself passed through death and came out the other side.
-
-[pause]
-
-Translation Room. Convert the abstract into a visual. The rod and the staff. The rod was a short, heavy club used to fight off predators. The staff was a long, hooked pole used to guide and rescue sheep. One is for defense. The other is for direction. God's discipline in your life takes two forms: He fights off your enemies, and He guides your steps. The rod and the staff are not the same tool. They represent two different kinds of divine care. Sometimes God is your warrior. Sometimes God is your guide. Both comfort.
+Let us walk through the sequence of events.
 
 [long pause]
 
-Concentration Room. Where is Christ? Everywhere. John chapter ten verses eleven and fourteen: I am the good shepherd. The good shepherd giveth his life for the sheep. I am the good shepherd, and know my sheep, and am known of mine. Jesus explicitly identifies Himself as the Shepherd of Psalm twenty-three. And He is the shepherd who does something David's shepherd only foreshadowed: He lays down His life for the sheep. The Good Shepherd dies so the sheep can live. Hebrews chapter thirteen verse twenty calls Him the great shepherd of the sheep, brought again from the dead through the blood of the everlasting covenant. And First Peter chapter five verse four calls Him the chief Shepherd, who shall appear and give the crown of glory. Good Shepherd in His earthly ministry. Great Shepherd in His resurrection. Chief Shepherd at His return. Three titles. Three phases. One Shepherd.
+The Third Heaven begins with the second coming of Jesus Christ. First Thessalonians chapter four, verses sixteen and seventeen: For the Lord himself shall descend from heaven with a shout, with the voice of the archangel, and with the trump of God: and the dead in Christ shall rise first: then we which are alive and remain shall be caught up together with them in the clouds, to meet the Lord in the air: and so shall we ever be with the Lord. This is not a secret event. This is not a silent rapture. The Lord descends with a shout, with the voice of the archangel, with the trump of God. It is the loudest, most visible, most dramatic event in the history of the universe.
 
 [pause]
 
-Theme Room. Which wall does Psalm twenty-three hang on? The Gospel floor, certainly. The Shepherd laying down His life is substitutionary atonement. The Sanctuary wall: verse five describes a table prepared in the presence of enemies and the anointing of the head with oil. The table is the showbread. The oil is the anointing of the Spirit. The Great Controversy wall: the rod fights off enemies, and the valley of death is navigated safely because the Shepherd is present. Evil is real, but the Shepherd is greater.
+Revelation chapter one, verse seven: Behold, he cometh with clouds; and every eye shall see him, and they also which pierced him: and all kindreds of the earth shall wail because of him. Every eye shall see Him. There is no secret about this. There is no private disappearance. Every human being on the planet witnesses the return of Christ in glory. Matthew chapter twenty-four, verses twenty-seven and thirty: For as the lightning cometh out of the east, and shineth even unto the west; so shall also the coming of the Son of man be. And then shall appear the sign of the Son of man in heaven: and then shall all the tribes of the earth mourn, and they shall see the Son of man coming in the clouds of heaven with power and great glory.
 
 [pause]
 
-Time Zone Room. Past, present, or future? All three. Verse one through three: present tense experience of God's provision. Verse four: a journey through danger that may be present or past. Verse five: a table prepared, possibly present. Verse six: surely goodness and mercy shall follow me all the days of my life, and I will dwell in the house of the Lord forever. That last phrase is future, extending into eternity. Psalm twenty-three spans all three time zones.
+At the second coming, the righteous dead are resurrected and the righteous living are translated. Together, they are caught up to meet the Lord in the air and are taken to heaven. John chapter fourteen, verses two and three: In my Father's house are many mansions: if it were not so, I would have told you. I go to prepare a place for you. And if I go and prepare a place for you, I will come again, and receive you unto myself; that where I am, there ye may be also. Christ takes His people to the Father's house. They go to heaven, not to an earthly kingdom.
 
 [pause]
 
-Patterns Room. The shepherd pattern runs throughout Scripture. Abel was a keeper of sheep. Abraham, Isaac, and Jacob were shepherds. Moses was tending sheep when God called him from the burning bush. David was tending sheep when Samuel anointed him. The prophets use shepherd imagery for both faithful leaders and corrupt ones. Ezekiel chapter thirty-four contrasts the false shepherds of Israel with the true Shepherd: I myself will search for my sheep. And the pattern culminates in Christ: the Lamb who is also the Shepherd. Revelation chapter seven verse seventeen: For the Lamb which is in the midst of the throne shall feed them, and shall lead them unto living fountains of waters. The Lamb shepherds. The sacrifice leads. Only in Christ can the victim be the victor and the offering be the overseer.
-
-[pause]
-
-Parallels Room. Psalm twenty-three parallels Revelation chapters twenty-one and twenty-two. In the psalm: green pastures and still waters. In Revelation: a pure river of water of life, clear as crystal. In the psalm: I will dwell in the house of the Lord forever. In Revelation: Behold, the tabernacle of God is with men, and he will dwell with them. In the psalm: thou anointest my head with oil, my cup runneth over. In Revelation: God shall wipe away all tears from their eyes, and there shall be no more death. Psalm twenty-three is the personal experience of what Revelation twenty-one describes cosmically. What David experienced with his Shepherd in the fields of Judea, the redeemed will experience with their Shepherd for eternity on the new earth.
-
-[pause]
-
-Blue Room. Sanctuary placement. The journey of Psalm twenty-three mirrors the sanctuary path. Verse one through two: the courtyard, where the sacrifice is made and the washing occurs, where rest is given. Verse three: restoration and the path of righteousness, the Holy Place with its lampstand lighting the way. Verse four: the valley of shadow, walking through judgment, the approach to the Most Holy Place. Verse five: the table prepared, the showbread, the anointing oil, the abundance of the sanctuary. Verse six: dwelling in the house of the Lord forever, the final reality that the sanctuary points to. Psalm twenty-three is a sanctuary walk compressed into six verses.
-
-[pause]
-
-Prophecy Room. Does Psalm twenty-three have prophetic dimensions? Yes. Verse five: thou preparest a table before me in the presence of mine enemies. In the last days, God's people will feast on His truth while surrounded by hostile powers. The beast and his image are the enemies. But the table is prepared. The provision is secure. And verse six's house of the Lord forever connects to the Third Heaven, NE three, the eternal dwelling of God with His people.
-
-[pause]
-
-Three Angels Room. Psalm twenty-three and the Three Angels Messages converge in verse one. The Lord is my Shepherd. The first angel calls: worship the Creator. The Shepherd is the Creator. If you acknowledge Him as your Shepherd, you worship Him as your Maker. I shall not want. The everlasting gospel is sufficient. Nothing more is needed. No Babylonian additions. No beast-system substitutions. The Shepherd provides everything.
-
-[pause]
-
-Feasts Room. The green pastures correspond to Tabernacles, the harvest feast, the joy of completion. The valley of shadow corresponds to the Day of Atonement, the solemn passage through judgment. The restoration of the soul corresponds to Firstfruits, new life after death. Psalm twenty-three echoes the feast calendar.
-
-[pause]
-
-Eight Cycles. Which cycle does Psalm twenty-three belong to? The Mosaic cycle, written by David during the monarchy period within the broader @Mo arc. But its truths echo across all cycles. In the Adamic cycle, God is the Shepherd who covers Adam and Eve's shame with skins. In the Noahic cycle, God is the Shepherd who guides one family through the flood. In the Abrahamic cycle, God is the Shepherd who provides a ram on Moriah. In the Remnant cycle, God is the Shepherd who prepares a table for His people in the presence of end-time enemies.
-
-[pause]
-
-Fruit Room. What fruit does this psalm produce when properly studied? Peace. Trust. Courage. Gratitude. Hope. If your study of Psalm twenty-three leaves you anxious, you missed something. If it leaves you boasting in your own knowledge, you missed the Shepherd entirely. The fruit test confirms: this is a gospel psalm, and it produces gospel character.
+At the same time, the wicked are destroyed by the brightness of His coming. Second Thessalonians chapter two, verse eight: And then shall that Wicked be revealed, whom the Lord shall consume with the spirit of his mouth, and shall destroy with the brightness of his coming. The surface of the earth is devastated. Jeremiah chapter four language applies here in its ultimate fulfillment: without form and void. The cities are broken down. No man remains. The earth becomes a desolate waste.
 
 [long pause]
 
-That is the Juice Room. One psalm. Six verses. Twelve rooms. And we could keep going. We could examine the Hebrew poetry, the chiastic structure, the connections to Psalm twenty-two, which is the psalm of the cross, and Psalm twenty-four, which is the psalm of the King's return. Psalms twenty-two, twenty-three, and twenty-four are a trilogy: the Shepherd dies, the Shepherd provides, the Shepherd reigns.
+Then comes the millennium. Revelation chapter twenty describes a thousand-year period during which several things occur simultaneously. First, the righteous are in heaven, sitting on thrones of judgment, reviewing the records of the lost. Revelation chapter twenty, verse four: And I saw thrones, and they sat upon them, and judgment was given unto them. First Corinthians chapter six, verse two: Do ye not know that the saints shall judge the world? This is the vindication phase of the judgment. The saints are not deciding who is saved and who is lost. That was determined before the second coming. They are reviewing the cases to understand and affirm God's justice. Every question is answered. Every doubt is resolved. Every person sees for themselves that God was fair, that every case was handled with perfect righteousness and perfect mercy.
 
 [pause]
 
-In the Phototheology app, the Training Drills for the Juice Room will assign you a passage and challenge you to run it through a minimum of eight rooms. The Study Buddy can guide you through each room sequentially, asking targeted questions: What do you observe? Where is Christ? Which cycle? Which heaven? What fruit? Over time, this process becomes instinctive, and every passage you read will automatically be run through the entire Palace in your mind.
+Second, Satan is bound on the desolate earth. Revelation chapter twenty, verses one through three: And I saw an angel come down from heaven, having the key of the bottomless pit and a great chain in his hand. And he laid hold on the dragon, that old serpent, which is the Devil, and Satan, and bound him a thousand years. The bottomless pit, the abyssos, is not a literal dungeon. It is the desolate earth, the same tohu language from Genesis one and Jeremiah four. Satan is confined to a ruined planet with no one to tempt, no one to deceive, no one to manipulate. For a thousand years, he is left to contemplate the consequences of his rebellion. This is the ultimate azazel, the scapegoat led into the wilderness, bearing the weight of sin's origin.
 
 [pause]
 
-I am Professor Squeeze. This has been the Juice Room. Now take your favorite passage and squeeze it until there is not a single drop of meaning left inside.`;
-
-export const SCRIPT_MATHEMATICS_ROOM = `Welcome to the Mathematics Room. I am Professor Chronos, and this room reveals the numerical architecture of biblical prophecy. God is a mathematician. That statement is not metaphorical. Throughout Scripture, time prophecies are given in precise numerical structures that can be calculated, verified, and confirmed against the historical record. The Mathematics Room teaches you to work with these numbers, because when you see the math, you see the fingerprint of a God who controls time itself.
-
-[pause]
-
-Daniel chapter twelve verse four says: But thou, O Daniel, shut up the words, and seal the book, even to the time of the end. Many shall run to and fro, and knowledge shall be increased. The prophetic time periods in Daniel were sealed, not fully understood in Daniel's day. But at the time of the end, knowledge would increase, and the math would become clear. We live in that time. The seal is broken. The calculations are open. And they are staggering in their precision.
+Third, the wicked dead remain in their graves during the millennium. Revelation chapter twenty, verse five: But the rest of the dead lived not again until the thousand years were finished.
 
 [long pause]
 
-Let me begin with the foundational principle: the year-day principle. In symbolic prophecy, one prophetic day equals one literal year. This is not an invention of interpreters. It is established by Scripture itself. Numbers chapter fourteen verse thirty-four: After the number of the days in which ye searched the land, even forty days, each day for a year, shall ye bear your iniquities, even forty years. Ezekiel chapter four verse six: I have appointed thee each day for a year. When God gives prophetic time periods in days within symbolic visions, each day represents a year of real historical time.
+At the end of the thousand years, the holy city, the New Jerusalem, descends from heaven to earth. Revelation chapter twenty-one, verse two: And I John saw the holy city, new Jerusalem, coming down from God out of heaven, prepared as a bride adorned for her husband. The saints descend with the city. The wicked dead are resurrected in the second resurrection. Revelation chapter twenty, verse five: This is the first resurrection. Blessed and holy is he that hath part in the first resurrection: on such the second death hath no power. The second resurrection, of the wicked, occurs at the end of the thousand years.
 
 [pause]
 
-With this key in hand, let us examine the major time prophecies.
+Satan is loosed. He goes out to deceive the resurrected wicked nations, Gog and Magog, whose number is as the sand of the sea. They surround the beloved city, the New Jerusalem, now sitting on the earth. And then fire comes down from God out of heaven and devours them. Revelation chapter twenty, verses nine and ten. This is the lake of fire. This is the second death. This is the final, total, complete destruction of sin, sinners, Satan, and death itself.
+
+[pause]
+
+Notice what the Bible says and what it does not say. The fire devours them. It does not perpetually torture them. Malachi chapter four, verse three: And ye shall tread down the wicked; for they shall be ashes under the soles of your feet in the day that I shall do this, saith the Lord of hosts. Ashes. Not immortal souls in eternal conscious torment. Ashes. The wicked are consumed. They cease to exist. Obadiah verse sixteen: They shall be as though they had not been. The doctrine of eternal hellfire is Babylonian wine, a false teaching that slanders the character of God. The wages of sin is death, Romans chapter six, verse twenty-three. Not eternal life in torment. Death.
+
+[pause]
+
+Second Peter chapter three, verses ten through thirteen, describes the cosmic purging: But the day of the Lord will come as a thief in the night; in the which the heavens shall pass away with a great noise, and the elements shall melt with fervent heat, the earth also and the works that are therein shall be burned up. The entire cosmos is purified by fire. Every trace of sin, every stain of rebellion, every mark of the curse, is consumed. And then: Nevertheless we, according to his promise, look for new heavens and a new earth, wherein dwelleth righteousness.
 
 [long pause]
 
-The seventy-week prophecy. Daniel chapter nine verses twenty-four through twenty-seven. This is the most mathematically precise Messianic prophecy in the entire Bible.
+And now we come to the climax. Revelation chapter twenty-one, verses one through five: And I saw a new heaven and a new earth: for the first heaven and the first earth were passed away; and there was no more sea. And I John saw the holy city, new Jerusalem, coming down from God out of heaven, prepared as a bride adorned for her husband. And I heard a great voice out of heaven saying, Behold, the tabernacle of God is with men, and he will dwell with them, and they shall be his people, and God himself shall be with them, and be their God. And God shall wipe away all tears from their eyes; and there shall be no more death, neither sorrow, nor crying, neither shall there be any more pain: for the former things are passed away. And he that sat upon the throne said, Behold, I make all things new.
 
 [pause]
 
-Daniel chapter nine verse twenty-four: Seventy weeks are determined upon thy people and upon thy holy city, to finish the transgression, and to make an end of sins, and to make reconciliation for iniquity, and to bring in everlasting righteousness, and to seal up the vision and prophecy, and to anoint the most Holy.
+This is NE three. The real thing. The final reality. No more death. No more sorrow. No more crying. No more pain. Not a partial renewal like NE one. Not a spiritual renewal like NE two. A total, physical, cosmic, eternal renewal. All things new.
 
 [pause]
 
-Seventy weeks. In Hebrew, shavuim shivim, seventy sevens. Seventy times seven equals four hundred and ninety. Under the year-day principle, four hundred and ninety prophetic days equal four hundred and ninety literal years. This prophecy covers a four hundred and ninety year period that will accomplish six monumental things: finish transgression, end sins, reconcile iniquity, bring in everlasting righteousness, seal vision and prophecy, and anoint the Most Holy. Every one of these was accomplished by Christ.
+And notice the crowning detail. Revelation chapter twenty-one, verse twenty-two: And I saw no temple therein: for the Lord God Almighty and the Lamb are the temple of it. No temple needed. The sanctuary system has served its purpose. The Altar of Burnt Offering is no longer needed because sin has been eradicated. The Laver is no longer needed because there is nothing to cleanse. The Lampstand is no longer needed because the Lamb is its light. The Table of Showbread is no longer needed because the Bread of Life is physically present. The Altar of Incense is no longer needed because prayer is replaced by direct communion. The Ark and Mercy Seat are no longer needed because the throne of God and the Lamb are right there, visible, accessible, touchable. The entire sanctuary was a structure designed to bridge the gap between God and man. When the gap no longer exists, the bridge is no longer needed.
 
 [pause]
 
-Now the starting point. Daniel chapter nine verse twenty-five: Know therefore and understand, that from the going forth of the commandment to restore and to build Jerusalem unto the Messiah the Prince shall be seven weeks, and threescore and two weeks. The commandment to restore and build Jerusalem was the decree of Artaxerxes recorded in Ezra chapter seven, issued in 457 BC. This is the starting date for both the seventy-week prophecy and the twenty-three hundred day prophecy.
-
-[pause]
-
-Let me walk through the math step by step, and I want you to follow this carefully because this is the kind of calculation you can do yourself using the Equation Builder feature in the Phototheology app.
-
-[pause]
-
-From 457 BC, count forward seven weeks, which is forty-nine years. That brings you to 408 BC, the completion of the restoration of Jerusalem under Nehemiah. From that point, count forward sixty-two more weeks, which is four hundred and thirty-four years. Seven weeks plus sixty-two weeks equals sixty-nine weeks, which equals four hundred and eighty-three years. From 457 BC, counting forward four hundred and eighty-three years, and remembering that there is no year zero in the calendar, you arrive at 27 AD.
-
-[pause]
-
-What happened in 27 AD? Luke chapter three verses twenty-one and twenty-two: Now when all the people were baptized, it came to pass, that Jesus also being baptized, and praying, the heaven was opened, and the Holy Ghost descended in a bodily shape like a dove upon him, and a voice came from heaven, which said, Thou art my beloved Son; in thee I am well pleased. The baptism of Jesus. The anointing of the Messiah. Messiah means Anointed One. Daniel predicted that from the decree to the Messiah would be sixty-nine weeks, four hundred and eighty-three years. Starting from 457 BC, that lands exactly on 27 AD. Jesus was anointed at His baptism on the very year the prophecy predicted.
+Revelation chapter twenty-two, verse four: And they shall see his face. After six thousand years of separation, after the long exile from Eden, after the veil and the smoke and the distance and the intercession and the judgment and the fire, the redeemed will finally look into the face of God. And His name shall be in their foreheads. Not the mark of the beast. The name of God. Sealed forever as His own.
 
 [long pause]
 
-But there is still one week remaining. The seventieth week. Daniel chapter nine verse twenty-seven: And he shall confirm the covenant with many for one week, and in the midst of the week he shall cause the sacrifice and the oblation to cease. In the midst of the week. One week equals seven years. The midst of seven years is three and a half years. From 27 AD, count forward three and a half years: you arrive at 31 AD.
+Now let me show you how to distinguish NE three from NE one and NE two. This is a critical interpretive skill.
 
 [pause]
 
-What happened in 31 AD? The crucifixion. Matthew chapter twenty-seven verse fifty-one: And, behold, the veil of the temple was rent in twain from the top to the bottom. When Christ died, the veil tore. The sacrifice and oblation ceased, not because the priests stopped offering lambs on the altar, but because the true Lamb had been slain, and every subsequent animal sacrifice was rendered meaningless. The shadow met the substance. The type met the antitype. And it happened in the midst of the week, exactly when Daniel said it would.
+If the passage describes a new order where death still exists, where sinners are still present, where agriculture and commerce and ordinary human life continue, it is NE one or NE two. If the passage describes a new order where there is no more death, no more sin, no more pain, no more temple, no more night, where God dwells physically with His people and the Lamb is the light, it is NE three. The litmus test is simple: does death still exist in this new world? If yes, it is not the final new creation. If no, it is.
 
 [pause]
 
-The final half of the seventieth week extends from 31 AD to 34 AD. What happened in 34 AD? Acts chapter seven records the stoning of Stephen, the first Christian martyr. This event marked the formal rejection of the gospel by the Jewish leadership and the transition of the gospel mission to the Gentiles. Acts chapter eight verse one: And at that time there was a great persecution against the church which was at Jerusalem, and they were all scattered abroad throughout the regions of Judea and Samaria. The seventy weeks allotted to Daniel's people were complete. The gospel was now going to all nations.
+Apply this to Isaiah sixty-five, verse twenty, where children still die at a hundred years old. That is NE one. Apply this to Hebrews twelve, where we have come to the heavenly Jerusalem but still need faith and endurance. That is NE two. Apply this to Revelation twenty-one, where God wipes away all tears and death is no more. That is NE three. Three layers. Three new worlds. One escalating pattern of divine faithfulness.
 
 [pause]
 
-Let me summarize the math. 457 BC plus 483 years equals 27 AD: Christ's baptism. 27 AD plus 3.5 years equals 31 AD: Christ's crucifixion. 31 AD plus 3.5 years equals 34 AD: gospel to the Gentiles. Every calculation confirmed by history. Every date verifiable. This is not speculation. This is mathematics.
+The cycle alignment for the Third Heaven is at-sign Re, the Remnant cycle. This is the final generation, the people who live through the three angels' messages, the mark-of-the-beast crisis, the close of probation, the seven last plagues, and the second coming. They are the ones who keep the commandments of God and the faith of Jesus. They endure to the end. And they are alive to witness the NE three reality descend from heaven to earth.
+
+[pause]
+
+Your training exercise is this. Map all three Day of the Lord events side by side. For each one, identify five things: the crisis that triggered the judgment, the destruction itself, the renewal that followed, the nature of the new order, and whether death still exists in that new order. You will see the escalation. Each cycle is bigger, more complete, and more glorious than the last. And you will see that the first two are the proof, the down payment, the guarantee of the third.
+
+[pause]
+
+Then read Revelation chapters twenty-one and twenty-two slowly, prayerfully, and ask the Holy Spirit to make it real to you. This is not fantasy. This is not mythology. This is the destination. This is what all the rooms, all the floors, all the skills, and all the sacrifice have been preparing you for. This is home.
+
+[pause]
+
+I am Professor Novus. This has been the Third Heaven Room. Now look up. The final renewal is coming. And when it arrives, it will never end.`;
+
+export const SCRIPT_EIGHT_CYCLES = `Welcome to the Eight Cycles Room. I am Professor Covenant, Covenant Historian, and I am going to show you the backbone of redemption history.
+
+[pause]
+
+If the Three Heavens are the three acts of God's great drama, the Eight Cycles are the individual scenes within those acts. Think of it this way. The Bible is like a television series that has been running from Eden to the end of time. It has eight seasons. Each season has its own characters, its own setting, its own crisis, and its own resolution. But every single season follows the same five-part rhythm. Once you see that rhythm, you can locate any text in the Bible within its proper season and understand its role in the larger story.
 
 [long pause]
 
-Now the twenty-three hundred day prophecy. Daniel chapter eight verse fourteen: Unto two thousand and three hundred days, then shall the sanctuary be cleansed. This is the longest time prophecy in the Bible, and it shares the same starting point as the seventy weeks.
+Let me give you the five-part rhythm first, because this is the pattern that repeats in all eight cycles.
 
 [pause]
 
-How do we know they share the same starting point? Because Daniel chapter nine verse twenty-four says seventy weeks are determined, cut off, from the larger period. The Hebrew word chathak means to cut off. The seventy weeks are a subset, a portion cut from the twenty-three hundred days. If the first segment of the seventy weeks begins in 457 BC, then the twenty-three hundred days also begin in 457 BC.
+Part one: Fall. Humanity or the covenant community falls into sin, rebellion, or unfaithfulness. The covenant is broken. The relationship with God is damaged.
 
 [pause]
 
-In the Equation Builder, set your starting point: 457 BC. Add twenty-three hundred years. Again, accounting for no year zero: 2300 minus 457 equals 1843, plus one for the year-zero adjustment, equals 1844. The twenty-three hundred day prophecy points to 1844 AD. In that year, according to the prophecy, the sanctuary would be cleansed.
+Part two: Covenant. God responds not with immediate annihilation but with a covenant, a promise, a formal agreement. He initiates. He reaches out. He establishes the terms of restoration. Grace always precedes demand.
 
 [pause]
 
-Since the earthly sanctuary was destroyed in 70 AD, this cleansing must refer to the heavenly sanctuary. Hebrews chapter nine verse twenty-three: It was therefore necessary that the patterns of things in the heavens should be purified with these, but the heavenly things themselves with better sacrifices than these. The heavenly sanctuary requires a purification, a cleansing. This is the antitypical Day of Atonement: Christ entering the Most Holy Place of the heavenly sanctuary to begin the investigative judgment, the examination of every case, the determination of every destiny.
+Part three: Sanctuary. God provides a system of worship, a place of meeting, a structure through which the broken relationship can be maintained and repaired. This is the dwelling place, the tabernacle, the temple, the gathering, the place where heaven and earth overlap.
 
 [pause]
 
-The Equation Builder in the app lets you input these calculations yourself. You set 457 BC as your starting point. You add the time period. You see the endpoint. You compare it to the historical record. And the numbers match. Every time. This is one of the most powerful apologetic tools in the Bible: mathematical prophecy that can be checked against the calendar.
+Part four: Enemy. An opposing force rises to attack, corrupt, or destroy the covenant community and its sanctuary. Satan works through human agents to undermine what God has established. There is always an enemy in every cycle.
+
+[pause]
+
+Part five: Restoration. God delivers His people. The enemy is defeated. The covenant is renewed. The community is restored. And the pattern begins again at a higher level.
+
+[pause]
+
+Fall, Covenant, Sanctuary, Enemy, Restoration. Five beats. Eight times. This is the heartbeat of the Bible.
 
 [long pause]
 
-Now the twelve hundred and sixty day prophecy. This time period appears in seven different forms across Daniel and Revelation:
+Now let us walk through all eight cycles in detail.
 
 [pause]
 
-Daniel chapter seven verse twenty-five: a time, times, and the dividing of time. A time equals one year. Times equals two years. The dividing of time equals half a year. Total: three and a half years.
+Cycle one: the Adamic Cycle, at-sign Ad. This is the beginning of everything. The Fall: Adam and Eve eat the forbidden fruit in Genesis chapter three. They are deceived by the serpent. They distrust God's word. They grasp for autonomy. And in a single act, the entire human race is plunged into sin and separation from God. The Covenant: immediately, before any punishment is pronounced, God makes a promise. Genesis chapter three, verse fifteen: I will put enmity between thee and the woman, and between thy seed and her seed; it shall bruise thy head, and thou shalt bruise his heel. This is the protoevangelium, the first gospel. The seed of the woman will crush the serpent. A Deliverer is coming. The Sanctuary: God clothes Adam and Eve in animal skins, Genesis chapter three, verse twenty-one. An animal died to cover their nakedness. This is the first sacrifice. The first blood shed. The first sanctuary act. Substitutionary death begins in Eden. The Enemy: Cain rises as the first human agent of the serpent, murdering his brother Abel, the first righteous martyr, in Genesis chapter four. The Restoration: Seth is born as the replacement for Abel. Through Seth's line, the godly remnant is preserved. Genesis chapter four, verse twenty-six: Then began men to call upon the name of the Lord. Worship is restored.
 
 [pause]
 
-Daniel chapter twelve verse seven repeats the same phrase: a time, times, and an half.
-
-[pause]
-
-Revelation chapter twelve verse fourteen: a time, and times, and half a time.
-
-[pause]
-
-Revelation chapter eleven verse two: forty and two months. Three and a half years equals forty-two months.
-
-[pause]
-
-Revelation chapter thirteen verse five: forty and two months again.
-
-[pause]
-
-Revelation chapter eleven verse three: a thousand two hundred and threescore days. Forty-two months of thirty days each equals twelve hundred and sixty days.
-
-[pause]
-
-Revelation chapter twelve verse six: a thousand two hundred and threescore days.
-
-[pause]
-
-Seven references. Three different expressions. All pointing to the same period. Under the year-day principle, twelve hundred and sixty prophetic days equal twelve hundred and sixty literal years.
-
-[pause]
-
-The starting point is 538 AD, when the last of the three opposing Arian kingdoms was removed and the Bishop of Rome received full civil and ecclesiastical authority. Count forward twelve hundred and sixty years: 538 plus 1260 equals 1798. What happened in 1798? Napoleon's general Berthier entered Rome, took Pope Pius the Sixth prisoner, and the papacy received what Revelation chapter thirteen verse three calls a deadly wound. The period of papal supremacy, predicted to the exact year, from 538 to 1798. Twelve hundred and sixty years. Exact.
+Think of the Adamic cycle as Season One of the series. It introduces the main characters, God and humanity, the main conflict, sin and redemption, the main villain, the serpent, and the main promise, the seed that will crush the serpent's head. Every subsequent season is a variation on these themes.
 
 [long pause]
 
-There are additional time prophecies worth examining. The one hundred and twenty years of Genesis chapter six verse three: the period of probation before the flood. The four hundred years of Genesis chapter fifteen verse thirteen: the sojourn of Abraham's descendants before deliverance from Egypt. The seventy years of Jeremiah chapter twenty-five verse eleven: the Babylonian captivity, fulfilled to the year. The thirteen hundred and thirty-five days of Daniel chapter twelve verse twelve: extending from 508 AD to 1843, marking the beginning of the great Advent movement.
+Cycle two: the Noahic Cycle, at-sign No. The Fall: Genesis chapter six, verses five and six. And God saw that the wickedness of man was great in the earth, and that every imagination of the thoughts of his heart was only evil continually. And it repented the Lord that he had made man on the earth. Humanity has become so corrupt that God determines to cleanse the earth. The Covenant: God makes a covenant with Noah. Genesis chapter six, verse eighteen: But with thee will I establish my covenant. And Genesis chapter nine, verse twelve through thirteen: I do set my bow in the cloud, and it shall be for a token of a covenant between me and the earth. The rainbow covenant. Never again will water destroy the earth. The Sanctuary: the Ark itself is the sanctuary of this cycle. It is the structure God provides for preservation and worship during judgment. Noah's family enters the Ark and is saved through water, a type of baptism, First Peter chapter three, verse twenty-one. The Enemy: the corrupt antediluvian world that mocks Noah and refuses to enter the Ark. They are the enemy of God's purpose in this season. The Restoration: after the flood, Noah and his family emerge into a cleansed world. He builds an altar, Genesis chapter eight, verse twenty. He offers sacrifices. The covenant is confirmed. A new beginning, a mini new creation, begins.
 
 [pause]
 
-Each of these prophecies forms a thread in the mathematical tapestry of redemption. They are not isolated numbers. They interlock. The seventy weeks are cut from the twenty-three hundred days. The twelve hundred and sixty years overlap with the twenty-three hundred days. The starting points are established by verifiable historical decrees. The endpoints are confirmed by verifiable historical events. The architecture is precise, interlocking, and self-verifying.
-
-[pause]
-
-In the Phototheology app, the Equation Builder is your primary tool for this room. You can input any time prophecy, set the starting date, apply the year-day principle, and see the endpoint calculated automatically. You can overlay multiple prophecies on the same timeline and see how they intersect. The Training Drills will give you a starting date and a time period and ask you to calculate the endpoint. They will give you an endpoint and ask you to work backward to the decree. They will give you two endpoints and ask which prophecy connects them.
-
-[pause]
-
-The Study Buddy can walk you through the relationship between Daniel chapters two, seven, eight, and nine, showing how the same empires and the same timeline appear across all four visions with increasing mathematical precision. It can also help you address common objections, like alternative dating schemes for the decree of Artaxerxes, or alternative interpretations of the year-day principle, and show you why the historicist calculations remain the most historically defensible.
+Season Two is the flood season. It establishes the principle that God will judge the world when sin reaches a tipping point, but He always preserves a remnant. Noah's family is the first remnant, the first small group preserved through judgment for the purpose of starting over.
 
 [long pause]
 
-Let me close with this thought. The mathematical architecture of prophecy is not just an intellectual curiosity. It is an anchor for faith. When someone asks you how you know the Bible is true, you can point to Daniel chapter nine and say: this book predicted the exact year of the Messiah's anointing five hundred years before it happened. When someone asks how you know we are living in the judgment hour, you can point to Daniel chapter eight verse fourteen and say: the twenty-three hundred year prophecy terminated in 1844, exactly when the heavenly judgment was to begin. When someone asks how you know that the papacy fulfills prophetic expectations, you can point to the twelve hundred and sixty year period from 538 to 1798 and say: the math adds up, to the exact year.
+Cycle three: the Abrahamic Cycle, at-sign Ab. The Fall: after the flood, humanity quickly returns to rebellion. The Tower of Babel in Genesis chapter eleven is the definitive Fall event of this cycle. Humanity unites in a self-salvation project, building a tower to heaven by their own effort. God confuses their languages and scatters them. The Covenant: God calls one man out of the scattered nations. Genesis chapter twelve, verses one through three: Get thee out of thy country, and from thy kindred, and from thy father's house, unto a land that I will shew thee: and I will make of thee a great nation, and I will bless thee, and make thy name great; and thou shalt be a blessing: and in thee shall all families of the earth be blessed. The Abrahamic covenant. One family will be the channel of blessing to all nations. The Sanctuary: Abraham builds altars wherever he goes. Genesis chapter twelve, verse seven: He builded an altar unto the Lord, who appeared unto him. Genesis chapter thirteen, verse eighteen: He built there an altar unto the Lord. The altar is the portable sanctuary of this cycle. Wherever Abraham goes, worship goes with him. The Enemy: the famine that drives the family to Egypt, the pharaohs who threaten Sarah, the war of the kings in Genesis chapter fourteen, and ultimately the four hundred years of slavery predicted in Genesis chapter fifteen, verse thirteen. Egypt becomes the great enemy of the Abrahamic seed. The Restoration: God's promise to Abraham is fulfilled through Isaac, the child of promise. The covenant passes to Jacob, renamed Israel, and his twelve sons. Despite every threat, the family grows into a great nation, exactly as God said.
+
+[long pause]
+
+Cycle four: the Mosaic Cycle, at-sign Mo. This is the central Old Testament cycle. The Fall: Israel is enslaved in Egypt. Four hundred years of bondage. They cry out to God. Exodus chapter two, verses twenty-three and twenty-four: The children of Israel sighed by reason of the bondage, and they cried, and their cry came up unto God by reason of the bondage. And God heard their groaning, and God remembered his covenant with Abraham, with Isaac, and with Jacob. The Covenant: the Sinai covenant. God delivers Israel from Egypt through the ten plagues and the Red Sea, and then at Mount Sinai, He establishes a formal covenant relationship. Exodus chapter nineteen, verse five and six: Now therefore, if ye will obey my voice indeed, and keep my covenant, then ye shall be a peculiar treasure unto me above all people. The Ten Commandments are given. The law is proclaimed. The terms of the covenant are established. The Sanctuary: this is the cycle where the full sanctuary is given. Exodus chapters twenty-five through forty describe in exhaustive detail the construction of the tabernacle, every piece of furniture, every curtain, every measurement, all according to the pattern shown to Moses on the mount. God's presence fills the tabernacle in Exodus chapter forty, verse thirty-four. The Shekinah glory takes up residence in the Most Holy Place. The Enemy: persistent apostasy within Israel, the golden calf in Exodus chapter thirty-two being the most dramatic example. External enemies include the Canaanite nations, the Philistines, and ultimately the Babylonian empire, which serves as the instrument of DoL one. The Restoration: the Mosaic cycle's restoration is actually the beginning of the next cycle, the return from Babylon under Cyrus. Fall, Covenant, Sanctuary, Enemy, Restoration.
+
+[long pause]
+
+Cycle five: the Cyrusic Cycle, at-sign Cy. The Fall: the Babylonian exile. DoL one. Jerusalem destroyed, temple burned, people scattered. We covered this in detail in the First Heaven Room. The Covenant: God's promise through Jeremiah of seventy years and through Isaiah of Cyrus as the anointed liberator. The Sanctuary: the rebuilt temple under Zerubbabel, dedicated in 515 BC, and the rebuilt walls under Nehemiah. A renewed place of worship, though the glory of the first temple is notably absent. The Shekinah does not return. The Ark of the Covenant is missing. Yet God is faithful, and worship continues. The Enemy: opposition from Sanballat, Tobiah, and the neighboring peoples who try to prevent the rebuilding, Nehemiah chapter four. Also the internal corruption that Nehemiah and Ezra must address, including intermarriage with pagan nations and neglect of the Sabbath. The Restoration: the post-exilic community is established. The law is read publicly by Ezra. The people renew their covenant. The temple functions. The cycle completes, but with a sense of incompleteness, a longing for something greater. Haggai chapter two, verse nine: The glory of this latter house shall be greater than of the former. The greater glory has not yet arrived.
 
 [pause]
 
-Numbers do not lie. Calendars do not fudge. Dates do not negotiate. And the God who built this mathematical framework into His prophecies is the same God who declares the end from the beginning. He is not guessing. He is not hoping. He is not reacting. He is calculating, planning, and executing with the precision of the ultimate Mathematician.
+Cycle six: the Cyrus-to-Christ Cycle, at-sign CyC. This is the intertestamental and first-century cycle. The Fall: the post-exilic community gradually falls into formalism. By the time of Christ, Judaism has become a system of tradition and externalism. The Pharisees have added hundreds of human regulations to God's law. The temple has become a marketplace. The religious leaders are blind guides. The Covenant: the incarnation. The fullness of time. Galatians chapter four, verse four: But when the fulness of the time was come, God sent forth his Son, made of a woman, made under the law, to redeem them that were under the law. This is the greatest covenant event in history. God becomes human. The Word becomes flesh. The new covenant is inaugurated in Christ's blood at the Last Supper. The Sanctuary: Christ Himself is the sanctuary of this cycle. He is the temple, John chapter two. He is the Lamb, John chapter one. He is the High Priest, Hebrews chapters four through ten. Everything the physical sanctuary symbolized, He fulfills in His own person. The Enemy: the religious leaders who reject Him, the Roman system that crucifies Him, and behind them all, Satan himself, who attempts to destroy the seed of the woman on the cross. The Restoration: the resurrection. Christ rises from the dead. He ascends to the heavenly sanctuary. The new covenant is ratified. Pentecost pours out the Spirit. The church is born. The restoration of this cycle launches the seventh cycle.
+
+[long pause]
+
+Cycle seven: the Spirit Cycle, at-sign Sp. The Fall: the early church gradually falls into apostasy. Paul warned in Acts chapter twenty, verses twenty-nine and thirty: After my departing shall grievous wolves enter in among you, not sparing the flock. Also of your own selves shall men arise, speaking perverse things. By the fourth and fifth centuries, the church has compromised with paganism, adopted unbiblical doctrines, and merged with the state under Constantine and his successors. The little horn of Daniel seven takes shape. The Covenant: God preserves His truth through faithful witnesses throughout the dark ages, the Waldenses, the Albigenses, the Lollards, the Hussites, and eventually the Protestant Reformers who recover the gospel of justification by faith alone, Scripture alone, Christ alone. The covenant truth is never fully extinguished. The Sanctuary: the heavenly sanctuary where Christ ministers throughout this period. Hebrews chapter eight makes clear that Christ's priestly ministry in heaven is the sanctuary of the New Covenant era. The Enemy: the papal system during the twelve hundred and sixty years from 538 to 1798 AD. Persecution, the Inquisition, the suppression of Scripture, the burning of dissenters. The Restoration: the Reformation, the rise of religious liberty, the opening of the Scriptures to the common people, and the great awakening movements that lead into the eighth and final cycle.
+
+[long pause]
+
+Cycle eight: the Remnant Cycle, at-sign Re. This is the final season. The Fall: the Protestant churches, having recovered so much truth during the Reformation, gradually stop reforming and settle into their own traditions. New light is rejected. The three angels' messages are largely ignored or opposed. The world church system begins to move back toward Rome. The image of the beast is in formation. The Covenant: God raises a remnant people who keep all His commandments, including the seventh-day Sabbath, and hold the testimony of Jesus, which is the spirit of prophecy. Revelation chapter twelve, verse seventeen: And the dragon was wroth with the woman, and went to make war with the remnant of her seed, which keep the commandments of God, and have the testimony of Jesus Christ. The Sanctuary: the heavenly sanctuary in its final phase, the Most Holy Place ministry, the investigative judgment that began in 1844. The sanctuary message is central to the remnant's identity. The Enemy: the three-fold union of the beast, the image, and the false prophet. The mark-of-the-beast crisis. The death decree. The final global confederacy against God's commandment-keeping people. The Restoration: the second coming of Christ, the millennium, the final judgment, and the new creation. NE three. The cycle completes. The series ends. The credits roll. And then eternity begins.
+
+[long pause]
+
+Eight cycles. One pattern. Fall, Covenant, Sanctuary, Enemy, Restoration. Repeating and escalating from Eden to the New Earth. This is the backbone of the Bible. If you can identify which cycle a text belongs to, you will never misplace a passage again. You will know the setting, the characters, the conflict, and the resolution. You will know where you are in the story.
 
 [pause]
 
-Second Peter chapter three verse eight reminds us: But, beloved, be not ignorant of this one thing, that one day is with the Lord as a thousand years, and a thousand years as one day. God operates in timeframes that stagger the human mind. But within those timeframes, He places markers, mathematical markers, that allow His people to know exactly where they stand on the prophetic timeline.
+If you have access to the Equation Builder in the Phototheology OS, I want you to use it to map each cycle. The Equation Builder allows you to plot the five-part rhythm for each cycle side by side, so you can see the parallels across all eight seasons. You can tag specific Bible passages to their cycle and their position within the rhythm. This is one of the most powerful analytical tools in the entire OS, and this room is where it becomes indispensable.
 
 [pause]
 
-You are here. You are in the judgment hour. You are living between the terminus of the twenty-three hundred days and the close of probation. The numbers have brought you to this moment. And the same God who kept every mathematical appointment in the past will keep every appointment that remains.
+Your training exercise is this. Take a sheet of paper and draw a grid with eight columns and five rows. Label the columns Ad, No, Ab, Mo, Cy, CyC, Sp, Re. Label the rows Fall, Covenant, Sanctuary, Enemy, Restoration. Then fill in every cell with the key Scripture references and events for that cycle and that beat. When you finish, you will hold the entire story of the Bible in one grid. One page. Eight seasons. Five beats. The heartbeat of redemption.
 
 [pause]
 
-I am Professor Chronos. This has been the Mathematics Room. Now do the math, and see that God is always on time.`;
+I am Professor Covenant. This has been the Eight Cycles Room. Now trace the thread, and you will see that God has never abandoned His people in any season.`;
+
+export const SCRIPT_JUICE_ROOM = `Welcome to the Juice Room. I am Professor Squeeze, Integration Master, and this is where you put the entire Phototheology Palace to work on a single book of the Bible.
+
+[pause]
+
+The name says it all. You take a passage, you place it in the juicer, and you squeeze it through every room, every floor, every principle in the entire system until you have extracted the last drop of meaning. This is not casual Bible reading. This is comprehensive, multi-dimensional, multi-floor analysis. And by the end of this lecture, I am going to walk you through a full demonstration using the book of Exodus. We are going to push Exodus through every single room, from the Story Room on Floor One all the way up through the Three Heavens and Cycles of Floor Six. Every room. No shortcuts. No skipping.
+
+[long pause]
+
+But first, let me explain why this room exists. On every other floor, you learned one skill at a time. The Story Room taught you to recall narratives. The Observation Room taught you to interrogate texts. The Concentration Room taught you to find Christ. Each room was a single lens. But the Juice Room gives you all the lenses at once. It is the room where integration happens. It is where you stop thinking about Phototheology as a collection of separate skills and start using it as a unified system.
+
+[pause]
+
+Think of it like cooking. On Floor One, you learned to prepare individual ingredients: how to slice onions, how to season meat, how to boil pasta. On Floor Two, you learned techniques: how to saute, how to roast, how to deglaze a pan. On Floor Three, you learned flavor combinations: what goes with what. On Floor Four, you learned to plate, to present, to make the dish beautiful and nourishing. On Floor Five, you studied the master recipes, the sanctuary blueprint and the prophetic timeline. On Floor Six, you learned the seasons, the cycles of the menu. Now, in the Juice Room, you cook the entire meal from scratch. Every ingredient. Every technique. Every flavor. One dish. One book.
+
+[pause]
+
+And in the Phototheology OS app, the Chef's Challenge feature is designed for exactly this purpose. It gives you a Bible book and challenges you to process it through every room systematically. Think of the Juice Room as the training ground for the Chef's Challenge. The better you get at squeezing here, the faster and more thoroughly you will perform in the Challenge.
+
+[long pause]
+
+Now let us squeeze Exodus. I chose Exodus because it is the backbone of the Old Testament, the book that the entire Mosaic cycle revolves around. If you can juice Exodus, you can juice anything.
+
+[pause]
+
+Floor One: Furnishing.
+
+[pause]
+
+Story Room. Recall the narrative arc of Exodus from beginning to end. A family of seventy people enters Egypt. Four hundred years pass. They become a nation of millions but also become slaves. God raises Moses, calls him at the burning bush, sends him to Pharaoh. Ten plagues devastate Egypt. The Passover lamb is slain. The Red Sea parts. Israel crosses on dry ground. They travel to Sinai. God speaks the Ten Commandments. Moses ascends the mountain for forty days. The people make a golden calf. Moses intercedes. The tabernacle is built. God's glory fills it. The story runs from slavery to the Shekinah.
+
+[pause]
+
+Imagination Room. Step inside the story. Feel the heat of the Egyptian sun on your back as you carry bricks. Hear the crack of the taskmaster's whip. Now stand at the burning bush. Feel the heat that does not consume. Remove your sandals. The ground is holy. Now stand at the Red Sea. The water rises like walls of glass on either side. You can see fish swimming inside those walls. Walk through. Your feet are dry. The sand is firm. Behind you, the Egyptian chariots are swallowed. Now stand at the foot of Sinai. Thunder rolls. Lightning strikes. The mountain shakes. The voice of God speaks, and it is so terrifying that the people beg Moses to be the intermediary. You have not just read Exodus. You have lived it.
+
+[pause]
+
+24FPS Room. Create one frame for each chapter. Exodus one: a baby in a basket on a river. Exodus three: a bush on fire that does not burn. Exodus seven: a river turning to blood. Exodus twelve: a door painted with blood at midnight. Exodus fourteen: walls of water on either side of a path. Exodus twenty: stone tablets with fire above them. Exodus thirty-two: a golden calf with people dancing. Exodus forty: a cloud filling a tent. Forty frames, forty chapters, one mental film strip.
+
+[pause]
+
+Translation Room. Turn abstract truths into concrete images. The concept of deliverance becomes a broken chain lying on the ground beside a river. The concept of covenant becomes two hands clasping over a stone tablet. The concept of God's presence becomes a glowing pillar hovering over a tent. Every abstract doctrine in Exodus gets a visual anchor.
+
+[pause]
+
+Gems Room. Mine for individual treasures. Exodus chapter three, verse fourteen: I AM THAT I AM. The divine name. A gem of infinite value. Exodus chapter fifteen, verse twenty-six: I am the Lord that healeth thee, Jehovah-Rapha. A gem of healing. Exodus chapter thirty-three, verse eleven: And the Lord spake unto Moses face to face, as a man speaketh unto his friend. A gem of intimacy.
+
+[long pause]
+
+Floor Two: Investigation.
+
+[pause]
+
+Observation Room. Read Exodus like a detective. Notice what is there and what is not. Notice that God waits four hundred years before intervening. Why the delay? Notice that Moses argues with God at the burning bush, offering excuse after excuse. Notice that the plagues escalate, each one targeting a specific Egyptian deity: the Nile god, the frog goddess, the sun god. Notice that the text says God hardened Pharaoh's heart but also that Pharaoh hardened his own heart. Who hardened first? The detective asks these questions.
+
+[pause]
+
+Def-Com Room. Context matters. Egypt in the time of Moses was the most powerful empire on earth. The pyramids were already ancient. The Egyptian religion was elaborate and deeply entrenched. Pharaoh was considered a god on earth. When God sent Moses to say Let my people go, He was not just asking for a prisoner release. He was challenging the entire theological and political system of the ancient world. Understanding the historical context makes the Exodus story exponentially more powerful.
+
+[pause]
+
+Symbols and Types Room. Exodus is dense with types. The Passover lamb is a type of Christ. The Red Sea crossing is a type of baptism. The manna is a type of Christ the Bread of Life. The rock that gave water is a type of Christ the living water. First Corinthians chapter ten, verse four: And did all drink the same spiritual drink: for they drank of that spiritual Rock that followed them: and that Rock was Christ. The pillar of cloud and fire is a type of the Holy Spirit guiding the church.
+
+[pause]
+
+Questions Room. Interrogate the text. Why did God use plagues instead of a single dramatic act? Why ten plagues? Why did God bring Israel to Sinai before bringing them to Canaan? Why was the tabernacle described in such exhaustive detail? Why did God allow the golden calf incident? Every question opens a deeper layer of meaning.
+
+[pause]
+
+QA Room. Chain the questions to answers from other parts of Scripture. Why plagues? Because each plague was a judgment on a specific Egyptian god, demonstrating that Yahweh is supreme over all false deities. Why Sinai first? Because God wanted a covenant relationship, not just a rescue operation. He wanted a people who knew Him, not just a people who were free. Why the golden calf? Because it reveals that deliverance from external slavery does not automatically cure internal idolatry. The heart is the real Egypt.
+
+[long pause]
+
+Floor Three: Freestyle.
+
+[pause]
+
+Nature Freestyle. Exodus is packed with nature imagery. The burning bush that is not consumed. The river of blood. The swarms of locusts. The darkness that could be felt. The pillar of fire. The thunder on Sinai. Connect these to God's character. Fire that does not destroy speaks of holiness that purifies without annihilating. Darkness that can be felt speaks of judgment that is tangible and inescapable.
+
+[pause]
+
+Personal Freestyle. Where is your Egypt? What enslaves you? What is your Red Sea, the impossible obstacle between you and freedom? What is your Sinai, the place where God speaks His law into your life? What is your golden calf, the substitute you turn to when God seems distant? Exodus is not just ancient history. It is your story.
+
+[pause]
+
+Bible Freestyle. Connect Exodus to other books. The Red Sea crossing connects to Joshua's Jordan crossing. The manna connects to John chapter six where Jesus says I am the bread of life. The water from the rock connects to John chapter seven where Jesus says rivers of living water will flow from the believer. The tabernacle connects to Revelation twenty-one where the tabernacle of God is with men.
+
+[pause]
+
+History Freestyle. The Exodus pattern has repeated throughout history. The Protestant Reformation was an exodus from spiritual Egypt. The Pilgrim migration to America was an exodus from religious persecution. The abolitionist movement was a literal exodus from slavery. The three angels' messages are the final exodus call: come out of Babylon.
+
+[long pause]
+
+Floor Four: Next Level.
+
+[pause]
+
+Concentration Room. Where is Christ in Exodus? Everywhere. Christ is the Passover Lamb, chapter twelve. Christ is the manna from heaven, chapter sixteen. Christ is the rock that gives water, chapter seventeen. Christ is the tabernacle, chapters twenty-five through forty. Christ is the high priest, prefigured in Aaron. Christ is the mediator, prefigured in Moses who stands between God and the people. Christ is the I AM of the burning bush.
+
+[pause]
+
+Dimensions Room. Read Exodus through five dimensions. Literally: a historical narrative of Israel's deliverance from Egypt. Symbolically: every element points to spiritual realities. Spiritually: it speaks to my personal deliverance from sin. Prophetically: it foreshadows the final deliverance at the second coming. Eternally: it points to the new creation where God dwells with His people forever.
+
+[pause]
+
+Theme Room. The dominant themes of Exodus include: Great Controversy, God versus Pharaoh as a microcosm of God versus Satan. Sanctuary, the tabernacle as the goal of the Exodus. Gospel, deliverance by blood and power, not by human effort. Law, the Ten Commandments as the covenant standard. Every wall and floor of the Theme Room lights up when you bring Exodus in.
+
+[pause]
+
+Time Zone Room. Exodus belongs primarily to the Mosaic cycle, at-sign Mo. It is the origin story of that cycle. But its themes echo backward to Eden, where the first promise of deliverance was given, and forward to Revelation, where the final deliverance is accomplished. The Exodus is the prototype of all deliverances.
+
+[pause]
+
+Patterns Room. Patterns in Exodus: the number forty appears repeatedly. Forty years Moses is in Midian. Forty days on Sinai. Forty years in the wilderness. The pattern of three days: three days into the wilderness before the first test. Three days of darkness in the ninth plague. Three sections of the tabernacle: courtyard, Holy Place, Most Holy Place. The pattern of blood: the Passover blood, the covenant blood of Exodus twenty-four, the sacrificial blood of the tabernacle services.
+
+[pause]
+
+Parallels Room. Exodus parallels the gospel of Matthew deliberately. Moses is threatened as a baby; Jesus is threatened as a baby. Moses passes through the Red Sea; Jesus passes through baptism. Moses fasts forty days on Sinai; Jesus fasts forty days in the wilderness. Moses gives the law from a mountain; Jesus gives the Sermon on the Mount. Moses appoints twelve tribal leaders; Jesus appoints twelve apostles. Matthew is the new Exodus gospel.
+
+[pause]
+
+Fruit Room. Does the Exodus produce fruit in your life? Does the story of deliverance make you more grateful? Does the story of the golden calf make you examine your own idols? Does the story of God's patience with a grumbling people make you more patient with others? Does the tabernacle make you more reverent in worship? Test every insight by its fruit.
+
+[long pause]
+
+Floor Five: Vision.
+
+[pause]
+
+Blue Room: Sanctuary. The tabernacle is the climax of Exodus. Chapters twenty-five through forty are entirely devoted to it. The sanctuary in Exodus maps perfectly to the furniture walkthrough we did in the Blue Room. The Altar of Burnt Offering, the Laver, the Lampstand, the Table, the Incense Altar, the Ark and Mercy Seat. Exodus is the book where the sanctuary is born.
+
+[pause]
+
+Prophecy Room. Exodus contains embedded prophecies. The Passover prophecy, fulfilled at Calvary. The firstborn son theme, fulfilled in Christ as the firstborn of all creation. The tabernacle pattern, fulfilled in the heavenly sanctuary. The wilderness testing, fulfilled in Christ's temptation.
+
+[long pause]
+
+Floor Six: Three Heavens and Cycles.
+
+[pause]
+
+Cycles. Exodus is the origin story of the Mosaic cycle, at-sign Mo. It contains the Fall, the slavery in Egypt. The Covenant, Sinai. The Sanctuary, the tabernacle. The Enemy, Pharaoh and the golden calf. The Restoration, God's glory filling the tabernacle.
+
+[pause]
+
+Three Heavens. Exodus is a First Heaven precursor text. The deliverance from Egypt foreshadows the deliverance from Babylon in the First Heaven, DoL one. It also foreshadows the deliverance from the old covenant order in the Second Heaven, DoL two. And it foreshadows the final deliverance from sin and death in the Third Heaven, DoL three. Exodus is the template that all three heavens follow.
+
+[long pause]
+
+That is the Juice Room at full compression. We just pushed one book, Exodus, through every room on every floor. And what emerged is not a single insight but a multi-dimensional, multi-floor, multi-room understanding that connects across the entire Palace. This is what Phototheology looks like at full power.
+
+[pause]
+
+Now imagine doing this with every book of the Bible. Imagine juicing Ruth, Daniel, John, Romans, Revelation. Each book yields different concentrations from different rooms. Ruth yields heavily in the Fruit Room and the Parallels Room. Daniel yields heavily in the Prophecy Room and the Mathematics Room. John yields heavily in the Concentration Room and the Dimensions Room. But every book yields something in every room. That is the genius of the system. No room is ever empty. No floor is ever irrelevant.
+
+[pause]
+
+Your training exercise is this. Pick one short Bible book. I recommend Jonah, Ruth, Philemon, or Habakkuk. Now process it through at least fifteen rooms. Write one paragraph for each room's contribution. What does the Story Room see? What does the Observation Room notice? What does the Concentration Room find? What does the Blue Room map? What does the Cycles Room place? When you finish, you will have squeezed that book dry. And you will never read it the same way again.
+
+[pause]
+
+And if you have access to the Chef's Challenge in the Phototheology OS, take the challenge this week. The Chef's Challenge will assign you a book and a time limit. Your job is to combine all the ingredients from all the rooms into one comprehensive analysis. It is the ultimate test of integration. And the Juice Room is where you practice for it.
+
+[pause]
+
+I am Professor Squeeze. This has been the Juice Room. Now squeeze everything you can from the Word of God.`;
+
+export const SCRIPT_MATHEMATICS_ROOM = `Welcome to the Mathematics Room. I am Professor Chronos, Prophetic Mathematician, and this room reveals the numerical architecture of prophecy.
+
+[pause]
+
+God is a mathematician. That statement may surprise you, but it should not. The God who designed the mathematical constants of the universe, who set the speed of light and the gravitational constant and the fine-tuning of atomic forces, that same God embedded mathematical structures in the prophetic timeline of redemption. The Mathematics Room teaches you to work with these numbers, to verify the calculations, and to see how the precision of prophetic chronology confirms the divine origin of Scripture.
+
+[long pause]
+
+Before we begin the calculations, I need to establish one critical interpretive principle: the day-year principle. This is the key that unlocks all time prophecies in Daniel and Revelation. The day-year principle says that in apocalyptic prophecy, one prophetic day equals one literal year.
+
+[pause]
+
+This principle is not invented by interpreters. It is established by God Himself in Scripture. Numbers chapter fourteen, verse thirty-four: After the number of the days in which ye searched the land, even forty days, each day for a year, shall ye bear your iniquities, even forty years. Forty days of spying became forty years of wandering. One day equals one year. Ezekiel chapter four, verse six: I have appointed thee each day for a year. God tells Ezekiel to lie on his side for a specific number of days, and each day represents a year of punishment. The principle is divinely established, and it applies to the symbolic time periods of Daniel and Revelation.
+
+[long pause]
+
+Now let us begin with the master time prophecy of the Bible: the twenty-three hundred days of Daniel chapter eight, verse fourteen.
+
+[pause]
+
+The context: Daniel has a vision of a ram and a goat. The ram is Medo-Persia. The goat is Greece. A little horn arises from the goat, representing Rome in its pagan and papal phases. This horn grows exceedingly great, magnifies itself against the Prince of the host, takes away the daily service, and casts truth to the ground. Then the question is asked: how long? And the answer is given: Unto two thousand and three hundred days; then shall the sanctuary be cleansed.
+
+[pause]
+
+Twenty-three hundred prophetic days. Using the day-year principle, these are twenty-three hundred literal years. But twenty-three hundred years from when? Daniel chapter eight does not give the starting point. Daniel is left confused and sick at the end of the chapter. The angel Gabriel is told to make this man understand the vision, Daniel chapter eight, verse sixteen, but the chapter ends without the time element being explained.
+
+[pause]
+
+The explanation comes in Daniel chapter nine. Gabriel returns and says in verse twenty-three: I am come to shew thee; for thou art greatly beloved: therefore understand the matter, and consider the vision. The vision he is referring to is the vision of chapter eight, the one left unexplained. And now Gabriel provides the key. He introduces the seventy-week prophecy, which is cut off from the twenty-three hundred days and shares the same starting point.
+
+[long pause]
+
+Daniel chapter nine, verse twenty-four: Seventy weeks are determined upon thy people and upon thy holy city, to finish the transgression, and to make an end of sins, and to make reconciliation for iniquity, and to bring in everlasting righteousness, and to seal up the vision and prophecy, and to anoint the most Holy.
+
+[pause]
+
+Seventy weeks. The Hebrew word for determined is chathak, which literally means cut off. Seventy weeks are cut off from the larger period of twenty-three hundred days. This tells us two things. First, the seventy weeks are a subset of the twenty-three hundred days. Second, they share the same starting point. If we can determine when the seventy weeks begin, we know when the twenty-three hundred days begin.
+
+[pause]
+
+Seventy weeks of prophetic time. Seven times seventy equals four hundred and ninety. Using the day-year principle, seventy weeks of prophetic days equals four hundred and ninety literal years.
+
+[pause]
+
+Daniel chapter nine, verse twenty-five gives the starting point: Know therefore and understand, that from the going forth of the commandment to restore and to build Jerusalem unto the Messiah the Prince shall be seven weeks, and threescore and two weeks.
+
+[pause]
+
+The commandment to restore and build Jerusalem. There were several decrees related to the Jewish return from Babylon, but only one fully authorizes the restoration of Jerusalem as a self-governing entity. This is the decree of Artaxerxes recorded in Ezra chapter seven, issued in 457 BC. This decree gave Ezra authority not only to return and rebuild but to appoint judges, enforce laws, and govern, everything needed to restore Jerusalem as a functioning city and nation. The year 457 BC is established by multiple lines of historical evidence and is the consensus date among historians and scholars.
+
+[pause]
+
+So 457 BC is our starting point. Both the seventy weeks and the twenty-three hundred days begin at 457 BC.
+
+[long pause]
+
+Now let us do the calculations. The seventy weeks are divided into three sections.
+
+[pause]
+
+Section one: seven weeks, or forty-nine years. From 457 BC, forty-nine years brings us to 408 BC. This is the period of the actual physical rebuilding of Jerusalem, the walls and the streets, accomplished under Ezra and Nehemiah in troublous times, exactly as Daniel chapter nine, verse twenty-five states.
+
+[pause]
+
+Section two: sixty-two weeks, or four hundred and thirty-four years. From 408 BC, four hundred and thirty-four years brings us to 27 AD. Daniel chapter nine, verse twenty-five, says: unto the Messiah the Prince. The word Messiah means anointed one. Jesus was anointed at His baptism in the Jordan River in 27 AD, when the Holy Spirit descended upon Him like a dove and the Father's voice declared: This is my beloved Son, in whom I am well pleased, Matthew chapter three, verse seventeen. Luke chapter three, verse one, tells us that John the Baptist began his ministry in the fifteenth year of Tiberius Caesar, which was 27 AD. Jesus began His public ministry after His baptism in 27 AD. The Messiah appeared on the exact year the prophecy predicted.
+
+[pause]
+
+Let me emphasize this. A prophecy written over five hundred years before Christ specified the exact year of His anointing. Not approximately. Not within a decade. The exact year. 457 BC plus four hundred and eighty-three years, seven weeks plus sixty-two weeks, equals 27 AD. Remember, there is no year zero in the calendar, so 457 BC plus 483 years equals 27 AD. The math is precise.
+
+[long pause]
+
+Section three: one final week, or seven years. Daniel chapter nine, verse twenty-seven: And he shall confirm the covenant with many for one week: and in the midst of the week he shall cause the sacrifice and the oblation to cease. The He is the Messiah, not a future antichrist as some futurist interpreters claim. In the midst of the week, after three and a half years of ministry, the Messiah causes the sacrifice to cease. How? By becoming the sacrifice. By dying on the cross as the Lamb of God. The veil of the temple was torn. The sacrificial system was rendered obsolete. Not by decree but by fulfillment.
+
+[pause]
+
+The midst of the last week: 27 AD plus three and a half years equals the spring of 31 AD. Jesus was crucified in 31 AD, in the midst of the seventieth week, on the exact day of Passover. The sacrifice ceased because the true Sacrifice had been offered.
+
+[pause]
+
+The remaining three and a half years of the seventieth week extend from 31 AD to 34 AD. During this period, the gospel was preached primarily to the Jewish nation. The covenant was confirmed with many. But in 34 AD, the stoning of Stephen in Acts chapter seven marked the end of the exclusive Jewish probationary period. After Stephen's death, the gospel began to spread systematically to the Gentiles. Saul, who consented to Stephen's death, was converted and became Paul, the apostle to the Gentiles. The seventy weeks, the four hundred and ninety years allotted to the Jewish nation, were complete.
+
+[pause]
+
+So let me summarize the seventy-week timeline:
+
+[pause]
+
+457 BC: decree of Artaxerxes. Beginning of the seventy weeks and the twenty-three hundred days. 408 BC: end of the seven weeks. Jerusalem rebuilt. 27 AD: end of the sixty-nine weeks. Jesus baptized, the Messiah appears. 31 AD: midst of the seventieth week. Jesus crucified. 34 AD: end of the seventieth week. Stephen stoned. Gospel goes to the Gentiles.
+
+[pause]
+
+Every date confirmed by history. Every calculation verified by the calendar. The prophecy hit its marks with flawless accuracy.
+
+[long pause]
+
+Now the twenty-three hundred days. The seventy weeks, four hundred and ninety years, are cut off from the twenty-three hundred years. Both begin at 457 BC. Four hundred and ninety years brings us to 34 AD. The remaining eighteen hundred and ten years extend from 34 AD to 1844 AD. Or, calculating directly: 457 BC plus 2,300 years equals 1844 AD. Remember, no year zero, so 2300 minus 457 equals 1843, plus 1 for no year zero, equals 1844 AD.
+
+[pause]
+
+Daniel chapter eight, verse fourteen: Unto two thousand and three hundred days; then shall the sanctuary be cleansed. In 1844, the cleansing of the heavenly sanctuary began. This is the anti-typical Day of Atonement. This is the commencement of the investigative judgment in the Most Holy Place of the heavenly sanctuary. Christ, our High Priest, moved from the Holy Place ministry, intercession and mediation, to the Most Holy Place ministry, judgment and final atonement. This is the event that the Feast of Trumpets announced and the Day of Atonement enacted. The prophetic calendar and the prophetic mathematics converge on the same date.
+
+[long pause]
+
+Now let us examine the twelve hundred and sixty year prophecy. This number appears in seven different forms across Daniel and Revelation: twelve hundred and sixty days in Revelation chapter eleven, verse three, and Revelation chapter twelve, verse six. Forty-two months in Revelation chapter eleven, verse two, and Revelation chapter thirteen, verse five. A time, times, and the dividing of time in Daniel chapter seven, verse twenty-five, and Daniel chapter twelve, verse seven. And a time, times, and half a time in Revelation chapter twelve, verse fourteen.
+
+[pause]
+
+All of these are the same period expressed in different units. A time is one year. Times is two years. The dividing of time, or half a time, is half a year. Total: three and a half years. Three and a half years times twelve months per year equals forty-two months. Forty-two months times thirty days per month, using the prophetic calendar of thirty-day months, equals twelve hundred and sixty days. Using the day-year principle, twelve hundred and sixty prophetic days equals twelve hundred and sixty literal years.
+
+[pause]
+
+This is the period of papal supremacy, from 538 AD, when the last of the three Arian horns, the Ostrogoths, were driven from Rome and papal authority was established, to 1798 AD, when Napoleon's general Berthier entered Rome, deposed the pope, and dealt the papacy a deadly wound. 1798 minus 538 equals twelve hundred and sixty. Exactly as prophesied.
+
+[pause]
+
+During these twelve hundred and sixty years, the papal system did precisely what Daniel predicted. It spoke great words against the Most High, claiming authority equal to or greater than God's. It wore out the saints of the Most High through the Inquisition and centuries of persecution. It thought to change times and laws, altering the Sabbath from the seventh day to the first and modifying the Ten Commandments. The mathematical framework confirms the historical identification.
+
+[long pause]
+
+Now let me briefly mention several other time prophecies that complete the mathematical architecture.
+
+[pause]
+
+Jeremiah's seventy years: from the first deportation to Babylon in 605 BC to the fall of Babylon in 539 BC is sixty-six years, and to the completion of the temple in 515 BC is ninety years, but to the first return under the decree of Cyrus in 536 BC is approximately sixty-nine years. The seventy years are measured from 605 BC to approximately 536 or 535 BC. Precisely fulfilled.
+
+[pause]
+
+The four hundred years of Genesis chapter fifteen, verse thirteen: Know of a surety that thy seed shall be a stranger in a land that is not theirs, and shall serve them; and they shall afflict them four hundred years. From the time of the covenant with Abraham to the Exodus was approximately four hundred and thirty years, Galatians chapter three, verse seventeen, with the four hundred years representing the specific period of affliction within that larger timeframe.
+
+[pause]
+
+The one hundred and twenty years of Genesis chapter six, verse three: My spirit shall not always strive with man, for that he also is flesh: yet his days shall be an hundred and twenty years. One hundred and twenty years of probation before the flood. A pattern of divine patience before judgment, echoed in the hundred and twenty years of the prophetic time of the end.
+
+[long pause]
+
+If you have access to the Equation Builder in the Phototheology OS, this is the room where that tool becomes essential. The Equation Builder allows you to input starting dates, apply the day-year principle, calculate end dates, and visualize the relationships between different time prophecies on a single timeline. You can plot the twenty-three hundred days, the seventy weeks within them, the twelve hundred and sixty years alongside them, and see how they all interlock. The visual representation makes the mathematical architecture unmistakable. These are not random numbers. They are a coordinate system, a prophetic GPS that tells you exactly where you are in the story of redemption.
+
+[pause]
+
+Your training exercise is this. Get a piece of paper and draw a horizontal timeline. Mark 457 BC on the left as the starting point. Mark the following dates from left to right: 408 BC, the end of the seven weeks. 27 AD, the baptism of Christ. 31 AD, the crucifixion. 34 AD, the stoning of Stephen and the end of the seventy weeks. 538 AD, the beginning of the twelve hundred and sixty years. 1798 AD, the end of the twelve hundred and sixty years and the deadly wound. 1844 AD, the end of the twenty-three hundred days and the beginning of the heavenly sanctuary cleansing. Label each date with the event and the prophecy it fulfills. When you finish, you will hold the mathematical architecture of prophecy in your hands. And you will see that the God who calculated these numbers is the same God who holds history in His hands.
+
+[pause]
+
+I am Professor Chronos. This has been the Mathematics Room. Now do the math, and let the numbers confirm your faith.`;
+
 
 // ─── FLOOR 7: TRANSFORMATION ─────────────────────────────────────────────
 
