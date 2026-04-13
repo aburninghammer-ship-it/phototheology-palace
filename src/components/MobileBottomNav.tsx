@@ -17,7 +17,7 @@ const getPrimaryNavItems = (mode: string) => {
     { icon: BookOpen, labelKey: "nav.bible", path: "/bible" },
     { icon: Church, labelKey: "nav.church", path: "/living-manna" },
     { icon: Building2, labelKey: "nav.palace", path: "/palace" },
-    { icon: Crown, labelKey: "nav.subscribe", path: "/pricing" },
+    { icon: Headphones, labelKey: "nav.playlist", path: "/playlist" },
   ];
 };
 
@@ -26,6 +26,7 @@ const alwaysVisibleMoreItems = [
   { icon: User, label: "My Profile", path: "/profile" },
   { icon: Users, label: "Community", path: "/community" },
   { icon: MessageCircle, label: "Public Chat", path: "/public-chat" },
+  { icon: Crown, label: "Subscribe", path: "/pricing" },
 ];
 
 // Items gated by feature registry

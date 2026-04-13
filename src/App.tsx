@@ -87,6 +87,7 @@ const ShowMe = lazy(() => import("./pages/ShowMe"));
 const StudyExperience = lazy(() => import("./pages/StudyExperience"));
 const GoalsSurveyPage = lazy(() => import("./pages/GoalsSurveyPage"));
 const InstallApp = lazy(() => import("./pages/InstallApp"));
+const PlaylistPage = lazy(() => import("./pages/Playlist"));
 
 // Lazy load all other pages
 const Palace = lazy(() => import("./pages/Palace"));
@@ -489,6 +490,7 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/playlist" element={<ProtectedRoute><PlaylistPage /></ProtectedRoute>} />
             <Route path="/audio-library" element={<BasicModeGate><ProtectedRoute><AudioLibrary /></ProtectedRoute></BasicModeGate>} />
             <Route path="/music-manager" element={<ProtectedRoute><MusicManager /></ProtectedRoute>} />
             <Route path="/fix-billing" element={<ProtectedRoute><FixBilling /></ProtectedRoute>} />

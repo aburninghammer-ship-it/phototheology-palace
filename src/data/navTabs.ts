@@ -67,6 +67,20 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
     }
   },
   {
+    id: "playlist",
+    to: "/playlist",
+    label: "Playlist",
+    shortLabel: "Playlist",
+    icon: Headphones,
+    gradient: {
+      from: "from-violet-500/10",
+      to: "to-fuchsia-500/10",
+      border: "border-violet-500/20",
+      text: "from-violet-600 to-fuchsia-600",
+      glow: "rgba(139,92,246,0.5)"
+    }
+  },
+  {
     id: "prophecy-watch",
     to: "/prophecy-watch",
     label: "Prophecy Watch",
