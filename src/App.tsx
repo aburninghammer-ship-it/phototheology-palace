@@ -194,6 +194,7 @@ const DailyReading = lazy(() => import("./pages/DailyReading"));
 const TreasureHunt = lazy(() => import("./pages/TreasureHunt"));
 const TreasureHuntPlay = lazy(() => import("./pages/TreasureHuntPlay"));
 const TrainingDrills = lazy(() => import("./pages/TrainingDrills"));
+const PlaylistHub = lazy(() => import("./pages/PlaylistHub"));
 const DrillDrill = lazy(() => import("./pages/DrillDrill"));
 const EscapeRoom = lazy(() => import("./pages/EscapeRoomRenovated"));
 const EscapeRoomPlay = lazy(() => import("./pages/EscapeRoomPlayRenovated"));
