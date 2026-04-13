@@ -575,6 +575,7 @@ function App() {
             <Route path="/video-training" element={<BasicModeGate><ProtectedRoute><VideoTraining /></ProtectedRoute></BasicModeGate>} />
             <Route path="/video_admin" element={<BasicModeGate><ProtectedRoute><VideoTraining /></ProtectedRoute></BasicModeGate>} />
             <Route path="/music" element={<BasicModeGate><ProtectedRoute><MusicCategories /></ProtectedRoute></BasicModeGate>} />
+             <Route path="/playlist" element={<ProtectedRoute><PlaylistHub /></ProtectedRoute>} />
             <Route path="/daily-reading" element={<ProtectedRoute><DailyReading /></ProtectedRoute>} />
             <Route path="/memorization-verses" element={<BasicModeGate><ProtectedRoute><MemorizationVerses /></ProtectedRoute></BasicModeGate>} />
             <Route path="/verse-memory-hall" element={<BasicModeGate><ProtectedRoute><VerseMemoryHall /></ProtectedRoute></BasicModeGate>} />
