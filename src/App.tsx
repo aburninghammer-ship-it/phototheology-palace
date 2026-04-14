@@ -492,7 +492,7 @@ function App() {
             } />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/playlist" element={<ProtectedRoute><PlaylistPage /></ProtectedRoute>} />
-            <Route path="/audio-library" element={<BasicModeGate><ProtectedRoute><AudioLibrary /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/audio-library" element={<ProtectedRoute><AudioLibrary /></ProtectedRoute>} />
             <Route path="/music-manager" element={<ProtectedRoute><MusicManager /></ProtectedRoute>} />
             <Route path="/fix-billing" element={<ProtectedRoute><FixBilling /></ProtectedRoute>} />
             <Route path="/gift" element={<GiftAndShare />} />
@@ -548,7 +548,7 @@ function App() {
             <Route path="/gems" element={<Navigate to="/give-me-a-gem" replace />} />
             <Route path="/pt-multiplayer" element={<BasicModeGate><ProtectedRoute><PTMultiplayerLobby /></ProtectedRoute></BasicModeGate>} />
             <Route path="/pt-multiplayer/:gameId" element={<BasicModeGate><ProtectedRoute><PTMultiplayerGame /></ProtectedRoute></BasicModeGate>} />
-            <Route path="/analyze-thoughts" element={<BasicModeGate><ProtectedRoute><AnalyzeThoughts /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/analyze-thoughts" element={<ProtectedRoute><AnalyzeThoughts /></ProtectedRoute>} />
             <Route path="/polish" element={<BasicModeGate><ProtectedRoute><Polish /></ProtectedRoute></BasicModeGate>} />
             <Route path="/remix" element={<BasicModeGate><ProtectedRoute><Remix /></ProtectedRoute></BasicModeGate>} />
             <Route path="/amplify" element={<BasicModeGate><ProtectedRoute><Amplify /></ProtectedRoute></BasicModeGate>} />
@@ -569,8 +569,8 @@ function App() {
             <Route path="/reading-plans" element={<ProtectedRoute><ReadingPlans /></ProtectedRoute>} />
             <Route path="/bible-reference" element={<ProtectedRoute><BibleReference /></ProtectedRoute>} />
             <Route path="/ascensions-expansions" element={<BasicModeGate><ProtectedRoute><AscensionsExpansions /></ProtectedRoute></BasicModeGate>} />
-            <Route path="/encyclopedia" element={<BasicModeGate><ProtectedRoute><BibleEncyclopedia /></ProtectedRoute></BasicModeGate>} />
-            <Route path="/encyclopedia/:slug" element={<BasicModeGate><ProtectedRoute><EncyclopediaArticle /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/encyclopedia" element={<ProtectedRoute><BibleEncyclopedia /></ProtectedRoute>} />
+            <Route path="/encyclopedia/:slug" element={<ProtectedRoute><EncyclopediaArticle /></ProtectedRoute>} />
             <Route path="/character-profiles" element={<BasicModeGate><ProtectedRoute><CharacterProfiles /></ProtectedRoute></BasicModeGate>} />
             <Route path="/video-training" element={<BasicModeGate><ProtectedRoute><VideoTraining /></ProtectedRoute></BasicModeGate>} />
             <Route path="/video_admin" element={<BasicModeGate><ProtectedRoute><VideoTraining /></ProtectedRoute></BasicModeGate>} />
