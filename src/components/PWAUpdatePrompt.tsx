@@ -4,7 +4,7 @@ import { useRegisterSW } from 'virtual:pwa-register/react';
 import { Button } from '@/components/ui/button';
 import { Download, RefreshCw } from 'lucide-react';
 
-const SUPPRESSED_BUILD_PREFIX = 'pwa_update_suppressed_build:';
+const DISMISSED_BUILD_PREFIX = 'pwa_update_dismissed_build:';
 const AUTO_REFRESHED_BUILD_PREFIX = 'pwa_auto_refreshed_build:';
 const WAITING_SW_DISMISS_KEY = 'pwa_waiting_sw_dismissed';
 export const MANUAL_UPDATE_REQUIRED_EVENT = 'pt:manual-update-required';
@@ -45,14 +45,14 @@ async function fetchLatestBuildTag(): Promise<string | null> {
   return match?.[1] ?? null;
 }
 
-function suppressBuild(build: string | null): void {
+function dismissBuild(build: string | null): void {
   if (!build) return;
-  localStorage.setItem(`${SUPPRESSED_BUILD_PREFIX}${build}`, '1');
+  sessionStorage.setItem(`${DISMISSED_BUILD_PREFIX}${build}`, '1');
 }
 
-function isBuildSuppressed(build: string | null): boolean {
+function isBuildDismissed(build: string | null): boolean {
   if (!build) return false;
-  return localStorage.getItem(`${SUPPRESSED_BUILD_PREFIX}${build}`) === '1';
+  return sessionStorage.getItem(`${DISMISSED_BUILD_PREFIX}${build}`) === '1';
 }
 
 function hasAutoRefreshedBuild(build: string | null): boolean {
@@ -190,7 +190,7 @@ export function PWAUpdatePrompt() {
           cancelled ||
           !nextBuild ||
           nextBuild === currentBuild ||
-          isBuildSuppressed(nextBuild) ||
+          isBuildDismissed(nextBuild) ||
           hasAutoRefreshedBuild(nextBuild)
         ) {
           return;
@@ -255,7 +255,6 @@ export function PWAUpdatePrompt() {
       }
 
       markAutoRefreshedBuild(pendingBuild);
-      suppressBuild(pendingBuild);
       await forceHardRefresh('__app_refresh', pendingBuild ? `manual-${pendingBuild}` : `manual-${Date.now()}`);
     } catch (error) {
       console.error('Error during update:', error);
@@ -266,7 +265,7 @@ export function PWAUpdatePrompt() {
   }, [activateWaitingServiceWorker, isUpdating, pendingBuild]);
 
   const close = useCallback(() => {
-    suppressBuild(pendingBuild);
+    dismissBuild(pendingBuild);
     sessionStorage.setItem(WAITING_SW_DISMISS_KEY, '1');
     setOfflineReady(false);
     setNeedRefresh(false);
@@ -365,7 +364,7 @@ export function useCheckForUpdates() {
         currentBuild &&
         latestBuild &&
         latestBuild !== currentBuild &&
-        !isBuildSuppressed(latestBuild)
+        !isBuildDismissed(latestBuild)
       ) {
         setUpdateAvailable(true);
         return true;
