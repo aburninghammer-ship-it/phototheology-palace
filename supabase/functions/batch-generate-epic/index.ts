@@ -35,39 +35,27 @@ serve(async (req) => {
   }
 
   try {
-    // Verify admin access
+    // ===== MANDATORY AUTH + ADMIN CHECK =====
     const authHeader = req.headers.get("Authorization");
-    if (authHeader) {
-      const token = authHeader.replace("Bearer ", "");
-      const supabaseAuth = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-      const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
-      
-      if (authError || !user) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), {
-          status: 401,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      // Check if user is admin/creator
-      const { data: profile } = await supabaseAuth
-        .from("profiles")
-        .select("is_creator")
-        .eq("id", user.id)
-        .single();
-
-      const { data: adminCheck } = await supabaseAuth
-        .from("admin_users")
-        .select("id")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (!profile?.is_creator && !adminCheck) {
-        return new Response(JSON.stringify({ error: "Admin access required" }), {
-          status: 403,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const supabaseAuth = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const { data: adminCheck } = await supabaseAuth
+      .from("admin_users").select("id").eq("user_id", user.id).maybeSingle();
+    if (!adminCheck) {
+      return new Response(JSON.stringify({ error: "Admin access required" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const { startBook, startChapter, batchSize = 5, regenerate = false, books: targetBooks, mode = "epic" } = await req.json();

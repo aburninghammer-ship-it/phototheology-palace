@@ -230,23 +230,26 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Optional: Verify admin if called manually
+    // ===== MANDATORY AUTH + ADMIN CHECK =====
     const authHeader = req.headers.get("Authorization");
-    if (authHeader) {
-      const userClient = createClient(supabaseUrl, supabaseServiceKey, {
-        global: { headers: { Authorization: authHeader } }
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
-      const { data: { user }, error: authError } = await userClient.auth.getUser();
-      if (user) {
-        const { data: adminCheck } = await supabase
-          .from("admin_users")
-          .select("user_id")
-          .eq("user_id", user.id)
-          .single();
-        if (!adminCheck) {
-          throw new Error("Admin access required");
-        }
-      }
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const { data: adminCheck } = await supabase
+      .from("admin_users").select("user_id").eq("user_id", user.id).single();
+    if (!adminCheck) {
+      return new Response(JSON.stringify({ error: "Admin access required" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     // Check for backfill mode

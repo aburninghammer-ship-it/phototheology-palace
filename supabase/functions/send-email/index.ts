@@ -28,6 +28,12 @@ interface EmailRequest {
  * Consolidated email function that handles all email types
  * Replaces 8 separate email functions with a single unified handler
  */
+// HTML escape helper to prevent injection
+function escapeHtml(str: string): string {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -42,7 +48,39 @@ const handler = async (req: Request): Promise<Response> => {
     const resend = new Resend(resendApiKey);
     const { type, data }: EmailRequest = await req.json();
 
-    console.log(`Sending ${type} email with data:`, data);
+    // ===== MANDATORY AUTH CHECK (except for service-triggered types) =====
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Admin-only types require admin check
+    const adminOnlyTypes: EmailType[] = ['admin-signup', 'daily-challenge', 'engagement', 'renewal-reminder', 'signup-notification', 'partner-nudge', 'purchase-notification', 'devotional-ready'];
+    if (adminOnlyTypes.includes(type)) {
+      const { data: adminCheck } = await supabaseAdmin
+        .from('admin_users').select('id').eq('user_id', user.id).maybeSingle();
+      if (!adminCheck) {
+        return new Response(JSON.stringify({ error: 'Admin access required' }), {
+          status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+    // ===== END AUTH CHECK =====
+
+    console.log(`Sending ${type} email`);
 
     let emailConfig: {
       from: string;
