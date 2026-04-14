@@ -729,7 +729,7 @@ function App() {
           <Route path="/daniel-revelation-gpt" element={<BasicModeGate><ProtectedRoute><DanielRevelationGPT /></ProtectedRoute></BasicModeGate>} />
           <Route path="/apologetics-gpt" element={<BasicModeGate><ProtectedRoute><ApologeticsGPT /></ProtectedRoute></BasicModeGate>} />
           <Route path="/quarterly-study" element={<BasicModeGate><ProtectedRoute><QuarterlyStudy /></ProtectedRoute></BasicModeGate>} />
-          <Route path="/study-buddy" element={<BasicModeGate><ProtectedRoute><StudyBuddy /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/study-buddy" element={<ProtectedRoute><StudyBuddy /></ProtectedRoute>} />
           <Route path="/study-ideas" element={<BasicModeGate><ProtectedRoute><StudyIdeaLibrary /></ProtectedRoute></BasicModeGate>} />
           <Route path="/give-me-a-gem" element={<BasicModeGate><ProtectedRoute><GiveMeAGem /></ProtectedRoute></BasicModeGate>} />
           <Route path="/sources" element={<BasicModeGate><ProtectedRoute><SourceLibrary /></ProtectedRoute></BasicModeGate>} />
