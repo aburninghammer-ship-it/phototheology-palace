@@ -25,27 +25,6 @@ const isMetaWebView =
 const previewFreshnessKey = "__preview_sw_freshened_v3__";
 const chunkReloadKey = "__chunk_reload_once__";
 const metaForceReloadKey = "__meta_force_reload_v3__";
-const questBuildRefreshKeyPrefix = "__quest_build_refresh__:";
-const standardBuildRefreshKeyPrefix = "__standard_build_refresh__:";
-
-function readCurrentBuildTag() {
-  return document.querySelector('meta[name="app-build"]')?.getAttribute("content") ?? null;
-}
-
-async function fetchLatestBuildTag() {
-  const url = `${window.location.origin}/?__buildcheck=${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  const html = await fetch(url, {
-    cache: "no-store",
-    headers: {
-      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
-      Pragma: "no-cache",
-    },
-  }).then((response) => response.text());
-
-  const match = html.match(/<meta\s+name=["']app-build["']\s+content=["']([^"']+)["']/i);
-  return match?.[1] ?? null;
-}
-
 async function hardRefresh(cacheBusterKey: string) {
   try {
     const regs = await navigator.serviceWorker.getRegistrations();
@@ -60,28 +39,6 @@ async function hardRefresh(cacheBusterKey: string) {
     target.searchParams.set(cacheBusterKey, Date.now().toString());
     window.location.replace(target.toString());
   }
-}
-
-async function maybeRefreshForNewBuild(refreshKeyPrefix: string, cacheBusterKey: string) {
-  const currentBuild = readCurrentBuildTag();
-  if (!currentBuild) return;
-
-  const nextBuild = await fetchLatestBuildTag().catch(() => null);
-  if (!nextBuild || nextBuild === currentBuild) return;
-
-  const refreshKey = `${refreshKeyPrefix}${nextBuild}`;
-  if (sessionStorage.getItem(refreshKey) === "1") return;
-
-  sessionStorage.setItem(refreshKey, "1");
-  await hardRefresh(cacheBusterKey);
-}
-
-async function maybeRefreshQuestBuild() {
-  await maybeRefreshForNewBuild(questBuildRefreshKeyPrefix, "__quest_refresh");
-}
-
-async function maybeRefreshStandardBuild() {
-  await maybeRefreshForNewBuild(standardBuildRefreshKeyPrefix, "__app_refresh");
 }
 
 function requestManualUpdate() {
@@ -180,17 +137,14 @@ if ("serviceWorker" in navigator) {
       );
     })();
   } else {
-    // Production: check for newer builds periodically and trigger SW update.
-    // The PWAUpdatePrompt component will show a "Reload Now" button — no auto-refresh.
+    // Production desktop/mobile web: check for SW updates periodically.
+    // The PWAUpdatePrompt component owns the manual "Reload Now" choice.
     void (async () => {
       const checkForStandardUpdate = () => {
         void navigator.serviceWorker
           .getRegistration()
           .then((registration) => registration?.update())
-          .catch(() => undefined)
-          .finally(() => {
-            void maybeRefreshStandardBuild().catch(() => undefined);
-          });
+          .catch(() => undefined);
       };
 
       const handleVisibilityChange = () => {
