@@ -88,6 +88,40 @@ export function PWAUpdatePrompt() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [pendingBuild, setPendingBuild] = useState<string | null>(null);
 
+  const openReloadPrompt = useCallback(
+    ({ build = null, resetDismissal = false }: { build?: string | null; resetDismissal?: boolean } = {}) => {
+      if (build) {
+        setPendingBuild(build);
+      }
+
+      if (resetDismissal) {
+        sessionStorage.removeItem(WAITING_SW_DISMISS_KEY);
+      } else if (sessionStorage.getItem(WAITING_SW_DISMISS_KEY) === '1') {
+        return false;
+      }
+
+      setShowReload(true);
+      return true;
+    },
+    [],
+  );
+
+  const checkForWaitingServiceWorker = useCallback(async () => {
+    if (!('serviceWorker' in navigator)) return false;
+
+    const registration = await navigator.serviceWorker.getRegistration().catch(() => undefined);
+    if (!registration) return false;
+
+    if (!registration.waiting) {
+      await registration.update().catch(() => undefined);
+    }
+
+    const refreshedRegistration = await navigator.serviceWorker.getRegistration().catch(() => undefined);
+    if (!refreshedRegistration?.waiting) return false;
+
+    return openReloadPrompt();
+  }, [openReloadPrompt]);
+
   const {
     offlineReady: [offlineReady, setOfflineReady],
     needRefresh: [needRefresh, setNeedRefresh],
@@ -95,14 +129,16 @@ export function PWAUpdatePrompt() {
     onRegisteredSW(swUrl, registration) {
       console.log('SW registered:', swUrl);
 
-      if (registration?.waiting && sessionStorage.getItem(WAITING_SW_DISMISS_KEY) !== '1') {
-        setShowReload(true);
+      if (registration?.waiting) {
+        void openReloadPrompt();
+        return;
       }
+
+      void checkForWaitingServiceWorker();
     },
     onNeedRefresh() {
       console.log('New content available, showing reload prompt');
-      sessionStorage.removeItem(WAITING_SW_DISMISS_KEY);
-      setShowReload(true);
+      openReloadPrompt({ resetDismissal: true });
     },
     onOfflineReady() {
       console.log('App ready for offline use');
@@ -149,31 +185,43 @@ export function PWAUpdatePrompt() {
 
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return;
-    if (sessionStorage.getItem(WAITING_SW_DISMISS_KEY) === '1') return;
 
-    void navigator.serviceWorker.getRegistration().then((registration) => {
-      if (registration?.waiting) {
-        setShowReload(true);
+    void checkForWaitingServiceWorker();
+
+    const handleVisibilityCheck = () => {
+      if (document.visibilityState === 'visible') {
+        void checkForWaitingServiceWorker();
       }
-    });
-  }, []);
+    };
+
+    const intervalId = window.setInterval(() => {
+      void checkForWaitingServiceWorker();
+    }, 15_000);
+
+    window.addEventListener('focus', handleVisibilityCheck);
+    document.addEventListener('visibilitychange', handleVisibilityCheck);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', handleVisibilityCheck);
+      document.removeEventListener('visibilitychange', handleVisibilityCheck);
+    };
+  }, [checkForWaitingServiceWorker]);
 
   useEffect(() => {
     if (needRefresh) {
-      sessionStorage.removeItem(WAITING_SW_DISMISS_KEY);
-      setShowReload(true);
+      openReloadPrompt({ resetDismissal: true });
     }
-  }, [needRefresh]);
+  }, [needRefresh, openReloadPrompt]);
 
   useEffect(() => {
     const handleManualUpdateRequired = () => {
-      sessionStorage.removeItem(WAITING_SW_DISMISS_KEY);
-      setShowReload(true);
+      openReloadPrompt({ resetDismissal: true });
     };
 
     window.addEventListener(MANUAL_UPDATE_REQUIRED_EVENT, handleManualUpdateRequired);
     return () => window.removeEventListener(MANUAL_UPDATE_REQUIRED_EVENT, handleManualUpdateRequired);
-  }, []);
+  }, [openReloadPrompt]);
 
   useEffect(() => {
     if (isMetaWebView || isPreviewHost || isInIframe) return;
@@ -203,9 +251,7 @@ export function PWAUpdatePrompt() {
             .catch(() => undefined);
         }
 
-        setPendingBuild(nextBuild);
-        sessionStorage.removeItem(WAITING_SW_DISMISS_KEY);
-        setShowReload(true);
+        openReloadPrompt({ build: nextBuild, resetDismissal: true });
       } catch {
         // Ignore transient network/cache issues and retry on next poll.
       }
@@ -235,7 +281,7 @@ export function PWAUpdatePrompt() {
       window.removeEventListener('focus', handleVisibilityCheck);
       document.removeEventListener('visibilitychange', handleVisibilityCheck);
     };
-  }, []);
+  }, [openReloadPrompt]);
 
   const handleUpdate = useCallback(async () => {
     if (isUpdating) return;
