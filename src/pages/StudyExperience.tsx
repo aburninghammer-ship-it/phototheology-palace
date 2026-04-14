@@ -1173,6 +1173,7 @@ INSTRUCTIONS FOR RECAP:
                     onCompound={handleCompound}
                     compounding={compounding}
                     onSaveLayer={handleSaveLayer}
+                    onContinueBuilding={(mode === "jeeves-led" || mode === "teach") ? handleContinueBuilding : undefined}
                   />
                 ))}
               </div>
