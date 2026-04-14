@@ -285,8 +285,41 @@ Use KJV text only. Be precise with references.`,
 
   const handleContinueBuilding = useCallback(() => {
     if (!parsedRef) return;
-    autoPickAndApply(parsedRef, verseRef);
-  }, [parsedRef, verseRef, autoPickAndApply]);
+    const used = new Set(layers.map((l) => l.principleId));
+    const pickA = autoPickPrinciple(allFloors, used);
+    if (!pickA) { toast("All principles explored! 🎉"); return; }
+    const usedPlusA = new Set([...used, pickA.principle.id]);
+    const pickB = autoPickPrinciple(allFloors, usedPlusA);
+    if (!pickB) {
+      // Only one option left, just run it directly
+      autoPickAndApply(parsedRef, verseRef);
+      return;
+    }
+    setAbChoice({ a: pickA, b: pickB });
+  }, [parsedRef, verseRef, autoPickAndApply, allFloors, layers]);
+
+  const handleAbSelect = useCallback(async (choice: "a" | "b") => {
+    if (!abChoice || !parsedRef) return;
+    const pick = choice === "a" ? abChoice.a : abChoice.b;
+    if (!pick) return;
+    setAbChoice(null);
+    setLoadingPrinciple(pick.principle.id);
+    try {
+      const promptBuilder = mode === "teach" ? buildTeachPrompt : buildDeepPrompt;
+      const { data } = await callJeeves({
+        mode: "principle-amplification",
+        book: parsedRef.book, chapter: parsedRef.chapter, verse: parsedRef.verse,
+        verseText: verseText,
+        principle: promptBuilder(pick.roomName, pick.roomId, pick.principle.name, pick.principle.description),
+      }, "study-experience");
+      const response = typeof data === "string" ? data : (data as any)?.response || "";
+      setPendingLayer({ roomId: pick.roomId, roomName: pick.roomName, principleId: pick.principle.id, principleName: pick.principle.name, analysis: response });
+    } catch (err) {
+      console.error("A/B analysis failed:", err);
+      toast.error("Analysis failed — try again.");
+    }
+    setLoadingPrinciple(null);
+  }, [abChoice, parsedRef, mode, verseText]);
 
   const fetchCrossRoomSuggestion = async (
     parsed: { book: string; chapter: string; verse: string },
