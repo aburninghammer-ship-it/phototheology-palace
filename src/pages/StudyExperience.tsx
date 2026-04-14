@@ -1089,13 +1089,40 @@ INSTRUCTIONS FOR RECAP:
               </motion.div>
             )}
 
+            {/* A/B Choice */}
+            {abChoice && !pendingLayer && !loadingPrinciple && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-card/60 to-card/40 backdrop-blur-xl p-5 shadow-[0_0_25px_-8px_hsl(var(--primary)/0.25)]">
+                <p className="text-sm font-semibold text-foreground mb-1">Choose your next lens</p>
+                <p className="text-xs text-muted-foreground mb-4">Jeeves has two different angles ready. Pick one — you won't know which principle it uses until after.</p>
+                <div className="flex items-center gap-3">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    onClick={() => handleAbSelect("a")}
+                    className="flex-1 h-14 text-lg font-bold border-2 border-primary/40 hover:border-primary hover:bg-primary/10 transition-all"
+                  >
+                    A
+                  </Button>
+                  <span className="text-xs text-muted-foreground font-medium">or</span>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    onClick={() => handleAbSelect("b")}
+                    className="flex-1 h-14 text-lg font-bold border-2 border-primary/40 hover:border-primary hover:bg-primary/10 transition-all"
+                  >
+                    B
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
             {/* Continue bar after accepting */}
-            {(mode === "jeeves-led" || mode === "teach") && parsedRef && !pendingLayer && !loadingPrinciple && layers.length > 0 && (
+            {(mode === "jeeves-led" || mode === "teach") && parsedRef && !pendingLayer && !loadingPrinciple && !abChoice && layers.length > 0 && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3 p-4 rounded-xl border border-primary/20 bg-card/40">
                 <Button size="sm" onClick={handleContinueBuilding} className="gap-1.5">
                   <Sparkles className="w-4 h-4" /> Continue Building
                 </Button>
-                <span className="text-xs text-muted-foreground">Jeeves will pick a new lens and apply it</span>
+                <span className="text-xs text-muted-foreground">Choose between two mystery lenses</span>
               </motion.div>
             )}
 
