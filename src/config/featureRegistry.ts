@@ -3,23 +3,20 @@
  * All navigation surfaces consume this to gate features.
  *
  * Mode names match ExperienceModeContext:
- *   basic    (Level 1) — formerly "simple"
- *   explorer (Level 2) — formerly "guided"
- *   immersion(Level 3) — formerly "master"
+ *   basic    (Level 1) — "Learn" — Bible learning, devotional, consumption
+ *   immersion(Level 2) — "Study" — PT principles, deep analysis, creation
  */
 
-export type ExperienceMode = "basic" | "explorer" | "immersion";
+export type ExperienceMode = "basic" | "immersion";
 
 export const MODE_LEVEL: Record<ExperienceMode, number> = {
   basic: 1,
-  explorer: 2,
-  immersion: 3,
+  immersion: 2,
 };
 
 export const MODE_LABELS: Record<ExperienceMode, string> = {
-  basic: "Basic",
-  explorer: "Explorer",
-  immersion: "Immersion",
+  basic: "Learn",
+  immersion: "Study",
 };
 
 /** Returns true if `current` mode meets or exceeds `min` mode */
@@ -31,9 +28,15 @@ export function meetsMinMode(current: ExperienceMode, min: ExperienceMode): bool
  * Registry mapping route path prefixes to minimum required mode.
  * Ordered from most specific to least specific within each mode.
  * Paths not listed here default to "basic" (accessible to all).
+ *
+ * Level 1 (Learn): Devotional, listening, absorbing — Chapel, Commentary, Master Class,
+ *   Podcast, Give Me a Gem, Audio Library, KidGPT, Study Buddy, Daily Reading, etc.
+ *
+ * Level 2 (Study): PT-powered analysis & creation — Palace, Sermon Builder, Mind Map,
+ *   specialized GPTs, Prophecy Watch, Defense Mode, etc.
  */
 const FEATURE_REGISTRY: Array<{ path: string; minMode: ExperienceMode }> = [
-  // ── Immersion-only features (Level 3) ──
+  // ── Study-only features (Level 2 — Immersion) ──
   // Train Space
   { path: "/mastery", minMode: "immersion" },
   { path: "/palace/freestyle", minMode: "immersion" },
@@ -58,10 +61,9 @@ const FEATURE_REGISTRY: Array<{ path: string; minMode: ExperienceMode }> = [
   // Workshop / AI Tools Space
   { path: "/phototheologygpt", minMode: "immersion" },
   { path: "/branch-study", minMode: "immersion" },
-  { path: "/kidgpt", minMode: "immersion" },
   { path: "/daniel-revelation-gpt", minMode: "immersion" },
 
-  // Other Immersion features
+  // Other Study features
   { path: "/prophecy-watch", minMode: "immersion" },
   { path: "/research-mode", minMode: "immersion" },
   { path: "/encyclopedia", minMode: "immersion" },
@@ -70,49 +72,41 @@ const FEATURE_REGISTRY: Array<{ path: string; minMode: ExperienceMode }> = [
   { path: "/bible-atlas", minMode: "immersion" },
   { path: "/quarterly-study", minMode: "immersion" },
 
-  // ── Explorer features (Level 2) ──
-  { path: "/master-class", minMode: "basic" },
-  { path: "/podcast", minMode: "basic" },
-  // Study Experience
-  { path: "/study-experience", minMode: "explorer" },
-  // Study Space
-  { path: "/palace/tour", minMode: "explorer" },
-  { path: "/palace", minMode: "explorer" },
-  { path: "/image-bible", minMode: "explorer" },
-  { path: "/bible-timeline", minMode: "explorer" },
-  { path: "/bible-lexicon", minMode: "explorer" },
-  { path: "/interlinear", minMode: "explorer" },
-  { path: "/study-buddy", minMode: "explorer" },
-  { path: "/research-assistant", minMode: "explorer" },
-  { path: "/give-me-a-gem", minMode: "explorer" },
-  { path: "/analyze-thoughts", minMode: "explorer" },
-  { path: "/memory", minMode: "explorer" },
-  { path: "/mind-map", minMode: "explorer" },
-  { path: "/test-me", minMode: "explorer" },
-  { path: "/drill-drill", minMode: "explorer" },
+  // Palace & Study tools (formerly Explorer, now Study)
+  { path: "/palace/tour", minMode: "immersion" },
+  { path: "/palace", minMode: "immersion" },
+  { path: "/image-bible", minMode: "immersion" },
+  { path: "/bible-timeline", minMode: "immersion" },
+  { path: "/bible-lexicon", minMode: "immersion" },
+  { path: "/interlinear", minMode: "immersion" },
+  { path: "/research-assistant", minMode: "immersion" },
+  { path: "/analyze-thoughts", minMode: "immersion" },
+  { path: "/mind-map", minMode: "immersion" },
+  { path: "/test-me", minMode: "immersion" },
+  { path: "/drill-drill", minMode: "immersion" },
 
   // Games Space
-  { path: "/daily-challenges", minMode: "explorer" },
-  { path: "/challenge-board", minMode: "explorer" },
-  { path: "/leaderboard", minMode: "explorer" },
-  { path: "/achievements", minMode: "explorer" },
-
-  // Chapel Space — morning/night watches are basic (part of Chapel, accessible to all)
+  { path: "/daily-challenges", minMode: "immersion" },
+  { path: "/challenge-board", minMode: "immersion" },
+  { path: "/leaderboard", minMode: "immersion" },
+  { path: "/achievements", minMode: "immersion" },
 
   // University Space
-  { path: "/phototheology-course", minMode: "explorer" },
-  { path: "/daniel-course", minMode: "explorer" },
-  { path: "/revelation-course", minMode: "explorer" },
-  { path: "/bible-study-series", minMode: "explorer" },
-  { path: "/audio-library", minMode: "explorer" },
-  { path: "/40-day-challenge", minMode: "explorer" },
+  { path: "/phototheology-course", minMode: "immersion" },
+  { path: "/daniel-course", minMode: "immersion" },
+  { path: "/revelation-course", minMode: "immersion" },
+  { path: "/bible-study-series", minMode: "immersion" },
+  { path: "/40-day-challenge", minMode: "immersion" },
 
-  // ── Basic (all users) — no entries needed, it's the default ──
+  // ── Learn (Level 1 — all users) — no entries needed, it's the default ──
+  // Chapel, Morning/Night Watches, Study Bible, Ask Jeeves, Study Experience,
+  // Study Buddy, Give Me a Gem, Memory, Master Class, Podcast, Audio Library,
+  // KidGPT, Devotionals, Daily Reading, Reading Plans, Commentary Suite
 ];
 
 /**
  * Get the minimum mode required for a given path.
- * Uses longest-prefix matching so `/palace/freestyle` (immersion) beats `/palace` (explorer).
+ * Uses longest-prefix matching so `/palace/freestyle` (immersion) beats `/palace` (immersion).
  */
 export function getMinModeForPath(path: string): ExperienceMode {
   let bestMatch: { path: string; minMode: ExperienceMode } | null = null;

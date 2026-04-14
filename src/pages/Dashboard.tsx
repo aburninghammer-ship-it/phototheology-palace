@@ -142,7 +142,7 @@ export default function Dashboard() {
   const { getRecentReading } = useReadingHistory();
   const { preferences } = useUserPreferences();
   const { meetsMinMode, isExplorer, isImmersion } = useExperienceMode();
-  const showGuidedWidgets = meetsMinMode("explorer"); // explorer + immersion
+  const showGuidedWidgets = meetsMinMode("immersion"); // study mode only
   const [stats, setStats] = useState<DashboardStats>({
     dailyStreak: 0,
     totalPoints: 0,

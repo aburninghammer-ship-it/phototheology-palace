@@ -21,11 +21,8 @@ export const useRoomUnlock = (floorNumber: number, roomId: string) => {
         setLoading(false);
         return;
       }
-      if (mode === "explorer" && floorNumber > 3) {
-        setIsUnlocked(false);
-        setLoading(false);
-        return;
-      }
+      // In Learn mode (basic), all floors are locked (handled above)
+      // In Study mode (immersion), all floors are open
 
       if (!user) {
         setIsUnlocked(true);

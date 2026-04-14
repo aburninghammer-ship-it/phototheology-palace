@@ -1,9 +1,9 @@
 /**
- * ExperienceModeSelector — Toggle between Basic, Explorer, and Immersion modes
+ * ExperienceModeSelector — Toggle between Learn and Study modes
  */
 import { motion } from "framer-motion";
 import { useExperienceMode, type ExperienceMode } from "@/contexts/ExperienceModeContext";
-import { Zap, Compass, Flame } from "lucide-react";
+import { BookOpen, Flame } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
@@ -13,7 +13,7 @@ interface ModeOption {
   label: string;
   tagline: string;
   description: string;
-  icon: typeof Zap;
+  icon: typeof BookOpen;
   color: string;
   bgActive: string;
 }
@@ -22,29 +22,19 @@ const MODE_OPTIONS: ModeOption[] = [
   {
     mode: "basic",
     level: 1,
-    label: "Seeker",
-    tagline: "I want to see",
-    description: "Uncover truths hidden beneath the surface of Scripture — experience the power of Phototheology.",
-    icon: Zap,
+    label: "Learn",
+    tagline: "I want to learn the Bible",
+    description: "Discover Scripture through reading, devotionals, and guided insights — build your foundation.",
+    icon: BookOpen,
     color: "text-emerald-400",
     bgActive: "bg-emerald-500/20 border-emerald-500/50",
   },
   {
-    mode: "explorer",
-    level: 2,
-    label: "Explorer",
-    tagline: "I'm ready to think",
-    description: "Connect Scripture for yourself — see patterns, structures, and meaning unfold with clarity and precision.",
-    icon: Compass,
-    color: "text-amber-400",
-    bgActive: "bg-amber-500/20 border-amber-500/50",
-  },
-  {
     mode: "immersion",
-    level: 3,
-    label: "Architect",
-    tagline: "I'm ready to create",
-    description: "Master every room, every connection — create powerful Bible studies, sermons, and ministry tools.",
+    level: 2,
+    label: "Study",
+    tagline: "I'm ready to study with PT principles",
+    description: "Master every room, every connection — create powerful Bible studies, sermons, and ministry tools using Phototheology.",
     icon: Flame,
     color: "text-violet-400",
     bgActive: "bg-violet-500/20 border-violet-500/50",
@@ -91,7 +81,7 @@ export function ExperienceModeSelector({ variant = "full", className }: Experien
       <div>
         <h3 className="text-lg font-semibold text-foreground">Experience Level</h3>
         <p className="text-sm text-muted-foreground">
-          Choose how much of the Phototheology system you want to see
+          Choose how you want to engage with the Bible
         </p>
       </div>
 

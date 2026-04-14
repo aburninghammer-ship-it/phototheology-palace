@@ -142,7 +142,7 @@ const Welcome = () => {
         <ContinueWhereYouLeftOff />
       </div>
 
-      <PTSection showIn={["explorer", "immersion"]}>
+      <PTSection showIn="immersion">
         <PtGlossaryTable />
       </PTSection>
     </>

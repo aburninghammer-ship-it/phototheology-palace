@@ -38,14 +38,12 @@ export const ProgressivePalace = ({ showStartHere = true }: ProgressivePalacePro
 
   /** Is this floor hard-locked by the current experience mode? */
   const isFloorLockedByMode = (floorNum: number): boolean => {
-    if (mode === "basic") return true; // All floors locked in basic
-    if (mode === "explorer") return floorNum > 3; // Floors 4-8 locked in Explorer
-    return false; // Immersion: all open
+    if (mode === "basic") return true; // All floors locked in Learn mode
+    return false; // Study mode: all open
   };
 
   const getFloorLockMessage = (floorNum: number): string => {
-    if (mode === "basic") return "Upgrade to Explorer to unlock the Palace";
-    if (mode === "explorer" && floorNum > 3) return "Complete Floor 3 first, or upgrade to Immersion";
+    if (mode === "basic") return "Upgrade to Study to unlock the Palace";
     return "";
   };
   

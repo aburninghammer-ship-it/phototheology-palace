@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useExperienceMode, type ExperienceMode } from "@/contexts/ExperienceModeContext";
 import { motion } from "framer-motion";
-import { Eye, Blocks, Crown, Check, ChevronDown } from "lucide-react";
+import { BookOpen, Crown, Check, ChevronDown } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { useRef } from "react";
 import { SavedItemsTab } from "@/components/level-select/SavedItemsTab";
@@ -15,7 +15,7 @@ interface LevelOption {
   description: string;
   feelsLike: string[];
   become: string;
-  icon: typeof Eye;
+  icon: typeof BookOpen;
   gradient: string;
   accentHsl: string;
   glowColor: string;
@@ -28,13 +28,13 @@ const LEVELS: LevelOption[] = [
   {
     mode: "basic",
     level: 1,
-    identity: "Seeker",
-    declaration: "\"I want to see.\"",
+    identity: "Learn",
+    declaration: "\"I want to learn the Bible.\"",
     description:
-      "I want to uncover truths hidden beneath the surface of Scripture — to experience the power of Phototheology, even before I know how it works.",
+      "Discover Scripture through reading, devotionals, and guided insights — build your foundation with tools that make the Bible come alive.",
     feelsLike: ["Insight hits", "\"I never saw that before\"", "Scripture opens up"],
-    become: "A Seeker of Hidden Truth",
-    icon: Eye,
+    become: "A Student of the Word",
+    icon: BookOpen,
     gradient: "linear-gradient(135deg, hsl(170 55% 42%), hsl(140 50% 45%))",
     accentHsl: "hsl(160 55% 50%)",
     glowColor: "hsl(160 55% 45% / 0.3)",
@@ -43,30 +43,13 @@ const LEVELS: LevelOption[] = [
     btnGradient: "linear-gradient(135deg, hsl(170 55% 42%), hsl(140 50% 45%))",
   },
   {
-    mode: "explorer",
-    level: 2,
-    identity: "Explorer",
-    declaration: "\"I'm ready to think.\"",
-    description:
-      "I'm ready to connect Scripture for myself — to see patterns, structures, and meaning unfold with clarity and precision.",
-    feelsLike: ["\"I can do this now\"", "Patterns start clicking", "Confidence grows"],
-    become: "A Builder of Understanding",
-    icon: Blocks,
-    gradient: "linear-gradient(135deg, hsl(28 80% 55%), hsl(45 75% 55%))",
-    accentHsl: "hsl(35 80% 58%)",
-    glowColor: "hsl(35 80% 50% / 0.3)",
-    bgCard: "linear-gradient(160deg, hsl(30 25% 12%), hsl(25 20% 8%))",
-    bgCardActive: "linear-gradient(160deg, hsl(30 30% 14%), hsl(25 25% 10%))",
-    btnGradient: "linear-gradient(135deg, hsl(28 80% 55%), hsl(45 75% 55%))",
-  },
-  {
     mode: "immersion",
-    level: 3,
-    identity: "Architect",
-    declaration: "\"I'm ready to create.\"",
+    level: 2,
+    identity: "Study",
+    declaration: "\"I'm ready to study with PT principles.\"",
     description:
-      "I'm ready to create powerful Bible studies, sermons, and ministry tools — to master every room, every connection, and shape how others see truth.",
-    feelsLike: ["Authority", "Creativity", "Influence"],
+      "Master every room, every connection — create powerful Bible studies, sermons, and ministry tools using Phototheology's 38 interconnected principles.",
+    feelsLike: ["Authority", "Creativity", "Deep mastery"],
     become: "An Architect of Truth",
     icon: Crown,
     gradient: "linear-gradient(135deg, hsl(270 55% 55%), hsl(290 50% 50%))",
@@ -79,8 +62,7 @@ const LEVELS: LevelOption[] = [
 ];
 
 const TRANSITIONS = [
-  "But seeing is only the beginning…",
-  "But understanding is not the end…",
+  "But learning is only the beginning…",
 ];
 
 export default function LevelSelect() {
@@ -101,7 +83,7 @@ export default function LevelSelect() {
     <>
       <SEO
         title="Choose Your Level | PhototheologyOS"
-        description="Step into your role in the system. Seeker, Builder, or Architect."
+        description="Step into your role in the system. Learn or Study."
       />
       <div
         className="min-h-[100dvh] overflow-y-auto"
@@ -180,8 +162,8 @@ export default function LevelSelect() {
         </div>
 
         {/* === LEVEL CARDS === */}
-        <div ref={cardsRef} className="px-4 pb-10 max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+        <div ref={cardsRef} className="px-4 pb-10 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {LEVELS.map((level, i) => {
               const Icon = level.icon;
               const isActive = mode === level.mode;
@@ -204,7 +186,6 @@ export default function LevelSelect() {
                         : "none",
                     }}
                   >
-                    {/* Top accent bar */}
                     <div
                       className="h-1 w-full"
                       style={{ background: level.gradient }}
@@ -223,7 +204,6 @@ export default function LevelSelect() {
                         </span>
                       )}
 
-                      {/* Icon + Identity */}
                       <div className="flex items-center gap-3 mb-2">
                         <div
                           className="p-2.5 rounded-xl"
@@ -247,7 +227,6 @@ export default function LevelSelect() {
                         </div>
                       </div>
 
-                      {/* Declaration */}
                       <p
                         className="text-sm font-semibold italic mb-3"
                         style={{ color: level.accentHsl }}
@@ -255,7 +234,6 @@ export default function LevelSelect() {
                         {level.declaration}
                       </p>
 
-                      {/* Description */}
                       <p
                         className="text-[13px] leading-relaxed mb-4"
                         style={{ color: "hsl(220 10% 65%)" }}
@@ -263,7 +241,6 @@ export default function LevelSelect() {
                         {level.description}
                       </p>
 
-                      {/* Feels like */}
                       <div className="mb-4">
                         <p
                           className="text-[10px] uppercase tracking-wider font-semibold mb-1.5"
@@ -288,7 +265,6 @@ export default function LevelSelect() {
                         </div>
                       </div>
 
-                      {/* Become */}
                       <p
                         className="text-xs font-medium mb-5"
                         style={{ color: "hsl(220 10% 50%)" }}
@@ -302,7 +278,6 @@ export default function LevelSelect() {
                         </span>
                       </p>
 
-                      {/* CTA */}
                       <div
                         className="w-full py-2.5 rounded-xl text-center text-sm font-bold transition-all"
                         style={{
@@ -320,7 +295,6 @@ export default function LevelSelect() {
                     </div>
                   </motion.button>
 
-                  {/* Transition text between cards (mobile only) */}
                   {i < TRANSITIONS.length && (
                     <motion.p
                       initial={{ opacity: 0 }}
@@ -338,7 +312,6 @@ export default function LevelSelect() {
             })}
           </div>
 
-          {/* Final call */}
           <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -357,7 +330,6 @@ export default function LevelSelect() {
             </span>
           </motion.p>
 
-          {/* Saved Items Section */}
           <SavedItemsTab />
         </div>
       </div>
