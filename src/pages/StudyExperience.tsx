@@ -276,9 +276,7 @@ Use KJV text only. Be precise with references.`,
     setLayers((prev) => [...prev, { ...pendingLayer, accepted: true }]);
     setPendingLayer(null);
     toast.success("Layer accepted!");
-    // Auto-trigger A/B choice for next layer
-    setTimeout(() => handleContinueBuilding(), 300);
-  }, [pendingLayer, handleContinueBuilding]);
+  }, [pendingLayer]);
 
   const handleRejectPending = useCallback(() => {
     setPendingLayer(null);
