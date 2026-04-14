@@ -6,7 +6,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { callJeeves } from "@/lib/jeevesClient";
 import { supabase } from "@/integrations/supabase/client";
-import { Send, Sparkles, BookOpen, Eye, Layers, Link2, MapPin, Palette, ChevronRight, Search, Shield, Repeat, Compass, Heart, Bookmark } from "lucide-react";
+import { Send, Sparkles, BookOpen, Eye, Layers, Link2, MapPin, Palette, ChevronRight, Search, Shield, Repeat, Compass, Heart, Bookmark, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 import { SaveChatResponseDialog } from "../SaveChatResponseDialog";
@@ -201,18 +201,23 @@ export default function BasicChatTab() {
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto">
         {messages.length === 0 && !pendingQuestion ? (
-          <div className="flex flex-col items-center px-3 sm:px-6 max-w-3xl mx-auto pt-8 sm:pt-16 pb-4">
-            {/* Icon */}
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-primary/30 shadow-[0_0_30px_rgba(96,165,250,0.15)] flex items-center justify-center mb-5 sm:mb-6">
-              <Sparkles className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
+          <div className="flex flex-col items-center px-3 sm:px-6 max-w-3xl mx-auto pt-10 sm:pt-20 pb-4">
+            {/* Icon — brain in blue rounded square */}
+            <div className="w-18 h-18 sm:w-24 sm:h-24 rounded-[20px] sm:rounded-[24px] flex items-center justify-center mb-5 sm:mb-7"
+              style={{
+                background: "linear-gradient(160deg, hsl(217 70% 52%), hsl(217 65% 42%))",
+                boxShadow: "0 8px 32px rgba(59,130,246,0.3), inset 0 1px 1px rgba(255,255,255,0.15)",
+              }}
+            >
+              <Brain className="h-9 w-9 sm:h-12 sm:w-12 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]" />
             </div>
 
             {/* Title */}
             <h2 className="text-2xl sm:text-4xl font-bold mb-2 sm:mb-3 text-foreground tracking-tight">Ask Jeeves</h2>
-            <p className="text-sm sm:text-base text-center mb-1 sm:mb-2 text-muted-foreground">
+            <p className="text-sm sm:text-base text-center mb-1 sm:mb-2" style={{ color: "hsl(230 30% 65%)" }}>
               Your personal AI Bible study companion
             </p>
-            <p className="text-xs sm:text-sm text-center mb-6 sm:mb-10 max-w-lg text-muted-foreground/60 italic leading-relaxed">
+            <p className="text-xs sm:text-sm text-center mb-6 sm:mb-10 max-w-lg italic leading-relaxed" style={{ color: "hsl(220 10% 45%)" }}>
               Deep, Christ-centered answers that trace patterns, symbols, and prophecy across all 66 books.
             </p>
 
