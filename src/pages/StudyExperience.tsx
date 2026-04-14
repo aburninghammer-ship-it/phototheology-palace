@@ -509,6 +509,7 @@ ${isCurrentTopicStudy
 - Show how this principle SPECIFICALLY illuminates this verse in ways the reader may never have considered.`}
 - Include at minimum: (1) The direct application of this principle with specific scripture, (2) A cross-reference to at least one other Scripture that deepens the insight, (3) A practical or devotional takeaway.
 - Use the Phototheology study method language naturally.
+- IMPORTANT: Do NOT name the room, principle, or method label in your output. Do NOT say "Meditation Room" or "MR" or "Applied to..." with a principle label. Just deliver the insight directly as if the reader doesn't know which lens was used. The principle should be invisible — only the result should be visible.
 - STRICTLY BIBLICAL: All parallels, cross-references, and connections must be to OTHER SCRIPTURE — not to historical figures, secular history, or extra-biblical sources. Stay within the 66 books of the Bible. Do not reference Josephus, church fathers, or any non-biblical source as a parallel. The Bible interprets itself.
 - PROPHECY GUARDRAIL: Do NOT present Antiochus Epiphanes as a biblical fulfillment of Daniel 7 or Daniel 8. The little horn of Daniel 7 and Daniel 8 points to a greater prophetic power, not a historical Greek king. Follow the historicist interpretation — the Bible's own prophetic framework.
 ${roomId === "hf" ? `- HISTORY FREESTYLE GUARDRAIL: This is the History/Social Freestyle room. Use SECULAR history, culture, and current events as the source material — NOT biblical history. The goal is to find gospel illustrations and spiritual parallels in SECULAR events, trends, and historical figures. Do not analyze biblical narratives here — that belongs to other rooms. Draw from world history, social movements, science, art, politics, and culture to illuminate the biblical text.` : ""}
@@ -1033,9 +1034,8 @@ INSTRUCTIONS FOR RECAP:
               <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border-2 border-amber-500/40 bg-gradient-to-br from-amber-500/5 via-card/60 to-card/40 backdrop-blur-xl overflow-hidden shadow-[0_0_30px_-8px_rgba(251,191,36,0.3)]">
                 <div className="px-5 py-3 border-b border-amber-500/20 bg-amber-500/5 flex items-center gap-2 flex-wrap">
                   <Sparkles className="w-4 h-4 text-amber-400" />
-                  <span className="text-sm font-semibold text-amber-400">{pendingLayer.roomName}</span>
-                  <span className="text-xs text-muted-foreground">— {pendingLayer.principleName}</span>
-                  <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full border border-amber-500/30 text-amber-400">Pending Review</span>
+                  <span className="text-sm font-semibold text-amber-400">🎯 Applied to {verseRef}</span>
+                  <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full border border-amber-500/30 text-amber-400">Review</span>
                 </div>
                 <div className="p-5 max-h-[400px] overflow-y-auto">
                   <p className="text-sm whitespace-pre-wrap leading-relaxed text-foreground/90">{pendingLayer.analysis}</p>

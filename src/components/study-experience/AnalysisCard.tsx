@@ -185,10 +185,8 @@ INSTRUCTIONS:
       
       {/* Header */}
       <div className="relative flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-black/20">
-        <Badge variant="outline" className={cn("font-semibold text-xs px-2.5 py-0.5", colors.bg, colors.text, colors.border)}>
-          {layer.roomName}
-        </Badge>
-        <span className="text-xs text-muted-foreground/80 flex-1 font-medium">{layer.principleName}</span>
+        <Sparkles className={cn("w-4 h-4", colors.text)} />
+        <span className={cn("text-xs font-semibold flex-1", colors.text)}>Layer {index + 1}</span>
         {layer.accepted && (
           <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-[10px]">
             <Check className="w-3 h-3 mr-0.5" /> Built
