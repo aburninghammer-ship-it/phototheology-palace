@@ -168,8 +168,9 @@ export function PWAUpdatePrompt() {
             .catch(() => undefined);
         }
 
-        markAutoRefreshedBuild(nextBuild);
-        await forceHardRefresh('__app_refresh', `build-${nextBuild}`);
+        setPendingBuild(nextBuild);
+        sessionStorage.removeItem(WAITING_SW_DISMISS_KEY);
+        setShowReload(true);
       } catch {
         // Ignore transient network/cache issues and retry on next poll.
       }
