@@ -36,6 +36,8 @@ interface AnalysisCardProps {
   compounding?: boolean;
   onSaveLayer?: (layer: StudyLayer) => void;
   onContinueBuilding?: () => void;
+  showAbChoice?: boolean;
+  onAbSelect?: (choice: "a" | "b") => void;
 }
 
 const ROOM_COLORS: Record<string, { bg: string; border: string; text: string; glow: string; accent: string }> = {
@@ -94,7 +96,7 @@ function parseAnalysis(text: string) {
   return sections;
 }
 
-export function AnalysisCard({ layer, index, totalLayers = 0, verseRef, verseText, onRemove, onRebuild, onAccept, onCompound, compounding, onSaveLayer, onContinueBuilding }: AnalysisCardProps) {
+export function AnalysisCard({ layer, index, totalLayers = 0, verseRef, verseText, onRemove, onRebuild, onAccept, onCompound, compounding, onSaveLayer, onContinueBuilding, showAbChoice, onAbSelect }: AnalysisCardProps) {
   const colors = ROOM_COLORS[layer.roomId] || DEFAULT_COLORS;
   const sections = parseAnalysis(layer.analysis);
   const [isSaved, setIsSaved] = useState(false);
@@ -426,7 +428,7 @@ INSTRUCTIONS:
           <Badge className="bg-green-500/15 text-green-400 border-green-500/30 text-[10px]">
             <Check className="w-3 h-3 mr-0.5" /> Accepted
           </Badge>
-          {onContinueBuilding && (
+          {onContinueBuilding && !showAbChoice && (
             <Button
               size="sm"
               variant="ghost"
@@ -436,6 +438,28 @@ INSTRUCTIONS:
               <Sparkles className="w-3.5 h-3.5" />
               Continue Building
             </Button>
+          )}
+          {showAbChoice && onAbSelect && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Next lens:</span>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 px-4 text-sm font-bold border-2 border-primary/40 hover:border-primary hover:bg-primary/10 transition-all"
+                onClick={() => onAbSelect("a")}
+              >
+                A
+              </Button>
+              <span className="text-[10px] text-muted-foreground">or</span>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 px-4 text-sm font-bold border-2 border-primary/40 hover:border-primary hover:bg-primary/10 transition-all"
+                onClick={() => onAbSelect("b")}
+              >
+                B
+              </Button>
+            </div>
           )}
           {onSaveLayer && (
             <Button
