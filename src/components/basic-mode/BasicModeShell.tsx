@@ -1,6 +1,6 @@
 /**
- * BasicModeShell — Level 1 interface using the same dark theme as Level 3
- * 3 tabs: Ask Jeeves, Study Bible, Chapel
+ * BasicModeShell — Level 1 (Learn) interface
+ * 5 tabs: Spaces (Home), Ask Jeeves, Study Bible, Chapel, Study Experience
  * Desktop: sidebar + header. Mobile: fullscreen content + bottom tabs.
  */
 import { useState, useCallback, lazy, Suspense } from "react";
@@ -18,12 +18,14 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
+const BasicHomeTab = lazy(() => import("./tabs/BasicHomeTab"));
 const BasicChatTab = lazy(() => import("./tabs/BasicChatTab"));
 const BasicBibleTab = lazy(() => import("./tabs/BasicBibleTab"));
 const BasicChapelTab = lazy(() => import("./tabs/BasicChapelTab"));
 const BasicStudyExperienceTab = lazy(() => import("./tabs/BasicStudyExperienceTab"));
 
 const TAB_COMPONENTS: Record<BasicTab, React.LazyExoticComponent<() => JSX.Element>> = {
+  home: BasicHomeTab,
   chat: BasicChatTab,
   bible: BasicBibleTab,
   chapel: BasicChapelTab,
@@ -61,7 +63,7 @@ function useBasicProfile(userId: string | undefined) {
 }
 
 export function BasicModeShell() {
-  const [activeTab, setActiveTab] = useState<BasicTab>("chat");
+  const [activeTab, setActiveTab] = useState<BasicTab>("home");
   const [tourOpen, setTourOpen] = useState(false);
   const { user } = useAuth();
   const { activeCount } = useActiveUsers();

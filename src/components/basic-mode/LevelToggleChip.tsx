@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { useExperienceMode, type ExperienceMode } from "@/contexts/ExperienceModeContext";
 import { cn } from "@/lib/utils";
-import { Zap, Compass, Flame } from "lucide-react";
+import { BookOpen, Flame } from "lucide-react";
 
 interface LevelInfo {
   mode: ExperienceMode;
   level: number;
   label: string;
-  icon: typeof Zap;
+  icon: typeof BookOpen;
   chipColor: string;
 }
 
@@ -15,21 +15,14 @@ const LEVELS: LevelInfo[] = [
   {
     mode: "basic",
     level: 1,
-    label: "Seeker",
-    icon: Zap,
+    label: "Learn",
+    icon: BookOpen,
     chipColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
   },
   {
-    mode: "explorer",
-    level: 2,
-    label: "Explorer",
-    icon: Compass,
-    chipColor: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-  },
-  {
     mode: "immersion",
-    level: 3,
-    label: "Architect",
+    level: 2,
+    label: "Study",
     icon: Flame,
     chipColor: "bg-violet-500/20 text-violet-400 border-violet-500/30",
   },

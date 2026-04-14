@@ -2,33 +2,32 @@
  * Experience Mode System
  * 
  * Controls how much Phototheology architecture is visible to the user.
- * - basic: No PT jargon. ChatGPT-like interface. Answers only. ("The Clock")
- * - explorer: Guided PT context. Learn the engine through use. ("The Workshop")
- * - immersion: Full rooms, floors, codes, principles. ("The Engine")
+ * - basic: Learn the Bible. Devotional, listening, absorbing. ("Learn")
+ * - immersion: Study the Bible with PT principles. Full rooms, floors, codes. ("Study")
  */
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { MODE_LEVEL } from "@/config/featureRegistry";
 
-export type ExperienceMode = "basic" | "explorer" | "immersion";
+export type ExperienceMode = "basic" | "immersion";
 
-// Map old DB values to new ones
+// Map old DB values to new ones (collapse 3 → 2)
 const MIGRATE_MAP: Record<string, ExperienceMode> = {
   simple: "basic",
-  guided: "explorer",
+  guided: "basic",      // old explorer → now basic (Learn)
   master: "immersion",
+  explorer: "basic",     // new name that was briefly used
 };
 
 // Map new values to old DB values for storage compatibility
 const DB_VALUE_MAP: Record<ExperienceMode, string> = {
   basic: "simple",
-  explorer: "guided",
   immersion: "master",
 };
 
 function normalizeMode(raw: string | null): ExperienceMode {
   if (!raw) return "basic";
-  if (raw === "basic" || raw === "explorer" || raw === "immersion") return raw;
+  if (raw === "basic" || raw === "immersion") return raw;
   if (MIGRATE_MAP[raw]) return MIGRATE_MAP[raw];
   return "basic";
 }
@@ -40,13 +39,13 @@ interface ExperienceModeContextType {
   setMode: (mode: ExperienceMode) => void;
   isLoading: boolean;
   isBasic: boolean;
-  isExplorer: boolean;
   isImmersion: boolean;
   /** Backward compat aliases */
   isSimple: boolean;
+  isExplorer: boolean;
   isGuided: boolean;
   isMaster: boolean;
-  /** Returns true if PT terminology should be shown (explorer or immersion) */
+  /** Returns true if PT terminology should be shown (immersion only) */
   showPTLabels: boolean;
   /** Returns true if full PT architecture should be shown (immersion only) */
   showFullArchitecture: boolean;
@@ -124,13 +123,13 @@ export function ExperienceModeProvider({ children }: { children: ReactNode }) {
     setMode,
     isLoading,
     isBasic: mode === "basic",
-    isExplorer: mode === "explorer",
     isImmersion: mode === "immersion",
-    // Backward compat
+    // Backward compat — explorer maps to basic now
     isSimple: mode === "basic",
-    isGuided: mode === "explorer",
+    isExplorer: mode === "basic",
+    isGuided: mode === "basic",
     isMaster: mode === "immersion",
-    showPTLabels: mode === "explorer" || mode === "immersion",
+    showPTLabels: mode === "immersion",
     showFullArchitecture: mode === "immersion",
     meetsMinMode: meetsMinModeCheck,
   };

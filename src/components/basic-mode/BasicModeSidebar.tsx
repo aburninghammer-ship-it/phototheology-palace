@@ -1,13 +1,13 @@
 /**
- * BasicModeSidebar — Left sidebar for Level 1 (Basic) mode
+ * BasicModeSidebar — Left sidebar for Level 1 (Learn) mode
  * Desktop: vertical sidebar. Mobile: horizontal bottom tab bar.
  */
 import { cn } from "@/lib/utils";
-import { MessageCircle, BookOpen, Church, Settings, Layers } from "lucide-react";
+import { MessageCircle, BookOpen, Church, Settings, Layers, LayoutGrid } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-export type BasicTab = "chat" | "bible" | "chapel" | "study";
+export type BasicTab = "home" | "chat" | "bible" | "chapel" | "study";
 
 interface TabItem {
   id: BasicTab;
@@ -23,6 +23,18 @@ interface TabItem {
 }
 
 const TABS: TabItem[] = [
+  {
+    id: "home",
+    label: "Spaces",
+    icon: LayoutGrid,
+    tourId: "tab-home",
+    activeGradient: "bg-gradient-to-r from-emerald-500/20 via-emerald-400/10 to-transparent",
+    activeBorder: "border border-emerald-400/30",
+    activeGlow: "shadow-[0_0_15px_rgba(52,211,153,0.25)]",
+    activeText: "text-emerald-300",
+    hoverBg: "hover:bg-emerald-500/10",
+    iconGlow: "drop-shadow-[0_0_6px_rgba(52,211,153,0.6)]",
+  },
   {
     id: "chat",
     label: "Ask Jeeves",
@@ -159,14 +171,14 @@ export function BasicModeSidebar({ activeTab, onTabChange }: BasicModeSidebarPro
                 data-tour={tab.tourId}
                 onClick={() => onTabChange(tab.id)}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-xl transition-all min-w-[64px] active:scale-95",
+                  "flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-xl transition-all min-w-[56px] active:scale-95",
                   isActive
                     ? cn("bg-primary/12", tab.activeText)
                     : "text-muted-foreground"
                 )}
               >
                 <Icon className={cn("h-5 w-5 shrink-0", isActive && tab.iconGlow)} />
-                <span className={cn("text-[10px] font-medium", isActive && "font-semibold")}>
+                <span className={cn("text-[9px] font-medium", isActive && "font-semibold")}>
                   {tab.label}
                 </span>
               </button>
@@ -174,10 +186,10 @@ export function BasicModeSidebar({ activeTab, onTabChange }: BasicModeSidebarPro
           })}
           <button
             onClick={() => navigate("/settings")}
-            className="flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-xl transition-all min-w-[64px] text-muted-foreground active:scale-95"
+            className="flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-xl transition-all min-w-[56px] text-muted-foreground active:scale-95"
           >
             <Settings className="h-5 w-5 shrink-0" />
-            <span className="text-[10px] font-medium">Settings</span>
+            <span className="text-[9px] font-medium">Settings</span>
           </button>
         </div>
       </nav>
