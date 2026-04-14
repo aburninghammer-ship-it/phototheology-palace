@@ -201,19 +201,23 @@ export default function BasicChatTab() {
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto">
         {messages.length === 0 && !pendingQuestion ? (
-          <div className="flex flex-col items-center px-3 sm:px-6 max-w-2xl mx-auto py-3 sm:py-6">
-            <div className="p-2.5 sm:p-4 rounded-2xl mb-2 sm:mb-6 bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/20">
-              <Sparkles className="h-5 w-5 sm:h-8 sm:w-8 text-primary" />
+          <div className="flex flex-col items-center px-3 sm:px-6 max-w-3xl mx-auto pt-8 sm:pt-16 pb-4">
+            {/* Icon */}
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-primary/30 shadow-[0_0_30px_rgba(96,165,250,0.15)] flex items-center justify-center mb-5 sm:mb-6">
+              <Sparkles className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
             </div>
-            <h2 className="text-lg sm:text-2xl font-bold mb-1 sm:mb-2 text-foreground">Ask Jeeves Anything</h2>
-            <p className="text-[11px] sm:text-sm text-center mb-1 sm:mb-2 max-w-md text-muted-foreground">
-              Your personal Bible study partner — deep, Christ-centered insight.
+
+            {/* Title */}
+            <h2 className="text-2xl sm:text-4xl font-bold mb-2 sm:mb-3 text-foreground tracking-tight">Ask Jeeves</h2>
+            <p className="text-sm sm:text-base text-center mb-1 sm:mb-2 text-muted-foreground">
+              Your personal AI Bible study companion
             </p>
-            <p className="text-[9px] sm:text-xs text-center mb-3 sm:mb-8 max-w-md text-muted-foreground/70 italic leading-relaxed hidden sm:block">
-              Other AIs search a Bible. Jeeves <span className="text-primary font-medium not-italic">thinks</span> through one — running every answer through a proprietary engine of <span className="text-primary font-medium not-italic">38 interconnected study principles</span> that trace patterns, symbols, prophecy, sanctuary design, and Christ across all 66 books.
+            <p className="text-xs sm:text-sm text-center mb-6 sm:mb-10 max-w-lg text-muted-foreground/60 italic leading-relaxed">
+              Deep, Christ-centered answers that trace patterns, symbols, and prophecy across all 66 books.
             </p>
 
-            <div className="grid grid-cols-2 sm:grid-cols-2 gap-1.5 sm:gap-3 w-full max-w-lg">
+            {/* Suggestion Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 w-full">
               {dailySuggestions.map((text, i) => {
                 const style = GRADIENT_STYLES[i % GRADIENT_STYLES.length];
                 return (
@@ -221,9 +225,9 @@ export default function BasicChatTab() {
                     key={text}
                     onClick={() => sendMessage(text)}
                     className={cn(
-                      "text-left p-2.5 sm:p-4 rounded-xl text-[11px] sm:text-sm transition-all duration-300 border backdrop-blur-md leading-snug",
-                      "bg-gradient-to-br", style.gradient, style.border, style.glow, style.hoverGlow,
-                      "shadow-lg hover:shadow-xl hover:scale-[1.03] hover:text-foreground text-muted-foreground"
+                      "text-left px-4 py-3.5 sm:px-5 sm:py-4 rounded-xl text-xs sm:text-sm transition-all duration-300 border backdrop-blur-md leading-snug",
+                      "bg-gradient-to-r", style.gradient, style.border,
+                      "shadow-lg hover:shadow-xl hover:scale-[1.02] hover:brightness-125 text-muted-foreground hover:text-foreground"
                     )}
                   >
                     {text}
