@@ -8,8 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ExperienceModeSelector } from "@/components/experience-mode";
-import { BookOpen, Eye, Sparkles, ArrowRight } from "lucide-react";
+import { Sparkles, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export function NewcomerWelcomeBanner() {
@@ -38,21 +37,7 @@ export function NewcomerWelcomeBanner() {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-3"
     >
-      {/* Experience Mode — Prominent */}
-      <Card className="p-4 border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 justify-between">
-          <div className="flex items-center gap-2">
-            <Eye className="w-5 h-5 text-primary" />
-            <div>
-              <p className="text-sm font-semibold">How much do you want to see?</p>
-              <p className="text-xs text-muted-foreground">Choose your experience level — you can change this anytime</p>
-            </div>
-          </div>
-          <ExperienceModeSelector variant="compact" />
-        </div>
-      </Card>
-
-      {/* Bible 101 CTA — for Simple/new users */}
+      {/* Bible 101 CTA — for new users */}
       {isSimple && (
         <Card className="p-4 border-amber-500/20 bg-gradient-to-r from-amber-500/5 to-transparent">
           <div className="flex items-center gap-3">
