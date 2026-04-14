@@ -41,7 +41,7 @@ const SECTIONS: Section[] = [
       { label: "Analyze Thoughts", path: "/analyze-thoughts", icon: Lightbulb, description: "AI thought analysis", tooltip: "Paste any theological idea, quote, or sermon excerpt and let AI analyze it." },
       { label: "Encyclopedia", path: "/encyclopedia", icon: Search, description: "Biblical encyclopedia", tooltip: "Browse a comprehensive encyclopedia of biblical people, places, objects, and concepts." },
       { label: "Image Bible", path: "/image-bible", icon: ImageIcon, description: "Visual Scripture", tooltip: "Experience Scripture rendered as AI-generated artwork for memorization and meditation." },
-      { label: "Commentary Suite", path: "/audio-library", icon: Headphones, description: "8-voice audio commentary", tooltip: "Listen to any passage narrated in 8 unique voices — Epic, Modern Preacher, Counselor, Ancient, Preacher, Scholar, Kids, and Mirror." },
+      { label: "Commentary Suite", path: "/audio-bible", icon: Headphones, description: "8-voice audio commentary", tooltip: "Listen to any passage narrated in 8 unique voices — Epic, Modern Preacher, Counselor, Ancient, Preacher, Scholar, Kids, and Mirror." },
     ],
   },
   {

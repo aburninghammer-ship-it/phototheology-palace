@@ -36,7 +36,7 @@ export default function BasicAudioTab() {
           {VOICE_SUITE.map((voice) => (
             <button
               key={voice.id}
-              onClick={() => navigate("/audio-library")}
+              onClick={() => navigate("/audio-bible")}
               className="flex items-center gap-3.5 p-4 rounded-xl border text-left transition-all hover:brightness-110"
               style={{
                 background: "hsl(220 13% 10%)",
@@ -62,7 +62,7 @@ export default function BasicAudioTab() {
         {/* Quick actions */}
         <div className="flex flex-col sm:flex-row gap-3">
           <button
-            onClick={() => navigate("/audio-library")}
+            onClick={() => navigate("/audio-bible")}
             className="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all"
             style={{
               background: "hsl(38 65% 55% / 0.15)",
@@ -71,7 +71,7 @@ export default function BasicAudioTab() {
             }}
           >
             <BookOpen className="h-4 w-4" />
-            Open Full Audio Library
+            Open Commentary Suite
           </button>
         </div>
       </div>
