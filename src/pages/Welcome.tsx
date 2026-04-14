@@ -105,7 +105,7 @@ const Welcome = () => {
           >
             <Button
               onClick={() => navigate("/palace/tour")}
-              className="rounded-full px-6 py-3 text-base font-semibold gap-2 shadow-lg"
+              className="rounded-full px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold gap-2 shadow-lg"
               style={{
                 background: "linear-gradient(135deg, #d4a017, #b8860b)",
                 color: "#fff",
