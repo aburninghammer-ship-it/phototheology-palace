@@ -135,7 +135,7 @@ export function BasicModeSidebar({ activeTab, onTabChange }: BasicModeSidebarPro
                   collapsed ? "justify-center p-2.5" : "px-3 py-2.5",
                   isActive
                     ? cn(tab.activeGradient, tab.activeBorder, tab.activeGlow, tab.activeText)
-                    : cn("text-muted-foreground hover:text-foreground border border-transparent", tab.hoverBg)
+                    : cn(tab.inactiveText, "hover:text-foreground border border-transparent", tab.hoverBg)
                 )}
                 title={collapsed ? tab.label : undefined}
               >
