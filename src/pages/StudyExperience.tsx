@@ -145,6 +145,7 @@ export default function StudyExperience() {
   const [synthesizedOutput, setSynthesizedOutput] = useState<string | null>(null);
   const [synthesizing, setSynthesizing] = useState(false);
   const [pendingLayer, setPendingLayer] = useState<StudyLayer | null>(null);
+  const [abChoice, setAbChoice] = useState<{ a: ReturnType<typeof autoPickPrinciple>; b: ReturnType<typeof autoPickPrinciple> } | null>(null);
 
   // User-led state
   const [suggestedRoom, setSuggestedRoom] = useState<{ roomId: string; principleId: string } | null>(null);
@@ -284,8 +285,41 @@ Use KJV text only. Be precise with references.`,
 
   const handleContinueBuilding = useCallback(() => {
     if (!parsedRef) return;
-    autoPickAndApply(parsedRef, verseRef);
-  }, [parsedRef, verseRef, autoPickAndApply]);
+    const used = new Set(layers.map((l) => l.principleId));
+    const pickA = autoPickPrinciple(allFloors, used);
+    if (!pickA) { toast("All principles explored! 🎉"); return; }
+    const usedPlusA = new Set([...used, pickA.principle.id]);
+    const pickB = autoPickPrinciple(allFloors, usedPlusA);
+    if (!pickB) {
+      // Only one option left, just run it directly
+      autoPickAndApply(parsedRef, verseRef);
+      return;
+    }
+    setAbChoice({ a: pickA, b: pickB });
+  }, [parsedRef, verseRef, autoPickAndApply, allFloors, layers]);
+
+  const handleAbSelect = useCallback(async (choice: "a" | "b") => {
+    if (!abChoice || !parsedRef) return;
+    const pick = choice === "a" ? abChoice.a : abChoice.b;
+    if (!pick) return;
+    setAbChoice(null);
+    setLoadingPrinciple(pick.principle.id);
+    try {
+      const promptBuilder = mode === "teach" ? buildTeachPrompt : buildDeepPrompt;
+      const { data } = await callJeeves({
+        mode: "principle-amplification",
+        book: parsedRef.book, chapter: parsedRef.chapter, verse: parsedRef.verse,
+        verseText: verseText,
+        principle: promptBuilder(pick.roomName, pick.roomId, pick.principle.name, pick.principle.description),
+      }, "study-experience");
+      const response = typeof data === "string" ? data : (data as any)?.response || "";
+      setPendingLayer({ roomId: pick.roomId, roomName: pick.roomName, principleId: pick.principle.id, principleName: pick.principle.name, analysis: response });
+    } catch (err) {
+      console.error("A/B analysis failed:", err);
+      toast.error("Analysis failed — try again.");
+    }
+    setLoadingPrinciple(null);
+  }, [abChoice, parsedRef, mode, verseText]);
 
   const fetchCrossRoomSuggestion = async (
     parsed: { book: string; chapter: string; verse: string },
@@ -1055,13 +1089,40 @@ INSTRUCTIONS FOR RECAP:
               </motion.div>
             )}
 
+            {/* A/B Choice */}
+            {abChoice && !pendingLayer && !loadingPrinciple && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-card/60 to-card/40 backdrop-blur-xl p-5 shadow-[0_0_25px_-8px_hsl(var(--primary)/0.25)]">
+                <p className="text-sm font-semibold text-foreground mb-1">Choose your next lens</p>
+                <p className="text-xs text-muted-foreground mb-4">Jeeves has two different angles ready. Pick one — you won't know which principle it uses until after.</p>
+                <div className="flex items-center gap-3">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    onClick={() => handleAbSelect("a")}
+                    className="flex-1 h-14 text-lg font-bold border-2 border-primary/40 hover:border-primary hover:bg-primary/10 transition-all"
+                  >
+                    A
+                  </Button>
+                  <span className="text-xs text-muted-foreground font-medium">or</span>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    onClick={() => handleAbSelect("b")}
+                    className="flex-1 h-14 text-lg font-bold border-2 border-primary/40 hover:border-primary hover:bg-primary/10 transition-all"
+                  >
+                    B
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
             {/* Continue bar after accepting */}
-            {(mode === "jeeves-led" || mode === "teach") && parsedRef && !pendingLayer && !loadingPrinciple && layers.length > 0 && (
+            {(mode === "jeeves-led" || mode === "teach") && parsedRef && !pendingLayer && !loadingPrinciple && !abChoice && layers.length > 0 && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3 p-4 rounded-xl border border-primary/20 bg-card/40">
                 <Button size="sm" onClick={handleContinueBuilding} className="gap-1.5">
                   <Sparkles className="w-4 h-4" /> Continue Building
                 </Button>
-                <span className="text-xs text-muted-foreground">Jeeves will pick a new lens and apply it</span>
+                <span className="text-xs text-muted-foreground">Choose between two mystery lenses</span>
               </motion.div>
             )}
 
