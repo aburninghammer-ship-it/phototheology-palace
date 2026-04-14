@@ -187,8 +187,10 @@ if ("serviceWorker" in navigator) {
         void navigator.serviceWorker
           .getRegistration()
           .then((registration) => registration?.update())
-          .catch(() => undefined);
-        // Do NOT call maybeRefreshStandardBuild() — let the user decide when to reload
+          .catch(() => undefined)
+          .finally(() => {
+            void maybeRefreshStandardBuild().catch(() => undefined);
+          });
       };
 
       const handleVisibilityChange = () => {
