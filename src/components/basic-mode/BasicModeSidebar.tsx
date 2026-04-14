@@ -20,6 +20,7 @@ interface TabItem {
   activeText: string;
   hoverBg: string;
   iconGlow: string;
+  inactiveText: string;
 }
 
 const TABS: TabItem[] = [
@@ -32,6 +33,7 @@ const TABS: TabItem[] = [
     activeBorder: "border border-emerald-400/30",
     activeGlow: "shadow-[0_0_15px_rgba(52,211,153,0.25)]",
     activeText: "text-emerald-300",
+    inactiveText: "text-emerald-400/70",
     hoverBg: "hover:bg-emerald-500/10",
     iconGlow: "drop-shadow-[0_0_6px_rgba(52,211,153,0.6)]",
   },
@@ -44,6 +46,7 @@ const TABS: TabItem[] = [
     activeBorder: "border border-blue-400/30",
     activeGlow: "shadow-[0_0_15px_rgba(96,165,250,0.25)]",
     activeText: "text-blue-300",
+    inactiveText: "text-blue-400/70",
     hoverBg: "hover:bg-blue-500/10",
     iconGlow: "drop-shadow-[0_0_6px_rgba(96,165,250,0.6)]",
   },
@@ -56,6 +59,7 @@ const TABS: TabItem[] = [
     activeBorder: "border border-amber-400/30",
     activeGlow: "shadow-[0_0_15px_rgba(251,191,36,0.25)]",
     activeText: "text-amber-300",
+    inactiveText: "text-amber-400/70",
     hoverBg: "hover:bg-amber-500/10",
     iconGlow: "drop-shadow-[0_0_6px_rgba(251,191,36,0.6)]",
   },
@@ -68,6 +72,7 @@ const TABS: TabItem[] = [
     activeBorder: "border border-purple-400/30",
     activeGlow: "shadow-[0_0_15px_rgba(192,132,252,0.25)]",
     activeText: "text-purple-300",
+    inactiveText: "text-purple-400/70",
     hoverBg: "hover:bg-purple-500/10",
     iconGlow: "drop-shadow-[0_0_6px_rgba(192,132,252,0.6)]",
   },
@@ -80,6 +85,7 @@ const TABS: TabItem[] = [
     activeBorder: "border border-sky-400/30",
     activeGlow: "shadow-[0_0_15px_rgba(56,189,248,0.25)]",
     activeText: "text-sky-300",
+    inactiveText: "text-sky-400/70",
     hoverBg: "hover:bg-sky-500/10",
     iconGlow: "drop-shadow-[0_0_6px_rgba(56,189,248,0.6)]",
   },
@@ -129,7 +135,7 @@ export function BasicModeSidebar({ activeTab, onTabChange }: BasicModeSidebarPro
                   collapsed ? "justify-center p-2.5" : "px-3 py-2.5",
                   isActive
                     ? cn(tab.activeGradient, tab.activeBorder, tab.activeGlow, tab.activeText)
-                    : cn("text-muted-foreground hover:text-foreground border border-transparent", tab.hoverBg)
+                    : cn(tab.inactiveText, "hover:text-foreground border border-transparent", tab.hoverBg)
                 )}
                 title={collapsed ? tab.label : undefined}
               >
@@ -174,7 +180,7 @@ export function BasicModeSidebar({ activeTab, onTabChange }: BasicModeSidebarPro
                   "flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-xl transition-all min-w-[56px] active:scale-95",
                   isActive
                     ? cn("bg-primary/12", tab.activeText)
-                    : "text-muted-foreground"
+                    : tab.inactiveText
                 )}
               >
                 <Icon className={cn("h-5 w-5 shrink-0", isActive && tab.iconGlow)} />
