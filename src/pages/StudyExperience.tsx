@@ -145,6 +145,7 @@ export default function StudyExperience() {
   const [synthesizedOutput, setSynthesizedOutput] = useState<string | null>(null);
   const [synthesizing, setSynthesizing] = useState(false);
   const [pendingLayer, setPendingLayer] = useState<StudyLayer | null>(null);
+  const [abChoice, setAbChoice] = useState<{ a: ReturnType<typeof autoPickPrinciple>; b: ReturnType<typeof autoPickPrinciple> } | null>(null);
 
   // User-led state
   const [suggestedRoom, setSuggestedRoom] = useState<{ roomId: string; principleId: string } | null>(null);
