@@ -20,6 +20,7 @@ interface TabItem {
   activeText: string;
   hoverBg: string;
   iconGlow: string;
+  inactiveText: string;
 }
 
 const TABS: TabItem[] = [
