@@ -62,69 +62,69 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 40 30% 97%;
-    --foreground: 30 15% 15%;
+    --background: 40 28% 96%;
+    --foreground: 25 20% 10%;
 
-    --card: 40 25% 99%;
-    --card-foreground: 30 15% 15%;
+    --card: 40 22% 98%;
+    --card-foreground: 25 20% 10%;
 
-    --popover: 40 25% 99%;
-    --popover-foreground: 30 15% 15%;
+    --popover: 40 22% 98%;
+    --popover-foreground: 25 20% 10%;
 
-    --primary: 30 60% 38%;
+    --primary: 28 65% 32%;
     --primary-foreground: 40 30% 97%;
 
-    --secondary: 35 45% 48%;
+    --secondary: 33 50% 40%;
     --secondary-foreground: 40 30% 97%;
 
-    --muted: 38 20% 92%;
-    --muted-foreground: 30 10% 40%;
+    --muted: 38 18% 89%;
+    --muted-foreground: 28 14% 32%;
 
-    --accent: 40 85% 50%;
-    --accent-foreground: 30 15% 15%;
+    --accent: 40 85% 45%;
+    --accent-foreground: 25 20% 10%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 35 20% 85%;
-    --input: 35 18% 88%;
-    --ring: 30 60% 38%;
+    --border: 33 18% 78%;
+    --input: 35 16% 84%;
+    --ring: 28 65% 32%;
 
     --radius: 0.75rem;
 
     /* Vibrant Palace tokens */
-    --palace-purple: 210 55% 45%;
-    --palace-purple-light: 210 45% 60%;
-    --palace-pink: 190 45% 45%;
-    --palace-pink-light: 190 40% 60%;
-    --palace-blue: 210 65% 48%;
-    --palace-blue-light: 210 55% 62%;
-    --palace-teal: 180 50% 38%;
-    --palace-teal-light: 180 40% 55%;
-    --palace-orange: 25 70% 48%;
-    --palace-orange-light: 25 60% 60%;
-    --palace-yellow: 45 75% 48%;
-    --palace-green: 142 50% 34%;
-    --palace-green-light: 142 40% 50%;
+    --palace-purple: 210 60% 40%;
+    --palace-purple-light: 210 50% 55%;
+    --palace-pink: 190 50% 40%;
+    --palace-pink-light: 190 45% 55%;
+    --palace-blue: 210 70% 42%;
+    --palace-blue-light: 210 60% 56%;
+    --palace-teal: 180 55% 32%;
+    --palace-teal-light: 180 45% 48%;
+    --palace-orange: 22 75% 42%;
+    --palace-orange-light: 22 65% 55%;
+    --palace-yellow: 45 80% 42%;
+    --palace-green: 142 55% 28%;
+    --palace-green-light: 142 45% 44%;
     
     /* Vibrant gradients */
-    --gradient-palace: linear-gradient(135deg, hsl(30 60% 38%) 0%, hsl(35 45% 48%) 100%);
-    --gradient-royal: linear-gradient(135deg, hsl(30 55% 40%) 0%, hsl(40 50% 45%) 100%);
-    --gradient-sunset: linear-gradient(135deg, hsl(15 55% 52%) 0%, hsl(30 65% 50%) 50%, hsl(45 70% 50%) 100%);
-    --gradient-ocean: linear-gradient(135deg, hsl(210 55% 48%) 0%, hsl(180 50% 42%) 100%);
-    --gradient-forest: linear-gradient(135deg, hsl(180 50% 38%) 0%, hsl(142 50% 34%) 100%);
-    --gradient-warmth: linear-gradient(135deg, hsl(25 65% 48%) 0%, hsl(45 70% 48%) 100%);
-    --gradient-dreamy: linear-gradient(135deg, hsl(35 40% 60%) 0%, hsl(40 35% 65%) 50%, hsl(45 40% 62%) 100%);
-    --gradient-subtle: linear-gradient(180deg, hsl(40 30% 97%) 0%, hsl(38 25% 95%) 100%);
+    --gradient-palace: linear-gradient(135deg, hsl(28 65% 32%) 0%, hsl(33 50% 40%) 100%);
+    --gradient-royal: linear-gradient(135deg, hsl(28 60% 34%) 0%, hsl(38 55% 38%) 100%);
+    --gradient-sunset: linear-gradient(135deg, hsl(12 60% 46%) 0%, hsl(28 70% 44%) 50%, hsl(42 75% 44%) 100%);
+    --gradient-ocean: linear-gradient(135deg, hsl(210 60% 42%) 0%, hsl(180 55% 36%) 100%);
+    --gradient-forest: linear-gradient(135deg, hsl(180 55% 32%) 0%, hsl(142 55% 28%) 100%);
+    --gradient-warmth: linear-gradient(135deg, hsl(22 70% 42%) 0%, hsl(42 75% 42%) 100%);
+    --gradient-dreamy: linear-gradient(135deg, hsl(33 45% 52%) 0%, hsl(38 40% 58%) 50%, hsl(43 45% 55%) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(40 28% 96%) 0%, hsl(38 22% 93%) 100%);
     
     /* Colorful shadows */
-    --shadow-purple: 0 8px 32px -8px hsl(30 50% 40% / 0.2);
-    --shadow-pink: 0 8px 32px -8px hsl(35 45% 45% / 0.2);
-    --shadow-blue: 0 8px 32px -8px hsl(210 55% 48% / 0.2);
-    --shadow-elegant: 0 4px 20px -4px hsl(30 40% 40% / 0.12);
-    --shadow-hover: 0 12px 40px -8px hsl(30 50% 40% / 0.2);
-    --shadow-glow: 0 0 40px 8px hsl(40 60% 50% / 0.2);
-    --shadow-mega-glow: 0 0 60px 12px hsl(40 60% 50% / 0.25);
+    --shadow-purple: 0 8px 32px -8px hsl(28 55% 35% / 0.25);
+    --shadow-pink: 0 8px 32px -8px hsl(33 50% 38% / 0.25);
+    --shadow-blue: 0 8px 32px -8px hsl(210 60% 42% / 0.25);
+    --shadow-elegant: 0 4px 20px -4px hsl(28 45% 35% / 0.15);
+    --shadow-hover: 0 12px 40px -8px hsl(28 55% 35% / 0.25);
+    --shadow-glow: 0 0 40px 8px hsl(40 65% 45% / 0.22);
+    --shadow-mega-glow: 0 0 60px 12px hsl(40 65% 45% / 0.28);
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -143,14 +143,14 @@ All colors MUST be HSL.
     animation: gradient 8s ease infinite;
     --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-    --sidebar-background: 40 25% 97%;
-    --sidebar-foreground: 30 12% 25%;
-    --sidebar-primary: 30 60% 38%;
+    --sidebar-background: 40 22% 95%;
+    --sidebar-foreground: 28 16% 20%;
+    --sidebar-primary: 28 65% 32%;
     --sidebar-primary-foreground: 40 30% 97%;
-    --sidebar-accent: 40 30% 94%;
-    --sidebar-accent-foreground: 30 15% 15%;
-    --sidebar-border: 35 20% 88%;
-    --sidebar-ring: 30 60% 38%;
+    --sidebar-accent: 40 28% 91%;
+    --sidebar-accent-foreground: 25 20% 10%;
+    --sidebar-border: 33 18% 82%;
+    --sidebar-ring: 28 65% 32%;
   }
 
   .dark {
