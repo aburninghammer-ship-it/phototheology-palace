@@ -25,27 +25,6 @@ const isMetaWebView =
 const previewFreshnessKey = "__preview_sw_freshened_v3__";
 const chunkReloadKey = "__chunk_reload_once__";
 const metaForceReloadKey = "__meta_force_reload_v3__";
-const questBuildRefreshKeyPrefix = "__quest_build_refresh__:";
-const standardBuildRefreshKeyPrefix = "__standard_build_refresh__:";
-
-function readCurrentBuildTag() {
-  return document.querySelector('meta[name="app-build"]')?.getAttribute("content") ?? null;
-}
-
-async function fetchLatestBuildTag() {
-  const url = `${window.location.origin}/?__buildcheck=${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  const html = await fetch(url, {
-    cache: "no-store",
-    headers: {
-      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
-      Pragma: "no-cache",
-    },
-  }).then((response) => response.text());
-
-  const match = html.match(/<meta\s+name=["']app-build["']\s+content=["']([^"']+)["']/i);
-  return match?.[1] ?? null;
-}
-
 async function hardRefresh(cacheBusterKey: string) {
   try {
     const regs = await navigator.serviceWorker.getRegistrations();
