@@ -143,14 +143,14 @@ All colors MUST be HSL.
     animation: gradient 8s ease infinite;
     --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-    --sidebar-background: 40 25% 97%;
-    --sidebar-foreground: 30 12% 25%;
-    --sidebar-primary: 30 60% 38%;
+    --sidebar-background: 40 22% 95%;
+    --sidebar-foreground: 28 16% 20%;
+    --sidebar-primary: 28 65% 32%;
     --sidebar-primary-foreground: 40 30% 97%;
-    --sidebar-accent: 40 30% 94%;
-    --sidebar-accent-foreground: 30 15% 15%;
-    --sidebar-border: 35 20% 88%;
-    --sidebar-ring: 30 60% 38%;
+    --sidebar-accent: 40 28% 91%;
+    --sidebar-accent-foreground: 25 20% 10%;
+    --sidebar-border: 33 18% 82%;
+    --sidebar-ring: 28 65% 32%;
   }
 
   .dark {
