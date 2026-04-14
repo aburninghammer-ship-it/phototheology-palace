@@ -1096,6 +1096,7 @@ INSTRUCTIONS FOR RECAP:
           </div>
 
           {/* Right column: ALL rooms by floor */}
+          {!isBasic && (
           <div className="order-first md:order-last">
             {/* Mobile: horizontal scroll of floor groups */}
             <div className="md:hidden space-y-3">
@@ -1139,6 +1140,7 @@ INSTRUCTIONS FOR RECAP:
               ))}
             </div>
           </div>
+          )}
         </div>
       </div>
 
