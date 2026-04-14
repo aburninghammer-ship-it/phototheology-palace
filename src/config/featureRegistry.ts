@@ -66,7 +66,6 @@ const FEATURE_REGISTRY: Array<{ path: string; minMode: ExperienceMode }> = [
   // Other Study features
   { path: "/prophecy-watch", minMode: "immersion" },
   { path: "/research-mode", minMode: "immersion" },
-  { path: "/encyclopedia", minMode: "immersion" },
   { path: "/character-profiles", minMode: "immersion" },
   { path: "/libraries", minMode: "immersion" },
   { path: "/bible-atlas", minMode: "immersion" },
@@ -75,12 +74,10 @@ const FEATURE_REGISTRY: Array<{ path: string; minMode: ExperienceMode }> = [
   // Palace & Study tools (formerly Explorer, now Study)
   { path: "/palace/tour", minMode: "immersion" },
   { path: "/palace", minMode: "immersion" },
-  { path: "/image-bible", minMode: "immersion" },
   { path: "/bible-timeline", minMode: "immersion" },
   { path: "/bible-lexicon", minMode: "immersion" },
   { path: "/interlinear", minMode: "immersion" },
   { path: "/research-assistant", minMode: "immersion" },
-  { path: "/analyze-thoughts", minMode: "immersion" },
   { path: "/mind-map", minMode: "immersion" },
   { path: "/test-me", minMode: "immersion" },
   { path: "/drill-drill", minMode: "immersion" },
