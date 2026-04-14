@@ -112,6 +112,41 @@ export function PWAUpdatePrompt() {
     },
   });
 
+  const activateWaitingServiceWorker = useCallback(async () => {
+    if (!('serviceWorker' in navigator)) return false;
+
+    const registration = await navigator.serviceWorker.getRegistration();
+    await registration?.update().catch(() => undefined);
+
+    const refreshedRegistration = await navigator.serviceWorker.getRegistration();
+    const waitingWorker = refreshedRegistration?.waiting;
+
+    if (!waitingWorker) return false;
+
+    return await new Promise<boolean>((resolve) => {
+      let settled = false;
+
+      const cleanup = () => {
+        navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
+        window.clearTimeout(timeoutId);
+      };
+
+      const finish = (didActivate: boolean) => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        resolve(didActivate);
+      };
+
+      const handleControllerChange = () => finish(true);
+
+      const timeoutId = window.setTimeout(() => finish(false), 4_000);
+
+      navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
+      waitingWorker.postMessage({ type: 'SKIP_WAITING' });
+    });
+  }, []);
+
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return;
     if (sessionStorage.getItem(WAITING_SW_DISMISS_KEY) === '1') return;
@@ -214,6 +249,11 @@ export function PWAUpdatePrompt() {
         return;
       }
 
+      if (await activateWaitingServiceWorker()) {
+        window.location.reload();
+        return;
+      }
+
       markAutoRefreshedBuild(pendingBuild);
       suppressBuild(pendingBuild);
       await forceHardRefresh('__app_refresh', pendingBuild ? `manual-${pendingBuild}` : `manual-${Date.now()}`);
@@ -223,7 +263,7 @@ export function PWAUpdatePrompt() {
     } finally {
       setIsUpdating(false);
     }
-  }, [isUpdating, pendingBuild]);
+  }, [activateWaitingServiceWorker, isUpdating, pendingBuild]);
 
   const close = useCallback(() => {
     suppressBuild(pendingBuild);
