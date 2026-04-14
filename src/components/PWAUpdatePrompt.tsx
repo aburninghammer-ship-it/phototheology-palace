@@ -168,11 +168,8 @@ export function PWAUpdatePrompt() {
             .catch(() => undefined);
         }
 
-        // Show prompt instead of silently refreshing — silent refresh
-        // can fail on desktop due to CDN caching, leaving users stuck.
-        setPendingBuild(nextBuild);
-        sessionStorage.removeItem(WAITING_SW_DISMISS_KEY);
-        setShowReload(true);
+        markAutoRefreshedBuild(nextBuild);
+        await forceHardRefresh('__app_refresh', `build-${nextBuild}`);
       } catch {
         // Ignore transient network/cache issues and retry on next poll.
       }
