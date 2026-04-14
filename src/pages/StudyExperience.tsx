@@ -101,6 +101,7 @@ function loadSavedStudies(): { ref: string; layers: StudyLayer[]; timestamp: num
 export default function StudyExperience() {
   const [searchParams] = useSearchParams();
   const isDemo = searchParams.get("demo") === "true";
+  const { isBasic } = useExperienceMode();
 
   const [verseRef, setVerseRef] = useState("");
   const [parsedRef, setParsedRef] = useState<{ book: string; chapter: string; verse: string } | null>(null);
