@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useMemo } from "react";
 import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Save, Share2, Sparkles, ChevronDown, ChevronRight, FileText, ClipboardCopy } from "lucide-react";
+import { Save, Share2, Sparkles, ChevronDown, ChevronRight, FileText, ClipboardCopy, Check, X, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -73,6 +73,36 @@ function getSyntheticPrinciple(roomId: string, roomName: string): SubPrinciple {
 
 type Mode = "jeeves-led" | "user-led" | "teach";
 
+// Auto-pick a random room + principle that hasn't been used yet
+function autoPickPrinciple(
+  allFloors: FloorGroup[],
+  usedPrincipleIds: Set<string>
+): { roomId: string; roomName: string; principle: SubPrinciple } | null {
+  const candidates: { roomId: string; roomName: string; principle: SubPrinciple }[] = [];
+  for (const fg of allFloors) {
+    for (const r of fg.rooms) {
+      if (r.room) {
+        for (const p of r.room.subPrinciples) {
+          if (!usedPrincipleIds.has(p.id)) {
+            candidates.push({ roomId: r.id, roomName: r.room.roomName, principle: p });
+          }
+        }
+      } else {
+        const synId = `${r.id}-main`;
+        if (!usedPrincipleIds.has(synId)) {
+          candidates.push({
+            roomId: r.id,
+            roomName: r.name,
+            principle: { id: synId, name: r.name, shortName: r.name, description: `Apply the ${r.name} lens` },
+          });
+        }
+      }
+    }
+  }
+  if (candidates.length === 0) return null;
+  return candidates[Math.floor(Math.random() * candidates.length)];
+}
+
 function parseVerseRef(ref: string): { book: string; chapter: string; verse: string } | null {
   // Match "Book Chapter:Verse" or "Book Chapter:Verse-Verse"
   const m = ref.match(/^(.+?)\s+(\d+):(\d+(?:\s*[-–—]\s*\d+)?)$/);
@@ -114,6 +144,7 @@ export default function StudyExperience() {
   const [verseLookupLoading, setVerseLookupLoading] = useState(false);
   const [synthesizedOutput, setSynthesizedOutput] = useState<string | null>(null);
   const [synthesizing, setSynthesizing] = useState(false);
+  const [pendingLayer, setPendingLayer] = useState<StudyLayer | null>(null);
 
   // User-led state
   const [suggestedRoom, setSuggestedRoom] = useState<{ roomId: string; principleId: string } | null>(null);
@@ -165,7 +196,7 @@ export default function StudyExperience() {
     setSuggestedRoom(null);
     setUserInput("");
     setExpandedRoom(null);
-    setExpandedFloor(4);
+    setExpandedFloor(null);
 
     // For topics, ask Jeeves to identify the key scripture passage(s)
     if (isTopic) {
@@ -202,8 +233,59 @@ Use KJV text only. Be precise with references.`,
 
     if (mode === "user-led" && parsed) {
       fetchCrossRoomSuggestion(parsed, ref);
+    } else if (mode === "jeeves-led" || mode === "teach") {
+      setTimeout(() => {
+        autoPickAndApply(parsed || { book: ref, chapter: "", verse: "" }, ref, new Set());
+      }, 100);
     }
   }, [mode]);
+
+  const autoPickAndApply = useCallback(async (
+    ref: { book: string; chapter: string; verse: string },
+    refStr: string,
+    existingUsed?: Set<string>
+  ) => {
+    const used = existingUsed || new Set(layers.map((l) => l.principleId));
+    const pick = autoPickPrinciple(allFloors, used);
+    if (!pick) { toast("All principles explored! 🎉"); return; }
+    setLoadingPrinciple(pick.principle.id);
+    try {
+      const promptBuilder = mode === "teach" ? buildTeachPrompt : buildDeepPrompt;
+      const { data } = await callJeeves({
+        mode: "principle-amplification",
+        book: ref.book, chapter: ref.chapter, verse: ref.verse,
+        verseText: verseText,
+        principle: promptBuilder(pick.roomName, pick.roomId, pick.principle.name, pick.principle.description),
+      }, "study-experience");
+      const response = typeof data === "string" ? data : (data as any)?.response || "";
+      if (!verseText && response) {
+        const vMatch = response.match(/[""\u201C\u201D]([^""\u201C\u201D]{10,})["""\u201C\u201D]/);
+        if (vMatch) setVerseText(vMatch[1]);
+      }
+      setPendingLayer({ roomId: pick.roomId, roomName: pick.roomName, principleId: pick.principle.id, principleName: pick.principle.name, analysis: response });
+    } catch (err) {
+      console.error("Auto-pick analysis failed:", err);
+      toast.error("Analysis failed — try again.");
+    }
+    setLoadingPrinciple(null);
+  }, [allFloors, layers, mode, verseText]);
+
+  const handleAcceptPending = useCallback(() => {
+    if (!pendingLayer) return;
+    setLayers((prev) => [...prev, { ...pendingLayer, accepted: true }]);
+    setPendingLayer(null);
+    toast.success("Layer accepted! Click 'Continue' to add another lens.");
+  }, [pendingLayer]);
+
+  const handleRejectPending = useCallback(() => {
+    setPendingLayer(null);
+    toast("Layer rejected.", { icon: "🔄" });
+  }, []);
+
+  const handleContinueBuilding = useCallback(() => {
+    if (!parsedRef) return;
+    autoPickAndApply(parsedRef, verseRef);
+  }, [parsedRef, verseRef, autoPickAndApply]);
 
   const fetchCrossRoomSuggestion = async (
     parsed: { book: string; chapter: string; verse: string },
@@ -834,7 +916,9 @@ INSTRUCTIONS FOR RECAP:
             One Verse. Endless Combinations.
           </p>
           <p className="text-muted-foreground max-w-xl mx-auto mb-6">
-            Select a verse. Choose a room. Watch understanding unfold.
+            {mode === "user-led"
+              ? "Select a verse. Choose a room. Watch understanding unfold."
+              : "Enter a verse or theme. Jeeves will choose the lens."}
           </p>
 
           {/* Mode toggle */}
@@ -881,7 +965,7 @@ INSTRUCTIONS FOR RECAP:
         </motion.div>
 
         {/* Main layout */}
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_340px] gap-6">
+        <div className={cn("grid grid-cols-1 gap-6", mode === "user-led" && !isBasic && "md:grid-cols-[1fr_340px]")}>
           {/* Left column: Verse + Analysis */}
           <div className="space-y-6 min-w-0">
             <VersePanel
@@ -929,6 +1013,55 @@ INSTRUCTIONS FOR RECAP:
                   />
                 )}
               </div>
+            )}
+
+            {/* Jeeves-led: loading spinner */}
+            {(mode === "jeeves-led" || mode === "teach") && loadingPrinciple && !pendingLayer && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl border border-primary/20 bg-card/40 p-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                  <div>
+                    <p className="text-sm text-primary font-medium">Jeeves is selecting a principle…</p>
+                    <p className="text-xs text-muted-foreground mt-1">Analyzing your text with a fresh lens</p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Pending layer for accept/reject */}
+            {pendingLayer && (
+              <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border-2 border-amber-500/40 bg-gradient-to-br from-amber-500/5 via-card/60 to-card/40 backdrop-blur-xl overflow-hidden shadow-[0_0_30px_-8px_rgba(251,191,36,0.3)]">
+                <div className="px-5 py-3 border-b border-amber-500/20 bg-amber-500/5 flex items-center gap-2 flex-wrap">
+                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  <span className="text-sm font-semibold text-amber-400">{pendingLayer.roomName}</span>
+                  <span className="text-xs text-muted-foreground">— {pendingLayer.principleName}</span>
+                  <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full border border-amber-500/30 text-amber-400">Pending Review</span>
+                </div>
+                <div className="p-5 max-h-[400px] overflow-y-auto">
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed text-foreground/90">{pendingLayer.analysis}</p>
+                </div>
+                <div className="px-5 py-3 border-t border-amber-500/20 bg-amber-500/5 flex items-center gap-3 flex-wrap">
+                  <Button size="sm" onClick={handleAcceptPending} className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white">
+                    <Check className="w-4 h-4" /> Accept
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={handleRejectPending} className="gap-1.5 border-red-500/30 text-red-400 hover:bg-red-500/10">
+                    <X className="w-4 h-4" /> Reject
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => { setPendingLayer(null); handleContinueBuilding(); }} className="gap-1.5 text-muted-foreground hover:text-foreground ml-auto">
+                    <RefreshCw className="w-4 h-4" /> Try Different Lens
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Continue bar after accepting */}
+            {(mode === "jeeves-led" || mode === "teach") && parsedRef && !pendingLayer && !loadingPrinciple && layers.length > 0 && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3 p-4 rounded-xl border border-primary/20 bg-card/40">
+                <Button size="sm" onClick={handleContinueBuilding} className="gap-1.5">
+                  <Sparkles className="w-4 h-4" /> Continue Building
+                </Button>
+                <span className="text-xs text-muted-foreground">Jeeves will pick a new lens and apply it</span>
+              </motion.div>
             )}
 
             {/* Save + Share bar */}
@@ -1096,7 +1229,7 @@ INSTRUCTIONS FOR RECAP:
           </div>
 
           {/* Right column: ALL rooms by floor */}
-          {!isBasic && (
+          {!isBasic && mode === "user-led" && (
           <div className="order-first md:order-last">
             {/* Mobile: horizontal scroll of floor groups */}
             <div className="md:hidden space-y-3">
