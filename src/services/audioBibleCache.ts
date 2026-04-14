@@ -4,7 +4,7 @@
  */
 
 const DB_NAME = "phototheology-audio-bible";
-const DB_VERSION = 2; // Bumped 2026-04-05 to flush stale commentary after master regeneration
+const DB_VERSION = 3; // Bumped 2026-04-14 to flush stale commentary
 const VERSE_STORE = "verses";
 const COMMENTARY_STORE = "commentary";
 
