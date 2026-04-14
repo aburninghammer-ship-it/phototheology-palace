@@ -54,18 +54,18 @@ const Welcome = () => {
           <div className="eden-light eden-light-4" />
         </div>
 
-        <div className="relative z-10 text-center px-4 pt-10 pb-6 space-y-4">
+        <div className="relative z-10 text-center px-4 pt-6 sm:pt-10 pb-4 sm:pb-6 space-y-3 sm:space-y-4">
           {/* Main Title */}
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-wider leading-tight"
+            className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-wider leading-tight"
             style={{ fontFamily: "'Cinzel', serif" }}
           >
             <span style={{ color: "#d4a017" }}>PHOTOTHEOLOGY</span>
             <span
-              className="inline-flex items-center justify-center mx-2 px-2 py-0.5 border rounded text-2xl sm:text-3xl md:text-4xl align-middle"
+              className="inline-flex items-center justify-center mx-1 sm:mx-2 px-1.5 sm:px-2 py-0.5 border rounded text-lg sm:text-2xl md:text-3xl lg:text-4xl align-middle"
               style={{
                 borderColor: "hsl(var(--muted-foreground) / 0.4)",
                 color: "hsl(var(--muted-foreground))",
@@ -82,7 +82,7 @@ const Welcome = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            className="text-lg sm:text-xl font-bold text-foreground tracking-wide"
+            className="text-base sm:text-lg md:text-xl font-bold text-foreground tracking-wide"
           >
             The Choice Is Yours
           </motion.p>
