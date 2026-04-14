@@ -18,16 +18,41 @@ serve(async (req) => {
       { auth: { autoRefreshToken: false, persistSession: false } }
     );
 
+    // ===== MANDATORY AUTH + ADMIN CHECK =====
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await supabaseAdmin.auth.getUser(token);
+    if (claimsError || !claimsData?.user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const { data: adminCheck } = await supabaseAdmin
+      .from("admin_users")
+      .select("id")
+      .eq("user_id", claimsData.user.id)
+      .maybeSingle();
+    if (!adminCheck) {
+      return new Response(JSON.stringify({ error: "Admin access required" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    // ===== END AUTH CHECK =====
+
     const { email } = await req.json();
 
-    if (!email) {
+    if (!email || typeof email !== 'string' || email.length > 255) {
       return new Response(
-        JSON.stringify({ error: "Email is required" }),
+        JSON.stringify({ error: "Valid email is required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Send password reset email
     const { error } = await supabaseAdmin.auth.resetPasswordForEmail(email, {
       redirectTo: "https://phototheologybible.com/auth?mode=reset",
     });
@@ -40,7 +65,7 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, message: `Password reset email sent to ${email}` }),
+      JSON.stringify({ success: true, message: "Password reset email sent" }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: unknown) {

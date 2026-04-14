@@ -19,24 +19,55 @@ serve(async (req: Request) => {
       { auth: { persistSession: false } }
     );
 
-    const { fileBase64, fileName, bucketName, contentType } = await req.json();
-    
-    console.log(`Uploading file: ${fileName} to bucket: ${bucketName}`);
-    console.log(`Content type: ${contentType}`);
+    // ===== MANDATORY AUTH + ADMIN CHECK =====
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const { data: userData, error: authError } = await supabaseAdmin.auth.getUser(token);
+    if (authError || !userData?.user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const { data: adminCheck } = await supabaseAdmin
+      .from("admin_users")
+      .select("id")
+      .eq("user_id", userData.user.id)
+      .maybeSingle();
+    if (!adminCheck) {
+      return new Response(JSON.stringify({ error: "Admin access required" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    // ===== END AUTH CHECK =====
 
-    // Decode base64 to binary
+    const { fileBase64, fileName, bucketName, contentType } = await req.json();
+
+    // Input validation
+    if (!fileBase64 || !fileName || !bucketName) {
+      return new Response(JSON.stringify({ error: "fileBase64, fileName, and bucketName are required" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Whitelist allowed buckets
+    const allowedBuckets = ["product-files", "epic-audio", "image-bible", "baptism-audio"];
+    if (!allowedBuckets.includes(bucketName)) {
+      return new Response(JSON.stringify({ error: "Invalid bucket" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    console.log(`[upload-product-file] Admin ${userData.user.id} uploading to ${bucketName}/${fileName}`);
+
     const fileData = decodeBase64(fileBase64);
-    
-    console.log(`File size: ${fileData.length} bytes`);
 
     // Delete existing file if it exists
-    const { error: deleteError } = await supabaseAdmin.storage
-      .from(bucketName)
-      .remove([fileName]);
-    
-    if (deleteError) {
-      console.log("Delete error (might not exist):", deleteError.message);
-    }
+    await supabaseAdmin.storage.from(bucketName).remove([fileName]);
 
     // Upload the new file
     const { data, error: uploadError } = await supabaseAdmin.storage
@@ -51,32 +82,22 @@ serve(async (req: Request) => {
       throw uploadError;
     }
 
-    console.log("Upload successful:", data);
-
-    // Get the public URL
     const { data: urlData } = supabaseAdmin.storage
       .from(bucketName)
       .getPublicUrl(fileName);
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        path: data.path,
-        publicUrl: urlData.publicUrl 
+      JSON.stringify({
+        success: true,
+        path: data?.path,
+        publicUrl: urlData?.publicUrl,
       }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
-    console.error("Error uploading file:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
