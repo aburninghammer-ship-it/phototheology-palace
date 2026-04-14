@@ -35,6 +35,7 @@ interface AnalysisCardProps {
   onCompound?: (upToIndex: number) => void;
   compounding?: boolean;
   onSaveLayer?: (layer: StudyLayer) => void;
+  onContinueBuilding?: () => void;
 }
 
 const ROOM_COLORS: Record<string, { bg: string; border: string; text: string; glow: string; accent: string }> = {
@@ -93,7 +94,7 @@ function parseAnalysis(text: string) {
   return sections;
 }
 
-export function AnalysisCard({ layer, index, totalLayers = 0, verseRef, verseText, onRemove, onRebuild, onAccept, onCompound, compounding, onSaveLayer }: AnalysisCardProps) {
+export function AnalysisCard({ layer, index, totalLayers = 0, verseRef, verseText, onRemove, onRebuild, onAccept, onCompound, compounding, onSaveLayer, onContinueBuilding }: AnalysisCardProps) {
   const colors = ROOM_COLORS[layer.roomId] || DEFAULT_COLORS;
   const sections = parseAnalysis(layer.analysis);
   const [isSaved, setIsSaved] = useState(false);
@@ -420,26 +421,39 @@ INSTRUCTIONS:
         </div>
       )}
 
-      {layer.accepted && onSaveLayer && (
+      {layer.accepted && (onSaveLayer || onContinueBuilding) && (
         <div className="relative flex items-center gap-2 px-4 py-3 border-t border-white/10 bg-black/20">
           <Badge className="bg-green-500/15 text-green-400 border-green-500/30 text-[10px]">
             <Check className="w-3 h-3 mr-0.5" /> Accepted
           </Badge>
-          <Button
-            size="sm"
-            variant="ghost"
-            className={cn(
-              "h-8 px-3 text-xs gap-1.5 ml-auto border transition-all",
-              isSaved
-                ? "bg-primary/20 text-primary border-primary/30"
-                : "bg-muted/20 hover:bg-muted/40 text-muted-foreground border-muted-foreground/20"
-            )}
-            onClick={handleSave}
-            disabled={isSaved}
-          >
-            <Save className="w-3.5 h-3.5" />
-            {isSaved ? "Saved" : "Save Study"}
-          </Button>
+          {onContinueBuilding && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-8 px-3 text-xs gap-1.5 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 hover:border-primary/50 transition-all"
+              onClick={onContinueBuilding}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Continue Building
+            </Button>
+          )}
+          {onSaveLayer && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className={cn(
+                "h-8 px-3 text-xs gap-1.5 ml-auto border transition-all",
+                isSaved
+                  ? "bg-primary/20 text-primary border-primary/30"
+                  : "bg-muted/20 hover:bg-muted/40 text-muted-foreground border-muted-foreground/20"
+              )}
+              onClick={handleSave}
+              disabled={isSaved}
+            >
+              <Save className="w-3.5 h-3.5" />
+              {isSaved ? "Saved" : "Save Study"}
+            </Button>
+          )}
         </div>
       )}
     </motion.div>
