@@ -180,7 +180,7 @@ export function BasicModeSidebar({ activeTab, onTabChange }: BasicModeSidebarPro
                   "flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-xl transition-all min-w-[56px] active:scale-95",
                   isActive
                     ? cn("bg-primary/12", tab.activeText)
-                    : "text-muted-foreground"
+                    : tab.inactiveText
                 )}
               >
                 <Icon className={cn("h-5 w-5 shrink-0", isActive && tab.iconGlow)} />
