@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Download, RefreshCw } from 'lucide-react';
 
 const SUPPRESSED_BUILD_PREFIX = 'pwa_update_suppressed_build:';
+const AUTO_REFRESHED_BUILD_PREFIX = 'pwa_auto_refreshed_build:';
 const WAITING_SW_DISMISS_KEY = 'pwa_waiting_sw_dismissed';
 export const MANUAL_UPDATE_REQUIRED_EVENT = 'pt:manual-update-required';
 const BUILD_CHECK_INTERVAL_MS = 30_000;
 const INITIAL_BUILD_CHECK_DELAY_MS = 4_000;
-const WAITING_SW_TIMEOUT_MS = 4_000;
 
 const isMetaWebView =
   /FBAN|FBAV|FB_IAB|FBIOS|Instagram/i.test(navigator.userAgent) &&
@@ -55,6 +55,16 @@ function isBuildSuppressed(build: string | null): boolean {
   return localStorage.getItem(`${SUPPRESSED_BUILD_PREFIX}${build}`) === '1';
 }
 
+function hasAutoRefreshedBuild(build: string | null): boolean {
+  if (!build) return false;
+  return sessionStorage.getItem(`${AUTO_REFRESHED_BUILD_PREFIX}${build}`) === '1';
+}
+
+function markAutoRefreshedBuild(build: string | null): void {
+  if (!build) return;
+  sessionStorage.setItem(`${AUTO_REFRESHED_BUILD_PREFIX}${build}`, '1');
+}
+
 async function forceHardRefresh(queryKey: string, value: string) {
   try {
     if ('serviceWorker' in navigator) {
@@ -71,67 +81,6 @@ async function forceHardRefresh(queryKey: string, value: string) {
     target.searchParams.set(queryKey, value);
     window.location.replace(target.toString());
   }
-}
-
-async function waitForWaitingWorker(timeoutMs = WAITING_SW_TIMEOUT_MS): Promise<ServiceWorker | null> {
-  if (!('serviceWorker' in navigator)) return null;
-
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
-    const registration = await navigator.serviceWorker.getRegistration();
-    if (registration?.waiting) {
-      return registration.waiting;
-    }
-
-    await new Promise((resolve) => window.setTimeout(resolve, 250));
-  }
-
-  const finalRegistration = await navigator.serviceWorker.getRegistration();
-  return finalRegistration?.waiting ?? null;
-}
-
-async function activateWaitingWorker(waitingWorker: ServiceWorker): Promise<void> {
-  await new Promise<void>((resolve, reject) => {
-    let settled = false;
-
-    const cleanup = () => {
-      navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
-      waitingWorker.removeEventListener('statechange', handleStateChange);
-      window.clearTimeout(timeoutId);
-    };
-
-    const finishResolve = () => {
-      if (settled) return;
-      settled = true;
-      cleanup();
-      resolve();
-    };
-
-    const finishReject = (error: Error) => {
-      if (settled) return;
-      settled = true;
-      cleanup();
-      reject(error);
-    };
-
-    const handleControllerChange = () => {
-      finishResolve();
-    };
-
-    const handleStateChange = () => {
-      if (waitingWorker.state === 'activated' && navigator.serviceWorker.controller) {
-        finishResolve();
-      }
-    };
-
-    const timeoutId = window.setTimeout(() => {
-      finishReject(new Error('Waiting service worker activation timed out'));
-    }, WAITING_SW_TIMEOUT_MS + 4_000);
-
-    navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
-    waitingWorker.addEventListener('statechange', handleStateChange);
-    waitingWorker.postMessage({ type: 'SKIP_WAITING' });
-  });
 }
 
 export function PWAUpdatePrompt() {
@@ -206,14 +155,11 @@ export function PWAUpdatePrompt() {
           cancelled ||
           !nextBuild ||
           nextBuild === currentBuild ||
-          isBuildSuppressed(nextBuild)
+          isBuildSuppressed(nextBuild) ||
+          hasAutoRefreshedBuild(nextBuild)
         ) {
           return;
         }
-
-        setPendingBuild(nextBuild);
-        setShowReload(true);
-        sessionStorage.removeItem(WAITING_SW_DISMISS_KEY);
 
         if ('serviceWorker' in navigator) {
           await navigator.serviceWorker
@@ -221,6 +167,9 @@ export function PWAUpdatePrompt() {
             .then((registration) => registration?.update())
             .catch(() => undefined);
         }
+
+        markAutoRefreshedBuild(nextBuild);
+        await forceHardRefresh('__app_refresh', `build-${nextBuild}`);
       } catch {
         // Ignore transient network/cache issues and retry on next poll.
       }
@@ -264,23 +213,9 @@ export function PWAUpdatePrompt() {
         return;
       }
 
-      const registration = await navigator.serviceWorker.getRegistration();
-      if (!registration) {
-        await forceHardRefresh('__app_refresh', `no-registration-${Date.now()}`);
-        return;
-      }
-
-      await registration.update().catch(() => undefined);
-
-      const waitingWorker = registration.waiting ?? await waitForWaitingWorker();
-      if (!waitingWorker) {
-        await forceHardRefresh('__app_refresh', `no-waiting-worker-${Date.now()}`);
-        return;
-      }
-
-      await activateWaitingWorker(waitingWorker);
+      markAutoRefreshedBuild(pendingBuild);
       suppressBuild(pendingBuild);
-      window.location.reload();
+      await forceHardRefresh('__app_refresh', pendingBuild ? `manual-${pendingBuild}` : `manual-${Date.now()}`);
     } catch (error) {
       console.error('Error during update:', error);
       await forceHardRefresh('__app_refresh', `fallback-${Date.now()}`);
