@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
+import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Save, Share2, Sparkles, ChevronDown, ChevronRight, FileText, ClipboardCopy } from "lucide-react";
