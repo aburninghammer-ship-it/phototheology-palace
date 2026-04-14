@@ -5,7 +5,7 @@ const CACHE_EXPIRY_DAYS = 90; // Commentary doesn't change, cache longer
 
 // Bump this version whenever a master regeneration is performed.
 // All locally-cached entries stamped with an older version are treated as expired.
-const CACHE_VERSION = 2; // v2 = 2026-04-05 post-master-regeneration
+const CACHE_VERSION = 3; // v3 = 2026-04-14 cache bust for updated commentary
 
 interface CachedCommentary {
   commentary: string;
