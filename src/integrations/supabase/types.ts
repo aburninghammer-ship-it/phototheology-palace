@@ -21725,16 +21725,18 @@ export type Database = {
           daily_study_streak: number | null
           display_name: string | null
           id: string | null
-          interests: string[] | null
           is_profile_public: boolean | null
           level: number | null
           location: string | null
+          longest_study_streak: number | null
+          looking_for_partner: boolean | null
           master_title: string | null
           ministry_tags: string[] | null
           points: number | null
+          primary_role: string | null
           social_links: Json | null
+          total_gems_saved: number | null
           username: string | null
-          website: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -21745,16 +21747,18 @@ export type Database = {
           daily_study_streak?: number | null
           display_name?: string | null
           id?: string | null
-          interests?: string[] | null
           is_profile_public?: boolean | null
           level?: number | null
           location?: string | null
+          longest_study_streak?: number | null
+          looking_for_partner?: boolean | null
           master_title?: string | null
           ministry_tags?: string[] | null
           points?: number | null
+          primary_role?: string | null
           social_links?: Json | null
+          total_gems_saved?: number | null
           username?: string | null
-          website?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -21765,16 +21769,18 @@ export type Database = {
           daily_study_streak?: number | null
           display_name?: string | null
           id?: string | null
-          interests?: string[] | null
           is_profile_public?: boolean | null
           level?: number | null
           location?: string | null
+          longest_study_streak?: number | null
+          looking_for_partner?: boolean | null
           master_title?: string | null
           ministry_tags?: string[] | null
           points?: number | null
+          primary_role?: string | null
           social_links?: Json | null
+          total_gems_saved?: number | null
           username?: string | null
-          website?: string | null
         }
         Relationships: []
       }
