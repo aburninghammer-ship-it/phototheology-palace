@@ -275,8 +275,10 @@ Use KJV text only. Be precise with references.`,
     if (!pendingLayer) return;
     setLayers((prev) => [...prev, { ...pendingLayer, accepted: true }]);
     setPendingLayer(null);
-    toast.success("Layer accepted! Click 'Continue' to add another lens.");
-  }, [pendingLayer]);
+    toast.success("Layer accepted!");
+    // Auto-trigger A/B choice for next layer
+    setTimeout(() => handleContinueBuilding(), 300);
+  }, [pendingLayer, handleContinueBuilding]);
 
   const handleRejectPending = useCallback(() => {
     setPendingLayer(null);
