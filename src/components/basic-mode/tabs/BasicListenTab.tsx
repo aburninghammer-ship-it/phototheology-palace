@@ -578,13 +578,94 @@ export default function BasicListenTab() {
             ))}
           </div>
 
-          {/* Expanded inline panel for Commentary / Bible Reading */}
+          {/* Expanded: Morning Watch */}
+          {expandedSource === "morning" && (
+            <Card className="border-primary/20">
+              <CardContent className="p-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Sun className="h-4 w-4 text-amber-400" />
+                  <h4 className="text-xs font-semibold">Morning Watch Style</h4>
+                </div>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {MORNING_OPTIONS.map(opt => (
+                    <button key={opt.id} onClick={() => addMorningWatch(opt)}
+                      className="flex flex-col items-center gap-1 p-2.5 rounded-lg border border-transparent hover:border-border hover:bg-muted/50 transition-all">
+                      <span className="text-lg">{opt.emoji}</span>
+                      <span className="text-[10px] text-muted-foreground text-center leading-tight">{opt.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Expanded: Night Watch */}
+          {expandedSource === "night" && (
+            <Card className="border-primary/20">
+              <CardContent className="p-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Moon className="h-4 w-4 text-indigo-400" />
+                  <h4 className="text-xs font-semibold">Night Watch Style</h4>
+                </div>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {NIGHT_OPTIONS.map(opt => (
+                    <button key={opt.id} onClick={() => addNightWatch(opt)}
+                      className="flex flex-col items-center gap-1 p-2.5 rounded-lg border border-transparent hover:border-border hover:bg-muted/50 transition-all">
+                      <span className="text-lg">{opt.emoji}</span>
+                      <span className="text-[10px] text-muted-foreground text-center leading-tight">{opt.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Expanded: Apologetics */}
+          {expandedSource === "apologetics" && (
+            <Card className="border-primary/20">
+              <CardContent className="p-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Swords className="h-4 w-4 text-red-400" />
+                  <h4 className="text-xs font-semibold">Apologetics Type</h4>
+                </div>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {APOLOGETICS_OPTIONS.map(opt => (
+                    <button key={opt.id} onClick={() => addApologetics(opt)}
+                      className="flex items-center gap-2 p-2.5 rounded-lg border border-transparent hover:border-border hover:bg-muted/50 transition-all text-left">
+                      <span className="text-lg">{opt.emoji}</span>
+                      <span className="text-xs text-muted-foreground">{opt.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Expanded: Commentary / Bible Reading with voice selection */}
           {(expandedSource === "commentary" || expandedSource === "reading") && (
             <Card className="border-primary/20">
               <CardContent className="p-3 space-y-2">
                 <p className="text-xs font-semibold">
                   {expandedSource === "commentary" ? "Add Commentary" : "Add Bible Reading"}
                 </p>
+                {expandedSource === "commentary" && (
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] text-muted-foreground font-medium">Voice Style</p>
+                    <div className="grid grid-cols-4 gap-1">
+                      {VOICE_STYLES.map(v => (
+                        <button key={v.id} onClick={() => setSelectedVoiceStyle(v.id)}
+                          className={`flex flex-col items-center gap-0.5 p-1.5 rounded-lg border transition-all text-center ${
+                            selectedVoiceStyle === v.id
+                              ? "border-primary/50 bg-primary/10"
+                              : "border-transparent hover:border-border hover:bg-muted/50"
+                          }`}>
+                          <span className="text-sm">{v.emoji}</span>
+                          <span className="text-[9px] text-muted-foreground leading-tight">{v.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div className="flex gap-2">
                   <select
                     value={selectedBook}
@@ -601,15 +682,19 @@ export default function BasicListenTab() {
                   />
                   <Button size="sm" className="h-8 text-xs gap-1" onClick={() => {
                     const type = expandedSource === "commentary" ? "commentary" : "reading";
+                    const voiceLabel = expandedSource === "commentary"
+                      ? VOICE_STYLES.find(v => v.id === selectedVoiceStyle)?.label || "Epic Narrator"
+                      : "";
                     addItem({
-                      title: `${selectedBook} ${selectedChapter} (${type === "commentary" ? "Commentary" : "Reading"})`,
-                      description: `${type === "commentary" ? "Audio commentary for" : "Bible reading of"} ${selectedBook} ${selectedChapter}`,
+                      title: `${selectedBook} ${selectedChapter}${type === "commentary" ? ` (${voiceLabel})` : " (Reading)"}`,
+                      description: `${type === "commentary" ? `${voiceLabel} commentary for` : "Bible reading of"} ${selectedBook} ${selectedChapter}`,
                       audio_type: type,
                       audio_url: null,
                       audio_meta: {
                         generationType: type === "commentary" ? "chapter-commentary" : "chapter-reading",
                         book: selectedBook,
                         chapter: selectedChapter,
+                        ...(type === "commentary" ? { voiceStyle: selectedVoiceStyle } : {}),
                       },
                     });
                     toast.success(`Added ${selectedBook} ${selectedChapter}`);
@@ -621,7 +706,7 @@ export default function BasicListenTab() {
             </Card>
           )}
 
-          {/* Podcast quick-add (always visible) */}
+          {/* Podcast quick-add */}
           {expandedSource === "podcast" && (
             <Card className="border-primary/20">
               <CardContent className="p-3 space-y-2">
