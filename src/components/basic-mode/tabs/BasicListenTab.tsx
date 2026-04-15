@@ -305,7 +305,7 @@ export default function BasicListenTab() {
         }
 
         // Bible Reading — generate chapter commentary as fallback
-        if (genType === "bible-reading") {
+        if (genType === "bible-reading" || genType === "chapter-reading") {
           toast.info("Loading Bible reading...");
           const { data: resp } = await supabase.functions.invoke("generate-chapter-commentary", {
             body: { book: meta.book || "Genesis", chapter: meta.chapter || 1 },
