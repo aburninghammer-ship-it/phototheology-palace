@@ -151,6 +151,7 @@ export default function BasicListenTab() {
   const [editName, setEditName] = useState("");
   const [selectedBook, setSelectedBook] = useState("Genesis");
   const [selectedChapter, setSelectedChapter] = useState(1);
+  const [selectedVoiceStyle, setSelectedVoiceStyle] = useState("epic");
 
   // Audio playback
   const audioRef = useRef<HTMLAudioElement | null>(null);
