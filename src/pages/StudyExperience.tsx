@@ -449,7 +449,7 @@ INSTRUCTIONS FOR SYNTHESIS:
       toast.error("Synthesis failed — try again.");
     }
     setSynthesizing(false);
-  }, [layers, parsedRef, verseText, verseRef]);
+  }, [layers, parsedRef, verseText, verseRef, mode, handleContinueBuilding]);
 
   // Rebuild a layer — removes it so the user can re-click the principle
   const handleRebuildLayer = useCallback((principleId: string) => {
