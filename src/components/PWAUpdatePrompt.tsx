@@ -6,7 +6,6 @@ import { Download, RefreshCw } from 'lucide-react';
 
 const DISMISSED_BUILD_PREFIX = 'pwa_update_dismissed_build:';
 const AUTO_REFRESHED_BUILD_PREFIX = 'pwa_auto_refreshed_build:';
-const WAITING_SW_DISMISS_KEY = 'pwa_waiting_sw_dismissed';
 export const MANUAL_UPDATE_REQUIRED_EVENT = 'pt:manual-update-required';
 const BUILD_CHECK_INTERVAL_MS = 30_000;
 const INITIAL_BUILD_CHECK_DELAY_MS = 4_000;
@@ -90,20 +89,20 @@ export function PWAUpdatePrompt() {
 
   const openReloadPrompt = useCallback(
     ({ build = null, resetDismissal = false }: { build?: string | null; resetDismissal?: boolean } = {}) => {
-      if (build) {
-        setPendingBuild(build);
+      const normalizedBuild = build ?? pendingBuild;
+
+      if (!resetDismissal && normalizedBuild && isBuildDismissed(normalizedBuild)) {
+        return false;
       }
 
-      if (resetDismissal) {
-        sessionStorage.removeItem(WAITING_SW_DISMISS_KEY);
-      } else if (sessionStorage.getItem(WAITING_SW_DISMISS_KEY) === '1') {
-        return false;
+      if (build) {
+        setPendingBuild(build);
       }
 
       setShowReload(true);
       return true;
     },
-    [],
+    [pendingBuild],
   );
 
   const checkForWaitingServiceWorker = useCallback(async () => {
@@ -119,7 +118,8 @@ export function PWAUpdatePrompt() {
     const refreshedRegistration = await navigator.serviceWorker.getRegistration().catch(() => undefined);
     if (!refreshedRegistration?.waiting) return false;
 
-    return openReloadPrompt();
+    const nextBuild = await fetchLatestBuildTag().catch(() => null);
+    return openReloadPrompt({ build: nextBuild });
   }, [openReloadPrompt]);
 
   const {
@@ -129,8 +129,8 @@ export function PWAUpdatePrompt() {
     onRegisteredSW(swUrl, registration) {
       console.log('SW registered:', swUrl);
 
-      if (registration?.waiting) {
-        void openReloadPrompt();
+        if (registration?.waiting) {
+          void checkForWaitingServiceWorker();
         return;
       }
 
@@ -287,7 +287,6 @@ export function PWAUpdatePrompt() {
     if (isUpdating) return;
 
     setIsUpdating(true);
-    sessionStorage.removeItem(WAITING_SW_DISMISS_KEY);
 
     try {
       if (isMetaWebView) {
@@ -312,7 +311,6 @@ export function PWAUpdatePrompt() {
 
   const close = useCallback(() => {
     dismissBuild(pendingBuild);
-    sessionStorage.setItem(WAITING_SW_DISMISS_KEY, '1');
     setOfflineReady(false);
     setNeedRefresh(false);
     setShowReload(false);
