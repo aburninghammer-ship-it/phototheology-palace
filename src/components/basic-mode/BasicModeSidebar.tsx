@@ -91,7 +91,7 @@ const TABS: TabItem[] = [
   },
   {
     id: "listen",
-    label: "Listen",
+    label: "Listen Experience",
     icon: Headphones,
     tourId: "tab-listen",
     activeGradient: "bg-gradient-to-r from-orange-500/20 via-orange-400/10 to-transparent",
