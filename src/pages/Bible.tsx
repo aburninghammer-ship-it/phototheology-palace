@@ -66,24 +66,24 @@ const Bible = () => {
         <div className="container mx-auto max-w-7xl">
 
           {/* Header - Glass Card */}
-          <div className="glass-card mb-4 sm:mb-8 p-3 sm:p-6 rounded-xl sm:rounded-2xl">
-            <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
+          <div className="glass-card mb-4 sm:mb-8 p-3 sm:p-6 rounded-xl sm:rounded-2xl overflow-hidden">
+            <div className="relative z-10 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 xl:gap-6">
+              <div className="flex min-w-0 flex-1 items-center gap-4">
                 <img 
                   src="/pwa-192x192.png" 
                   alt="Phototheology" 
                   className="h-10 w-10 sm:h-14 sm:w-14 rounded-xl shadow-lg shadow-primary/20"
                 />
-                <div>
-                  <h1 className="font-serif text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-1 sm:mb-2 bg-gradient-palace bg-clip-text text-transparent">
+                <div className="min-w-0 flex-1">
+                  <h1 className="font-serif text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-1 sm:mb-2 bg-gradient-palace bg-clip-text text-transparent break-words">
                     {t('bible.title', 'Phototheology Study Bible (PSB)')}
                   </h1>
-                  <p className="text-sm sm:text-lg text-muted-foreground">
+                  <p className="text-sm sm:text-lg text-muted-foreground break-words">
                     {t('bible.subtitle', 'Scripture through principle lenses')}
                   </p>
                 </div>
               </div>
-              <div className="flex gap-1.5 sm:gap-2 flex-wrap">
+              <div className="flex w-full xl:w-auto gap-1.5 sm:gap-2 flex-wrap xl:justify-end">
                 <Button
                   variant="outline"
                   className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 whitespace-nowrap"
