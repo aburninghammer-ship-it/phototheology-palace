@@ -3,11 +3,11 @@
  * Desktop: vertical sidebar. Mobile: horizontal bottom tab bar.
  */
 import { cn } from "@/lib/utils";
-import { MessageCircle, BookOpen, Church, Settings, Layers, LayoutGrid } from "lucide-react";
+import { MessageCircle, BookOpen, Church, Settings, Layers, LayoutGrid, Headphones } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-export type BasicTab = "home" | "chat" | "bible" | "chapel" | "study";
+export type BasicTab = "home" | "chat" | "bible" | "chapel" | "study" | "listen";
 
 interface TabItem {
   id: BasicTab;
@@ -88,6 +88,19 @@ const TABS: TabItem[] = [
     inactiveText: "text-sky-400/70",
     hoverBg: "hover:bg-sky-500/10",
     iconGlow: "drop-shadow-[0_0_6px_rgba(56,189,248,0.6)]",
+  },
+  {
+    id: "listen",
+    label: "Listen",
+    icon: Headphones,
+    tourId: "tab-listen",
+    activeGradient: "bg-gradient-to-r from-orange-500/20 via-orange-400/10 to-transparent",
+    activeBorder: "border border-orange-400/30",
+    activeGlow: "shadow-[0_0_15px_rgba(251,146,60,0.25)]",
+    activeText: "text-orange-300",
+    inactiveText: "text-orange-400/70",
+    hoverBg: "hover:bg-orange-500/10",
+    iconGlow: "drop-shadow-[0_0_6px_rgba(251,146,60,0.6)]",
   },
 ];
 

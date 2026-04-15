@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { PODCAST_EPISODES } from "@/data/podcastData";
 import { usePlaylist } from "@/hooks/usePlaylist";
 import { useAuth } from "@/hooks/useAuth";
 import { useImmersiveMode } from "@/hooks/useImmersiveMode";
@@ -628,6 +629,50 @@ export default function PlaylistHub() {
                 </div>
               </div>
             ))}
+
+            {/* Podcast quick-add */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Mic className="h-4 w-4 text-orange-400" />
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Podcast Episodes</h3>
+                <Badge variant="outline" className="text-[9px]">{PODCAST_EPISODES.length} episodes</Badge>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {PODCAST_EPISODES.map(ep => {
+                  const alreadyAdded = items.some(i =>
+                    i.audio_meta && (i.audio_meta as any).episodeNumber === ep.episodeNumber && i.audio_type === "podcast"
+                  );
+                  return (
+                    <Card key={ep.id} className={`transition-all ${alreadyAdded ? "opacity-60 border-primary/20" : "hover:border-primary/50 hover:shadow-sm"}`}>
+                      <CardContent className="p-3 flex items-center gap-3">
+                        <div className="text-orange-400 flex-shrink-0">
+                          <Mic className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate">Ep. {ep.episodeNumber}: {ep.title}</p>
+                          <p className="text-xs text-muted-foreground">{ep.duration}</p>
+                        </div>
+                        <Button
+                          variant={alreadyAdded ? "ghost" : "outline"}
+                          size="sm"
+                          className="h-7 text-xs shrink-0"
+                          disabled={alreadyAdded}
+                          onClick={() => addItem({
+                            title: `Podcast Ep. ${ep.episodeNumber}: ${ep.title}`,
+                            description: ep.description.slice(0, 80),
+                            audio_type: "podcast",
+                            audio_url: `/audio/podcast/${ep.audioFile}`,
+                            audio_meta: { generationType: "podcast", episodeNumber: ep.episodeNumber },
+                          })}
+                        >
+                          {alreadyAdded ? <Check className="h-3.5 w-3.5" /> : <><Plus className="h-3.5 w-3.5 mr-1" /> Add</>}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

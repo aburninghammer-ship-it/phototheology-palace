@@ -23,6 +23,7 @@ const BasicChatTab = lazy(() => import("./tabs/BasicChatTab"));
 const BasicBibleTab = lazy(() => import("./tabs/BasicBibleTab"));
 const BasicChapelTab = lazy(() => import("./tabs/BasicChapelTab"));
 const BasicStudyExperienceTab = lazy(() => import("./tabs/BasicStudyExperienceTab"));
+const BasicListenTab = lazy(() => import("./tabs/BasicListenTab"));
 
 const TAB_COMPONENTS: Record<BasicTab, React.LazyExoticComponent<() => JSX.Element>> = {
   home: BasicHomeTab,
@@ -30,6 +31,7 @@ const TAB_COMPONENTS: Record<BasicTab, React.LazyExoticComponent<() => JSX.Eleme
   bible: BasicBibleTab,
   chapel: BasicChapelTab,
   study: BasicStudyExperienceTab,
+  listen: BasicListenTab,
 };
 
 /** Simplified profile stats for Level 1 */
