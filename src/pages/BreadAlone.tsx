@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Wheat, Clock, Flame, BookOpen, Gem, Sparkles, Play, Check, ChevronRight, Users, Church, Plus } from "lucide-react";
+import { ArrowLeft, Wheat, Clock, Flame, BookOpen, Gem, Sparkles, Play, Check, ChevronRight, Users, Church, Plus, ListPlus } from "lucide-react";
+import { AddToPlaylistButton } from "@/components/audio/AddToPlaylistButton";
 import { toast } from "sonner";
 
 /* ─── Duration tiers ─── */
