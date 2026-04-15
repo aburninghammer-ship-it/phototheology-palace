@@ -514,19 +514,7 @@ export const BibleReader = () => {
         {/* Main Reading Pane — 2/3 width */}
         <div className="lg:col-span-2 space-y-6">
           <Card variant="glass" className={`shadow-elegant hover:shadow-hover transition-smooth ${preferences.reading_mode === 'focus' ? 'max-w-3xl mx-auto' : ''}`}>
-            {/* Sticky Book Title Header */}
-            <div className="sticky top-0 z-20 bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 backdrop-blur-xl border-b border-primary/30 px-6 py-4 rounded-t-xl shadow-sm mx-0">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20">
-                  <BookOpen className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <h2 className="font-serif text-xl md:text-2xl font-bold text-foreground">
-                  {book} <span className="text-muted-foreground font-normal">· {t('bible.chapterLabel', { chapter })}</span>
-                </h2>
-              </div>
-            </div>
-
-            {/* Auto-Generated Chapter Image */}
+            {/* Chapter Image */}
             <div className="px-6 pt-6">
               <ChapterImage
                 book={book}
