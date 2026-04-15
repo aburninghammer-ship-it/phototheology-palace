@@ -341,84 +341,84 @@ export default function LivingManna() {
               {/* Mobile Tab List - Scrollable */}
               <div className="overflow-x-auto -mx-3 px-3 md:mx-0 md:px-0">
                 <TabsList className="bg-card/50 backdrop-blur inline-flex md:flex md:flex-wrap w-auto md:w-full h-auto gap-1 p-1 border border-border/50 rounded-lg min-w-max md:min-w-0">
-                  <TabsTrigger value="home" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                  <TabsTrigger value="home" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white min-w-[60px]">
                     <Home className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Home</span>
                   </TabsTrigger>
-                  <TabsTrigger value="diary" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                  <TabsTrigger value="diary" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-violet-600 data-[state=active]:text-white min-w-[60px]">
                     <BookMarked className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Diary</span>
                   </TabsTrigger>
-                  <TabsTrigger value="groups" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                  <TabsTrigger value="groups" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-teal-600 data-[state=active]:text-white min-w-[60px]">
                     <Users className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Groups</span>
                   </TabsTrigger>
-                  <TabsTrigger value="live" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                  <TabsTrigger value="live" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-red-600 data-[state=active]:text-white min-w-[60px]">
                     <Radio className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Live</span>
                   </TabsTrigger>
-                  <TabsTrigger value="learn" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                  <TabsTrigger value="learn" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-emerald-600 data-[state=active]:text-white min-w-[60px]">
                     <BookOpen className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Learn</span>
                   </TabsTrigger>
-                  <TabsTrigger value="exploits" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                  <TabsTrigger value="exploits" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-yellow-600 data-[state=active]:text-white min-w-[60px]">
                     <Zap className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Exploits</span>
                   </TabsTrigger>
-                  <TabsTrigger value="defense" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                  <TabsTrigger value="defense" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-slate-600 data-[state=active]:text-white min-w-[60px]">
                     <Shield className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Defense</span>
                   </TabsTrigger>
-                  <TabsTrigger value="aats" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                  <TabsTrigger value="aats" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-purple-600 data-[state=active]:text-white min-w-[60px]">
                     <GraduationCap className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">AATS</span>
                   </TabsTrigger>
-                  <TabsTrigger value="connect" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                  <TabsTrigger value="connect" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-pink-600 data-[state=active]:text-white min-w-[60px]">
                     <MessagesSquare className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Connect</span>
                   </TabsTrigger>
-                  <TabsTrigger value="baptism" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                  <TabsTrigger value="baptism" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-cyan-600 data-[state=active]:text-white min-w-[60px]">
                     <Droplets className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Baptism</span>
                   </TabsTrigger>
-                  <TabsTrigger value="youth" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                  <TabsTrigger value="youth" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-fuchsia-600 data-[state=active]:text-white min-w-[60px]">
                     <Sparkles className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Youth</span>
                   </TabsTrigger>
-                  <TabsTrigger value="serve" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                  <TabsTrigger value="serve" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-rose-600 data-[state=active]:text-white min-w-[60px]">
                     <HeartHandshake className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Serve</span>
                   </TabsTrigger>
-                  <TabsTrigger value="giving" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                  <TabsTrigger value="giving" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-green-600 data-[state=active]:text-white min-w-[60px]">
                     <DollarSign className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Giving</span>
                   </TabsTrigger>
-                  <TabsTrigger value="library" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                  <TabsTrigger value="library" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-stone-600 data-[state=active]:text-white min-w-[60px]">
                     <Library className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Library</span>
                   </TabsTrigger>
-                  <TabsTrigger value="grow" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                  <TabsTrigger value="grow" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-lime-600 data-[state=active]:text-white min-w-[60px]">
                     <Sprout className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Grow</span>
                   </TabsTrigger>
-                  <TabsTrigger value="egw" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                  <TabsTrigger value="egw" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-amber-700 data-[state=active]:text-white min-w-[60px]">
                     <BookMarked className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">EGW</span>
                   </TabsTrigger>
-                  <TabsTrigger value="morning-watch" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                  <TabsTrigger value="morning-watch" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-amber-500 data-[state=active]:text-white min-w-[60px]">
                     <Sunrise className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Morning</span>
                   </TabsTrigger>
-                  <TabsTrigger value="night-watch" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                  <TabsTrigger value="night-watch" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-indigo-600 data-[state=active]:text-white min-w-[60px]">
                     <MoonStar className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Night</span>
                   </TabsTrigger>
-                  <TabsTrigger value="bread-fast" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                  <TabsTrigger value="bread-fast" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-orange-600 data-[state=active]:text-white min-w-[60px]">
                     <Wheat className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Bread Fast</span>
                   </TabsTrigger>
                   {(isChurchAdmin || memberRole === 'leader') && (
-                    <TabsTrigger value="admin" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <TabsTrigger value="admin" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-zinc-600 data-[state=active]:text-white min-w-[60px]">
                       <Settings className="h-4 w-4" />
                       <span className="text-xs sm:text-sm">Admin</span>
                     </TabsTrigger>
