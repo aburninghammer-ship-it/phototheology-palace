@@ -616,8 +616,8 @@ function App() {
             <Route path="/games/phototheology-uno" element={<BasicModeGate><ProtectedRoute><PhototheologyUno /></ProtectedRoute></BasicModeGate>} />
             <Route path="/games/frame-snapshot" element={<BasicModeGate><ProtectedRoute><FrameSnapshot /></ProtectedRoute></BasicModeGate>} />
             <Route path="/games/story-room" element={<BasicModeGate><ProtectedRoute><StoryRoomGame /></ProtectedRoute></BasicModeGate>} />
-            
-            
+            <Route path="/glossary" element={<Glossary />} />
+
             
             <Route path="/games/observation-room" element={<BasicModeGate><ProtectedRoute><ObservationFlux /></ProtectedRoute></BasicModeGate>} />
             <Route path="/games/concentration-room" element={<BasicModeGate><ProtectedRoute><ConcentrationRoom /></ProtectedRoute></BasicModeGate>} />
