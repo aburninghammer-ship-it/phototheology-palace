@@ -196,6 +196,7 @@ const TreasureHunt = lazy(() => import("./pages/TreasureHunt"));
 const TreasureHuntPlay = lazy(() => import("./pages/TreasureHuntPlay"));
 const TrainingDrills = lazy(() => import("./pages/TrainingDrills"));
 const PlaylistHub = lazy(() => import("./pages/PlaylistHub"));
+const BreadAlone = lazy(() => import("./pages/BreadAlone"));
 const DrillDrill = lazy(() => import("./pages/DrillDrill"));
 const EscapeRoom = lazy(() => import("./pages/EscapeRoomRenovated"));
 const EscapeRoomPlay = lazy(() => import("./pages/EscapeRoomPlayRenovated"));
@@ -778,6 +779,7 @@ function App() {
             <Route path="/streaks" element={<BasicModeGate><ProtectedRoute><Streaks /></ProtectedRoute></BasicModeGate>} />
             <Route path="/church-admin" element={<ProtectedRoute><ChurchAdmin /></ProtectedRoute>} />
             <Route path="/living-manna" element={<ProtectedRoute><LivingManna /></ProtectedRoute>} />
+            <Route path="/bread-alone" element={<ProtectedRoute><BreadAlone /></ProtectedRoute>} />
             <Route path="/join-church" element={<JoinChurch />} />
             <Route path="/church-signup" element={<ChurchSignup />} />
             <Route path="/church-signup/success" element={<ChurchSignupSuccess />} />
