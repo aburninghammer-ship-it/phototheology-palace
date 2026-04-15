@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, RefreshCw, Download, X, Zap } from "lucide-react";
+import { Loader2, RefreshCw, Download, X, Zap, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -15,6 +15,7 @@ export const ChapterImage = ({ book, chapter, chapterText }: ChapterImageProps) 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -229,8 +230,68 @@ Reference: ${book} ${chapter} - Biblical Epic Masterpiece`;
 
   if (hidden) return null;
 
+  // --- Collapsed banner (default) ---
+  if (!isExpanded) {
+    return (
+      <Card className="glass-card mb-4 overflow-hidden">
+        {loading ? (
+          // Loading shimmer strip
+          <div className="h-20 relative overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-accent/10">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse" />
+            <div className="h-full flex items-center justify-center gap-3 px-4">
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+              <span className="text-sm text-muted-foreground">Generating {book} {chapter} image...</span>
+            </div>
+          </div>
+        ) : imageUrl ? (
+          // Collapsed strip with background image
+          <div
+            className="h-20 relative cursor-pointer group"
+            onClick={() => setIsExpanded(true)}
+            style={{
+              backgroundImage: `url(${imageUrl})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/70" />
+            <div className="relative h-full flex items-center justify-between px-4">
+              <div className="text-white">
+                <p className="text-sm font-semibold drop-shadow-lg">{book} {chapter}</p>
+                <p className="text-xs opacity-75">Chapter Image</p>
+              </div>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="h-7 px-2 bg-white/20 hover:bg-white/30 text-white border-white/20 backdrop-blur-sm"
+                onClick={(e) => { e.stopPropagation(); setIsExpanded(true); }}
+              >
+                <ChevronDown className="h-3 w-3 mr-1" />
+                Expand
+              </Button>
+            </div>
+          </div>
+        ) : (
+          // No image — dashed strip
+          <div className="h-20 flex items-center justify-center border-2 border-dashed border-primary/20 bg-gradient-to-r from-primary/5 via-accent/5 to-secondary/5">
+            <Button
+              onClick={generateImage}
+              disabled={loading}
+              size="sm"
+              variant="outline"
+            >
+              <Zap className="h-3 w-3 mr-2" />
+              Generate Image for {book} {chapter}
+            </Button>
+          </div>
+        )}
+      </Card>
+    );
+  }
+
+  // --- Expanded view (full image) ---
   return (
-    <Card className="glass-card mb-6 overflow-hidden">
+    <Card className="glass-card mb-4 overflow-hidden">
       <div className="relative">
         {loading ? (
           <div className="aspect-[16/9] sm:aspect-[21/9] bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10 flex items-center justify-center">
@@ -261,6 +322,15 @@ Reference: ${book} ${chapter} - Biblical Epic Masterpiece`;
                 <p className="text-xs opacity-75">{book} {chapter}</p>
               </div>
               <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => setIsExpanded(false)}
+                  className="h-8 px-2 sm:px-3 bg-white/90 hover:bg-white backdrop-blur-sm"
+                >
+                  <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline ml-2">Collapse</span>
+                </Button>
                 <Button
                   size="sm"
                   variant="secondary"
