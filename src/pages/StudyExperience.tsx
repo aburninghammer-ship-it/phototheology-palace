@@ -1201,7 +1201,7 @@ INSTRUCTIONS FOR RECAP:
                     onCompound={handleCompound}
                     compounding={compounding}
                     onSaveLayer={handleSaveLayer}
-                    onContinueBuilding={(mode === "jeeves-led" || mode === "teach") && !abChoice ? handleContinueBuilding : undefined}
+                    onContinueBuilding={undefined}
                     showAbChoice={(mode === "jeeves-led" || mode === "teach") && !!abChoice && !pendingLayer && !loadingPrinciple && layer.accepted && i === layers.length - 1}
                     onAbSelect={handleAbSelect}
                   />
