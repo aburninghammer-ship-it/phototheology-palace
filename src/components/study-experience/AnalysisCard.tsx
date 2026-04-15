@@ -423,7 +423,7 @@ INSTRUCTIONS:
         </div>
       )}
 
-      {layer.accepted && (onSaveLayer || onContinueBuilding) && (
+      {layer.accepted && (onSaveLayer || onContinueBuilding || onAbSelect) && (
         <div className="relative flex items-center gap-2 px-4 py-3 border-t border-white/10 bg-black/20">
           <Badge className="bg-green-500/15 text-green-400 border-green-500/30 text-[10px]">
             <Check className="w-3 h-3 mr-0.5" /> Accepted
