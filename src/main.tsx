@@ -139,8 +139,16 @@ if ("serviceWorker" in navigator) {
     })();
   } else {
     // Production desktop/mobile web: check for SW updates periodically.
-    // The PWAUpdatePrompt component owns the manual "Reload Now" choice.
+    // Auto-reload when a new service worker takes control.
     void (async () => {
+      // When a new SW activates (via skipWaiting), reload to load fresh assets.
+      let reloading = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (reloading) return;
+        reloading = true;
+        window.location.reload();
+      });
+
       const checkForStandardUpdate = () => {
         void navigator.serviceWorker
           .getRegistration()
