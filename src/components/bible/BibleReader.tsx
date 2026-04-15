@@ -567,7 +567,7 @@ export const BibleReader = () => {
       />
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Main Reading Pane */}
+        {/* Main Reading Pane — 2/3 width */}
         <div className="lg:col-span-2 space-y-6">
           <Card variant="glass" className={`shadow-elegant hover:shadow-hover transition-smooth ${preferences.reading_mode === 'focus' ? 'max-w-3xl mx-auto' : ''}`}>
             {/* Sticky Book Title Header */}
