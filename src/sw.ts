@@ -8,9 +8,9 @@ import { CacheFirst } from 'workbox-strategies';
 
 declare let self: ServiceWorkerGlobalScope;
 
-const IMAGE_CACHE = 'pt-images-2026-04-14-10';
-const GOOGLE_FONTS_CACHE = 'pt-google-fonts-2026-04-14-10';
-const GSTATIC_FONTS_CACHE = 'pt-gstatic-fonts-2026-04-14-10';
+const IMAGE_CACHE = 'pt-images-2026-04-15-11';
+const GOOGLE_FONTS_CACHE = 'pt-google-fonts-2026-04-15-11';
+const GSTATIC_FONTS_CACHE = 'pt-gstatic-fonts-2026-04-15-11';
 const ALLOWED_CACHES = new Set([cacheNames.precache, IMAGE_CACHE, GOOGLE_FONTS_CACHE, GSTATIC_FONTS_CACHE]);
 
 // Auto-activate new service workers immediately so fresh builds always land.
