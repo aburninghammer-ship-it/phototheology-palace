@@ -179,17 +179,37 @@ export default function BasicListenTab() {
     }
   }, [user, loading, playlists.length, createPlaylist]);
 
+  // Store playItem in a ref so event listeners always have the latest version
+  const playItemRef = useRef<(index: number) => Promise<void>>();
+
   // Audio setup
   useEffect(() => {
     if (!audioRef.current) audioRef.current = new Audio();
     const audio = audioRef.current;
     const onEnded = () => {
       notifyTTSStopped();
-      if (currentIndex !== null && currentIndex < items.length - 1) playItem(currentIndex + 1);
-      else { setIsPlaying(false); setCurrentIndex(null); setProgress(0); }
+      const ci = currentIndexRef.current;
+      const len = itemsLenRef.current;
+      if (ci !== null && ci < len - 1) {
+        playItemRef.current?.(ci + 1);
+      } else {
+        setIsPlaying(false); setCurrentIndex(null); setProgress(0);
+      }
     };
     const onLoadedMetadata = () => { setDuration(audio.duration || 0); setAudioLoading(false); };
-    const onError = () => { setAudioLoading(false); setIsPlaying(false); };
+    const onError = () => {
+      setAudioLoading(false);
+      // Auto-skip to next track on error instead of stopping
+      const ci = currentIndexRef.current;
+      const len = itemsLenRef.current;
+      if (ci !== null && ci < len - 1) {
+        toast.error("Track failed, skipping to next...");
+        playItemRef.current?.(ci + 1);
+      } else {
+        setIsPlaying(false);
+        toast.error("Playback failed");
+      }
+    };
     audio.addEventListener("ended", onEnded);
     audio.addEventListener("loadedmetadata", onLoadedMetadata);
     audio.addEventListener("error", onError);
@@ -198,7 +218,13 @@ export default function BasicListenTab() {
       audio.removeEventListener("loadedmetadata", onLoadedMetadata);
       audio.removeEventListener("error", onError);
     };
-  }, [currentIndex, items.length]);
+  }, []);
+
+  // Keep refs in sync for stable event listener callbacks
+  const currentIndexRef = useRef(currentIndex);
+  const itemsLenRef = useRef(items.length);
+  useEffect(() => { currentIndexRef.current = currentIndex; }, [currentIndex]);
+  useEffect(() => { itemsLenRef.current = items.length; }, [items.length]);
 
   useEffect(() => { if (audioRef.current) audioRef.current.volume = isMuted ? 0 : volume; }, [volume, isMuted]);
   useEffect(() => { localStorage.setItem("pt-playlist-volume", volume.toString()); }, [volume]);
@@ -341,7 +367,17 @@ export default function BasicListenTab() {
     if (!audio) return;
     try {
       const url = await resolveAudioUrl(item);
-      if (!url) { toast.error("No audio available"); setAudioLoading(false); return; }
+      if (!url) {
+        // Auto-skip to next on no audio
+        if (index < items.length - 1) {
+          toast.error(`No audio for "${item.title}", skipping...`);
+          playItemRef.current?.(index + 1);
+        } else {
+          toast.error("No audio available");
+        }
+        setAudioLoading(false);
+        return;
+      }
       audio.src = url;
       await new Promise<void>((res, rej) => {
         const ok = () => { off(); res(); };
@@ -358,9 +394,30 @@ export default function BasicListenTab() {
       setAudioLoading(false);
     } catch {
       setAudioLoading(false);
-      toast.error("Playback failed");
+      // Auto-skip to next track on playback failure
+      if (index < items.length - 1) {
+        toast.error(`"${item.title}" failed, skipping...`);
+        setTimeout(() => playItemRef.current?.(index + 1), 500);
+      } else {
+        toast.error("Playback failed");
+        setIsPlaying(false);
+      }
     }
   }, [items, resolveAudioUrl, setCurrentIndex, setIsPlaying, isMuted, volume]);
+
+  // Keep playItemRef in sync
+  useEffect(() => { playItemRef.current = playItem; }, [playItem]);
+
+  // Auto-play: start playlist automatically when items are loaded and nothing is playing
+  const hasAutoPlayed = useRef(false);
+  useEffect(() => {
+    if (items.length > 0 && currentIndex === null && !isPlaying && !hasAutoPlayed.current) {
+      hasAutoPlayed.current = true;
+      playItem(0);
+    }
+    // Reset auto-play flag when playlist changes
+    if (items.length === 0) hasAutoPlayed.current = false;
+  }, [items.length, currentIndex, isPlaying, playItem]);
 
   const togglePlay = () => {
     const audio = audioRef.current;
