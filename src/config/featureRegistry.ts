@@ -95,6 +95,11 @@ const FEATURE_REGISTRY: Array<{ path: string; minMode: ExperienceMode }> = [
   { path: "/bible-study-series", minMode: "immersion" },
   { path: "/40-day-challenge", minMode: "immersion" },
 
+  // Church Space
+  { path: "/living-manna", minMode: "immersion" },
+  { path: "/church-admin", minMode: "immersion" },
+  { path: "/bread-alone", minMode: "immersion" },
+
   // ── Learn (Level 1 — all users) — no entries needed, it's the default ──
   // Chapel, Morning/Night Watches, Study Bible, Ask Jeeves, Study Experience,
   // Study Buddy, Give Me a Gem, Memory, Master Class, Podcast, Audio Library,
