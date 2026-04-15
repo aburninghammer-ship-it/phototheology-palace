@@ -450,28 +450,6 @@ INSTRUCTIONS:
               </Button>
             </div>
           )}
-          {showAbChoice && onAbSelect && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">Next lens:</span>
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-8 px-4 text-sm font-bold border-2 border-primary/40 hover:border-primary hover:bg-primary/10 transition-all"
-                onClick={() => onAbSelect("a")}
-              >
-                A
-              </Button>
-              <span className="text-[10px] text-muted-foreground">or</span>
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-8 px-4 text-sm font-bold border-2 border-primary/40 hover:border-primary hover:bg-primary/10 transition-all"
-                onClick={() => onAbSelect("b")}
-              >
-                B
-              </Button>
-            </div>
-          )}
           {onSaveLayer && (
             <Button
               size="sm"
