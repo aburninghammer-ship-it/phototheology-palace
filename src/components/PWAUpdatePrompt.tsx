@@ -26,6 +26,8 @@ const isPreviewHost =
   window.location.hostname.includes('id-preview--') ||
   window.location.hostname.includes('lovableproject.com');
 
+const isPreviewContext = isPreviewHost || isInIframe;
+
 function readCurrentBuildTag(): string | null {
   return document.querySelector('meta[name="app-build"]')?.getAttribute('content') ?? null;
 }
@@ -87,8 +89,23 @@ export function PWAUpdatePrompt() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [pendingBuild, setPendingBuild] = useState<string | null>(null);
 
+  const detectPreviewUpdate = useCallback(async (): Promise<string | null> => {
+    if (!isPreviewContext) return null;
+
+    const currentBuild = readCurrentBuildTag();
+    const latestBuild = await fetchLatestBuildTag().catch(() => null);
+
+    if (!currentBuild || !latestBuild || latestBuild === currentBuild) {
+      return null;
+    }
+
+    return latestBuild;
+  }, []);
+
   const openReloadPrompt = useCallback(
     ({ build = null, resetDismissal = false }: { build?: string | null; resetDismissal?: boolean } = {}) => {
+      if (!isPreviewContext) return false;
+
       const normalizedBuild = build ?? pendingBuild;
 
       if (!resetDismissal && normalizedBuild && isBuildDismissed(normalizedBuild)) {
@@ -106,7 +123,7 @@ export function PWAUpdatePrompt() {
   );
 
   const checkForWaitingServiceWorker = useCallback(async () => {
-    if (!('serviceWorker' in navigator)) return false;
+    if (!isPreviewContext || !('serviceWorker' in navigator)) return false;
 
     const registration = await navigator.serviceWorker.getRegistration().catch(() => undefined);
     if (!registration) return false;
@@ -118,9 +135,11 @@ export function PWAUpdatePrompt() {
     const refreshedRegistration = await navigator.serviceWorker.getRegistration().catch(() => undefined);
     if (!refreshedRegistration?.waiting) return false;
 
-    const nextBuild = await fetchLatestBuildTag().catch(() => null);
+    const nextBuild = await detectPreviewUpdate();
+    if (!nextBuild) return false;
+
     return openReloadPrompt({ build: nextBuild });
-  }, [openReloadPrompt]);
+  }, [detectPreviewUpdate, openReloadPrompt]);
 
   const {
     offlineReady: [offlineReady, setOfflineReady],
@@ -138,7 +157,11 @@ export function PWAUpdatePrompt() {
     },
     onNeedRefresh() {
       console.log('New content available, showing reload prompt');
-      openReloadPrompt({ resetDismissal: true });
+      void detectPreviewUpdate().then((nextBuild) => {
+        if (nextBuild) {
+          openReloadPrompt({ build: nextBuild, resetDismissal: true });
+        }
+      });
     },
     onOfflineReady() {
       console.log('App ready for offline use');
@@ -184,7 +207,7 @@ export function PWAUpdatePrompt() {
   }, []);
 
   useEffect(() => {
-    if (!('serviceWorker' in navigator)) return;
+    if (!isPreviewContext || !('serviceWorker' in navigator)) return;
 
     void checkForWaitingServiceWorker();
 
@@ -210,13 +233,21 @@ export function PWAUpdatePrompt() {
 
   useEffect(() => {
     if (needRefresh) {
-      openReloadPrompt({ resetDismissal: true });
+      void detectPreviewUpdate().then((nextBuild) => {
+        if (nextBuild) {
+          openReloadPrompt({ build: nextBuild, resetDismissal: true });
+        }
+      });
     }
-  }, [needRefresh, openReloadPrompt]);
+  }, [detectPreviewUpdate, needRefresh, openReloadPrompt]);
 
   useEffect(() => {
     const handleManualUpdateRequired = () => {
-      openReloadPrompt({ resetDismissal: true });
+      void detectPreviewUpdate().then((nextBuild) => {
+        if (nextBuild) {
+          openReloadPrompt({ build: nextBuild, resetDismissal: true });
+        }
+      });
     };
 
     window.addEventListener(MANUAL_UPDATE_REQUIRED_EVENT, handleManualUpdateRequired);
@@ -224,7 +255,7 @@ export function PWAUpdatePrompt() {
   }, [openReloadPrompt]);
 
   useEffect(() => {
-    if (isMetaWebView || isInIframe) return;
+    if (isMetaWebView || !isPreviewContext) return;
 
     const currentBuild = readCurrentBuildTag();
     if (!currentBuild) return;
@@ -316,33 +347,13 @@ export function PWAUpdatePrompt() {
     setShowReload(false);
   }, [pendingBuild, setNeedRefresh, setOfflineReady]);
 
-  const showFloatingReloadButton = !isPreviewHost && !isInIframe;
+  const showUpdatePrompt = isPreviewContext && showReload;
 
-  if (!offlineReady && !showReload && !showFloatingReloadButton) return null;
+  if (!offlineReady && !showUpdatePrompt) return null;
 
   return createPortal(
     <>
-      {showFloatingReloadButton ? (
-        <div
-          className="fixed bottom-24 left-4 z-[2147483646] md:bottom-4"
-          style={{
-            bottom: 'max(6rem, calc(env(safe-area-inset-bottom, 0px) + 1rem))',
-            left: 'max(1rem, calc(env(safe-area-inset-left, 0px) + 0.75rem))',
-          }}
-        >
-          <Button
-            onClick={handleUpdate}
-            size="sm"
-            className="shadow-2xl ring-2 ring-background/70"
-            disabled={isUpdating}
-          >
-            <RefreshCw className={`mr-2 h-4 w-4 ${isUpdating ? 'animate-spin' : ''}`} />
-            {isUpdating ? 'Reloading...' : 'Reload Now'}
-          </Button>
-        </div>
-      ) : null}
-
-      {offlineReady || showReload ? (
+      {offlineReady || showUpdatePrompt ? (
         <div
           className="fixed inset-0 z-[2147483647] flex items-center justify-center p-4 overflow-visible"
           style={{ pointerEvents: 'none' }}
