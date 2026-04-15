@@ -1,6 +1,8 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { PODCAST_EPISODES } from "@/data/podcastData";
+import { WATCH_TRACTS } from "@/data/watchSeries";
+import { AUDIO_LIBRARY } from "@/data/audioLibraryData";
 import { usePlaylist } from "@/hooks/usePlaylist";
 import { useAuth } from "@/hooks/useAuth";
 import { useImmersiveMode } from "@/hooks/useImmersiveMode";
@@ -10,11 +12,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   ListMusic, Play, Pause, SkipForward, SkipBack, Trash2, Plus, Sun,
   Moon, BookOpen, Headphones, Swords, Compass, Maximize2, GripVertical,
   Volume2, VolumeX, Check, X, Pencil, ChevronDown, ArrowLeft, Loader2,
-  BookOpenCheck, Mic, Sparkles, ExternalLink, FolderPlus,
+  BookOpenCheck, Mic, Sparkles, ExternalLink, FolderPlus, Shield,
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
@@ -35,7 +38,7 @@ import { CSS } from "@dnd-kit/utilities";
 import type { PlaylistItem } from "@/hooks/usePlaylist";
 import { supabase } from "@/integrations/supabase/client";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 
 /* ── Audio source catalog ── */
 interface AudioSource {
@@ -599,16 +602,28 @@ export default function PlaylistHub() {
           {/* Add Content Tab */}
           <TabsContent value="add" className="mt-4 space-y-5">
             <p className="text-sm text-muted-foreground">
-              Tap a source to go there and add audio to <span className="font-medium text-foreground">{activePlaylist?.name || "your playlist"}</span>. You can add items from any page in the app.
+              Add audio to <span className="font-medium text-foreground">{activePlaylist?.name || "your playlist"}</span> using the selectors below, or add items from any page in the app.
             </p>
 
-            {Object.entries(groupedSources).map(([category, sources]) => (
+            {/* Morning Watch Selector */}
+            <MorningWatchSelector addItem={addItem} isFull={count >= maxItems} items={items} />
+
+            {/* Night Watch Selector */}
+            <NightWatchSelector addItem={addItem} isFull={count >= maxItems} items={items} />
+
+            {/* Apologetics Selector */}
+            <ApologeticsSelector addItem={addItem} isFull={count >= maxItems} items={items} />
+
+            {/* Other sources — navigation cards */}
+            {Object.entries(groupedSources)
+              .filter(([_, sources]) => sources.some(s => !["morning-watch", "night-watch", "aats-training"].includes(s.id)))
+              .map(([category, sources]) => (
               <div key={category} className="space-y-2">
                 <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   {CATEGORY_LABELS[category] || category}
                 </h3>
                 <div className="grid gap-2 sm:grid-cols-2">
-                  {sources.map((source) => (
+                  {sources.filter(s => !["morning-watch", "night-watch", "aats-training"].includes(s.id)).map((source) => (
                     <Card
                       key={source.id}
                       className="cursor-pointer hover:border-primary/50 transition-all hover:shadow-sm group"
@@ -689,5 +704,180 @@ export default function PlaylistHub() {
         onSetContinuousPlay={immersive.setContinuousPlay}
       />
     </div>
+  );
+}
+
+/* ── Inline Selector: Morning Watch ── */
+type SelectorProps = {
+  addItem: (item: { title: string; description?: string; audio_type: string; audio_meta?: Record<string, any> }) => Promise<any>;
+  isFull: boolean;
+  items: PlaylistItem[];
+};
+
+function MorningWatchSelector({ addItem, isFull, items }: SelectorProps) {
+  const [tractId, setTractId] = useState("");
+  const [sessionIdx, setSessionIdx] = useState("");
+
+  const tract = WATCH_TRACTS.find(t => t.id === tractId);
+  const sessions = tract?.mornings ?? [];
+  const session = sessionIdx ? sessions[parseInt(sessionIdx)] : null;
+
+  const title = tract && session ? `Day ${session.dayNumber} — ${session.title} (${tract.name})` : "";
+  const alreadyAdded = title && items.some(i => i.title === title);
+
+  const handleAdd = async () => {
+    if (!tract || !session) { toast.error("Select a tract and session"); return; }
+    await addItem({
+      title,
+      description: `${tract.icon} Morning Watch: ${tract.name} — ${session.title}`,
+      audio_type: "morning-watch",
+      audio_meta: {
+        tractId: tract.id, tractName: tract.name, dayNumber: session.dayNumber,
+        sessionTitle: session.title, morningScripture: session.morningScripture,
+        activationPrinciple: session.activationPrinciple, generationType: "morning-watch",
+      },
+    });
+  };
+
+  return (
+    <Card>
+      <CardContent className="p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Sun className="h-4 w-4 text-amber-400" />
+          <h3 className="text-sm font-semibold">Morning Watch</h3>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <Select value={tractId} onValueChange={v => { setTractId(v); setSessionIdx(""); }}>
+            <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Select Tract..." /></SelectTrigger>
+            <SelectContent className="max-h-[300px] z-[200]" position="popper">
+              {WATCH_TRACTS.map(t => (
+                <SelectItem key={t.id} value={t.id}>{t.icon} {t.name} ({t.totalSessions} days)</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={sessionIdx} onValueChange={setSessionIdx} disabled={!tract || sessions.length === 0}>
+            <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Select Session..." /></SelectTrigger>
+            <SelectContent className="max-h-[300px] z-[200]" position="popper">
+              {sessions.map((s, i) => (
+                <SelectItem key={i} value={String(i)}>Day {s.dayNumber} — {s.title}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <Button className="w-full gap-2" size="sm" onClick={handleAdd}
+          disabled={!tract || !session || isFull || !!alreadyAdded}>
+          {alreadyAdded ? <><Check className="h-3.5 w-3.5" /> In Playlist</> : <><Plus className="h-3.5 w-3.5" /> Add to Playlist</>}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+/* ── Inline Selector: Night Watch ── */
+function NightWatchSelector({ addItem, isFull, items }: SelectorProps) {
+  const [tractId, setTractId] = useState("");
+  const [sessionIdx, setSessionIdx] = useState("");
+
+  const tract = WATCH_TRACTS.find(t => t.id === tractId);
+  const sessions = tract?.sessions ?? [];
+  const session = sessionIdx ? sessions[parseInt(sessionIdx)] : null;
+
+  const title = tract && session ? `Night Watch: Day ${session.dayNumber} — ${session.title} (${tract.name})` : "";
+  const alreadyAdded = title && items.some(i => i.title === title);
+
+  const handleAdd = async () => {
+    if (!tract || !session) { toast.error("Select a tract and session"); return; }
+    await addItem({
+      title,
+      description: `${tract.icon} Night Watch: ${tract.name} — ${session.title}`,
+      audio_type: "night-watch",
+      audio_meta: {
+        tractId: tract.id, tractName: tract.name, dayNumber: session.dayNumber,
+        sessionTitle: session.title, scripture: session.scripture,
+        scene: session.scene, mood: session.mood, generationType: "night-watch",
+      },
+    });
+  };
+
+  // Only show tracts that have night watch sessions
+  const nightTracts = useMemo(() => WATCH_TRACTS.filter(t => t.sessions && t.sessions.length > 0), []);
+
+  return (
+    <Card>
+      <CardContent className="p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Moon className="h-4 w-4 text-indigo-400" />
+          <h3 className="text-sm font-semibold">Night Watch</h3>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <Select value={tractId} onValueChange={v => { setTractId(v); setSessionIdx(""); }}>
+            <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Select Tract..." /></SelectTrigger>
+            <SelectContent className="max-h-[300px] z-[200]" position="popper">
+              {nightTracts.map(t => (
+                <SelectItem key={t.id} value={t.id}>{t.icon} {t.name} ({t.sessions.length} nights)</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={sessionIdx} onValueChange={setSessionIdx} disabled={!tract || sessions.length === 0}>
+            <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Select Session..." /></SelectTrigger>
+            <SelectContent className="max-h-[300px] z-[200]" position="popper">
+              {sessions.map((s, i) => (
+                <SelectItem key={i} value={String(i)}>Day {s.dayNumber} — {s.title}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <Button className="w-full gap-2" size="sm" onClick={handleAdd}
+          disabled={!tract || !session || isFull || !!alreadyAdded}>
+          {alreadyAdded ? <><Check className="h-3.5 w-3.5" /> In Playlist</> : <><Plus className="h-3.5 w-3.5" /> Add to Playlist</>}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+/* ── Inline Selector: Apologetics ── */
+function ApologeticsSelector({ addItem, isFull, items }: SelectorProps) {
+  const [apologeticId, setApologeticId] = useState("");
+
+  const apologeticsItems = useMemo(
+    () => AUDIO_LIBRARY.filter(e => e.category === "apologetics"), []
+  );
+  const selected = apologeticsItems.find(e => e.id === apologeticId);
+  const alreadyAdded = selected && items.some(i => i.title === selected.title);
+
+  const handleAdd = async () => {
+    if (!selected) { toast.error("Select an apologetics topic"); return; }
+    await addItem({
+      title: selected.title,
+      description: selected.description,
+      audio_type: "apologetics",
+      audio_meta: selected.audioMeta,
+    });
+  };
+
+  return (
+    <Card>
+      <CardContent className="p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Shield className="h-4 w-4 text-red-400" />
+          <h3 className="text-sm font-semibold">Apologetics</h3>
+          <Badge variant="outline" className="text-[9px]">{apologeticsItems.length} topics</Badge>
+        </div>
+        <Select value={apologeticId} onValueChange={setApologeticId}>
+          <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Select Topic..." /></SelectTrigger>
+          <SelectContent className="max-h-[300px] z-[200]" position="popper">
+            {apologeticsItems.map(e => (
+              <SelectItem key={e.id} value={e.id}>{e.title}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {selected && <p className="text-xs text-muted-foreground">{selected.description}</p>}
+        <Button className="w-full gap-2" size="sm" variant="destructive" onClick={handleAdd}
+          disabled={!selected || isFull || !!alreadyAdded}>
+          {alreadyAdded ? <><Check className="h-3.5 w-3.5" /> In Playlist</> : <><Plus className="h-3.5 w-3.5" /> Add to Playlist</>}
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
