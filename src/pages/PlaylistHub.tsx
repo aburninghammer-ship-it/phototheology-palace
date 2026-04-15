@@ -8,13 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ListMusic, Play, Pause, SkipForward, SkipBack, Trash2, Plus, Sun,
   Moon, BookOpen, Headphones, Swords, Compass, Maximize2, GripVertical,
   Volume2, VolumeX, Check, X, Pencil, ChevronDown, ArrowLeft, Loader2,
-  BookOpenCheck, Mic, Sparkles,
+  BookOpenCheck, Mic, Sparkles, ExternalLink, FolderPlus,
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
@@ -46,7 +45,6 @@ interface AudioSource {
   category: "devotional" | "study" | "training" | "reading";
   audioType: string;
   color: string;
-  addMeta?: () => Record<string, any>;
   navigateTo?: string;
 }
 
@@ -54,7 +52,7 @@ const AUDIO_SOURCES: AudioSource[] = [
   {
     id: "morning-watch",
     title: "Morning Watch",
-    description: "Start your day downloading the mind of Christ through guided meditation",
+    description: "Start your day downloading the mind of Christ",
     icon: <Sun className="h-5 w-5" />,
     category: "devotional",
     audioType: "devotional",
@@ -64,7 +62,7 @@ const AUDIO_SOURCES: AudioSource[] = [
   {
     id: "night-watch",
     title: "Night Watch",
-    description: "Seal your day with Christ's emotional and mental posture",
+    description: "Seal your day with Christ's emotional posture",
     icon: <Moon className="h-5 w-5" />,
     category: "devotional",
     audioType: "devotional",
@@ -74,7 +72,7 @@ const AUDIO_SOURCES: AudioSource[] = [
   {
     id: "daily-devotional",
     title: "Daily Audio Devotional",
-    description: "Fresh devotional content generated daily for your spiritual growth",
+    description: "Fresh devotional content generated daily",
     icon: <Sparkles className="h-5 w-5" />,
     category: "devotional",
     audioType: "devotional",
@@ -84,7 +82,7 @@ const AUDIO_SOURCES: AudioSource[] = [
   {
     id: "chapter-commentary",
     title: "Commentary Suite",
-    description: "Rich audio commentary on any Bible chapter — epic, devotional, or scholarly",
+    description: "Rich audio commentary on any Bible chapter",
     icon: <BookOpen className="h-5 w-5" />,
     category: "study",
     audioType: "commentary",
@@ -94,7 +92,7 @@ const AUDIO_SOURCES: AudioSource[] = [
   {
     id: "chapter-reading",
     title: "Chapter Reading",
-    description: "Listen to Bible chapters read aloud in beautiful narration",
+    description: "Listen to Bible chapters read aloud",
     icon: <BookOpenCheck className="h-5 w-5" />,
     category: "reading",
     audioType: "reading",
@@ -104,7 +102,7 @@ const AUDIO_SOURCES: AudioSource[] = [
   {
     id: "aats-training",
     title: "Apologetics Audio Training",
-    description: "Sharpen your defense of biblical truth with War College sessions",
+    description: "Sharpen your defense of biblical truth",
     icon: <Swords className="h-5 w-5" />,
     category: "training",
     audioType: "apologetics",
@@ -114,7 +112,7 @@ const AUDIO_SOURCES: AudioSource[] = [
   {
     id: "palace-tour",
     title: "Palace Audio Tour",
-    description: "Walk through the Palace of Phototheology with guided audio narration",
+    description: "Walk through the Palace with guided narration",
     icon: <Compass className="h-5 w-5" />,
     category: "study",
     audioType: "tour",
@@ -124,7 +122,7 @@ const AUDIO_SOURCES: AudioSource[] = [
   {
     id: "podcast",
     title: "Podcast Episodes",
-    description: "Listen to Phototheology podcast episodes on the go",
+    description: "Listen to Phototheology podcast episodes",
     icon: <Mic className="h-5 w-5" />,
     category: "study",
     audioType: "podcast",
@@ -159,8 +157,8 @@ function SortableItem({
         {...attributes} {...listeners} onClick={(e) => e.stopPropagation()}>
         <GripVertical className="h-4 w-4" />
       </button>
-      <div className={`flex-shrink-0 ${isCurrent ? "text-primary" : "text-muted-foreground"}`}>
-        {isCurrent && isPlaying ? <Volume2 className="h-4 w-4 animate-pulse" /> : <Headphones className="h-4 w-4" />}
+      <div className={`flex-shrink-0 w-6 text-center ${isCurrent ? "text-primary" : "text-muted-foreground/50"}`}>
+        {isCurrent && isPlaying ? <Volume2 className="h-4 w-4 animate-pulse" /> : <span className="text-xs">{idx + 1}</span>}
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate">{item.title}</p>
@@ -183,12 +181,13 @@ export default function PlaylistHub() {
     items, loading, removeItem, clearPlaylist, count, maxItems,
     currentIndex, setCurrentIndex, isPlaying, setIsPlaying, reorderItems,
     playlists, activePlaylistId, selectPlaylist, createPlaylist, renamePlaylist, deletePlaylist,
+    addItem,
   } = usePlaylist();
   const immersive = useImmersiveMode();
 
-  const [activeTab, setActiveTab] = useState("browse");
+  const [activeTab, setActiveTab] = useState("queue");
   const [newPlaylistName, setNewPlaylistName] = useState("");
-  const [isCreatingPlaylist, setIsCreatingPlaylist] = useState(false);
+  const [showCreateInput, setShowCreateInput] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
 
@@ -209,24 +208,26 @@ export default function PlaylistHub() {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
+  // Auto-create a default playlist if user has none
+  const autoCreatedRef = useRef(false);
+  useEffect(() => {
+    if (user && !loading && playlists.length === 0 && !autoCreatedRef.current) {
+      autoCreatedRef.current = true;
+      createPlaylist("My Playlist");
+    }
+  }, [user, loading, playlists.length, createPlaylist]);
+
   // Audio element setup
   useEffect(() => {
     if (!audioRef.current) audioRef.current = new Audio();
     const audio = audioRef.current;
-
     const onEnded = () => {
       notifyTTSStopped();
-      if (currentIndex !== null && currentIndex < items.length - 1) {
-        playItem(currentIndex + 1);
-      } else {
-        setIsPlaying(false);
-        setCurrentIndex(null);
-        setProgress(0);
-      }
+      if (currentIndex !== null && currentIndex < items.length - 1) playItem(currentIndex + 1);
+      else { setIsPlaying(false); setCurrentIndex(null); setProgress(0); }
     };
     const onLoadedMetadata = () => { setDuration(audio.duration || 0); setAudioLoading(false); };
     const onError = () => { setAudioLoading(false); setIsPlaying(false); toast.error("Failed to play audio"); };
-
     audio.addEventListener("ended", onEnded);
     audio.addEventListener("loadedmetadata", onLoadedMetadata);
     audio.addEventListener("error", onError);
@@ -237,12 +238,8 @@ export default function PlaylistHub() {
     };
   }, [currentIndex, items.length]);
 
-  useEffect(() => {
-    if (audioRef.current) audioRef.current.volume = isMuted ? 0 : volume;
-  }, [volume, isMuted]);
-
+  useEffect(() => { if (audioRef.current) audioRef.current.volume = isMuted ? 0 : volume; }, [volume, isMuted]);
   useEffect(() => { localStorage.setItem("pt-playlist-volume", volume.toString()); }, [volume]);
-
   useEffect(() => {
     if (isPlaying && audioRef.current) {
       progressIntervalRef.current = setInterval(() => {
@@ -345,10 +342,11 @@ export default function PlaylistHub() {
   };
 
   const handleCreatePlaylist = async () => {
-    if (!newPlaylistName.trim()) return;
-    await createPlaylist(newPlaylistName);
+    const name = newPlaylistName.trim();
+    if (!name) return;
+    await createPlaylist(name);
     setNewPlaylistName("");
-    setIsCreatingPlaylist(false);
+    setShowCreateInput(false);
   };
 
   const handleRename = async (id: string) => {
@@ -395,7 +393,7 @@ export default function PlaylistHub() {
           </Button>
           <div className="flex items-center gap-2 flex-1">
             <ListMusic className="h-5 w-5 text-primary" />
-            <h1 className="text-lg font-bold">My Playlist</h1>
+            <h1 className="text-lg font-bold">Playlist Hub</h1>
           </div>
           {items.length > 0 && (
             <Badge variant="outline" className="text-xs">{count}/{maxItems}</Badge>
@@ -403,7 +401,89 @@ export default function PlaylistHub() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-4xl mx-auto px-4 py-4 space-y-4">
+        {/* ── Playlist Selector — always visible, prominent ── */}
+        <Card>
+          <CardContent className="p-3 space-y-2">
+            {/* Playlist tabs row */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+              {playlists.map(pl => (
+                <Button
+                  key={pl.id}
+                  variant={pl.id === activePlaylistId ? "default" : "outline"}
+                  size="sm"
+                  className="flex-shrink-0 gap-1.5 h-8"
+                  onClick={() => selectPlaylist(pl.id)}
+                >
+                  <ListMusic className="h-3.5 w-3.5" />
+                  {editingId === pl.id ? (
+                    <Input
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      className="h-6 w-28 text-xs px-1"
+                      autoFocus
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => {
+                        e.stopPropagation();
+                        if (e.key === "Enter") handleRename(pl.id);
+                        if (e.key === "Escape") setEditingId(null);
+                      }}
+                      onBlur={() => handleRename(pl.id)}
+                    />
+                  ) : (
+                    <span className="truncate max-w-[120px]">{pl.name}</span>
+                  )}
+                </Button>
+              ))}
+
+              {/* Inline new playlist */}
+              {showCreateInput ? (
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <Input
+                    value={newPlaylistName}
+                    onChange={(e) => setNewPlaylistName(e.target.value)}
+                    placeholder="Playlist name..."
+                    className="h-8 w-36 text-sm"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleCreatePlaylist();
+                      if (e.key === "Escape") { setShowCreateInput(false); setNewPlaylistName(""); }
+                    }}
+                  />
+                  <Button size="icon" variant="ghost" className="h-8 w-8" onClick={handleCreatePlaylist}>
+                    <Check className="h-4 w-4" />
+                  </Button>
+                  <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => { setShowCreateInput(false); setNewPlaylistName(""); }}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <Button variant="ghost" size="sm" className="flex-shrink-0 gap-1 h-8 text-muted-foreground"
+                  onClick={() => setShowCreateInput(true)}>
+                  <Plus className="h-3.5 w-3.5" /> New
+                </Button>
+              )}
+            </div>
+
+            {/* Active playlist actions */}
+            {activePlaylist && (
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <span className="flex-1">
+                  {count} item{count !== 1 ? "s" : ""} in <span className="font-medium text-foreground">{activePlaylist.name}</span>
+                </span>
+                <Button variant="ghost" size="icon" className="h-7 w-7"
+                  onClick={() => { setEditingId(activePlaylist.id); setEditName(activePlaylist.name); }}>
+                  <Pencil className="h-3 w-3" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive/70 hover:text-destructive"
+                  onClick={() => deletePlaylist(activePlaylist.id)}>
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Now Playing Bar */}
         {currentItem && (
           <Card className="border-primary/30 bg-primary/5">
@@ -446,151 +526,37 @@ export default function PlaylistHub() {
           </Card>
         )}
 
-        {/* Tabs: Browse / Queue */}
+        {/* Tabs: Queue / Add Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="browse" className="gap-2">
-              <Compass className="h-4 w-4" />
-              Browse Audio
-            </TabsTrigger>
             <TabsTrigger value="queue" className="gap-2">
               <ListMusic className="h-4 w-4" />
-              My Queue
+              Queue
               {count > 0 && <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-[10px]">{count}</Badge>}
+            </TabsTrigger>
+            <TabsTrigger value="add" className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add Content
             </TabsTrigger>
           </TabsList>
 
-          {/* Browse Tab */}
-          <TabsContent value="browse" className="mt-4 space-y-6">
-            <p className="text-sm text-muted-foreground">
-              Tap any audio source to navigate there and add content to your playlist. 
-              Build your perfect listening experience for the day.
-            </p>
-
-            {Object.entries(groupedSources).map(([category, sources]) => (
-              <div key={category} className="space-y-3">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                  {CATEGORY_LABELS[category] || category}
-                </h3>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {sources.map((source) => (
-                    <Card
-                      key={source.id}
-                      className="cursor-pointer hover:border-primary/50 transition-all hover:shadow-md group"
-                      onClick={() => source.navigateTo && navigate(source.navigateTo)}
-                    >
-                      <CardContent className="p-4 flex items-start gap-3">
-                        <div className={`flex-shrink-0 mt-0.5 ${source.color} group-hover:scale-110 transition-transform`}>
-                          {source.icon}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm">{source.title}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{source.description}</p>
-                        </div>
-                        <Play className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary flex-shrink-0 mt-1 transition-colors" />
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </TabsContent>
-
           {/* Queue Tab */}
           <TabsContent value="queue" className="mt-4 space-y-4">
-            {/* Playlist Selector */}
-            <div className="flex items-center gap-2">
-              {isCreatingPlaylist ? (
-                <div className="flex items-center gap-1.5 flex-1">
-                  <Input value={newPlaylistName} onChange={(e) => setNewPlaylistName(e.target.value)}
-                    placeholder="Playlist name..." className="h-9" autoFocus
-                    onKeyDown={(e) => { if (e.key === "Enter") handleCreatePlaylist(); if (e.key === "Escape") setIsCreatingPlaylist(false); }} />
-                  <Button size="icon" variant="ghost" className="h-9 w-9" onClick={handleCreatePlaylist}><Check className="h-4 w-4" /></Button>
-                  <Button size="icon" variant="ghost" className="h-9 w-9" onClick={() => setIsCreatingPlaylist(false)}><X className="h-4 w-4" /></Button>
-                </div>
-              ) : editingId ? (
-                <div className="flex items-center gap-1.5 flex-1">
-                  <Input value={editName} onChange={(e) => setEditName(e.target.value)} className="h-9" autoFocus
-                    onKeyDown={(e) => { if (e.key === "Enter") handleRename(editingId); if (e.key === "Escape") setEditingId(null); }} />
-                  <Button size="icon" variant="ghost" className="h-9 w-9" onClick={() => handleRename(editingId)}><Check className="h-4 w-4" /></Button>
-                  <Button size="icon" variant="ghost" className="h-9 w-9" onClick={() => setEditingId(null)}><X className="h-4 w-4" /></Button>
-                </div>
-              ) : (
-                <>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className="flex-1 justify-between h-9">
-                        <span className="truncate">{activePlaylist?.name || "Select Playlist"}</span>
-                        <ChevronDown className="h-4 w-4 ml-2 opacity-50" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-56">
-                      {playlists.map(pl => (
-                        <DropdownMenuItem key={pl.id} onClick={() => selectPlaylist(pl.id)}
-                          className="flex items-center justify-between">
-                          <span className="truncate">{pl.name}</span>
-                          {pl.id === activePlaylistId && <Check className="h-3.5 w-3.5 text-primary ml-2" />}
-                        </DropdownMenuItem>
-                      ))}
-                      {playlists.length === 0 && <DropdownMenuItem disabled>No playlists yet</DropdownMenuItem>}
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => setIsCreatingPlaylist(true)}>
-                        <Plus className="h-3.5 w-3.5 mr-2" /> New Playlist
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  {activePlaylist && (
-                    <>
-                      <Button variant="ghost" size="icon" className="h-9 w-9"
-                        onClick={() => { setEditingId(activePlaylist.id); setEditName(activePlaylist.name); }}>
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-9 w-9 text-destructive hover:text-destructive"
-                        onClick={() => deletePlaylist(activePlaylist.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </>
-                  )}
-                  {!activePlaylist && (
-                    <Button variant="outline" size="sm" className="h-9 gap-1" onClick={() => setIsCreatingPlaylist(true)}>
-                      <Plus className="h-4 w-4" /> New
-                    </Button>
-                  )}
-                </>
-              )}
-            </div>
-
-            {/* Queue Content */}
-            {!activePlaylistId && playlists.length === 0 ? (
-              <div className="flex flex-col items-center justify-center p-12 text-center gap-4">
-                <ListMusic className="h-16 w-16 text-muted-foreground/20" />
-                <div>
-                  <p className="font-medium text-lg text-muted-foreground">Build Your Daily Playlist</p>
-                  <p className="text-sm text-muted-foreground/60 mt-1 max-w-sm">
-                    Create a playlist and add Morning Watches, commentaries, training sessions, and more for continuous listening.
-                  </p>
-                </div>
-                <Button onClick={() => createPlaylist("My Daily Playlist")} className="gap-2">
-                  <Plus className="h-4 w-4" /> Create My First Playlist
-                </Button>
-              </div>
-            ) : loading ? (
+            {loading ? (
               <div className="flex items-center justify-center p-12">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               </div>
             ) : items.length === 0 ? (
-              <div className="flex flex-col items-center justify-center p-12 text-center gap-4">
-                <Headphones className="h-16 w-16 text-muted-foreground/20" />
-                <div>
-                  <p className="font-medium text-lg text-muted-foreground">
-                    {activePlaylist ? `"${activePlaylist.name}" is empty` : "Your playlist is empty"}
-                  </p>
-                  <p className="text-sm text-muted-foreground/60 mt-1 max-w-sm">
-                    Browse the audio sources and add content using the playlist button throughout the app.
-                  </p>
-                </div>
-                <Button variant="outline" onClick={() => setActiveTab("browse")} className="gap-2">
-                  <Compass className="h-4 w-4" /> Browse Audio Sources
+              <div className="flex flex-col items-center justify-center p-10 text-center gap-3">
+                <Headphones className="h-12 w-12 text-muted-foreground/20" />
+                <p className="text-muted-foreground">
+                  {activePlaylist ? `"${activePlaylist.name}" is empty` : "No playlist selected"}
+                </p>
+                <p className="text-sm text-muted-foreground/60 max-w-xs">
+                  Tap <span className="font-medium text-foreground">"Add Content"</span> above to browse audio sources, or add items from anywhere in the app.
+                </p>
+                <Button variant="default" size="sm" className="gap-2 mt-1" onClick={() => setActiveTab("add")}>
+                  <Plus className="h-4 w-4" /> Add Your First Item
                 </Button>
               </div>
             ) : (
@@ -612,6 +578,9 @@ export default function PlaylistHub() {
                     <Trash2 className="h-3.5 w-3.5" /> Clear All
                   </Button>
                   <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" className="gap-1" onClick={() => setActiveTab("add")}>
+                      <Plus className="h-3.5 w-3.5" /> Add More
+                    </Button>
                     <Button variant="outline" size="sm" className="gap-1" onClick={() => openImmersive(currentIndex ?? 0)}>
                       <Maximize2 className="h-3.5 w-3.5" /> Immerse
                     </Button>
@@ -624,6 +593,41 @@ export default function PlaylistHub() {
                 </div>
               </>
             )}
+          </TabsContent>
+
+          {/* Add Content Tab */}
+          <TabsContent value="add" className="mt-4 space-y-5">
+            <p className="text-sm text-muted-foreground">
+              Tap a source to go there and add audio to <span className="font-medium text-foreground">{activePlaylist?.name || "your playlist"}</span>. You can add items from any page in the app.
+            </p>
+
+            {Object.entries(groupedSources).map(([category, sources]) => (
+              <div key={category} className="space-y-2">
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  {CATEGORY_LABELS[category] || category}
+                </h3>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {sources.map((source) => (
+                    <Card
+                      key={source.id}
+                      className="cursor-pointer hover:border-primary/50 transition-all hover:shadow-sm group"
+                      onClick={() => source.navigateTo && navigate(source.navigateTo)}
+                    >
+                      <CardContent className="p-3 flex items-center gap-3">
+                        <div className={`flex-shrink-0 ${source.color} group-hover:scale-110 transition-transform`}>
+                          {source.icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm">{source.title}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{source.description}</p>
+                        </div>
+                        <ExternalLink className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary flex-shrink-0 transition-colors" />
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            ))}
           </TabsContent>
         </Tabs>
       </div>
