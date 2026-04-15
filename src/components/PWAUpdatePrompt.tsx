@@ -324,13 +324,18 @@ export function PWAUpdatePrompt() {
     <>
       {showFloatingReloadButton ? (
         <div
-          className="fixed bottom-4 right-4 z-[2147483646]"
+          className="fixed bottom-24 left-4 z-[2147483646] md:bottom-4"
           style={{
-            bottom: 'max(1rem, calc(env(safe-area-inset-bottom, 0px) + 0.75rem))',
-            right: 'max(1rem, calc(env(safe-area-inset-right, 0px) + 0.75rem))',
+            bottom: 'max(6rem, calc(env(safe-area-inset-bottom, 0px) + 1rem))',
+            left: 'max(1rem, calc(env(safe-area-inset-left, 0px) + 0.75rem))',
           }}
         >
-          <Button onClick={handleUpdate} size="sm" className="shadow-2xl" disabled={isUpdating}>
+          <Button
+            onClick={handleUpdate}
+            size="sm"
+            className="shadow-2xl ring-2 ring-background/70"
+            disabled={isUpdating}
+          >
             <RefreshCw className={`mr-2 h-4 w-4 ${isUpdating ? 'animate-spin' : ''}`} />
             {isUpdating ? 'Reloading...' : 'Reload Now'}
           </Button>
