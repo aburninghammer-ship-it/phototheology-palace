@@ -80,7 +80,7 @@ export function MobileBottomNav() {
   const isWorkspacePane = new URLSearchParams(window.location.search).has('workspace');
   if (isWorkspacePane) return null;
 
-  const hiddenPaths = ["/auth", "/onboarding", "/interactive-demo"];
+  const hiddenPaths = ["/auth", "/onboarding", "/interactive-demo", "/welcome"];
   if (hiddenPaths.some(path => location.pathname.startsWith(path))) return null;
 
   const isMoreActive = filteredMoreNavItems.some(item =>
