@@ -20,6 +20,7 @@ const CHAPEL_ITEMS = [
   { icon: Heart, label: "Devotionals", path: "/devotionals", description: "In-depth devotional content", color: "text-rose-400" },
   { icon: Swords, label: "Dojo", path: "/christian-art-of-war", description: "Strategic spiritual warfare training", color: "text-red-400" },
   { icon: Flame, label: "40 Days in the Tomb", path: "/forty-day-challenge", description: "An intense 40-day spiritual debate challenge", color: "text-orange-500" },
+  { icon: Wheat, label: "Bread Alone Fast", path: "/bread-alone", description: "Replace food with the Word — spiritual fasting through PT meals", color: "text-amber-500" },
   { icon: Church, label: "My Church", path: "/join-church", description: "Connect with your church community", color: "text-blue-400" },
   { icon: Globe, label: "Prophecy Watch", path: "/prophecy-watch", description: "Current events in the light of prophecy", color: "text-purple-400" },
   { icon: Shield, label: "Living Manna", path: "/living-manna", description: "Spiritual preparation resources", color: "text-teal-400" },
