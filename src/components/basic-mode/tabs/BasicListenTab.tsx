@@ -283,7 +283,65 @@ export default function BasicListenTab() {
     });
   };
 
-  const formatTime = (s: number) => {
+  const handleQuickAdd = async (sourceId: string) => {
+    const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    switch (sourceId) {
+      case "morning":
+        await addItem({
+          title: `Morning Watch — ${today}`,
+          description: "Morning activation session",
+          audio_type: "morning-watch",
+          audio_url: null,
+          audio_meta: { generationType: "morning-watch", date: today },
+        });
+        toast.success("Morning Watch added");
+        break;
+      case "night":
+        await addItem({
+          title: `Night Watch — ${today}`,
+          description: "Night meditation session",
+          audio_type: "night-watch",
+          audio_url: null,
+          audio_meta: { generationType: "night-watch", date: today },
+        });
+        toast.success("Night Watch added");
+        break;
+      case "devotional":
+        await addItem({
+          title: `Daily Devotional — ${today}`,
+          description: "Today's audio devotional",
+          audio_type: "devotional",
+          audio_url: null,
+          audio_meta: { generationType: "daily-devotional", date: today },
+        });
+        toast.success("Devotional added");
+        break;
+      case "apologetics":
+        await addItem({
+          title: "Apologetics Training",
+          description: "COTA/AATS apologetics session",
+          audio_type: "apologetics",
+          audio_url: null,
+          audio_meta: { generationType: "apologetics" },
+        });
+        toast.success("Apologetics added");
+        break;
+      case "tour":
+        await addItem({
+          title: "Palace Tour",
+          description: "Guided Phototheology Palace walkthrough",
+          audio_type: "palace-tour",
+          audio_url: null,
+          audio_meta: { generationType: "palace-tour" },
+        });
+        toast.success("Palace Tour added");
+        break;
+      case "podcast":
+        setExpandedSource(expandedSource === "podcast" ? null : "podcast");
+        break;
+    }
+  };
+
     if (!s || !isFinite(s)) return "0:00";
     return `${Math.floor(s / 60)}:${Math.floor(s % 60).toString().padStart(2, "0")}`;
   };
