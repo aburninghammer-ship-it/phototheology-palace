@@ -316,7 +316,7 @@ export function PWAUpdatePrompt() {
     setShowReload(false);
   }, [pendingBuild, setNeedRefresh, setOfflineReady]);
 
-  const showFloatingReloadButton = !isPreviewHost && !isInIframe && !offlineReady && !showReload;
+  const showFloatingReloadButton = !isPreviewHost && !isInIframe;
 
   if (!offlineReady && !showReload && !showFloatingReloadButton) return null;
 
