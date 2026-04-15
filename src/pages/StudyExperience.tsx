@@ -401,7 +401,11 @@ Use KJV text only. Be precise with references.`,
     const acceptedLayers = updatedLayers.filter((l) => l.accepted);
 
     if (acceptedLayers.length < 2) {
-      toast.success("Layer accepted! Add more layers and Build to synthesize.");
+      toast.success("Layer accepted! Choose A or B to continue building.");
+      // Auto-generate A/B choices for jeeves-led and teach modes
+      if (mode === "jeeves-led" || mode === "teach") {
+        setTimeout(() => handleContinueBuilding(), 100);
+      }
       return;
     }
 
