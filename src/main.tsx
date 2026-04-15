@@ -56,7 +56,8 @@ function bindChunkLoadRecovery() {
 
     return (
       message.includes("ChunkLoadError") ||
-      message.includes("Failed to fetch dynamically imported module")
+      message.includes("Failed to fetch dynamically imported module") ||
+      message.includes("Importing a module script failed")
     );
   };
 
