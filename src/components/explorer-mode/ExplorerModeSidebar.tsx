@@ -5,13 +5,13 @@
 import { cn } from "@/lib/utils";
 import {
   MessageCircle, BookOpen, Church, Settings, Layers,
-  Gamepad2, GraduationCap,
+  Gamepad2, GraduationCap, Headphones,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 export type ExplorerTab =
-  | "chat" | "bible" | "chapel" | "study"
+  | "chat" | "bible" | "chapel" | "study" | "listen"
   | "games-space" | "university-space";
 
 interface TabItem {
@@ -80,6 +80,19 @@ const TABS: TabItem[] = [
     activeText: "text-sky-300",
     hoverBg: "hover:bg-sky-500/10",
     iconGlow: "drop-shadow-[0_0_6px_rgba(56,189,248,0.6)]",
+  },
+  {
+    id: "listen",
+    label: "Listen",
+    shortLabel: "Listen",
+    icon: Headphones,
+    section: "core",
+    activeGradient: "bg-gradient-to-r from-orange-500/20 via-orange-400/10 to-transparent",
+    activeBorder: "border border-orange-400/30",
+    activeGlow: "shadow-[0_0_15px_rgba(251,146,60,0.25)]",
+    activeText: "text-orange-300",
+    hoverBg: "hover:bg-orange-500/10",
+    iconGlow: "drop-shadow-[0_0_6px_rgba(251,146,60,0.6)]",
   },
   {
     id: "games-space",
