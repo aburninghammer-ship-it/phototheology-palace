@@ -418,11 +418,17 @@ export default function PlaylistPage() {
                   <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 flex items-center justify-center mb-2">
                     <Music className="h-4 w-4 text-violet-500" />
                   </div>
-                  {activePlaylistId === pl.id && expandedPlaylistId === pl.id ? (
-                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                  )}
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                      onClick={(e) => { e.stopPropagation(); deletePlaylist(pl.id); }}>
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                    {activePlaylistId === pl.id && expandedPlaylistId === pl.id ? (
+                      <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </div>
                 </div>
                 {editingId === pl.id ? (
                   <div className="flex gap-1" onClick={e => e.stopPropagation()}>
