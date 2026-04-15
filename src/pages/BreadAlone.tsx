@@ -8,8 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Wheat, Clock, Flame, BookOpen, Gem, Sparkles, Play, Check, ChevronRight, Users, Church, Plus, ListPlus } from "lucide-react";
-import { AddToPlaylistButton } from "@/components/audio/AddToPlaylistButton";
+import { ArrowLeft, Wheat, Clock, Flame, BookOpen, Gem, Sparkles, Play, Check, ChevronRight, Users, Church, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 /* ─── Duration tiers ─── */
@@ -450,7 +449,7 @@ function ActiveFastDashboard({ fast }: { fast: FastRow }) {
                     <Icon className="h-4 w-4 text-amber-400" />
                   </div>
                 </div>
-                <div className="min-w-0 flex-1 space-y-1">
+                <div className="min-w-0 space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-semibold text-foreground">Meal {meal.meal_number}</span>
                     <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-400">{meal.meal_label}</Badge>
@@ -471,16 +470,6 @@ function ActiveFastDashboard({ fast }: { fast: FastRow }) {
                     </div>
                   )}
                 </div>
-                <AddToPlaylistButton
-                  title={`Bread Alone — Meal ${meal.meal_number}: ${meal.meal_label}`}
-                  description={meal.journal_entry || meal.passage || undefined}
-                  audioType="bread-alone-meal"
-                  audioMeta={{ mealId: meal.id, mealType: meal.meal_type, room: meal.palace_room_code, passage: meal.passage }}
-                  showLabel={false}
-                  size="icon"
-                  variant="ghost"
-                  className="shrink-0"
-                />
               </div>
             );
           })}
