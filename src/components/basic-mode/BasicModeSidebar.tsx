@@ -180,7 +180,7 @@ export function BasicModeSidebar({ activeTab, onTabChange }: BasicModeSidebarPro
         className="fixed bottom-0 left-0 right-0 z-[60] md:hidden bg-card/95 backdrop-blur-xl border-t border-border/50 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.15)]"
         style={{ paddingBottom: "env(safe-area-inset-bottom, 6px)" }}
       >
-        <div className="flex items-center justify-evenly h-[56px] px-1">
+        <div className="flex items-center justify-evenly h-[52px] px-0.5">
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id;
             const Icon = tab.icon;
@@ -190,25 +190,28 @@ export function BasicModeSidebar({ activeTab, onTabChange }: BasicModeSidebarPro
                 data-tour={tab.tourId}
                 onClick={() => onTabChange(tab.id)}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-xl transition-all min-w-[56px] active:scale-95",
+                  "flex flex-col items-center justify-center gap-0.5 py-1 rounded-lg transition-all min-w-0 flex-1 active:scale-95",
                   isActive
                     ? cn("bg-primary/12", tab.activeText)
                     : tab.inactiveText
                 )}
               >
-                <Icon className={cn("h-5 w-5 shrink-0", isActive && tab.iconGlow)} />
-                <span className={cn("text-[9px] font-medium", isActive && "font-semibold")}>
-                  {tab.label}
+                <Icon className={cn("h-[18px] w-[18px] shrink-0", isActive && tab.iconGlow)} />
+                <span className={cn(
+                  "text-[8px] leading-tight font-medium truncate max-w-full px-0.5",
+                  isActive && "font-semibold"
+                )}>
+                  {tab.id === "study" ? "Study" : tab.id === "listen" ? "Listen" : tab.label}
                 </span>
               </button>
             );
           })}
           <button
             onClick={() => navigate("/settings")}
-            className="flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-xl transition-all min-w-[56px] text-muted-foreground active:scale-95"
+            className="flex flex-col items-center justify-center gap-0.5 py-1 rounded-lg transition-all min-w-0 flex-1 text-muted-foreground active:scale-95"
           >
-            <Settings className="h-5 w-5 shrink-0" />
-            <span className="text-[9px] font-medium">Settings</span>
+            <Settings className="h-[18px] w-[18px] shrink-0" />
+            <span className="text-[8px] leading-tight font-medium">Settings</span>
           </button>
         </div>
       </nav>
