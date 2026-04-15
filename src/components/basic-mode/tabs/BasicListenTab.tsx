@@ -79,14 +79,44 @@ interface QuickSource {
   expandable?: boolean;
 }
 
+const VOICE_STYLES = [
+  { id: "epic", label: "Epic Narrator", emoji: "🎬" },
+  { id: "urban", label: "Modern Preacher", emoji: "🎤" },
+  { id: "counselor", label: "Counselor", emoji: "💬" },
+  { id: "ancient", label: "Ancient Voice", emoji: "📜" },
+  { id: "preacher", label: "Preacher", emoji: "🔥" },
+  { id: "scholar", label: "Scholar", emoji: "🎓" },
+  { id: "kids", label: "Kids Adventure", emoji: "🧒" },
+  { id: "mirror", label: "Mirror", emoji: "🪞" },
+];
+
+const MORNING_OPTIONS = [
+  { id: "activation", label: "Mental Activation", emoji: "⚡" },
+  { id: "scripture", label: "Scripture Focus", emoji: "📖" },
+  { id: "prayer", label: "Prayer & Praise", emoji: "🙏" },
+];
+
+const NIGHT_OPTIONS = [
+  { id: "reflection", label: "Day Reflection", emoji: "🌙" },
+  { id: "meditation", label: "Scripture Meditation", emoji: "🧘" },
+  { id: "rest", label: "Rest & Surrender", emoji: "😴" },
+];
+
+const APOLOGETICS_OPTIONS = [
+  { id: "cota", label: "COTA Deep Dive", emoji: "📚" },
+  { id: "aats", label: "AATS Defense", emoji: "🛡️" },
+  { id: "prophecy", label: "Prophetic Evidence", emoji: "🔮" },
+  { id: "general", label: "General Apologetics", emoji: "⚔️" },
+];
+
 const QUICK_SOURCES: QuickSource[] = [
-  { id: "morning", title: "Morning Watch", icon: <Sun className="h-4 w-4" />, color: "text-amber-400" },
-  { id: "night", title: "Night Watch", icon: <Moon className="h-4 w-4" />, color: "text-indigo-400" },
+  { id: "morning", title: "Morning Watch", icon: <Sun className="h-4 w-4" />, color: "text-amber-400", expandable: true },
+  { id: "night", title: "Night Watch", icon: <Moon className="h-4 w-4" />, color: "text-indigo-400", expandable: true },
   { id: "devotional", title: "Daily Devotional", icon: <Sparkles className="h-4 w-4" />, color: "text-purple-400" },
   { id: "commentary", title: "Commentary", icon: <BookOpen className="h-4 w-4" />, color: "text-emerald-400", expandable: true },
   { id: "reading", title: "Bible Reading", icon: <BookOpenCheck className="h-4 w-4" />, color: "text-blue-400", expandable: true },
   { id: "podcast", title: "Podcast", icon: <Mic className="h-4 w-4" />, color: "text-orange-400", expandable: true },
-  { id: "apologetics", title: "Apologetics", icon: <Swords className="h-4 w-4" />, color: "text-red-400" },
+  { id: "apologetics", title: "Apologetics", icon: <Swords className="h-4 w-4" />, color: "text-red-400", expandable: true },
   { id: "tour", title: "Palace Tour", icon: <Compass className="h-4 w-4" />, color: "text-cyan-400" },
 ];
 
