@@ -85,7 +85,7 @@ const QUICK_SOURCES: QuickSource[] = [
   { id: "devotional", title: "Daily Devotional", icon: <Sparkles className="h-4 w-4" />, color: "text-purple-400" },
   { id: "commentary", title: "Commentary", icon: <BookOpen className="h-4 w-4" />, color: "text-emerald-400", expandable: true },
   { id: "reading", title: "Bible Reading", icon: <BookOpenCheck className="h-4 w-4" />, color: "text-blue-400", expandable: true },
-  { id: "podcast", title: "Podcast", icon: <Mic className="h-4 w-4" />, color: "text-orange-400" },
+  { id: "podcast", title: "Podcast", icon: <Mic className="h-4 w-4" />, color: "text-orange-400", expandable: true },
   { id: "apologetics", title: "Apologetics", icon: <Swords className="h-4 w-4" />, color: "text-red-400" },
   { id: "tour", title: "Palace Tour", icon: <Compass className="h-4 w-4" />, color: "text-cyan-400" },
 ];
