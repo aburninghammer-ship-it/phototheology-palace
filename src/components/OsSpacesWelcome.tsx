@@ -267,8 +267,8 @@ export const OsSpacesWelcome = () => {
         </p>
       </motion.div>
 
-      {/* 8 OS Space Grid */}
-      <div className="grid grid-cols-4 sm:grid-cols-8 gap-3 max-w-5xl mx-auto">
+      {/* OS Space Grid */}
+      <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-3 max-w-5xl mx-auto">
         {OS_SPACES.map((space, i) => {
           const Icon = space.icon;
           const isActive = activeSpace === space.id;
@@ -455,7 +455,7 @@ export const OsSpacesWelcome = () => {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card/80 border border-border/40">
             <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#d4a017" }} />
             <span className="text-xs text-muted-foreground">
-              <span className="font-semibold" style={{ color: "#d4a017" }}>BI</span> · Biblical Intelligence Engine · 70+ tools across 8 spaces
+              <span className="font-semibold" style={{ color: "#d4a017" }}>BI</span> · Biblical Intelligence Engine · 70+ tools across 9 spaces
             </span>
           </div>
         </motion.div>
