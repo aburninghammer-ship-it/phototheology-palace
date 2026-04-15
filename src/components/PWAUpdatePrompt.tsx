@@ -316,13 +316,13 @@ export function PWAUpdatePrompt() {
     setShowReload(false);
   }, [pendingBuild, setNeedRefresh, setOfflineReady]);
 
-  const showMetaReloadButton = isMetaWebView && !offlineReady && !showReload;
+  const showFloatingReloadButton = !isPreviewHost && !isInIframe && !offlineReady && !showReload;
 
-  if (!offlineReady && !showReload && !showMetaReloadButton) return null;
+  if (!offlineReady && !showReload && !showFloatingReloadButton) return null;
 
   return createPortal(
     <>
-      {showMetaReloadButton ? (
+      {showFloatingReloadButton ? (
         <div
           className="fixed bottom-4 right-4 z-[2147483646]"
           style={{
@@ -332,7 +332,7 @@ export function PWAUpdatePrompt() {
         >
           <Button onClick={handleUpdate} size="sm" className="shadow-2xl" disabled={isUpdating}>
             <RefreshCw className={`mr-2 h-4 w-4 ${isUpdating ? 'animate-spin' : ''}`} />
-            {isUpdating ? 'Reloading...' : 'Reload app'}
+            {isUpdating ? 'Reloading...' : 'Reload Now'}
           </Button>
         </div>
       ) : null}
