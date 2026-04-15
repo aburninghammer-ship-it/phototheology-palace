@@ -15,7 +15,6 @@ import {
 const CHAPEL_ITEMS = [
   { icon: Sunrise, label: "Morning Watch", path: "/morning-watches", description: "Start your day with guided devotionals", color: "text-amber-400" },
   { icon: Moon, label: "Night Watch", path: "/night-watches", description: "Evening reflection & prayer", color: "text-indigo-400" },
-  { icon: BookOpenCheck, label: "Daily Audio Devotional", path: "/daily-audio-devotional", description: "Listen to the day's devotional", color: "text-emerald-400" },
   { icon: CalendarDays, label: "Reading Plans", path: "/reading-plans", description: "Structured Bible reading programs", color: "text-sky-400" },
   { icon: Gem, label: "Daily Verse", path: "/daily-verse", description: "A gem from Scripture each day", color: "text-yellow-400" },
   { icon: Heart, label: "Devotionals", path: "/devotionals", description: "In-depth devotional content", color: "text-rose-400" },
