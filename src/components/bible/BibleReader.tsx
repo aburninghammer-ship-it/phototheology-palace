@@ -302,95 +302,39 @@ export const BibleReader = () => {
   }[preferences.bible_font_size];
 
     return (
-      <div className="space-y-6">
-        {/* Sticky Header + AI Prompt Banner */}
-        <div className="sticky top-16 z-50 space-y-3">
-          {/* Chapter Header - Glass */}
-          <div className="isolate glass-card-subtle rounded-xl -mx-4 px-6 py-4 flex items-center justify-between flex-wrap gap-4 backdrop-blur-xl">
-            <div className="relative">
-              <h1 className="font-serif text-3xl md:text-4xl font-bold bg-gradient-palace bg-clip-text text-transparent">
-                {book} {chapter}
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                {chapterData.verses.length} {t('bible.verses').toLowerCase()}
-              </p>
-            </div>
-
-            <div className="relative z-10 flex gap-2 flex-wrap items-center">
-              {/* Spark indicators */}
-              {sparks.length > 0 && (
-                <Badge variant="outline" className="text-amber-500 border-amber-500/30 animate-pulse">
-                  🔥 {sparks.length}
-                </Badge>
-              )}
-              <SparkSettings
-                preferences={sparkPreferences}
-                onUpdate={updateSparkPreferences}
-              />
-              <ReadingStreakBadge compact />
-              <ReadingControls />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => addBookmark(book, chapter)}
-                disabled={isBookmarked(book, chapter)}
-                className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20"
-              >
-                <Bookmark className="h-4 w-4 mr-2" />
-                {isBookmarked(book, chapter) ? t('bible.bookmarked') : t('bible.bookmark')}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigateChapter("prev")}
-                disabled={chapter <= 1}
-                className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20"
-              >
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                {t('bible.previous')}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigateChapter("next")}
-                className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20"
-              >
-                {t('bible.next')}
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Spark Container */}
+      <div className="space-y-3">
+        {/* Compact inline controls — no duplicate title/nav */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-sm text-muted-foreground">{chapterData.verses.length} {t('bible.verses').toLowerCase()}</span>
+          <div className="flex-1" />
           {sparks.length > 0 && (
-            <div className="fixed bottom-24 right-4 md:bottom-auto md:top-20 z-50">
-              <SparkContainer
-                sparks={sparks}
-                onOpen={openSpark}
-                onSave={saveSpark}
-                onDismiss={dismissSpark}
-                onExplore={exploreSpark}
-              />
-            </div>
+            <Badge variant="outline" className="text-amber-500 border-amber-500/30 animate-pulse text-xs">
+              🔥 {sparks.length}
+            </Badge>
           )}
-
-          {/* AI Prompt Banner - Surface Jeeves */}
-          {!jeevesMode && (
-            <div className="relative">
-              <AIPromptBanner
-                context="bible"
-                book={book}
-                chapter={chapter}
-                onAskJeeves={() => {
-                  setJeevesMode(true);
-                  setTimeout(() => {
-                    jeevesRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                  }, 100);
-                }}
-              />
-            </div>
-          )}
+          <SparkSettings preferences={sparkPreferences} onUpdate={updateSparkPreferences} />
+          <ReadingStreakBadge compact />
+          <ReadingControls />
+          <Button variant="outline" size="sm" onClick={() => addBookmark(book, chapter)}
+            disabled={isBookmarked(book, chapter)} className="h-8 text-xs">
+            <Bookmark className="h-3.5 w-3.5 mr-1" />
+            {isBookmarked(book, chapter) ? t('bible.bookmarked') : t('bible.bookmark')}
+          </Button>
         </div>
+
+        {/* Spark Container */}
+        {sparks.length > 0 && (
+          <div className="fixed bottom-24 right-4 md:bottom-auto md:top-20 z-50">
+            <SparkContainer sparks={sparks} onOpen={openSpark} onSave={saveSpark}
+              onDismiss={dismissSpark} onExplore={exploreSpark} />
+          </div>
+        )}
+
+        {/* AI Prompt Banner */}
+        {!jeevesMode && (
+          <AIPromptBanner context="bible" book={book} chapter={chapter}
+            onAskJeeves={() => { setJeevesMode(true); setTimeout(() => { jeevesRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }); }, 100); }} />
+        )}
 
       {/* Compact Toolbar */}
       <div className="flex items-center gap-2 flex-wrap">
@@ -570,19 +514,7 @@ export const BibleReader = () => {
         {/* Main Reading Pane — 2/3 width */}
         <div className="lg:col-span-2 space-y-6">
           <Card variant="glass" className={`shadow-elegant hover:shadow-hover transition-smooth ${preferences.reading_mode === 'focus' ? 'max-w-3xl mx-auto' : ''}`}>
-            {/* Sticky Book Title Header */}
-            <div className="sticky top-0 z-20 bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 backdrop-blur-xl border-b border-primary/30 px-6 py-4 rounded-t-xl shadow-sm mx-0">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20">
-                  <BookOpen className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <h2 className="font-serif text-xl md:text-2xl font-bold text-foreground">
-                  {book} <span className="text-muted-foreground font-normal">· {t('bible.chapterLabel', { chapter })}</span>
-                </h2>
-              </div>
-            </div>
-
-            {/* Auto-Generated Chapter Image */}
+            {/* Chapter Image */}
             <div className="px-6 pt-6">
               <ChapterImage
                 book={book}
