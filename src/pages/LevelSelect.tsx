@@ -330,7 +330,7 @@ export default function LevelSelect() {
             </span>
           </motion.p>
 
-          <SavedItemsTab />
+          
         </div>
       </div>
     </>
