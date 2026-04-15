@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
 import { PODCAST_EPISODES } from "@/data/podcastData";
 import { BIBLE_BOOKS } from "@/types/bible";
+import { WATCH_TRACTS } from "@/data/watchSeries";
+import { AUDIO_LIBRARY } from "@/data/audioLibraryData";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -769,22 +771,67 @@ function DevotionalBrowser() {
 // ── Tab Content: Morning Manna ──
 // ══════════════════════════════════════════════════════════════════════════════
 function MannaBrowser() {
+  const [tractId, setTractId] = useState("");
+  const [sessionIdx, setSessionIdx] = useState("");
+  const { addItem, isFull, items } = usePlaylist();
+
+  const tract = WATCH_TRACTS.find(t => t.id === tractId);
+  const sessions = tract?.mornings ?? [];
+  const session = sessionIdx ? sessions[parseInt(sessionIdx)] : null;
+
+  const title = tract && session
+    ? `Day ${session.dayNumber} — ${session.title} (${tract.name})`
+    : "";
+  const alreadyAdded = title && items.some(i => i.title === title);
+
+  const handleAdd = async () => {
+    if (!tract || !session) { toast.error("Select a tract and session"); return; }
+    await addItem({
+      title,
+      description: `${tract.icon} ${tract.name}: ${session.title}`,
+      audio_type: "morning-watch",
+      audio_meta: {
+        tractId: tract.id,
+        tractName: tract.name,
+        dayNumber: session.dayNumber,
+        sessionTitle: session.title,
+        morningScripture: session.morningScripture,
+        activationPrinciple: session.activationPrinciple,
+        generationType: "morning-watch",
+      },
+    });
+  };
+
   return (
     <Card>
-      <CardContent className="p-6 text-center space-y-3">
-        <div className="h-12 w-12 rounded-xl bg-amber-500/10 flex items-center justify-center mx-auto">
-          <Sun className="h-6 w-6 text-amber-500" />
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm flex items-center gap-2">
+          <Sun className="h-4 w-4 text-amber-500" /> Morning Manna
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <Select value={tractId} onValueChange={v => { setTractId(v); setSessionIdx(""); }}>
+            <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Select Tract..." /></SelectTrigger>
+            <SelectContent className="max-h-[300px] z-[200]" position="popper">
+              {WATCH_TRACTS.map(t => (
+                <SelectItem key={t.id} value={t.id}>{t.icon} {t.name} ({t.totalSessions} days)</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={sessionIdx} onValueChange={setSessionIdx} disabled={!tract || sessions.length === 0}>
+            <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Select Session..." /></SelectTrigger>
+            <SelectContent className="max-h-[300px] z-[200]" position="popper">
+              {sessions.map((s, i) => (
+                <SelectItem key={i} value={String(i)}>Day {s.dayNumber} — {s.title}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-        <h3 className="font-medium">Morning Manna</h3>
-        <p className="text-sm text-muted-foreground">
-          Browse your morning watch devotionals and add them to any playlist.
-        </p>
-        <Button variant="outline" asChild>
-          <a href="/morning-watches">Open Morning Watches</a>
+        <Button className="w-full gap-2" size="sm" onClick={handleAdd}
+          disabled={!tract || !session || isFull || !!alreadyAdded}>
+          {alreadyAdded ? <><Check className="h-4 w-4" /> In Playlist</> : <><Plus className="h-4 w-4" /> Add to Playlist</>}
         </Button>
-        <p className="text-xs text-muted-foreground">
-          Use the "+ Playlist" button on each watch to add it here.
-        </p>
       </CardContent>
     </Card>
   );
@@ -796,13 +843,31 @@ function MannaBrowser() {
 function ApologeticsBrowser() {
   const [avatar, setAvatar] = useState("");
   const [day, setDay] = useState("");
+  const [apologeticId, setApologeticId] = useState("");
   const { addItem, isFull, items } = usePlaylist();
 
-  const avatarInfo = AATS_AVATARS.find(a => a.id === avatar);
-  const title = avatarInfo && day ? `Day ${day} — ${avatarInfo.name} AATS Training` : "";
-  const alreadyAdded = title && items.some(i => i.title === title);
+  const apologeticsItems = useMemo(
+    () => AUDIO_LIBRARY.filter(e => e.category === "apologetics"),
+    []
+  );
+  const selectedApologetic = apologeticsItems.find(e => e.id === apologeticId);
+  const apolAlreadyAdded = selectedApologetic && items.some(i => i.title === selectedApologetic.title);
 
-  const handleAdd = async () => {
+  const handleAddApologetic = async () => {
+    if (!selectedApologetic) { toast.error("Select an apologetics topic"); return; }
+    await addItem({
+      title: selectedApologetic.title,
+      description: selectedApologetic.description,
+      audio_type: "apologetics",
+      audio_meta: selectedApologetic.audioMeta,
+    });
+  };
+
+  const avatarInfo = AATS_AVATARS.find(a => a.id === avatar);
+  const aatsTitle = avatarInfo && day ? `Day ${day} — ${avatarInfo.name} AATS Training` : "";
+  const aatsAlreadyAdded = aatsTitle && items.some(i => i.title === aatsTitle);
+
+  const handleAddAATS = async () => {
     if (!avatar || !day) { toast.error("Select avatar and day"); return; }
     const a = AATS_AVATARS.find(x => x.id === avatar)!;
     await addItem({
@@ -814,35 +879,62 @@ function ApologeticsBrowser() {
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm flex items-center gap-2">
-          <Shield className="h-4 w-4 text-destructive" /> AATS Apologetics Training
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <Select value={avatar} onValueChange={v => { setAvatar(v); setDay(""); }}>
-            <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Select Avatar..." /></SelectTrigger>
+    <div className="space-y-4">
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Shield className="h-4 w-4 text-destructive" /> Apologetics Audio Library
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Select value={apologeticId} onValueChange={setApologeticId}>
+            <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Select Topic..." /></SelectTrigger>
             <SelectContent className="max-h-[300px] z-[200]" position="popper">
-              {AATS_AVATARS.map(a => <SelectItem key={a.id} value={a.id}>{a.emoji} {a.name}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Select value={day} onValueChange={setDay} disabled={!avatar}>
-            <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Select Day..." /></SelectTrigger>
-            <SelectContent className="max-h-[300px] z-[200]" position="popper">
-              {avatarInfo && Array.from({ length: avatarInfo.totalDays }, (_, i) => i + 1).map(d => (
-                <SelectItem key={d} value={String(d)}>Day {d}</SelectItem>
+              {apologeticsItems.map(e => (
+                <SelectItem key={e.id} value={e.id}>{e.title}</SelectItem>
               ))}
             </SelectContent>
           </Select>
-        </div>
-        <Button className="w-full gap-2" size="sm" variant="destructive" onClick={handleAdd}
-          disabled={!avatar || !day || isFull || !!alreadyAdded}>
-          {alreadyAdded ? <><Check className="h-4 w-4" /> In Playlist</> : <><Plus className="h-4 w-4" /> Add to Playlist</>}
-        </Button>
-      </CardContent>
-    </Card>
+          {selectedApologetic && (
+            <p className="text-xs text-muted-foreground">{selectedApologetic.description}</p>
+          )}
+          <Button className="w-full gap-2" size="sm" variant="destructive" onClick={handleAddApologetic}
+            disabled={!selectedApologetic || isFull || !!apolAlreadyAdded}>
+            {apolAlreadyAdded ? <><Check className="h-4 w-4" /> In Playlist</> : <><Plus className="h-4 w-4" /> Add to Playlist</>}
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Shield className="h-4 w-4 text-destructive" /> AATS Apologetics Training
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <Select value={avatar} onValueChange={v => { setAvatar(v); setDay(""); }}>
+              <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Select Avatar..." /></SelectTrigger>
+              <SelectContent className="max-h-[300px] z-[200]" position="popper">
+                {AATS_AVATARS.map(a => <SelectItem key={a.id} value={a.id}>{a.emoji} {a.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={day} onValueChange={setDay} disabled={!avatar}>
+              <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Select Day..." /></SelectTrigger>
+              <SelectContent className="max-h-[300px] z-[200]" position="popper">
+                {avatarInfo && Array.from({ length: avatarInfo.totalDays }, (_, i) => i + 1).map(d => (
+                  <SelectItem key={d} value={String(d)}>Day {d}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Button className="w-full gap-2" size="sm" variant="destructive" onClick={handleAddAATS}
+            disabled={!avatar || !day || isFull || !!aatsAlreadyAdded}>
+            {aatsAlreadyAdded ? <><Check className="h-4 w-4" /> In Playlist</> : <><Plus className="h-4 w-4" /> Add to Playlist</>}
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
