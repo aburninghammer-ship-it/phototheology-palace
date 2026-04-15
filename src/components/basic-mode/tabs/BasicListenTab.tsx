@@ -70,24 +70,36 @@ function SortableItem({
   );
 }
 
-/* ── Quick add sources ── */
+/* ── Quick add sources (inline — no navigation) ── */
 interface QuickSource {
   id: string;
   title: string;
   icon: React.ReactNode;
   color: string;
-  navigateTo: string;
+  expandable?: boolean;
 }
 
 const QUICK_SOURCES: QuickSource[] = [
-  { id: "morning", title: "Morning Watch", icon: <Sun className="h-4 w-4" />, color: "text-amber-400", navigateTo: "/morning-watches" },
-  { id: "night", title: "Night Watch", icon: <Moon className="h-4 w-4" />, color: "text-indigo-400", navigateTo: "/night-watches" },
-  { id: "devotional", title: "Daily Devotional", icon: <Sparkles className="h-4 w-4" />, color: "text-purple-400", navigateTo: "/daily-audio-devotional" },
-  { id: "commentary", title: "Commentary", icon: <BookOpen className="h-4 w-4" />, color: "text-emerald-400", navigateTo: "/bible" },
-  { id: "reading", title: "Bible Reading", icon: <BookOpenCheck className="h-4 w-4" />, color: "text-blue-400", navigateTo: "/bible" },
-  { id: "podcast", title: "Podcast", icon: <Mic className="h-4 w-4" />, color: "text-orange-400", navigateTo: "/podcast" },
-  { id: "apologetics", title: "Apologetics", icon: <Swords className="h-4 w-4" />, color: "text-red-400", navigateTo: "/cota-series?tab=aats" },
-  { id: "tour", title: "Palace Tour", icon: <Compass className="h-4 w-4" />, color: "text-cyan-400", navigateTo: "/palace" },
+  { id: "morning", title: "Morning Watch", icon: <Sun className="h-4 w-4" />, color: "text-amber-400" },
+  { id: "night", title: "Night Watch", icon: <Moon className="h-4 w-4" />, color: "text-indigo-400" },
+  { id: "devotional", title: "Daily Devotional", icon: <Sparkles className="h-4 w-4" />, color: "text-purple-400" },
+  { id: "commentary", title: "Commentary", icon: <BookOpen className="h-4 w-4" />, color: "text-emerald-400", expandable: true },
+  { id: "reading", title: "Bible Reading", icon: <BookOpenCheck className="h-4 w-4" />, color: "text-blue-400", expandable: true },
+  { id: "podcast", title: "Podcast", icon: <Mic className="h-4 w-4" />, color: "text-orange-400" },
+  { id: "apologetics", title: "Apologetics", icon: <Swords className="h-4 w-4" />, color: "text-red-400" },
+  { id: "tour", title: "Palace Tour", icon: <Compass className="h-4 w-4" />, color: "text-cyan-400" },
+];
+
+const BIBLE_BOOKS = [
+  "Genesis","Exodus","Leviticus","Numbers","Deuteronomy","Joshua","Judges","Ruth",
+  "1 Samuel","2 Samuel","1 Kings","2 Kings","1 Chronicles","2 Chronicles","Ezra",
+  "Nehemiah","Esther","Job","Psalms","Proverbs","Ecclesiastes","Song of Solomon",
+  "Isaiah","Jeremiah","Lamentations","Ezekiel","Daniel","Hosea","Joel","Amos",
+  "Obadiah","Jonah","Micah","Nahum","Habakkuk","Zephaniah","Haggai","Zechariah",
+  "Malachi","Matthew","Mark","Luke","John","Acts","Romans","1 Corinthians",
+  "2 Corinthians","Galatians","Ephesians","Philippians","Colossians","1 Thessalonians",
+  "2 Thessalonians","1 Timothy","2 Timothy","Titus","Philemon","Hebrews","James",
+  "1 Peter","2 Peter","1 John","2 John","3 John","Jude","Revelation",
 ];
 
 export default function BasicListenTab() {
