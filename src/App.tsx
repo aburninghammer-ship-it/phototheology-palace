@@ -158,6 +158,7 @@ const WeeklyChallenge = lazy(() => import("./pages/WeeklyChallenge"));
 const SeriesPresentationMode = lazy(() => import("./pages/SeriesPresentationMode"));
 const PublicSeriesBrowser = lazy(() => import("./pages/PublicSeriesBrowser"));
 const Flashcards = lazy(() => import("./pages/Flashcards"));
+const Glossary = lazy(() => import("./pages/Glossary"));
 const PhototheologyImageBible = lazy(() => import("./pages/PhototheologyImageBible"));
 const PowerOfTheLamb = lazy(() => import("./pages/PowerOfTheLamb"));
 const CharacterProfiles = lazy(() => import("./pages/CharacterProfiles"));
