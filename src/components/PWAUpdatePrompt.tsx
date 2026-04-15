@@ -224,7 +224,7 @@ export function PWAUpdatePrompt() {
   }, [openReloadPrompt]);
 
   useEffect(() => {
-    if (isMetaWebView || isPreviewHost || isInIframe) return;
+    if (isMetaWebView || isInIframe) return;
 
     const currentBuild = readCurrentBuildTag();
     if (!currentBuild) return;
