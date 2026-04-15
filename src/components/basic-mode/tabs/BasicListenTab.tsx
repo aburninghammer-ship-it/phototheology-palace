@@ -214,19 +214,110 @@ export default function BasicListenTab() {
 
   const resolveAudioUrl = useCallback(async (item: PlaylistItem): Promise<string | null> => {
     let url = item.audio_url ?? null;
-    if (!url && item.audio_meta) {
-      const meta = item.audio_meta as Record<string, any>;
-      if (meta.generationType === "chapter-commentary" || meta.generationType === "verse-commentary") {
-        const voiceMode = meta.voiceStyle || "epic";
-        const { data: cached } = await supabase.from("chapter_commentary_cache")
-          .select("audio_storage_path").eq("book", meta.book).eq("chapter", meta.chapter)
-          .eq("voice_id", voiceMode).maybeSingle();
-        if (cached?.audio_storage_path) {
-          const { data: signed } = await supabase.storage.from("audio-cache").createSignedUrl(cached.audio_storage_path, 3600);
-          if (signed?.signedUrl) url = signed.signedUrl;
+
+    // If there's already a direct URL (e.g. podcast), return it
+    if (url && !url.includes('/storage/v1/object/sign/')) return url;
+
+    const meta = (item.audio_meta || {}) as Record<string, any>;
+    const genType = meta.generationType;
+
+    if (!url && genType) {
+      try {
+        // Commentary (epic, modern, etc.) — call generate-epic-commentary
+        if (genType === "chapter-commentary" || genType === "verse-commentary") {
+          const voiceMode = meta.voiceStyle || "epic";
+          // First try epic_commentaries table (voice-styled)
+          const { data: epic } = await (supabase as any).from("epic_commentaries")
+            .select("audio_storage_path, commentary_text")
+            .eq("book", meta.book).eq("chapter", meta.chapter)
+            .eq("commentary_mode", voiceMode).eq("status", "ready")
+            .order("version", { ascending: false }).limit(1).maybeSingle();
+          if (epic?.audio_storage_path) {
+            const { data: signed } = await supabase.storage.from("epic-audio").createSignedUrl(epic.audio_storage_path, 3600);
+            if (signed?.signedUrl) url = signed.signedUrl;
+          }
+          // Fallback to chapter_commentary_cache
+          if (!url) {
+            const { data: cached } = await supabase.from("chapter_commentary_cache")
+              .select("audio_storage_path").eq("book", meta.book).eq("chapter", meta.chapter)
+              .eq("voice_id", voiceMode).maybeSingle();
+            if (cached?.audio_storage_path) {
+              const { data: signed } = await supabase.storage.from("audio-cache").createSignedUrl(cached.audio_storage_path, 3600);
+              if (signed?.signedUrl) url = signed.signedUrl;
+            }
+          }
+          // If still no cached audio, generate it via edge function
+          if (!url && meta.book && meta.chapter) {
+            toast.info("Generating commentary audio... this may take a moment");
+            const { data: resp } = await supabase.functions.invoke("generate-epic-commentary", {
+              body: { book: meta.book, chapter: meta.chapter, mode: meta.voiceStyle || "epic" },
+            });
+            if (resp?.audioUrl) url = resp.audioUrl;
+          }
         }
+
+        // Morning / Night Watch — generate via edge function
+        if (genType === "morning-watch" || genType === "night-watch") {
+          const watchType = genType === "morning-watch" ? "morning" : "night";
+          toast.info(`Generating ${watchType} watch audio...`);
+          const { data: resp } = await supabase.functions.invoke("generate-chapter-commentary", {
+            body: { book: "Psalms", chapter: 23, watchType, mode: meta.mode || "reflection" },
+          });
+          if (resp?.audioUrl) url = resp.audioUrl;
+          // Fallback: try generating a simple TTS of watch content
+          if (!url) {
+            const watchText = `${watchType === "morning" ? "Good morning" : "Good evening"}. This is your ${watchType} watch ${meta.mode || ""} session. Take a moment to center your mind on Christ.`;
+            const { data: ttsResp } = await supabase.functions.invoke("watch-tts", {
+              body: { text: watchText, watchType },
+            });
+            if (ttsResp?.audioUrl) url = ttsResp.audioUrl;
+          }
+        }
+
+        // Daily devotional
+        if (genType === "daily-devotional") {
+          const { data: devs } = await (supabase as any).from("daily_audio_devotionals")
+            .select("audio_url, audio_storage_path")
+            .eq("status", "ready")
+            .order("day_number", { ascending: false }).limit(1).maybeSingle();
+          if (devs?.audio_url) url = devs.audio_url;
+          else if (devs?.audio_storage_path) {
+            const { data: signed } = await supabase.storage.from("audio-cache").createSignedUrl(devs.audio_storage_path, 3600);
+            if (signed?.signedUrl) url = signed.signedUrl;
+          }
+        }
+
+        // Palace tour
+        if (genType === "palace-tour") {
+          const { data: resp } = await supabase.functions.invoke("generate-palace-tour-audio", {
+            body: { script: "Welcome to the Phototheology Palace. Let me guide you through the eight floors of biblical discovery.", voice: "reginald", guide: "reginald", segmentId: "playlist-tour" },
+          });
+          if (resp?.audioUrl) url = resp.audioUrl;
+        }
+
+        // Apologetics
+        if (genType === "apologetics") {
+          toast.info("Generating apologetics audio...");
+          const { data: resp } = await supabase.functions.invoke("generate-epic-commentary", {
+            body: { book: "Daniel", chapter: 2, mode: "scholar" },
+          });
+          if (resp?.audioUrl) url = resp.audioUrl;
+        }
+
+        // Bible Reading — generate chapter commentary as fallback
+        if (genType === "bible-reading") {
+          toast.info("Loading Bible reading...");
+          const { data: resp } = await supabase.functions.invoke("generate-chapter-commentary", {
+            body: { book: meta.book || "Genesis", chapter: meta.chapter || 1 },
+          });
+          if (resp?.audioUrl) url = resp.audioUrl;
+        }
+      } catch (err) {
+        console.error("[resolveAudioUrl] Error resolving audio:", err);
       }
     }
+
+    // Re-sign expired signed URLs
     if (url && url.includes('/storage/v1/object/sign/')) {
       try {
         const m = url.match(/\/storage\/v1\/object\/sign\/([^?]+)/);
