@@ -1233,6 +1233,246 @@ export type Database = {
         }
         Relationships: []
       }
+      bread_alone_buddies: {
+        Row: {
+          accepted_at: string | null
+          buddy_id: string
+          created_at: string
+          fast_id: string
+          id: string
+          invite_code: string
+          inviter_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          buddy_id: string
+          created_at?: string
+          fast_id: string
+          id?: string
+          invite_code: string
+          inviter_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          buddy_id?: string
+          created_at?: string
+          fast_id?: string
+          id?: string
+          invite_code?: string
+          inviter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bread_alone_buddies_fast_id_fkey"
+            columns: ["fast_id"]
+            isOneToOne: false
+            referencedRelation: "bread_alone_fasts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bread_alone_church_fasts: {
+        Row: {
+          church_id: string
+          created_at: string
+          created_by: string
+          description: string | null
+          duration_tier: string
+          ends_at: string
+          id: string
+          is_active: boolean
+          participant_count: number
+          passage_or_theme: string
+          starts_at: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          church_id: string
+          created_at?: string
+          created_by: string
+          description?: string | null
+          duration_tier: string
+          ends_at: string
+          id?: string
+          is_active?: boolean
+          participant_count?: number
+          passage_or_theme: string
+          starts_at: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          church_id?: string
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          duration_tier?: string
+          ends_at?: string
+          id?: string
+          is_active?: boolean
+          participant_count?: number
+          passage_or_theme?: string
+          starts_at?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bread_alone_church_fasts_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bread_alone_church_fasts_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches_public_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bread_alone_fasts: {
+        Row: {
+          abandoned_at: string | null
+          assignment_mode: string
+          breaking_bread_summary: string | null
+          buddy_code: string | null
+          church_fast_id: string | null
+          completed_at: string | null
+          created_at: string
+          duration_label: string
+          duration_tier: string
+          ends_at: string
+          gems_collected: number
+          id: string
+          meal_interval_hours: number
+          meals_consumed: number
+          passage_or_theme: string
+          started_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          abandoned_at?: string | null
+          assignment_mode?: string
+          breaking_bread_summary?: string | null
+          buddy_code?: string | null
+          church_fast_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          duration_label: string
+          duration_tier: string
+          ends_at: string
+          gems_collected?: number
+          id?: string
+          meal_interval_hours?: number
+          meals_consumed?: number
+          passage_or_theme: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          abandoned_at?: string | null
+          assignment_mode?: string
+          breaking_bread_summary?: string | null
+          buddy_code?: string | null
+          church_fast_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          duration_label?: string
+          duration_tier?: string
+          ends_at?: string
+          gems_collected?: number
+          id?: string
+          meal_interval_hours?: number
+          meals_consumed?: number
+          passage_or_theme?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bread_alone_fasts_church_fast_id_fkey"
+            columns: ["church_fast_id"]
+            isOneToOne: false
+            referencedRelation: "bread_alone_church_fasts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bread_alone_meals: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          fast_id: string
+          gems_found: string[] | null
+          id: string
+          journal_entry: string | null
+          meal_label: string
+          meal_number: number
+          meal_type: string
+          palace_floor: number | null
+          palace_room_code: string | null
+          passage: string | null
+          questions_raised: string[] | null
+          started_at: string
+          suggested_by: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          fast_id: string
+          gems_found?: string[] | null
+          id?: string
+          journal_entry?: string | null
+          meal_label: string
+          meal_number: number
+          meal_type: string
+          palace_floor?: number | null
+          palace_room_code?: string | null
+          passage?: string | null
+          questions_raised?: string[] | null
+          started_at?: string
+          suggested_by?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          fast_id?: string
+          gems_found?: string[] | null
+          id?: string
+          journal_entry?: string | null
+          meal_label?: string
+          meal_number?: number
+          meal_type?: string
+          palace_floor?: number | null
+          palace_room_code?: string | null
+          passage?: string | null
+          questions_raised?: string[] | null
+          started_at?: string
+          suggested_by?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bread_alone_meals_fast_id_fkey"
+            columns: ["fast_id"]
+            isOneToOne: false
+            referencedRelation: "bread_alone_fasts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       certificates: {
         Row: {
           certificate_data: Json
