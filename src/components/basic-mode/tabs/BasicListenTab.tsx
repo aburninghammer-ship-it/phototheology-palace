@@ -108,7 +108,7 @@ export default function BasicListenTab() {
   const {
     items, loading, removeItem, clearPlaylist, count, maxItems,
     currentIndex, setCurrentIndex, isPlaying, setIsPlaying, reorderItems,
-    playlists, activePlaylistId, selectPlaylist, createPlaylist, deletePlaylist,
+    playlists, activePlaylistId, selectPlaylist, createPlaylist, renamePlaylist, deletePlaylist,
     addItem,
   } = usePlaylist();
   const immersive = useImmersiveMode();
@@ -117,6 +117,8 @@ export default function BasicListenTab() {
   const [expandedSource, setExpandedSource] = useState<string | null>(null);
   const [newPlaylistName, setNewPlaylistName] = useState("");
   const [showCreateInput, setShowCreateInput] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
   const [selectedBook, setSelectedBook] = useState("Genesis");
   const [selectedChapter, setSelectedChapter] = useState(1);
 
@@ -384,16 +386,32 @@ export default function BasicListenTab() {
         {/* Playlist tabs */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
           {playlists.map(pl => (
-            <Button
-              key={pl.id}
-              variant={pl.id === activePlaylistId ? "default" : "outline"}
-              size="sm"
-              className="flex-shrink-0 h-7 text-xs gap-1"
-              onClick={() => selectPlaylist(pl.id)}
-            >
-              <ListMusic className="h-3 w-3" />
-              <span className="truncate max-w-[100px]">{pl.name}</span>
-            </Button>
+            editingId === pl.id ? (
+              <div key={pl.id} className="flex items-center gap-1 flex-shrink-0">
+                <Input value={editName} onChange={(e) => setEditName(e.target.value)}
+                  placeholder="Name..." className="h-7 w-28 text-xs" autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && editName.trim()) { renamePlaylist(pl.id, editName); setEditingId(null); }
+                    if (e.key === "Escape") setEditingId(null);
+                  }} />
+                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => { if (editName.trim()) { renamePlaylist(pl.id, editName); setEditingId(null); } }}><Check className="h-3 w-3" /></Button>
+                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditingId(null)}><X className="h-3 w-3" /></Button>
+              </div>
+            ) : (
+              <Button
+                key={pl.id}
+                variant={pl.id === activePlaylistId ? "default" : "outline"}
+                size="sm"
+                className="flex-shrink-0 h-7 text-xs gap-1 group"
+                onClick={() => selectPlaylist(pl.id)}
+                onDoubleClick={(e) => { e.stopPropagation(); setEditingId(pl.id); setEditName(pl.name); }}
+              >
+                <ListMusic className="h-3 w-3" />
+                <span className="truncate max-w-[100px]">{pl.name}</span>
+                <Pencil className="h-2.5 w-2.5 opacity-0 group-hover:opacity-60 transition-opacity ml-0.5"
+                  onClick={(e) => { e.stopPropagation(); setEditingId(pl.id); setEditName(pl.name); }} />
+              </Button>
+            )
           ))}
           {showCreateInput ? (
             <div className="flex items-center gap-1 flex-shrink-0">
