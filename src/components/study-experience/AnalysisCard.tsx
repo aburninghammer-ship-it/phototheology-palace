@@ -428,16 +428,27 @@ INSTRUCTIONS:
           <Badge className="bg-green-500/15 text-green-400 border-green-500/30 text-[10px]">
             <Check className="w-3 h-3 mr-0.5" /> Accepted
           </Badge>
-          {onContinueBuilding && !showAbChoice && (
-            <Button
-              size="sm"
-              variant="ghost"
-              className="h-8 px-3 text-xs gap-1.5 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 hover:border-primary/50 transition-all"
-              onClick={onContinueBuilding}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              Continue Building
-            </Button>
+          {onAbSelect && !showAbChoice && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Continue Building:</span>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 px-4 text-sm font-bold border-2 border-primary/40 hover:border-primary hover:bg-primary/10 transition-all"
+                onClick={() => onAbSelect("a")}
+              >
+                A
+              </Button>
+              <span className="text-[10px] text-muted-foreground">or</span>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 px-4 text-sm font-bold border-2 border-primary/40 hover:border-primary hover:bg-primary/10 transition-all"
+                onClick={() => onAbSelect("b")}
+              >
+                B
+              </Button>
+            </div>
           )}
           {showAbChoice && onAbSelect && (
             <div className="flex items-center gap-2">
