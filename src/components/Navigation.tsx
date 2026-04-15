@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Building2, Columns2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap, Trophy, MessageSquare, Target, StickyNote, Radio, Church, GraduationCap, Award, Gamepad2, BarChart3, Archive, Library, Layers, Network, Home, Heart, Gem, FileImage, FolderOpen, Globe, Settings } from "lucide-react";
+import { Building2, Columns2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap, Trophy, MessageSquare, Target, StickyNote, Radio, Church, GraduationCap, Award, Gamepad2, BarChart3, Archive, Library, Layers, Network, Home, Heart, Gem, FileImage, FolderOpen, Globe, Settings, Headphones } from "lucide-react";
 import { DraggableNavTabs } from "@/components/navigation/DraggableNavTabs";
 import { GlobalStudyBanner } from "@/components/GlobalStudyBanner";
 import { Button } from "@/components/ui/button";
@@ -509,11 +509,18 @@ className="fixed left-0 right-0 z-40 bg-card border-b border-border shadow-sm pt
                     <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-semibold">{t('navTabs.reading-plans', 'Reading Plans')}</span>
                   </Link>
                   <Link
-                    to="/devotionals" 
+                    to="/devotionals"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-pink-500/10 to-rose-500/10 border border-pink-500/20 hover:from-pink-500/20 hover:to-rose-500/20 ${isActiveTab('/devotionals') ? 'shadow-[0_0_12px_2px_rgba(236,72,153,0.5)] border-pink-400/60' : ''}`}
                   >
                     <BookOpen className="h-3.5 w-3.5 text-pink-500" />
                     <span className="bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent font-semibold">{t('navTabs.devotionals', 'Devotionals')}</span>
+                  </Link>
+                  <Link
+                    to="/audio-library"
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-cyan-500/10 to-teal-500/10 border border-cyan-500/20 hover:from-cyan-500/20 hover:to-teal-500/20 ${isActiveTab('/audio-library') ? 'shadow-[0_0_12px_2px_rgba(6,182,212,0.5)] border-cyan-400/60' : ''}`}
+                  >
+                    <Headphones className="h-3.5 w-3.5 text-cyan-500" />
+                    <span className="bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent font-semibold">{t('navTabs.audio-library', 'Audio Library')}</span>
                   </Link>
                   <Link
                     to="/encyclopedia"
