@@ -426,6 +426,7 @@ function ActiveFastDashboard({ fast }: { fast: FastRow }) {
         <MealForm
           fastId={fast.id}
           mealNumber={(meals?.length ?? 0) + 1}
+          passageOrTheme={fast.passage_or_theme}
           onDone={() => {
             setShowMealForm(false);
             queryClient.invalidateQueries({ queryKey: ["bread-alone-meals", fast.id] });
