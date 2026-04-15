@@ -3,7 +3,7 @@
  * Shows playlist hub inline within the shell.
  */
 import { useState, useCallback, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+
 import { usePlaylist } from "@/hooks/usePlaylist";
 import { useAuth } from "@/hooks/useAuth";
 import { useImmersiveMode } from "@/hooks/useImmersiveMode";
@@ -103,7 +103,7 @@ const BIBLE_BOOKS = [
 ];
 
 export default function BasicListenTab() {
-  const navigate = useNavigate();
+  
   const { user } = useAuth();
   const {
     items, loading, removeItem, clearPlaylist, count, maxItems,
