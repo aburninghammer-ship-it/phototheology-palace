@@ -3,7 +3,6 @@ import { ContinueWhereYouLeftOff } from "@/components/ContinueWhereYouLeftOff";
 import { ReginaldGreeting } from "@/components/ReginaldGreeting";
 import { DailyAudioDevotional } from "@/components/DailyAudioDevotional";
 import { OsSpacesWelcome } from "@/components/OsSpacesWelcome";
-import { PtGlossaryTable } from "@/components/PtGlossaryTable";
 import { UpgradeFloatingCard } from "@/components/UpgradeFloatingCard";
 import { WhatsNewTicker } from "@/components/WhatsNewTicker";
 import { ExperienceModeSelector } from "@/components/experience-mode";
@@ -142,9 +141,6 @@ const Welcome = () => {
         <ContinueWhereYouLeftOff />
       </div>
 
-      <PTSection showIn="immersion">
-        <PtGlossaryTable />
-      </PTSection>
     </>
   );
 };
