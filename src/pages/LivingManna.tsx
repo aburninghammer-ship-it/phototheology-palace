@@ -9,7 +9,7 @@ import { useChurchMembership } from "@/hooks/useChurchMembership";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap, Settings, Droplets, ExternalLink, HeartHandshake, DollarSign, Library, Radio, Shield, Globe, GraduationCap } from "lucide-react";
+import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap, Settings, Droplets, ExternalLink, HeartHandshake, DollarSign, Library, Radio, Shield, Globe, GraduationCap, Sunrise, MoonStar, Wheat } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { useTheme } from "next-themes";
@@ -32,6 +32,9 @@ import { LMLiveTab } from "@/components/living-manna/LMLiveTab";
 import { LiveMembersStrip } from "@/components/living-manna/LiveMembersStrip";
 import { BaptismTrack } from "@/components/living-manna/baptism-track/BaptismTrack";
 import { DirectMessagesProvider } from "@/contexts/DirectMessagesContext";
+import { MorningWatchEmbed } from "@/components/living-manna/MorningWatchEmbed";
+import { NightWatchEmbed } from "@/components/living-manna/NightWatchEmbed";
+import { BreadFastEmbed } from "@/components/living-manna/BreadFastEmbed";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TagFriendButton } from "@/components/TagFriendButton";
 export default function LivingManna() {
@@ -402,6 +405,18 @@ export default function LivingManna() {
                     <BookMarked className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">EGW</span>
                   </TabsTrigger>
+                  <TabsTrigger value="morning-watch" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <Sunrise className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">Morning</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="night-watch" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <MoonStar className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">Night</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="bread-fast" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <Wheat className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">Bread Fast</span>
+                  </TabsTrigger>
                   {(isChurchAdmin || memberRole === 'leader') && (
                     <TabsTrigger value="admin" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
                       <Settings className="h-4 w-4" />
@@ -477,6 +492,18 @@ export default function LivingManna() {
 
               <TabsContent value="egw">
                 <SpiritOfProphecyTab churchId={effectiveChurchId!} />
+              </TabsContent>
+
+              <TabsContent value="morning-watch">
+                <MorningWatchEmbed />
+              </TabsContent>
+
+              <TabsContent value="night-watch">
+                <NightWatchEmbed />
+              </TabsContent>
+
+              <TabsContent value="bread-fast">
+                <BreadFastEmbed />
               </TabsContent>
 
               {(isChurchAdmin || memberRole === 'leader') && (
