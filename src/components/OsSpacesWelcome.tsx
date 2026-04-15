@@ -20,6 +20,8 @@ import {
   MessageSquare, Megaphone, Video, Crown, Users, User,
   Library, Clock, Map, Languages, BookText, Glasses,
   CreditCard, LayoutGrid, ImageIcon, Scroll, Moon,
+  Wheat, Droplets, UserPlus, Bell, BookHeart, ClipboardList,
+  HandHeart, Podcast, Music, FileText,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -198,6 +200,28 @@ const OS_SPACES: OsSpace[] = [
       { label: "AATS War College", path: "/cota-series?tab=aats", icon: Target, description: "Advanced training", tooltip: "Advanced Apologetics Training System — intensive combat-level theological training." },
       { label: "Apologetics GPT", path: "/apologetics-gpt", icon: Shield, description: "Defend the faith", tooltip: "An AI trained specifically for apologetics. Present any objection and receive Scripture-grounded defensive arguments." },
       { label: "Christ & Culture", path: "/culture-controversy", icon: Scale, description: "Cultural topics", tooltip: "Explore how Scripture speaks to modern cultural issues with balanced, Christ-centered perspectives." },
+    ],
+  },
+  {
+    id: "church",
+    label: "Living Manna Church",
+    simpleLabel: "Church",
+    subtitle: "Your Church Community Hub",
+    icon: Wheat,
+    color: "152 60% 42%",
+    items: [
+      { label: "My Church", path: "/living-manna", icon: Church, description: "Church hub", tooltip: "Your church's central digital hub — announcements, members, events, and everything your local church offers." },
+      { label: "Church Admin", path: "/church-admin", icon: ClipboardList, description: "Admin dashboard", tooltip: "Manage your church's settings, members, roles, and digital ministry tools." },
+      { label: "Join a Church", path: "/join-church", icon: UserPlus, description: "Find & join", tooltip: "Search for a church community to join and connect with fellow believers." },
+      { label: "Announcements", path: "/living-manna?tab=announcements", icon: Bell, description: "Church news", tooltip: "View and manage church announcements, events, and important updates." },
+      { label: "Sabbath School", path: "/quarterly-study", icon: BookOpen, description: "Weekly lesson", tooltip: "Follow along with the current Sabbath School quarterly — daily lessons and discussion questions." },
+      { label: "Discipleship", path: "/living-manna?tab=discipleship", icon: BookHeart, description: "72-week journey", tooltip: "A 72-week discipleship journey for your congregation — structured, progressive, Christ-centered growth." },
+      { label: "Baptism Prep", path: "/living-manna?tab=baptism", icon: Droplets, description: "Baptism studies", tooltip: "Guided baptismal preparation studies covering fundamental beliefs through the Phototheology method." },
+      { label: "Prayer Wall", path: "/living-manna?tab=prayer", icon: HandHeart, description: "Prayer requests", tooltip: "Share and support prayer requests within your church family." },
+      { label: "Bible Workers", path: "/living-manna?tab=bible-workers", icon: Users, description: "Ministry teams", tooltip: "Manage and coordinate Bible worker teams, study releases, and evangelism contacts." },
+      { label: "Church Sermons", path: "/living-manna?tab=sermons", icon: Podcast, description: "Sermon archive", tooltip: "Access your church's sermon archive — watch, listen, and study past messages." },
+      { label: "Bread Alone", path: "/bread-alone", icon: Wheat, description: "Scripture fasting", tooltip: "Join a guided Scripture fasting experience — feed on the Word alone with your church community." },
+      { label: "Church Chat", path: "/living-manna?tab=chat", icon: MessageSquare, description: "Fellowship", tooltip: "Connect with your church family in real-time chat rooms." },
     ],
   },
 ];
