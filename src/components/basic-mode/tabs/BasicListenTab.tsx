@@ -16,7 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   ListMusic, Play, Pause, SkipForward, SkipBack, Trash2, Plus, Sun,
   Moon, BookOpen, Headphones, Swords, Compass, Maximize2, GripVertical,
-  Volume2, VolumeX, Check, X, Pencil, ArrowRight, Loader2,
+  Volume2, VolumeX, Check, X, Pencil, Loader2,
   BookOpenCheck, Mic, Sparkles, ExternalLink,
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
