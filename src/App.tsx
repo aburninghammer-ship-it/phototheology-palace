@@ -158,6 +158,7 @@ const WeeklyChallenge = lazy(() => import("./pages/WeeklyChallenge"));
 const SeriesPresentationMode = lazy(() => import("./pages/SeriesPresentationMode"));
 const PublicSeriesBrowser = lazy(() => import("./pages/PublicSeriesBrowser"));
 const Flashcards = lazy(() => import("./pages/Flashcards"));
+const Glossary = lazy(() => import("./pages/Glossary"));
 const PhototheologyImageBible = lazy(() => import("./pages/PhototheologyImageBible"));
 const PowerOfTheLamb = lazy(() => import("./pages/PowerOfTheLamb"));
 const CharacterProfiles = lazy(() => import("./pages/CharacterProfiles"));
@@ -615,8 +616,8 @@ function App() {
             <Route path="/games/phototheology-uno" element={<BasicModeGate><ProtectedRoute><PhototheologyUno /></ProtectedRoute></BasicModeGate>} />
             <Route path="/games/frame-snapshot" element={<BasicModeGate><ProtectedRoute><FrameSnapshot /></ProtectedRoute></BasicModeGate>} />
             <Route path="/games/story-room" element={<BasicModeGate><ProtectedRoute><StoryRoomGame /></ProtectedRoute></BasicModeGate>} />
-            
-            
+            <Route path="/glossary" element={<Glossary />} />
+
             
             <Route path="/games/observation-room" element={<BasicModeGate><ProtectedRoute><ObservationFlux /></ProtectedRoute></BasicModeGate>} />
             <Route path="/games/concentration-room" element={<BasicModeGate><ProtectedRoute><ConcentrationRoom /></ProtectedRoute></BasicModeGate>} />
