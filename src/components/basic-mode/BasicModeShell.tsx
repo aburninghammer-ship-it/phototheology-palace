@@ -153,7 +153,7 @@ export function BasicModeShell() {
         </header>
 
         {/* Main content — on mobile, add bottom padding for the tab bar */}
-        <main className="flex-1 overflow-hidden pb-[62px] md:pb-0">
+        <main className="flex-1 overflow-hidden pb-[58px] md:pb-0">
           <Suspense fallback={<LoadingScreen />}>
             <ActiveComponent />
           </Suspense>
