@@ -127,7 +127,7 @@ const BibleChapter = () => {
               </Select>
 
               <Select value={String(currentChapter)} onValueChange={handleChapterChange}>
-                <SelectTrigger className="h-8 sm:h-9 w-[65px] sm:w-[80px] bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 text-xs sm:text-sm font-medium">
+                <SelectTrigger className="h-8 sm:h-9 w-[75px] sm:w-[85px] bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 text-xs sm:text-sm font-medium">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px] bg-card/95 backdrop-blur-xl border-white/20 z-50">
