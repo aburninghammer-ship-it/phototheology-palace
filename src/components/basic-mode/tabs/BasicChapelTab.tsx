@@ -20,7 +20,7 @@ const CHAPEL_ITEMS = [
   { icon: Heart, label: "Devotionals", path: "/devotionals", description: "In-depth devotional content", color: "text-rose-400" },
   { icon: Swords, label: "Dojo", path: "/christian-art-of-war", description: "Strategic spiritual warfare training", color: "text-red-400" },
   { icon: Flame, label: "40 Days in the Tomb", path: "/forty-day-challenge", description: "An intense 40-day spiritual debate challenge", color: "text-orange-500" },
-  { icon: Church, label: "My Church", path: "/join-church", description: "Connect with your church community", color: "text-blue-400" },
+  
   { icon: GraduationCap, label: "Blueprint: Marriage", path: "/blueprint-marriage", description: "Biblical principles for marriage", color: "text-pink-400" },
   { icon: Baby, label: "Blueprint: Parenting", path: "/blueprint-parenting", description: "Raising children God's way", color: "text-orange-400" },
   { icon: Users, label: "Singles Devotional", path: "/singles-devotional", description: "Devotionals for singles", color: "text-cyan-400" },
