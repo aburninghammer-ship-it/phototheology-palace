@@ -426,6 +426,7 @@ function ActiveFastDashboard({ fast }: { fast: FastRow }) {
         <MealForm
           fastId={fast.id}
           mealNumber={(meals?.length ?? 0) + 1}
+          passageOrTheme={fast.passage_or_theme}
           onDone={() => {
             setShowMealForm(false);
             queryClient.invalidateQueries({ queryKey: ["bread-alone-meals", fast.id] });
@@ -500,16 +501,37 @@ function ActiveFastDashboard({ fast }: { fast: FastRow }) {
 }
 
 /* ─── MEAL FORM ─── */
-function MealForm({ fastId, mealNumber, onDone }: { fastId: string; mealNumber: number; onDone: () => void }) {
+function MealForm({ fastId, mealNumber, passageOrTheme, onDone }: { fastId: string; mealNumber: number; passageOrTheme: string; onDone: () => void }) {
   const { user } = useAuth();
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [journal, setJournal] = useState("");
   const [gems, setGems] = useState("");
   const [passage, setPassage] = useState("");
+  const [jeevesInstruction, setJeevesInstruction] = useState<string | null>(null);
+  const [loadingInstruction, setLoadingInstruction] = useState(false);
 
   // Suggest a meal type based on meal number (hybrid mode)
   const suggestedIndex = (mealNumber - 1) % MEAL_TYPES.length;
   const suggested = MEAL_TYPES[suggestedIndex];
+
+  // Fetch Jeeves instruction when meal type is selected
+  const fetchInstruction = async (mealType: string) => {
+    setSelectedType(mealType);
+    setJeevesInstruction(null);
+    setLoadingInstruction(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("bread-alone-instructions", {
+        body: { passage_or_theme: passageOrTheme, meal_type: mealType },
+      });
+      if (error) throw error;
+      setJeevesInstruction(data?.instruction || null);
+    } catch (e) {
+      console.error("Failed to fetch instruction:", e);
+      setJeevesInstruction(null);
+    } finally {
+      setLoadingInstruction(false);
+    }
+  };
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -566,7 +588,7 @@ function MealForm({ fastId, mealNumber, onDone }: { fastId: string; mealNumber: 
             return (
               <button
                 key={mt.id}
-                onClick={() => setSelectedType(mt.id)}
+                onClick={() => fetchInstruction(mt.id)}
                 className={`text-left p-3 rounded-lg border text-xs transition-all ${
                   selectedType === mt.id
                     ? "border-amber-400 bg-amber-500/10"
@@ -583,8 +605,25 @@ function MealForm({ fastId, mealNumber, onDone }: { fastId: string; mealNumber: 
           })}
         </div>
 
+        {/* Jeeves instruction */}
         {selectedType && (
           <>
+            {loadingInstruction ? (
+              <div className="p-3 rounded-lg border border-amber-500/20 bg-amber-500/5 animate-pulse">
+                <p className="text-xs text-amber-400 italic">Jeeves is preparing your assignment...</p>
+              </div>
+            ) : jeevesInstruction ? (
+              <div className="p-3 rounded-lg border border-amber-500/20 bg-amber-500/5">
+                <div className="flex items-start gap-2">
+                  <Sparkles className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-[10px] text-amber-400 font-semibold uppercase tracking-wide mb-1">Jeeves' Assignment</p>
+                    <p className="text-xs text-foreground leading-relaxed">{jeevesInstruction}</p>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
             <Input
               value={passage}
               onChange={(e) => setPassage(e.target.value)}
