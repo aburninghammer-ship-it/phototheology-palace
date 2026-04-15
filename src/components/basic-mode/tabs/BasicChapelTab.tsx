@@ -18,7 +18,7 @@ const CHAPEL_ITEMS = [
   { icon: CalendarDays, label: "Reading Plans", path: "/reading-plans", description: "Structured Bible reading programs", color: "text-sky-400" },
   { icon: Gem, label: "Daily Verse", path: "/daily-verse", description: "A gem from Scripture each day", color: "text-yellow-400" },
   { icon: Heart, label: "Devotionals", path: "/devotionals", description: "In-depth devotional content", color: "text-rose-400" },
-  { icon: Swords, label: "Dojo", path: "/defense-mode", description: "Train your doctrinal defense skills", color: "text-red-400" },
+  { icon: Swords, label: "Dojo", path: "/christian-art-of-war", description: "Strategic spiritual warfare training", color: "text-red-400" },
   { icon: Flame, label: "40 Days in the Tomb", path: "/forty-day-challenge", description: "An intense 40-day spiritual debate challenge", color: "text-orange-500" },
   { icon: Church, label: "My Church", path: "/join-church", description: "Connect with your church community", color: "text-blue-400" },
   { icon: Globe, label: "Prophecy Watch", path: "/prophecy-watch", description: "Current events in the light of prophecy", color: "text-purple-400" },
