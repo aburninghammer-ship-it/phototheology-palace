@@ -433,22 +433,26 @@ export default function BasicListenTab() {
           </div>
         )}
 
-        {/* ── Add Content Section ── */}
+        {/* ── Add Content Section (all inline) ── */}
         <div className="border-t pt-3 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold">Add Content</h3>
-            <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => navigate("/playlist")}>
-              Full Library <ArrowRight className="h-3 w-3 ml-1" />
-            </Button>
-          </div>
+          <h3 className="text-sm font-semibold">Add Content</h3>
 
           {/* Quick source buttons */}
           <div className="grid grid-cols-4 gap-2">
             {QUICK_SOURCES.map(src => (
               <button
                 key={src.id}
-                onClick={() => navigate(src.navigateTo)}
-                className="flex flex-col items-center gap-1 p-2 rounded-lg border border-transparent hover:border-border hover:bg-muted/50 transition-all group"
+                onClick={() => {
+                  if (src.expandable) {
+                    setExpandedSource(expandedSource === src.id ? null : src.id);
+                  } else {
+                    // Direct add for non-expandable sources
+                    handleQuickAdd(src.id);
+                  }
+                }}
+                className={`flex flex-col items-center gap-1 p-2 rounded-lg border transition-all group ${
+                  expandedSource === src.id ? "border-primary/40 bg-primary/5" : "border-transparent hover:border-border hover:bg-muted/50"
+                }`}
               >
                 <div className={`${src.color} group-hover:scale-110 transition-transform`}>{src.icon}</div>
                 <span className="text-[10px] text-muted-foreground text-center leading-tight">{src.title}</span>
@@ -456,44 +460,85 @@ export default function BasicListenTab() {
             ))}
           </div>
 
-          {/* Podcast quick-add */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Mic className="h-4 w-4 text-orange-400" />
-              <h4 className="text-xs font-semibold">Podcast Episodes</h4>
-              <Badge variant="outline" className="text-[9px]">{PODCAST_EPISODES.length} episodes</Badge>
-            </div>
-            <div className="space-y-1 max-h-48 overflow-y-auto">
-              {PODCAST_EPISODES.map(ep => {
-                const alreadyAdded = items.some(i => 
-                  i.audio_meta && (i.audio_meta as any).episodeNumber === ep.episodeNumber && i.audio_type === "podcast"
-                );
-                return (
-                  <div
-                    key={ep.id}
-                    className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${
-                      alreadyAdded ? "border-primary/20 bg-primary/5 opacity-60" : "border-transparent hover:border-border hover:bg-muted/30"
-                    }`}
+          {/* Expanded inline panel for Commentary / Bible Reading */}
+          {(expandedSource === "commentary" || expandedSource === "reading") && (
+            <Card className="border-primary/20">
+              <CardContent className="p-3 space-y-2">
+                <p className="text-xs font-semibold">
+                  {expandedSource === "commentary" ? "Add Commentary" : "Add Bible Reading"}
+                </p>
+                <div className="flex gap-2">
+                  <select
+                    value={selectedBook}
+                    onChange={(e) => { setSelectedBook(e.target.value); setSelectedChapter(1); }}
+                    className="flex-1 h-8 text-xs rounded-md border bg-background px-2"
                   >
-                    <span className="text-[10px] text-muted-foreground w-5 text-center shrink-0">{ep.episodeNumber}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium truncate">{ep.title}</p>
-                      <p className="text-[10px] text-muted-foreground">{ep.duration}</p>
-                    </div>
-                    <Button
-                      variant={alreadyAdded ? "ghost" : "outline"}
-                      size="sm"
-                      className="h-6 text-[10px] px-2 shrink-0"
-                      disabled={alreadyAdded}
-                      onClick={() => addPodcastToPlaylist(ep)}
-                    >
-                      {alreadyAdded ? <Check className="h-3 w-3" /> : <><Plus className="h-3 w-3 mr-0.5" /> Add</>}
-                    </Button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+                    {BIBLE_BOOKS.map(b => <option key={b} value={b}>{b}</option>)}
+                  </select>
+                  <Input
+                    type="number" min={1} max={150} value={selectedChapter}
+                    onChange={(e) => setSelectedChapter(parseInt(e.target.value) || 1)}
+                    className="w-16 h-8 text-xs"
+                    placeholder="Ch"
+                  />
+                  <Button size="sm" className="h-8 text-xs gap-1" onClick={() => {
+                    const type = expandedSource === "commentary" ? "commentary" : "reading";
+                    addItem({
+                      title: `${selectedBook} ${selectedChapter} (${type === "commentary" ? "Commentary" : "Reading"})`,
+                      description: `${type === "commentary" ? "Audio commentary for" : "Bible reading of"} ${selectedBook} ${selectedChapter}`,
+                      audio_type: type,
+                      audio_url: null,
+                      audio_meta: {
+                        generationType: type === "commentary" ? "chapter-commentary" : "chapter-reading",
+                        book: selectedBook,
+                        chapter: selectedChapter,
+                      },
+                    });
+                    toast.success(`Added ${selectedBook} ${selectedChapter}`);
+                  }}>
+                    <Plus className="h-3 w-3" /> Add
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Podcast quick-add (always visible) */}
+          {expandedSource === "podcast" && (
+            <Card className="border-primary/20">
+              <CardContent className="p-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Mic className="h-4 w-4 text-orange-400" />
+                  <h4 className="text-xs font-semibold">Podcast Episodes</h4>
+                  <Badge variant="outline" className="text-[9px]">{PODCAST_EPISODES.length} episodes</Badge>
+                </div>
+                <div className="space-y-1 max-h-48 overflow-y-auto">
+                  {PODCAST_EPISODES.map(ep => {
+                    const alreadyAdded = items.some(i => 
+                      i.audio_meta && (i.audio_meta as any).episodeNumber === ep.episodeNumber && i.audio_type === "podcast"
+                    );
+                    return (
+                      <div key={ep.id}
+                        className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${
+                          alreadyAdded ? "border-primary/20 bg-primary/5 opacity-60" : "border-transparent hover:border-border hover:bg-muted/30"
+                        }`}>
+                        <span className="text-[10px] text-muted-foreground w-5 text-center shrink-0">{ep.episodeNumber}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium truncate">{ep.title}</p>
+                          <p className="text-[10px] text-muted-foreground">{ep.duration}</p>
+                        </div>
+                        <Button variant={alreadyAdded ? "ghost" : "outline"} size="sm"
+                          className="h-6 text-[10px] px-2 shrink-0" disabled={alreadyAdded}
+                          onClick={() => addPodcastToPlaylist(ep)}>
+                          {alreadyAdded ? <Check className="h-3 w-3" /> : <><Plus className="h-3 w-3 mr-0.5" /> Add</>}
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
 
