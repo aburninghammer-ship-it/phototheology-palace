@@ -114,8 +114,11 @@ export default function BasicListenTab() {
   const immersive = useImmersiveMode();
 
   const [showAddPanel, setShowAddPanel] = useState(false);
+  const [expandedSource, setExpandedSource] = useState<string | null>(null);
   const [newPlaylistName, setNewPlaylistName] = useState("");
   const [showCreateInput, setShowCreateInput] = useState(false);
+  const [selectedBook, setSelectedBook] = useState("Genesis");
+  const [selectedChapter, setSelectedChapter] = useState(1);
 
   // Audio playback
   const audioRef = useRef<HTMLAudioElement | null>(null);
