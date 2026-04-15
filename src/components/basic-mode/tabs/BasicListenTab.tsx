@@ -79,14 +79,44 @@ interface QuickSource {
   expandable?: boolean;
 }
 
+const VOICE_STYLES = [
+  { id: "epic", label: "Epic Narrator", emoji: "🎬" },
+  { id: "urban", label: "Modern Preacher", emoji: "🎤" },
+  { id: "counselor", label: "Counselor", emoji: "💬" },
+  { id: "ancient", label: "Ancient Voice", emoji: "📜" },
+  { id: "preacher", label: "Preacher", emoji: "🔥" },
+  { id: "scholar", label: "Scholar", emoji: "🎓" },
+  { id: "kids", label: "Kids Adventure", emoji: "🧒" },
+  { id: "mirror", label: "Mirror", emoji: "🪞" },
+];
+
+const MORNING_OPTIONS = [
+  { id: "activation", label: "Mental Activation", emoji: "⚡" },
+  { id: "scripture", label: "Scripture Focus", emoji: "📖" },
+  { id: "prayer", label: "Prayer & Praise", emoji: "🙏" },
+];
+
+const NIGHT_OPTIONS = [
+  { id: "reflection", label: "Day Reflection", emoji: "🌙" },
+  { id: "meditation", label: "Scripture Meditation", emoji: "🧘" },
+  { id: "rest", label: "Rest & Surrender", emoji: "😴" },
+];
+
+const APOLOGETICS_OPTIONS = [
+  { id: "cota", label: "COTA Deep Dive", emoji: "📚" },
+  { id: "aats", label: "AATS Defense", emoji: "🛡️" },
+  { id: "prophecy", label: "Prophetic Evidence", emoji: "🔮" },
+  { id: "general", label: "General Apologetics", emoji: "⚔️" },
+];
+
 const QUICK_SOURCES: QuickSource[] = [
-  { id: "morning", title: "Morning Watch", icon: <Sun className="h-4 w-4" />, color: "text-amber-400" },
-  { id: "night", title: "Night Watch", icon: <Moon className="h-4 w-4" />, color: "text-indigo-400" },
+  { id: "morning", title: "Morning Watch", icon: <Sun className="h-4 w-4" />, color: "text-amber-400", expandable: true },
+  { id: "night", title: "Night Watch", icon: <Moon className="h-4 w-4" />, color: "text-indigo-400", expandable: true },
   { id: "devotional", title: "Daily Devotional", icon: <Sparkles className="h-4 w-4" />, color: "text-purple-400" },
   { id: "commentary", title: "Commentary", icon: <BookOpen className="h-4 w-4" />, color: "text-emerald-400", expandable: true },
   { id: "reading", title: "Bible Reading", icon: <BookOpenCheck className="h-4 w-4" />, color: "text-blue-400", expandable: true },
   { id: "podcast", title: "Podcast", icon: <Mic className="h-4 w-4" />, color: "text-orange-400", expandable: true },
-  { id: "apologetics", title: "Apologetics", icon: <Swords className="h-4 w-4" />, color: "text-red-400" },
+  { id: "apologetics", title: "Apologetics", icon: <Swords className="h-4 w-4" />, color: "text-red-400", expandable: true },
   { id: "tour", title: "Palace Tour", icon: <Compass className="h-4 w-4" />, color: "text-cyan-400" },
 ];
 
@@ -121,6 +151,7 @@ export default function BasicListenTab() {
   const [editName, setEditName] = useState("");
   const [selectedBook, setSelectedBook] = useState("Genesis");
   const [selectedChapter, setSelectedChapter] = useState(1);
+  const [selectedVoiceStyle, setSelectedVoiceStyle] = useState("epic");
 
   // Audio playback
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -289,24 +320,12 @@ export default function BasicListenTab() {
     const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
     switch (sourceId) {
       case "morning":
-        await addItem({
-          title: `Morning Watch — ${today}`,
-          description: "Morning activation session",
-          audio_type: "morning-watch",
-          audio_url: null,
-          audio_meta: { generationType: "morning-watch", date: today },
-        });
-        toast.success("Morning Watch added");
-        break;
       case "night":
-        await addItem({
-          title: `Night Watch — ${today}`,
-          description: "Night meditation session",
-          audio_type: "night-watch",
-          audio_url: null,
-          audio_meta: { generationType: "night-watch", date: today },
-        });
-        toast.success("Night Watch added");
+      case "apologetics":
+      case "commentary":
+      case "reading":
+      case "podcast":
+        setExpandedSource(expandedSource === sourceId ? null : sourceId);
         break;
       case "devotional":
         await addItem({
@@ -318,16 +337,6 @@ export default function BasicListenTab() {
         });
         toast.success("Devotional added");
         break;
-      case "apologetics":
-        await addItem({
-          title: "Apologetics Training",
-          description: "COTA/AATS apologetics session",
-          audio_type: "apologetics",
-          audio_url: null,
-          audio_meta: { generationType: "apologetics" },
-        });
-        toast.success("Apologetics added");
-        break;
       case "tour":
         await addItem({
           title: "Palace Tour",
@@ -338,10 +347,42 @@ export default function BasicListenTab() {
         });
         toast.success("Palace Tour added");
         break;
-      case "podcast":
-        setExpandedSource(expandedSource === "podcast" ? null : "podcast");
-        break;
     }
+  };
+
+  const addMorningWatch = async (option: typeof MORNING_OPTIONS[0]) => {
+    const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    await addItem({
+      title: `Morning Watch: ${option.label} — ${today}`,
+      description: `Morning ${option.label.toLowerCase()} session`,
+      audio_type: "morning-watch",
+      audio_url: null,
+      audio_meta: { generationType: "morning-watch", mode: option.id, date: today },
+    });
+    toast.success(`Morning Watch (${option.label}) added`);
+  };
+
+  const addNightWatch = async (option: typeof NIGHT_OPTIONS[0]) => {
+    const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    await addItem({
+      title: `Night Watch: ${option.label} — ${today}`,
+      description: `Night ${option.label.toLowerCase()} session`,
+      audio_type: "night-watch",
+      audio_url: null,
+      audio_meta: { generationType: "night-watch", mode: option.id, date: today },
+    });
+    toast.success(`Night Watch (${option.label}) added`);
+  };
+
+  const addApologetics = async (option: typeof APOLOGETICS_OPTIONS[0]) => {
+    await addItem({
+      title: `Apologetics: ${option.label}`,
+      description: `${option.label} apologetics session`,
+      audio_type: "apologetics",
+      audio_url: null,
+      audio_meta: { generationType: "apologetics", mode: option.id },
+    });
+    toast.success(`Apologetics (${option.label}) added`);
   };
 
   const formatTime = (s: number) => {
@@ -537,13 +578,94 @@ export default function BasicListenTab() {
             ))}
           </div>
 
-          {/* Expanded inline panel for Commentary / Bible Reading */}
+          {/* Expanded: Morning Watch */}
+          {expandedSource === "morning" && (
+            <Card className="border-primary/20">
+              <CardContent className="p-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Sun className="h-4 w-4 text-amber-400" />
+                  <h4 className="text-xs font-semibold">Morning Watch Style</h4>
+                </div>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {MORNING_OPTIONS.map(opt => (
+                    <button key={opt.id} onClick={() => addMorningWatch(opt)}
+                      className="flex flex-col items-center gap-1 p-2.5 rounded-lg border border-transparent hover:border-border hover:bg-muted/50 transition-all">
+                      <span className="text-lg">{opt.emoji}</span>
+                      <span className="text-[10px] text-muted-foreground text-center leading-tight">{opt.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Expanded: Night Watch */}
+          {expandedSource === "night" && (
+            <Card className="border-primary/20">
+              <CardContent className="p-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Moon className="h-4 w-4 text-indigo-400" />
+                  <h4 className="text-xs font-semibold">Night Watch Style</h4>
+                </div>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {NIGHT_OPTIONS.map(opt => (
+                    <button key={opt.id} onClick={() => addNightWatch(opt)}
+                      className="flex flex-col items-center gap-1 p-2.5 rounded-lg border border-transparent hover:border-border hover:bg-muted/50 transition-all">
+                      <span className="text-lg">{opt.emoji}</span>
+                      <span className="text-[10px] text-muted-foreground text-center leading-tight">{opt.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Expanded: Apologetics */}
+          {expandedSource === "apologetics" && (
+            <Card className="border-primary/20">
+              <CardContent className="p-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Swords className="h-4 w-4 text-red-400" />
+                  <h4 className="text-xs font-semibold">Apologetics Type</h4>
+                </div>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {APOLOGETICS_OPTIONS.map(opt => (
+                    <button key={opt.id} onClick={() => addApologetics(opt)}
+                      className="flex items-center gap-2 p-2.5 rounded-lg border border-transparent hover:border-border hover:bg-muted/50 transition-all text-left">
+                      <span className="text-lg">{opt.emoji}</span>
+                      <span className="text-xs text-muted-foreground">{opt.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Expanded: Commentary / Bible Reading with voice selection */}
           {(expandedSource === "commentary" || expandedSource === "reading") && (
             <Card className="border-primary/20">
               <CardContent className="p-3 space-y-2">
                 <p className="text-xs font-semibold">
                   {expandedSource === "commentary" ? "Add Commentary" : "Add Bible Reading"}
                 </p>
+                {expandedSource === "commentary" && (
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] text-muted-foreground font-medium">Voice Style</p>
+                    <div className="grid grid-cols-4 gap-1">
+                      {VOICE_STYLES.map(v => (
+                        <button key={v.id} onClick={() => setSelectedVoiceStyle(v.id)}
+                          className={`flex flex-col items-center gap-0.5 p-1.5 rounded-lg border transition-all text-center ${
+                            selectedVoiceStyle === v.id
+                              ? "border-primary/50 bg-primary/10"
+                              : "border-transparent hover:border-border hover:bg-muted/50"
+                          }`}>
+                          <span className="text-sm">{v.emoji}</span>
+                          <span className="text-[9px] text-muted-foreground leading-tight">{v.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div className="flex gap-2">
                   <select
                     value={selectedBook}
@@ -560,15 +682,19 @@ export default function BasicListenTab() {
                   />
                   <Button size="sm" className="h-8 text-xs gap-1" onClick={() => {
                     const type = expandedSource === "commentary" ? "commentary" : "reading";
+                    const voiceLabel = expandedSource === "commentary"
+                      ? VOICE_STYLES.find(v => v.id === selectedVoiceStyle)?.label || "Epic Narrator"
+                      : "";
                     addItem({
-                      title: `${selectedBook} ${selectedChapter} (${type === "commentary" ? "Commentary" : "Reading"})`,
-                      description: `${type === "commentary" ? "Audio commentary for" : "Bible reading of"} ${selectedBook} ${selectedChapter}`,
+                      title: `${selectedBook} ${selectedChapter}${type === "commentary" ? ` (${voiceLabel})` : " (Reading)"}`,
+                      description: `${type === "commentary" ? `${voiceLabel} commentary for` : "Bible reading of"} ${selectedBook} ${selectedChapter}`,
                       audio_type: type,
                       audio_url: null,
                       audio_meta: {
                         generationType: type === "commentary" ? "chapter-commentary" : "chapter-reading",
                         book: selectedBook,
                         chapter: selectedChapter,
+                        ...(type === "commentary" ? { voiceStyle: selectedVoiceStyle } : {}),
                       },
                     });
                     toast.success(`Added ${selectedBook} ${selectedChapter}`);
@@ -580,7 +706,7 @@ export default function BasicListenTab() {
             </Card>
           )}
 
-          {/* Podcast quick-add (always visible) */}
+          {/* Podcast quick-add */}
           {expandedSource === "podcast" && (
             <Card className="border-primary/20">
               <CardContent className="p-3 space-y-2">
