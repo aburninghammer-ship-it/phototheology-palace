@@ -320,24 +320,12 @@ export default function BasicListenTab() {
     const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
     switch (sourceId) {
       case "morning":
-        await addItem({
-          title: `Morning Watch — ${today}`,
-          description: "Morning activation session",
-          audio_type: "morning-watch",
-          audio_url: null,
-          audio_meta: { generationType: "morning-watch", date: today },
-        });
-        toast.success("Morning Watch added");
-        break;
       case "night":
-        await addItem({
-          title: `Night Watch — ${today}`,
-          description: "Night meditation session",
-          audio_type: "night-watch",
-          audio_url: null,
-          audio_meta: { generationType: "night-watch", date: today },
-        });
-        toast.success("Night Watch added");
+      case "apologetics":
+      case "commentary":
+      case "reading":
+      case "podcast":
+        setExpandedSource(expandedSource === sourceId ? null : sourceId);
         break;
       case "devotional":
         await addItem({
@@ -349,16 +337,6 @@ export default function BasicListenTab() {
         });
         toast.success("Devotional added");
         break;
-      case "apologetics":
-        await addItem({
-          title: "Apologetics Training",
-          description: "COTA/AATS apologetics session",
-          audio_type: "apologetics",
-          audio_url: null,
-          audio_meta: { generationType: "apologetics" },
-        });
-        toast.success("Apologetics added");
-        break;
       case "tour":
         await addItem({
           title: "Palace Tour",
@@ -369,10 +347,42 @@ export default function BasicListenTab() {
         });
         toast.success("Palace Tour added");
         break;
-      case "podcast":
-        setExpandedSource(expandedSource === "podcast" ? null : "podcast");
-        break;
     }
+  };
+
+  const addMorningWatch = async (option: typeof MORNING_OPTIONS[0]) => {
+    const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    await addItem({
+      title: `Morning Watch: ${option.label} — ${today}`,
+      description: `Morning ${option.label.toLowerCase()} session`,
+      audio_type: "morning-watch",
+      audio_url: null,
+      audio_meta: { generationType: "morning-watch", mode: option.id, date: today },
+    });
+    toast.success(`Morning Watch (${option.label}) added`);
+  };
+
+  const addNightWatch = async (option: typeof NIGHT_OPTIONS[0]) => {
+    const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    await addItem({
+      title: `Night Watch: ${option.label} — ${today}`,
+      description: `Night ${option.label.toLowerCase()} session`,
+      audio_type: "night-watch",
+      audio_url: null,
+      audio_meta: { generationType: "night-watch", mode: option.id, date: today },
+    });
+    toast.success(`Night Watch (${option.label}) added`);
+  };
+
+  const addApologetics = async (option: typeof APOLOGETICS_OPTIONS[0]) => {
+    await addItem({
+      title: `Apologetics: ${option.label}`,
+      description: `${option.label} apologetics session`,
+      audio_type: "apologetics",
+      audio_url: null,
+      audio_meta: { generationType: "apologetics", mode: option.id },
+    });
+    toast.success(`Apologetics (${option.label}) added`);
   };
 
   const formatTime = (s: number) => {
