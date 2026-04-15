@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { BookMarked, HelpCircle, Headphones, FlaskConical, PanelLeft, GraduationCap } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { StudyBibleDemoDialog } from "@/components/bible/StudyBibleDemoDialog";
-import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 import { useAuth } from "@/hooks/useAuth";
 import { OfflineIndicator } from "@/components/bible/OfflineIndicator";
 import { usePreservePage } from "@/hooks/usePreservePage";
@@ -148,14 +147,6 @@ const Bible = () => {
 
           {tutorialOpen && (
             <BibleTabTutorial onClose={() => setTutorialOpen(false)} />
-          )}
-
-          {user && (
-            <VoiceChatWidget
-              roomType="bible"
-              roomId="study"
-              className="mb-6"
-            />
           )}
 
           {/* Main content with optional sidebar */}
