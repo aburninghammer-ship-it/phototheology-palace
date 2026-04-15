@@ -36,33 +36,33 @@ export const palaceFloors: Floor[] = [
         name: "Story Room",
         tag: "SR",
         icon: "Book",
-        purpose: "Transform biblical events into memorable, sequential scenes. Build your foundational library of stories you can instantly recall.",
-        action: "Break down a narrative into 3-7 memorable 'beats' (major plot movements) and arrange them chronologically.",
-        output: "A beat list with arrows (→) showing sequence, plus a one-line plot summary.",
-        coreQuestion: "What exactly happened—and in what order?",
+        purpose: "Store biblical stories as vivid mental movies. The Story Room is FIRST because story is the FOUNDATION — every room above depends on the raw material you collect here.",
+        action: "Read a narrative passage and store it as a sequence of vivid scenes (who was there, what happened, what was said, what was felt) that you can replay on command.",
+        output: "A scene sequence with arrows (→) showing the story's movement, plus a one-line summary capturing the arc.",
+        coreQuestion: "Can you see this story playing as a movie in your mind — and replay it scene by scene?",
         estimatedTime: "standard",
         quickMode: [
-          "Read the passage completely",
-          "Identify 3-7 major moments",
-          "Name each with a punchy noun/verb (Coat, Pit, Palace)",
-          "Test: Can you teach this story using only these beats?"
+          "Read the passage completely — absorb the story",
+          "Identify 3-7 major scenes (vivid moments you can picture)",
+          "Name each scene with a concrete noun/verb (Coat, Pit, Palace)",
+          "Test: Close your eyes — can you replay the entire movie?"
         ],
-        method: "📋 STEP-BY-STEP METHODOLOGY:\n\n1️⃣ Read the narrative passage completely (a chapter, a story arc, or a complete episode)\n\n2️⃣ Identify 3-7 distinct 'beats' (major plot movements)—not too many (loses focus) or too few (loses detail)\n\n3️⃣ Name each beat with a punchy NOUN or VERB (not full sentences)\n   ✅ Good: 'Coat' → 'Pit' → 'Caravan' → 'Prison' → 'Palace'\n   ❌ Bad: 'Joseph receives a colorful coat from his father' (too wordy)\n\n4️⃣ Arrange beats chronologically using arrows (→) to show sequence\n\n5️⃣ Test your beat list: Can you teach this story to a child using only these beats?\n\n6️⃣ Write a one-line plot summary that captures the movement from first beat to last\n\n🎯 KEY PRINCIPLES:\n• 🎬 Beats are like film shots—each one freezes a distinct moment\n• 🏔️ Use CONCRETE nouns (Altar, River, Mountain) over abstractions (Crisis, Decision)\n• 👑 Chronology is king—if you mix up the order, you've failed the room\n• 🎯 The goal is MEMORABLE, not comprehensive\n• ⚠️ If you need more than 7 beats, you're probably covering too much ground",
+        method: "📋 STEP-BY-STEP METHODOLOGY:\n\n🏛️ PHILOSOPHY: The Story Room exists for STORAGE THROUGH VISUALIZATION. Stories are the raw material — the furniture — of the Palace. A sparsely furnished Palace limits you; a richly furnished Palace expands you exponentially. Store stories BEFORE you understand them. Collect first, interpret later.\n\n1️⃣ Read the narrative passage completely (a chapter, a story arc, or a complete episode)\n\n2️⃣ Identify 3-7 vivid SCENES — major moments you can picture as frames in a mental movie\n\n3️⃣ Name each scene with a punchy NOUN or VERB (not full sentences)\n   ✅ Good: 'Coat' → 'Pit' → 'Caravan' → 'Prison' → 'Palace'\n   ❌ Bad: 'Joseph receives a colorful coat from his father' (too wordy)\n\n4️⃣ For each scene, notice: WHO is there, WHAT happens, WHAT is said, WHAT is felt\n\n5️⃣ Arrange scenes chronologically using arrows (→) — play the movie in order\n\n6️⃣ Test: Close your eyes and replay the entire movie. If you can see it, you own it.\n\n7️⃣ Write a one-line summary capturing the arc from first scene to last\n\n🎯 KEY PRINCIPLES:\n• 🏛️ Stories are FURNITURE — every story you store adds capacity to the Palace\n• 🎬 Each scene freezes a distinct moment — like a frame in a film\n• 🏔️ Use CONCRETE nouns (Altar, River, Mountain) over abstractions (Crisis, Decision)\n• 📦 Store BEFORE you interpret — collect the witness statements first\n• 🔗 Connections form NATURALLY as more stories accumulate — more furniture = exponentially more capacity\n• ⚠️ If you need more than 7 scenes, you're probably covering too much ground",
         examples: [
-          "Genesis 37 (Joseph): Dream → Coat → Pit → Caravan → Egypt → Potiphar (6 beats capture the descent arc)",
-          "Exodus 14 (Red Sea): Trapped → Fear → 'Stand Still' → Staff Raised → Waters Part → Crossing → Egypt Drowns (7 beats show the deliverance sequence)",
-          "1 Samuel 17 (David & Goliath): Giant Mocks → Boy Arrives → 5 Stones → Sling → Head Severed (5 beats emphasize the underdog victory)",
-          "Daniel 3 (Fiery Furnace): Idol Built → Bow or Burn → Three Refuse → Furnace Heated → Fourth Man → Untouched (6 beats highlight supernatural deliverance)",
-          "Mark 5:1-20 (Demoniac): Tombs → Legion → Pigs → Cliff → Clothed → 'Go Tell' (6 beats show radical transformation)"
+          "Genesis 37 (Joseph): Dream → Coat → Pit → Caravan → Egypt → Potiphar (6 scenes stored — the entire descent arc, ready for later rooms to pull out and examine)",
+          "Exodus 14 (Red Sea): Trapped → Fear → 'Stand Still' → Staff Raised → Waters Part → Crossing → Egypt Drowns (7 scenes furnishing the deliverance narrative)",
+          "1 Samuel 17 (David & Goliath): Giant Mocks → Boy Arrives → 5 Stones → Sling → Head Severed (5 vivid scenes locked into memory)",
+          "Daniel 3 (Fiery Furnace): Idol Built → Bow or Burn → Three Refuse → Furnace Heated → Fourth Man → Untouched (6 scenes stored for later Christological study)",
+          "Mark 5:1-20 (Demoniac): Tombs → Legion → Pigs → Cliff → Clothed → 'Go Tell' (6 scenes capturing radical transformation)"
         ],
         pitfalls: [
-          "Commentary before chronology—don't interpret until you've mapped the sequence",
-          "Too many beats (10+)—you're making an outline, not a story beat list",
+          "Interpreting before storing — don't analyze until you've collected the story as a mental movie",
+          "Too many scenes (10+) — you're making an outline, not building a vivid film",
           "Using full sentences instead of punchy nouns/verbs",
-          "Mixing up chronological order",
-          "Including interpretation in the beat names ('Joseph's prideful dream' vs. just 'Dream')"
+          "Skipping the visualization — if you can't SEE the scene, it won't stick",
+          "Rushing past the Story Room to 'deeper' rooms — without stored stories, you have no raw material"
         ],
-        deliverable: "Beat list (3-7 beats with arrows) + one-line plot summary capturing the arc from start to finish"
+        deliverable: "Scene sequence (3-7 scenes with arrows) showing the story as a mental movie, plus a one-line summary capturing the arc"
       },
       {
         id: "ir",

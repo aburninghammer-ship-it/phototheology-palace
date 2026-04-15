@@ -33,16 +33,16 @@ export function StoryRoomFlowchart() {
       <rect width="800" height="520" fill="url(#sr-bg)" rx="16" />
 
       <text x="400" y="40" textAnchor="middle" fill="#1E40AF" fontSize="24" fontWeight="bold" letterSpacing="0.5">
-        Story Room Method: Beat Mapping
+        Story Room: Storage Through Visualization
       </text>
 
       {/* Steps */}
       <g transform="translate(30, 80)">
         {[
-          { step: '1', icon: 'BOOK', title: 'Read the', subtitle: 'Passage' },
-          { step: '2', icon: 'SCENE', title: 'Identify', subtitle: '3-7 Beats' },
+          { step: '1', icon: 'BOOK', title: 'Read the', subtitle: 'Story' },
+          { step: '2', icon: 'SCENE', title: 'Identify', subtitle: '3-7 Scenes' },
           { step: '3', icon: 'PEN', title: 'Name Each', subtitle: 'with Noun/Verb' },
-          { step: '4', icon: 'ARROW', title: 'Arrange with', subtitle: 'Arrows' },
+          { step: '4', icon: 'STORE', title: 'Store as', subtitle: 'Mental Movie' },
         ].map((item, i) => (
           <g key={i} filter="url(#sr-shadow)">
             <rect x={i * 185} y="0" width="170" height="100" rx="12" fill="url(#sr-grad)" />
@@ -65,8 +65,8 @@ export function StoryRoomFlowchart() {
         <circle cx="0" cy="50" r="22" fill="#FCD34D" filter="url(#sr-glow)" />
         <text x="0" y="57" textAnchor="middle" fill="#1E40AF" fontWeight="bold" fontSize="10">TEST</text>
         <text x="0" y="95" textAnchor="middle" fill="white" fontWeight="bold" fontSize="14">STEP 5</text>
-        <text x="0" y="120" textAnchor="middle" fill="white" fontSize="12">Test: Can you teach</text>
-        <text x="0" y="138" textAnchor="middle" fill="#D1FAE5" fontSize="12">using only beats?</text>
+        <text x="0" y="120" textAnchor="middle" fill="white" fontSize="12">Test: Can you replay</text>
+        <text x="0" y="138" textAnchor="middle" fill="#D1FAE5" fontSize="12">the whole movie?</text>
       </g>
 
       {/* Key Principles Box */}
@@ -74,11 +74,11 @@ export function StoryRoomFlowchart() {
         <rect x="30" y="350" width="740" height="150" rx="12" fill="white" fillOpacity="0.95" stroke="#3B82F6" strokeWidth="2" />
         <rect x="30" y="350" width="740" height="35" rx="12" fill="url(#sr-header)" />
         <text x="400" y="375" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" letterSpacing="0.5">KEY PRINCIPLES</text>
-        <text x="50" y="410" fill="#374151" fontSize="12">Beats are like film shots—each freezes a distinct moment</text>
-        <text x="50" y="432" fill="#374151" fontSize="12">Use CONCRETE nouns (Altar, River) not abstractions</text>
-        <text x="50" y="454" fill="#374151" fontSize="12">Chronology is king—mix up order and you've failed</text>
-        <text x="430" y="410" fill="#374151" fontSize="12">Goal is MEMORABLE, not comprehensive</text>
-        <text x="430" y="432" fill="#374151" fontSize="12">7+ beats = covering too much ground</text>
+        <text x="50" y="410" fill="#374151" fontSize="12">Stories are FURNITURE — every scene stored adds capacity</text>
+        <text x="50" y="432" fill="#374151" fontSize="12">Store BEFORE you interpret — collect first, analyze later</text>
+        <text x="50" y="454" fill="#374151" fontSize="12">Use CONCRETE nouns (Altar, River) not abstractions</text>
+        <text x="430" y="410" fill="#374151" fontSize="12">More furniture = exponentially more connections</text>
+        <text x="430" y="432" fill="#374151" fontSize="12">If you can SEE it, you OWN it</text>
         {/* Divider line between columns */}
         <line x1="415" y1="395" x2="415" y2="470" stroke="#CBD5E1" strokeWidth="1" />
       </g>
@@ -104,14 +104,14 @@ export function StoryRoomConcept() {
       <rect width="800" height="450" fill="url(#sr2-bg)" rx="16" />
 
       <text x="400" y="40" textAnchor="middle" fill="#1E40AF" fontSize="24" fontWeight="bold" letterSpacing="0.5">
-        What is a "Beat"?
+        What is a "Scene"?
       </text>
 
-      {/* Beat Concept Circle */}
+      {/* Scene Concept Circle */}
       <circle cx="150" cy="160" r="80" fill="#3B82F6" opacity="0.9" />
-      <text x="150" y="145" textAnchor="middle" fill="white" fontWeight="bold" fontSize="18">BEAT</text>
-      <text x="150" y="170" textAnchor="middle" fill="white" fontSize="12">= Major Plot</text>
-      <text x="150" y="188" textAnchor="middle" fill="white" fontSize="12">Movement</text>
+      <text x="150" y="145" textAnchor="middle" fill="white" fontWeight="bold" fontSize="18">SCENE</text>
+      <text x="150" y="170" textAnchor="middle" fill="white" fontSize="12">= A Vivid Moment</text>
+      <text x="150" y="188" textAnchor="middle" fill="white" fontSize="12">You Can Store</text>
 
       {/* Film strip visualization */}
       <g transform="translate(280, 100)" filter="url(#sr2-shadow)">
@@ -148,16 +148,16 @@ export function StoryRoomConcept() {
       {/* Good vs Bad Examples */}
       <g transform="translate(50, 280)" filter="url(#sr2-shadow)">
         <rect x="0" y="0" width="330" height="150" rx="12" fill="#D1FAE5" fillOpacity="0.9" stroke="#16A34A" strokeWidth="2" />
-        <text x="165" y="30" textAnchor="middle" fill="#166534" fontWeight="bold" fontSize="16">Good Beat Names</text>
-        <text x="20" y="60" fill="#166534" fontSize="13">"Coat" — concrete, visual</text>
-        <text x="20" y="85" fill="#166534" fontSize="13">"Pit" — specific location</text>
-        <text x="20" y="110" fill="#166534" fontSize="13">"Waters Part" — action moment</text>
-        <text x="20" y="135" fill="#166534" fontSize="13">"Head Severed" — dramatic climax</text>
+        <text x="165" y="30" textAnchor="middle" fill="#166534" fontWeight="bold" fontSize="16">Good Scene Names</text>
+        <text x="20" y="60" fill="#166534" fontSize="13">"Coat" — concrete, visual, storable</text>
+        <text x="20" y="85" fill="#166534" fontSize="13">"Pit" — specific location you can see</text>
+        <text x="20" y="110" fill="#166534" fontSize="13">"Waters Part" — vivid action moment</text>
+        <text x="20" y="135" fill="#166534" fontSize="13">"Head Severed" — unforgettable image</text>
       </g>
 
       <g transform="translate(420, 280)" filter="url(#sr2-shadow)">
         <rect x="0" y="0" width="330" height="150" rx="12" fill="#FEE2E2" fillOpacity="0.9" stroke="#DC2626" strokeWidth="2" />
-        <text x="165" y="30" textAnchor="middle" fill="#991B1B" fontWeight="bold" fontSize="16">Bad Beat Names</text>
+        <text x="165" y="30" textAnchor="middle" fill="#991B1B" fontWeight="bold" fontSize="16">Bad Scene Names</text>
         <text x="20" y="60" fill="#991B1B" fontSize="13">"Joseph's prideful dream" — too wordy</text>
         <text x="20" y="85" fill="#991B1B" fontSize="13">"The crisis deepens" — abstract</text>
         <text x="20" y="110" fill="#991B1B" fontSize="13">"God shows His grace" — interpretive</text>
@@ -244,13 +244,13 @@ export function StoryRoomExample() {
       <g filter="url(#sr3-shadow)">
         <rect x="50" y="400" width="700" height="80" rx="12" fill="#FEF3C7" fillOpacity="0.9" stroke="#F59E0B" strokeWidth="2" />
         <text x="400" y="430" textAnchor="middle" fill="#92400E" fontWeight="bold" fontSize="16">
-          Deliverable: Beat List + Plot Summary
+          Deliverable: Scene Sequence + Summary
         </text>
         <text x="400" y="455" textAnchor="middle" fill="#78350F" fontSize="14">
           Dream → Coat → Pit → Caravan → Egypt → Potiphar
         </text>
         <text x="400" y="475" textAnchor="middle" fill="#78350F" fontSize="12" fontStyle="italic">
-          (6 beats capture the complete descent arc)
+          (6 scenes stored — the complete descent arc)
         </text>
       </g>
     </svg>

@@ -6,9 +6,9 @@ export const roomDescriptions: Record<string, string[]> = {
   // ─── Floor 1: Furnishing ───
 
   sr: [
-    "The Story Room is the most basic but also the most foundational room in the palace. The Bible is primarily narrative. Before it is a book of doctrines or prophecies, it is a book of stories: creation, fall, flood, exodus, kingdom, exile, incarnation, crucifixion, resurrection, and restoration.",
-    "In this room, the believer's goal is not to interpret but to collect and memorize the stories in their sequence. This means turning each story into a vivid mental movie — Joseph's story as a sequence from coat to pit to caravan to prison to palace, or David and Goliath as sling in motion, stone in flight, giant falling, sword raised in triumph.",
-    "The Story Room is like a detective gathering witness statements. Each testimony is logged, not yet cross-examined, but preserved for later. Without these story files, the detective cannot build the case. Later, when you move to other floors, these stories will be pulled out, compared, and linked to Christ.",
+    "The Story Room is FIRST because story is the FOUNDATION. The Bible is primarily narrative. Before it is a book of doctrines or prophecies, it is a book of stories: creation, fall, flood, exodus, kingdom, exile, incarnation, crucifixion, resurrection, and restoration. These stories are the raw material of the entire Palace — the furniture that fills every room above.",
+    "The purpose of the Story Room is storage through visualization. You are not here to interpret — you are here to collect. Each story is turned into a vivid mental movie and stored: Joseph as a sequence of scenes from coat to pit to caravan to prison to palace, David and Goliath as valley, shepherd arriving, armor refused, brook, sling, triumph. Store the scenes BEFORE you understand them. Collect first, interpret later.",
+    "Think of the Palace as a house, and stories as furniture. A sparsely furnished Palace limits you — there is nothing to work with in the rooms above. A richly furnished Palace expands you exponentially — the more stories you store, the more connections form naturally between them, and the more capacity you have for every technique on every floor. The Story Room builds that foundational library. Every single room above will reach down and pull out what you have stored here.",
   ],
 
   ir: [

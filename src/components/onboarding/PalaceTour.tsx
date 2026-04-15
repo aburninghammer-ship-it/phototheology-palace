@@ -38,13 +38,13 @@ const tourSteps = [
   {
     id: "rooms",
     title: "Rooms = Techniques",
-    description: "Inside each floor are 'rooms' — specific techniques for studying Scripture. The Story Room helps you memorize narratives. The Gems Room stores your discoveries.",
+    description: "Inside each floor are 'rooms' — specific techniques for studying Scripture. The Story Room stores narratives as vivid mental movies. The Gems Room stores your discoveries.",
     icon: DoorOpen,
     highlight: "room-door",
     gradient: "from-emerald-500 via-green-500 to-lime-500",
     bgGlow: "bg-emerald-500/20",
     examples: [
-      { code: "SR", name: "Story Room", purpose: "Memorize Bible stories as mental movies", emoji: "📖" },
+      { code: "SR", name: "Story Room", purpose: "Store Bible stories as vivid mental movies — furnish the Palace", emoji: "📖" },
       { code: "GR", name: "Gems Room", purpose: "Store your insights and discoveries", emoji: "💎" },
       { code: "CR", name: "Concentration Room", purpose: "Find Christ in every text", emoji: "✝️" },
     ],
@@ -62,7 +62,7 @@ const tourSteps = [
   {
     id: "start",
     title: "Your First Room Awaits",
-    description: "Ready to begin? Start with the Story Room on Floor 1. Pick a Bible story, turn it into a vivid mental movie, and watch how memory transforms into understanding.",
+    description: "Ready to begin? Start with the Story Room on Floor 1. Pick a Bible story, store it as a vivid mental movie, and start furnishing your Palace with the raw material every room above will use.",
     icon: Sparkles,
     highlight: "story-room",
     cta: "Enter the Story Room",

@@ -70,8 +70,8 @@ const ALL_PRINCIPLES: PalacePrinciple[] = [
     color: "bg-blue-500/20 text-blue-600",
     verse: "Psalm 23:1-6",
     verseText: "The LORD is my shepherd; I shall not want... I will dwell in the house of the LORD for ever.",
-    principleExplanation: "The Story Room principle: Turn each biblical story into a vivid mental movie with a clear sequence. Don't just read — create a chain of images: scene 1 → scene 2 → scene 3. The stranger the images, the more memorable they become.",
-    applicationToText: "Psalm 23's sequence: (1) Shepherd with staff → (2) Green meadow, still water → (3) Dark valley with shadow → (4) Banquet table with enemies watching → (5) Temple doors opening. Five scenes, one movie you can replay anytime.",
+    principleExplanation: "The Story Room principle: Storage through visualization. Store each biblical story as a vivid mental movie — collect scenes before you interpret. Stories are the furniture of the Palace. The more you store, the more capacity you gain.",
+    applicationToText: "Store Psalm 23 as five scenes: (1) Shepherd with staff → (2) Green meadow, still water → (3) Dark valley with shadow → (4) Banquet table with enemies watching → (5) Temple doors opening. Five scenes stored — raw material for every room above.",
     christConnection: "Jesus declares 'I am the Good Shepherd' (John 10:11). When you replay this movie, Christ is the figure with the staff in every scene.",
     jeevesInsight: "Notice the psalm moves from outdoor pasture to indoor temple — a journey from earth to heaven. Your mental movie should feel like you're walking FROM somewhere TO somewhere. That movement is the story.",
     memoryHook: "Close your eyes and walk through: meadow → stream → valley → banquet hall → temple. Five rooms in your mind."

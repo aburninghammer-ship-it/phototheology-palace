@@ -24,7 +24,7 @@ DOCTRINAL CONTEXT (Seventh-day Adventist):
 - Spirit of Prophecy: Prophetic gift through Ellen White
 
 PALACE ROOM MAPPING (Phototheology System):
-- Story Room: Narrative, historical accounts, character studies
+- Story Room: Storage through visualization — narrative collection, vivid scene storage, story furnishing
 - Detective Room: Close reading, word studies, textual analysis
 - Freestyle Room: Personal connections, creative applications
 - Christ-Centered Room: Christological focus, typology of Christ

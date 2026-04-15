@@ -109,11 +109,11 @@ export const principles: Record<string, PhototheologyPrinciple> = {
     howToApply: "Read slowly. Note repeated words, unusual phrases, specific numbers, proper names and their meanings, and structural patterns."
   },
   storyFlow: {
-    name: "Narrative Flow",
+    name: "Storage Through Visualization",
     room: "Story Room",
     roomTag: "SR",
-    explanation: "Understanding the narrative context - what comes before and after - reveals the author's intended meaning.",
-    howToApply: "Read the surrounding chapters. Understand the historical setting. Follow the plot development."
+    explanation: "Store the story as a vivid mental movie — collect the scenes (who, what happened, what was said, what was felt) before you interpret. Stories are the raw material of the Palace.",
+    howToApply: "Read the full narrative. Identify 3-7 vivid scenes. Name each with a concrete noun/verb. Replay the movie in your mind — if you can see it, you own it."
   },
   defCom: {
     name: "Definition & Comparison",
