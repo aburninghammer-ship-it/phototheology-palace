@@ -77,13 +77,13 @@ export default function BasicChapelTab() {
   const navigate = useNavigate();
 
   return (
-    <div className="h-full overflow-y-auto p-6">
-      <div className="max-w-3xl mx-auto space-y-6">
+    <div className="h-full overflow-y-auto p-3 sm:p-6">
+      <div className="max-w-3xl mx-auto space-y-4 sm:space-y-6">
         <div>
-          <h2 className="text-xl font-bold text-foreground">
+          <h2 className="text-lg sm:text-xl font-bold text-foreground">
             Phototheology Chapel
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Devotionals, watches, reading plans, community, and life resources — all in one place.
           </p>
         </div>
@@ -94,14 +94,14 @@ export default function BasicChapelTab() {
         {/* Daily Audio Devotional card */}
         <DailyAudioDevotional />
 
-        <div className="grid gap-3">
+        <div className="grid gap-2 sm:gap-3">
           {CHAPEL_ITEMS.map((item) => {
             const Icon = item.icon;
             return (
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className="w-full flex items-center gap-4 p-4 rounded-xl border border-border bg-card text-left transition-all hover:bg-muted/50 hover:border-primary/30"
+                className="w-full flex items-center gap-3 p-3 sm:p-4 rounded-xl border border-border bg-card text-left transition-all hover:bg-muted/50 hover:border-primary/30 active:scale-[0.98]"
               >
                 <div className={`shrink-0 ${item.color}`}>
                   <Icon className="h-5 w-5" />
