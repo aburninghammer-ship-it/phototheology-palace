@@ -179,17 +179,37 @@ export default function BasicListenTab() {
     }
   }, [user, loading, playlists.length, createPlaylist]);
 
+  // Store playItem in a ref so event listeners always have the latest version
+  const playItemRef = useRef<(index: number) => Promise<void>>();
+
   // Audio setup
   useEffect(() => {
     if (!audioRef.current) audioRef.current = new Audio();
     const audio = audioRef.current;
     const onEnded = () => {
       notifyTTSStopped();
-      if (currentIndex !== null && currentIndex < items.length - 1) playItem(currentIndex + 1);
-      else { setIsPlaying(false); setCurrentIndex(null); setProgress(0); }
+      const ci = currentIndexRef.current;
+      const len = itemsLenRef.current;
+      if (ci !== null && ci < len - 1) {
+        playItemRef.current?.(ci + 1);
+      } else {
+        setIsPlaying(false); setCurrentIndex(null); setProgress(0);
+      }
     };
     const onLoadedMetadata = () => { setDuration(audio.duration || 0); setAudioLoading(false); };
-    const onError = () => { setAudioLoading(false); setIsPlaying(false); };
+    const onError = () => {
+      setAudioLoading(false);
+      // Auto-skip to next track on error instead of stopping
+      const ci = currentIndexRef.current;
+      const len = itemsLenRef.current;
+      if (ci !== null && ci < len - 1) {
+        toast.error("Track failed, skipping to next...");
+        playItemRef.current?.(ci + 1);
+      } else {
+        setIsPlaying(false);
+        toast.error("Playback failed");
+      }
+    };
     audio.addEventListener("ended", onEnded);
     audio.addEventListener("loadedmetadata", onLoadedMetadata);
     audio.addEventListener("error", onError);
@@ -198,7 +218,13 @@ export default function BasicListenTab() {
       audio.removeEventListener("loadedmetadata", onLoadedMetadata);
       audio.removeEventListener("error", onError);
     };
-  }, [currentIndex, items.length]);
+  }, []);
+
+  // Keep refs in sync for stable event listener callbacks
+  const currentIndexRef = useRef(currentIndex);
+  const itemsLenRef = useRef(items.length);
+  useEffect(() => { currentIndexRef.current = currentIndex; }, [currentIndex]);
+  useEffect(() => { itemsLenRef.current = items.length; }, [items.length]);
 
   useEffect(() => { if (audioRef.current) audioRef.current.volume = isMuted ? 0 : volume; }, [volume, isMuted]);
   useEffect(() => { localStorage.setItem("pt-playlist-volume", volume.toString()); }, [volume]);
