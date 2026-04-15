@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { BookOpen, Crown, Check, ChevronDown } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { useRef } from "react";
-import { SavedItemsTab } from "@/components/level-select/SavedItemsTab";
+
 import { FrontPagePodcastPreview } from "@/components/FrontPagePodcastPreview";
 
 interface LevelOption {
