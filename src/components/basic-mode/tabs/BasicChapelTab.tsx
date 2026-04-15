@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   Sunrise, Moon, BookOpenCheck, CalendarDays, Church, Heart,
   GraduationCap, Users, Baby, Gem, Shield, Globe, HeartHandshake,
-  Sparkles, ArrowRight, Swords, Flame,
+  Sparkles, ArrowRight, Swords, Flame, Wheat,
 } from "lucide-react";
 
 const CHAPEL_ITEMS = [
