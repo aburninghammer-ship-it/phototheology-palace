@@ -17,7 +17,7 @@ import {
   ListMusic, Play, Pause, SkipForward, SkipBack, Trash2, Plus, Sun,
   Moon, BookOpen, Headphones, Swords, Compass, Maximize2, GripVertical,
   Volume2, VolumeX, Check, X, Pencil, Loader2,
-  BookOpenCheck, Mic, Sparkles, ExternalLink,
+  BookOpenCheck, Mic, Sparkles,
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
@@ -132,8 +132,9 @@ const BIBLE_BOOKS = [
   "1 Peter","2 Peter","1 John","2 John","3 John","Jude","Revelation",
 ];
 
+const SILENT_MP3 = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRwBHAAAAAAD/+1AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+
 export default function BasicListenTab() {
-  
   const { user } = useAuth();
   const {
     items, loading, removeItem, clearPlaylist, count, maxItems,
@@ -164,6 +165,74 @@ export default function BasicListenTab() {
   });
   const [isMuted, setIsMuted] = useState(false);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval>>();
+  const pendingAutoplayRef = useRef(false);
+  const objectUrlRef = useRef<string | null>(null);
+
+  const clearObjectUrl = useCallback(() => {
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = null;
+    }
+  }, []);
+
+  const primeAudioForPlayback = useCallback(async () => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+    }
+
+    const audio = audioRef.current;
+    audio.preload = "auto";
+    audio.crossOrigin = "anonymous";
+    try {
+      audio.setAttribute("playsinline", "true");
+    } catch {}
+
+    try {
+      audio.muted = true;
+      audio.volume = 0;
+      audio.src = SILENT_MP3;
+      audio.load();
+      await audio.play().catch(() => undefined);
+      audio.pause();
+      audio.currentTime = 0;
+    } catch {
+      // Best effort for mobile autoplay unlock
+    } finally {
+      audio.muted = isMuted;
+      audio.volume = isMuted ? 0 : volume;
+    }
+  }, [isMuted, volume]);
+
+  const preparePlayableUrl = useCallback(async (url: string) => {
+    clearObjectUrl();
+
+    if (!url.startsWith("http")) {
+      return url;
+    }
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Audio fetch failed: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      objectUrlRef.current = objectUrl;
+      return objectUrl;
+    } catch {
+      return url;
+    }
+  }, [clearObjectUrl]);
+
+  const maybeQueueAutoplayFromGesture = useCallback(async () => {
+    if (items.length > 0 || currentIndex !== null || isPlaying) {
+      return;
+    }
+
+    pendingAutoplayRef.current = true;
+    await primeAudioForPlayback();
+  }, [items.length, currentIndex, isPlaying, primeAudioForPlayback]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -186,6 +255,12 @@ export default function BasicListenTab() {
   useEffect(() => {
     if (!audioRef.current) audioRef.current = new Audio();
     const audio = audioRef.current;
+    audio.preload = "auto";
+    audio.crossOrigin = "anonymous";
+    try {
+      audio.setAttribute("playsinline", "true");
+    } catch {}
+
     const onEnded = () => {
       notifyTTSStopped();
       const ci = currentIndexRef.current;
@@ -199,7 +274,6 @@ export default function BasicListenTab() {
     const onLoadedMetadata = () => { setDuration(audio.duration || 0); setAudioLoading(false); };
     const onError = () => {
       setAudioLoading(false);
-      // Auto-skip to next track on error instead of stopping
       const ci = currentIndexRef.current;
       const len = itemsLenRef.current;
       if (ci !== null && ci < len - 1) {
@@ -217,8 +291,9 @@ export default function BasicListenTab() {
       audio.removeEventListener("ended", onEnded);
       audio.removeEventListener("loadedmetadata", onLoadedMetadata);
       audio.removeEventListener("error", onError);
+      clearObjectUrl();
     };
-  }, []);
+  }, [clearObjectUrl, setCurrentIndex, setIsPlaying]);
 
   // Keep refs in sync for stable event listener callbacks
   const currentIndexRef = useRef(currentIndex);
@@ -297,6 +372,7 @@ export default function BasicListenTab() {
               body: { text: watchText, watchType },
             });
             if (ttsResp?.audioUrl) url = ttsResp.audioUrl;
+            else if (ttsResp?.audioContent) url = `data:audio/mpeg;base64,${ttsResp.audioContent}`;
           }
         }
 
@@ -368,7 +444,6 @@ export default function BasicListenTab() {
     try {
       const url = await resolveAudioUrl(item);
       if (!url) {
-        // Auto-skip to next on no audio
         if (index < items.length - 1) {
           toast.error(`No audio for "${item.title}", skipping...`);
           playItemRef.current?.(index + 1);
@@ -378,7 +453,9 @@ export default function BasicListenTab() {
         setAudioLoading(false);
         return;
       }
-      audio.src = url;
+
+      const playableUrl = await preparePlayableUrl(url);
+      audio.src = playableUrl;
       await new Promise<void>((res, rej) => {
         const ok = () => { off(); res(); };
         const fail = () => { off(); rej(new Error("Load failed")); };
@@ -394,7 +471,6 @@ export default function BasicListenTab() {
       setAudioLoading(false);
     } catch {
       setAudioLoading(false);
-      // Auto-skip to next track on playback failure
       if (index < items.length - 1) {
         toast.error(`"${item.title}" failed, skipping...`);
         setTimeout(() => playItemRef.current?.(index + 1), 500);
@@ -403,37 +479,65 @@ export default function BasicListenTab() {
         setIsPlaying(false);
       }
     }
-  }, [items, resolveAudioUrl, setCurrentIndex, setIsPlaying, isMuted, volume]);
+  }, [items, preparePlayableUrl, resolveAudioUrl, setCurrentIndex, setIsPlaying, isMuted, volume]);
 
   // Keep playItemRef in sync
   useEffect(() => { playItemRef.current = playItem; }, [playItem]);
 
-  // Auto-play: start playlist automatically when items are loaded and nothing is playing
-  const hasAutoPlayed = useRef(false);
   useEffect(() => {
-    if (items.length > 0 && currentIndex === null && !isPlaying && !hasAutoPlayed.current) {
-      hasAutoPlayed.current = true;
-      playItem(0);
+    if (items.length === 0) {
+      pendingAutoplayRef.current = false;
+      return;
     }
-    // Reset auto-play flag when playlist changes
-    if (items.length === 0) hasAutoPlayed.current = false;
-  }, [items.length, currentIndex, isPlaying, playItem]);
+
+    if (!pendingAutoplayRef.current || currentIndex !== null || isPlaying || audioLoading) {
+      return;
+    }
+
+    pendingAutoplayRef.current = false;
+    void playItem(0);
+  }, [items.length, currentIndex, isPlaying, audioLoading, playItem]);
+
+  const startPlayback = useCallback(async (index: number) => {
+    await primeAudioForPlayback();
+    await playItem(index);
+  }, [playItem, primeAudioForPlayback]);
 
   const togglePlay = () => {
     const audio = audioRef.current;
     if (!audio) return;
-    if (isPlaying) { audio.pause(); notifyTTSStopped(); setIsPlaying(false); }
-    else if (currentIndex !== null) { audio.play(); notifyTTSStarted(); setIsPlaying(true); }
-    else if (items.length > 0) playItem(0);
+    if (isPlaying) {
+      audio.pause();
+      notifyTTSStopped();
+      setIsPlaying(false);
+    }
+    else if (currentIndex !== null) {
+      audio.play()
+        .then(() => {
+          notifyTTSStarted();
+          setIsPlaying(true);
+        })
+        .catch(() => {
+          toast.error("Playback failed");
+        });
+    }
+    else if (items.length > 0) {
+      void startPlayback(0);
+    }
   };
 
-  const skipNext = () => { if (currentIndex !== null && currentIndex < items.length - 1) playItem(currentIndex + 1); };
-  const skipPrev = () => { if (currentIndex !== null && currentIndex > 0) playItem(currentIndex - 1); };
+  const skipNext = () => { if (currentIndex !== null && currentIndex < items.length - 1) void playItem(currentIndex + 1); };
+  const skipPrev = () => { if (currentIndex !== null && currentIndex > 0) void playItem(currentIndex - 1); };
 
   const handleRemove = async (id: string) => {
     const audio = audioRef.current;
     if (audio && items[currentIndex ?? -1]?.id === id) {
-      audio.pause(); audio.src = ""; notifyTTSStopped(); setIsPlaying(false); setCurrentIndex(null);
+      audio.pause();
+      audio.src = "";
+      clearObjectUrl();
+      notifyTTSStopped();
+      setIsPlaying(false);
+      setCurrentIndex(null);
     }
     await removeItem(id);
   };
@@ -455,6 +559,7 @@ export default function BasicListenTab() {
   };
 
   const addPodcastToPlaylist = async (ep: typeof PODCAST_EPISODES[0]) => {
+    await maybeQueueAutoplayFromGesture();
     await addItem({
       title: `Podcast Ep. ${ep.episodeNumber}: ${ep.title}`,
       description: ep.description.slice(0, 80),
@@ -476,6 +581,7 @@ export default function BasicListenTab() {
         setExpandedSource(expandedSource === sourceId ? null : sourceId);
         break;
       case "devotional":
+        await maybeQueueAutoplayFromGesture();
         await addItem({
           title: `Daily Devotional — ${today}`,
           description: "Today's audio devotional",
@@ -486,6 +592,7 @@ export default function BasicListenTab() {
         toast.success("Devotional added");
         break;
       case "tour":
+        await maybeQueueAutoplayFromGesture();
         await addItem({
           title: "Palace Tour",
           description: "Guided Phototheology Palace walkthrough",
@@ -500,6 +607,7 @@ export default function BasicListenTab() {
 
   const addMorningWatch = async (option: typeof MORNING_OPTIONS[0]) => {
     const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    await maybeQueueAutoplayFromGesture();
     await addItem({
       title: `Morning Watch: ${option.label} — ${today}`,
       description: `Morning ${option.label.toLowerCase()} session`,
@@ -512,6 +620,7 @@ export default function BasicListenTab() {
 
   const addNightWatch = async (option: typeof NIGHT_OPTIONS[0]) => {
     const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    await maybeQueueAutoplayFromGesture();
     await addItem({
       title: `Night Watch: ${option.label} — ${today}`,
       description: `Night ${option.label.toLowerCase()} session`,
@@ -523,6 +632,7 @@ export default function BasicListenTab() {
   };
 
   const addApologetics = async (option: typeof APOLOGETICS_OPTIONS[0]) => {
+    await maybeQueueAutoplayFromGesture();
     await addItem({
       title: `Apologetics: ${option.label}`,
       description: `${option.label} apologetics session`,
@@ -673,7 +783,7 @@ export default function BasicListenTab() {
                 {items.map((item, idx) => (
                   <SortableItem key={item.id} item={item} idx={idx}
                     isCurrent={currentIndex === idx} isPlaying={isPlaying}
-                    onPlay={() => playItem(idx)} onRemove={() => handleRemove(item.id)} />
+                    onPlay={() => { void startPlayback(idx); }} onRemove={() => handleRemove(item.id)} />
                 ))}
               </div>
             </SortableContext>
@@ -691,7 +801,7 @@ export default function BasicListenTab() {
                 <Maximize2 className="h-3 w-3" /> Immerse
               </Button>
               {!isPlaying && (
-                <Button size="sm" className="text-xs h-7 gap-1" onClick={() => playItem(0)}>
+                <Button size="sm" className="text-xs h-7 gap-1" onClick={() => { void startPlayback(0); }}>
                   <Play className="h-3 w-3" /> Play All
                 </Button>
               )}
@@ -712,8 +822,7 @@ export default function BasicListenTab() {
                   if (src.expandable) {
                     setExpandedSource(expandedSource === src.id ? null : src.id);
                   } else {
-                    // Direct add for non-expandable sources
-                    handleQuickAdd(src.id);
+                    void handleQuickAdd(src.id);
                   }
                 }}
                 className={`flex flex-col items-center gap-1 p-2 rounded-lg border transition-all group ${
@@ -736,7 +845,7 @@ export default function BasicListenTab() {
                 </div>
                 <div className="grid grid-cols-3 gap-1.5">
                   {MORNING_OPTIONS.map(opt => (
-                    <button key={opt.id} onClick={() => addMorningWatch(opt)}
+                    <button key={opt.id} onClick={() => { void addMorningWatch(opt); }}
                       className="flex flex-col items-center gap-1 p-2.5 rounded-lg border border-transparent hover:border-border hover:bg-muted/50 transition-all">
                       <span className="text-lg">{opt.emoji}</span>
                       <span className="text-[10px] text-muted-foreground text-center leading-tight">{opt.label}</span>
@@ -757,7 +866,7 @@ export default function BasicListenTab() {
                 </div>
                 <div className="grid grid-cols-3 gap-1.5">
                   {NIGHT_OPTIONS.map(opt => (
-                    <button key={opt.id} onClick={() => addNightWatch(opt)}
+                    <button key={opt.id} onClick={() => { void addNightWatch(opt); }}
                       className="flex flex-col items-center gap-1 p-2.5 rounded-lg border border-transparent hover:border-border hover:bg-muted/50 transition-all">
                       <span className="text-lg">{opt.emoji}</span>
                       <span className="text-[10px] text-muted-foreground text-center leading-tight">{opt.label}</span>
@@ -778,7 +887,7 @@ export default function BasicListenTab() {
                 </div>
                 <div className="grid grid-cols-2 gap-1.5">
                   {APOLOGETICS_OPTIONS.map(opt => (
-                    <button key={opt.id} onClick={() => addApologetics(opt)}
+                    <button key={opt.id} onClick={() => { void addApologetics(opt); }}
                       className="flex items-center gap-2 p-2.5 rounded-lg border border-transparent hover:border-border hover:bg-muted/50 transition-all text-left">
                       <span className="text-lg">{opt.emoji}</span>
                       <span className="text-xs text-muted-foreground">{opt.label}</span>
@@ -829,23 +938,27 @@ export default function BasicListenTab() {
                     placeholder="Ch"
                   />
                   <Button size="sm" className="h-8 text-xs gap-1" onClick={() => {
-                    const type = expandedSource === "commentary" ? "commentary" : "reading";
-                    const voiceLabel = expandedSource === "commentary"
-                      ? VOICE_STYLES.find(v => v.id === selectedVoiceStyle)?.label || "Epic Narrator"
-                      : "";
-                    addItem({
-                      title: `${selectedBook} ${selectedChapter}${type === "commentary" ? ` (${voiceLabel})` : " (Reading)"}`,
-                      description: `${type === "commentary" ? `${voiceLabel} commentary for` : "Bible reading of"} ${selectedBook} ${selectedChapter}`,
-                      audio_type: type,
-                      audio_url: null,
-                      audio_meta: {
-                        generationType: type === "commentary" ? "chapter-commentary" : "chapter-reading",
-                        book: selectedBook,
-                        chapter: selectedChapter,
-                        ...(type === "commentary" ? { voiceStyle: selectedVoiceStyle } : {}),
-                      },
-                    });
-                    toast.success(`Added ${selectedBook} ${selectedChapter}`);
+                    void (async () => {
+                      const type = expandedSource === "commentary" ? "commentary" : "reading";
+                      const voiceLabel = expandedSource === "commentary"
+                        ? VOICE_STYLES.find(v => v.id === selectedVoiceStyle)?.label || "Epic Narrator"
+                        : "";
+
+                      await maybeQueueAutoplayFromGesture();
+                      await addItem({
+                        title: `${selectedBook} ${selectedChapter}${type === "commentary" ? ` (${voiceLabel})` : " (Reading)"}`,
+                        description: `${type === "commentary" ? `${voiceLabel} commentary for` : "Bible reading of"} ${selectedBook} ${selectedChapter}`,
+                        audio_type: type,
+                        audio_url: null,
+                        audio_meta: {
+                          generationType: type === "commentary" ? "chapter-commentary" : "chapter-reading",
+                          book: selectedBook,
+                          chapter: selectedChapter,
+                          ...(type === "commentary" ? { voiceStyle: selectedVoiceStyle } : {}),
+                        },
+                      });
+                      toast.success(`Added ${selectedBook} ${selectedChapter}`);
+                    })();
                   }}>
                     <Plus className="h-3 w-3" /> Add
                   </Button>
@@ -865,7 +978,7 @@ export default function BasicListenTab() {
                 </div>
                 <div className="space-y-1 max-h-48 overflow-y-auto">
                   {PODCAST_EPISODES.map(ep => {
-                    const alreadyAdded = items.some(i => 
+                    const alreadyAdded = items.some(i =>
                       i.audio_meta && (i.audio_meta as any).episodeNumber === ep.episodeNumber && i.audio_type === "podcast"
                     );
                     return (
@@ -880,7 +993,7 @@ export default function BasicListenTab() {
                         </div>
                         <Button variant={alreadyAdded ? "ghost" : "outline"} size="sm"
                           className="h-6 text-[10px] px-2 shrink-0" disabled={alreadyAdded}
-                          onClick={() => addPodcastToPlaylist(ep)}>
+                          onClick={() => { void addPodcastToPlaylist(ep); }}>
                           {alreadyAdded ? <Check className="h-3 w-3" /> : <><Plus className="h-3 w-3 mr-0.5" /> Add</>}
                         </Button>
                       </div>
