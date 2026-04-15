@@ -66,7 +66,7 @@ export default function BasicHomeTab() {
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="px-4 py-6 space-y-8 max-w-4xl mx-auto">
+      <div className="px-3 sm:px-4 py-4 sm:py-6 space-y-5 sm:space-y-8 max-w-4xl mx-auto">
         {/* Hero tagline */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -74,7 +74,7 @@ export default function BasicHomeTab() {
           className="text-center space-y-2"
         >
           <h2
-            className="text-2xl sm:text-3xl font-bold tracking-wide"
+            className="text-xl sm:text-2xl md:text-3xl font-bold tracking-wide"
             style={{ fontFamily: "'Cinzel', serif", color: "#d4a017" }}
           >
             Explore the Bible
@@ -95,21 +95,21 @@ export default function BasicHomeTab() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.08 }}
                 onClick={() => navigate(tool.path)}
-                className="relative flex flex-col items-center gap-3 p-5 rounded-2xl border border-primary/20 backdrop-blur-xl transition-all hover:scale-[1.02] hover:border-primary/40 group text-center"
+                className="relative flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-5 rounded-2xl border border-primary/20 backdrop-blur-xl transition-all hover:scale-[1.02] hover:border-primary/40 group text-center"
                 style={{
                   background: "linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--primary) / 0.04), rgba(0,0,0,0.4))",
                   boxShadow: "0 4px 24px hsl(var(--primary) / 0.12)",
                 }}
               >
                 <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 relative overflow-hidden"
+                  className="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 relative overflow-hidden"
                   style={{
                     background: "linear-gradient(160deg, hsl(var(--primary)), hsl(var(--primary) / 0.7))",
                     boxShadow: "0 4px 16px hsl(var(--primary) / 0.35), inset 0 1px 1px rgba(255,255,255,0.2)",
                   }}
                 >
                   <div className="absolute inset-0 rounded-2xl" style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.22) 0%, transparent 45%)' }} />
-                  <Icon className="w-6 h-6 text-white relative z-10 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
+                  <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white relative z-10 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
                 </div>
                 <div>
                   <h3 className="font-bold text-sm">{tool.label}</h3>
@@ -154,13 +154,13 @@ export default function BasicHomeTab() {
                 const card = (
                   <button
                     onClick={() => navigate(item.path)}
-                    className="flex items-center gap-3 p-3 rounded-xl backdrop-blur-md border border-white/10 hover:border-white/25 transition-all group/item hover:scale-[1.02] text-left w-full"
+                    className="flex items-center gap-2.5 p-2.5 sm:p-3 rounded-xl backdrop-blur-md border border-white/10 hover:border-white/25 transition-all group/item hover:scale-[1.02] text-left w-full"
                     style={{
                       background: `linear-gradient(135deg, hsl(${itemColor} / 0.1), hsl(${itemColor} / 0.03))`,
                     }}
                   >
                     <div
-                      className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover/item:scale-110 relative overflow-hidden"
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover/item:scale-110 relative overflow-hidden"
                       style={{
                         background: `linear-gradient(160deg, hsl(${itemColor} / 0.85), hsl(${itemColor} / 0.5))`,
                         boxShadow: `0 3px 10px hsl(${itemColor} / 0.3), inset 0 1px 1px rgba(255,255,255,0.15)`,
