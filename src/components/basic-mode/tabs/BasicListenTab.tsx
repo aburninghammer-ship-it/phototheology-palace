@@ -3,7 +3,7 @@
  * Shows playlist hub inline within the shell.
  */
 import { useState, useCallback, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+
 import { usePlaylist } from "@/hooks/usePlaylist";
 import { useAuth } from "@/hooks/useAuth";
 import { useImmersiveMode } from "@/hooks/useImmersiveMode";
@@ -16,7 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   ListMusic, Play, Pause, SkipForward, SkipBack, Trash2, Plus, Sun,
   Moon, BookOpen, Headphones, Swords, Compass, Maximize2, GripVertical,
-  Volume2, VolumeX, Check, X, Pencil, ArrowRight, Loader2,
+  Volume2, VolumeX, Check, X, Pencil, Loader2,
   BookOpenCheck, Mic, Sparkles, ExternalLink,
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
@@ -70,28 +70,40 @@ function SortableItem({
   );
 }
 
-/* ── Quick add sources ── */
+/* ── Quick add sources (inline — no navigation) ── */
 interface QuickSource {
   id: string;
   title: string;
   icon: React.ReactNode;
   color: string;
-  navigateTo: string;
+  expandable?: boolean;
 }
 
 const QUICK_SOURCES: QuickSource[] = [
-  { id: "morning", title: "Morning Watch", icon: <Sun className="h-4 w-4" />, color: "text-amber-400", navigateTo: "/morning-watches" },
-  { id: "night", title: "Night Watch", icon: <Moon className="h-4 w-4" />, color: "text-indigo-400", navigateTo: "/night-watches" },
-  { id: "devotional", title: "Daily Devotional", icon: <Sparkles className="h-4 w-4" />, color: "text-purple-400", navigateTo: "/daily-audio-devotional" },
-  { id: "commentary", title: "Commentary", icon: <BookOpen className="h-4 w-4" />, color: "text-emerald-400", navigateTo: "/bible" },
-  { id: "reading", title: "Bible Reading", icon: <BookOpenCheck className="h-4 w-4" />, color: "text-blue-400", navigateTo: "/bible" },
-  { id: "podcast", title: "Podcast", icon: <Mic className="h-4 w-4" />, color: "text-orange-400", navigateTo: "/podcast" },
-  { id: "apologetics", title: "Apologetics", icon: <Swords className="h-4 w-4" />, color: "text-red-400", navigateTo: "/cota-series?tab=aats" },
-  { id: "tour", title: "Palace Tour", icon: <Compass className="h-4 w-4" />, color: "text-cyan-400", navigateTo: "/palace" },
+  { id: "morning", title: "Morning Watch", icon: <Sun className="h-4 w-4" />, color: "text-amber-400" },
+  { id: "night", title: "Night Watch", icon: <Moon className="h-4 w-4" />, color: "text-indigo-400" },
+  { id: "devotional", title: "Daily Devotional", icon: <Sparkles className="h-4 w-4" />, color: "text-purple-400" },
+  { id: "commentary", title: "Commentary", icon: <BookOpen className="h-4 w-4" />, color: "text-emerald-400", expandable: true },
+  { id: "reading", title: "Bible Reading", icon: <BookOpenCheck className="h-4 w-4" />, color: "text-blue-400", expandable: true },
+  { id: "podcast", title: "Podcast", icon: <Mic className="h-4 w-4" />, color: "text-orange-400", expandable: true },
+  { id: "apologetics", title: "Apologetics", icon: <Swords className="h-4 w-4" />, color: "text-red-400" },
+  { id: "tour", title: "Palace Tour", icon: <Compass className="h-4 w-4" />, color: "text-cyan-400" },
+];
+
+const BIBLE_BOOKS = [
+  "Genesis","Exodus","Leviticus","Numbers","Deuteronomy","Joshua","Judges","Ruth",
+  "1 Samuel","2 Samuel","1 Kings","2 Kings","1 Chronicles","2 Chronicles","Ezra",
+  "Nehemiah","Esther","Job","Psalms","Proverbs","Ecclesiastes","Song of Solomon",
+  "Isaiah","Jeremiah","Lamentations","Ezekiel","Daniel","Hosea","Joel","Amos",
+  "Obadiah","Jonah","Micah","Nahum","Habakkuk","Zephaniah","Haggai","Zechariah",
+  "Malachi","Matthew","Mark","Luke","John","Acts","Romans","1 Corinthians",
+  "2 Corinthians","Galatians","Ephesians","Philippians","Colossians","1 Thessalonians",
+  "2 Thessalonians","1 Timothy","2 Timothy","Titus","Philemon","Hebrews","James",
+  "1 Peter","2 Peter","1 John","2 John","3 John","Jude","Revelation",
 ];
 
 export default function BasicListenTab() {
-  const navigate = useNavigate();
+  
   const { user } = useAuth();
   const {
     items, loading, removeItem, clearPlaylist, count, maxItems,
@@ -102,8 +114,11 @@ export default function BasicListenTab() {
   const immersive = useImmersiveMode();
 
   const [showAddPanel, setShowAddPanel] = useState(false);
+  const [expandedSource, setExpandedSource] = useState<string | null>(null);
   const [newPlaylistName, setNewPlaylistName] = useState("");
   const [showCreateInput, setShowCreateInput] = useState(false);
+  const [selectedBook, setSelectedBook] = useState("Genesis");
+  const [selectedChapter, setSelectedChapter] = useState(1);
 
   // Audio playback
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -268,6 +283,65 @@ export default function BasicListenTab() {
     });
   };
 
+  const handleQuickAdd = async (sourceId: string) => {
+    const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    switch (sourceId) {
+      case "morning":
+        await addItem({
+          title: `Morning Watch — ${today}`,
+          description: "Morning activation session",
+          audio_type: "morning-watch",
+          audio_url: null,
+          audio_meta: { generationType: "morning-watch", date: today },
+        });
+        toast.success("Morning Watch added");
+        break;
+      case "night":
+        await addItem({
+          title: `Night Watch — ${today}`,
+          description: "Night meditation session",
+          audio_type: "night-watch",
+          audio_url: null,
+          audio_meta: { generationType: "night-watch", date: today },
+        });
+        toast.success("Night Watch added");
+        break;
+      case "devotional":
+        await addItem({
+          title: `Daily Devotional — ${today}`,
+          description: "Today's audio devotional",
+          audio_type: "devotional",
+          audio_url: null,
+          audio_meta: { generationType: "daily-devotional", date: today },
+        });
+        toast.success("Devotional added");
+        break;
+      case "apologetics":
+        await addItem({
+          title: "Apologetics Training",
+          description: "COTA/AATS apologetics session",
+          audio_type: "apologetics",
+          audio_url: null,
+          audio_meta: { generationType: "apologetics" },
+        });
+        toast.success("Apologetics added");
+        break;
+      case "tour":
+        await addItem({
+          title: "Palace Tour",
+          description: "Guided Phototheology Palace walkthrough",
+          audio_type: "palace-tour",
+          audio_url: null,
+          audio_meta: { generationType: "palace-tour" },
+        });
+        toast.success("Palace Tour added");
+        break;
+      case "podcast":
+        setExpandedSource(expandedSource === "podcast" ? null : "podcast");
+        break;
+    }
+  };
+
   const formatTime = (s: number) => {
     if (!s || !isFinite(s)) return "0:00";
     return `${Math.floor(s / 60)}:${Math.floor(s % 60).toString().padStart(2, "0")}`;
@@ -418,22 +492,26 @@ export default function BasicListenTab() {
           </div>
         )}
 
-        {/* ── Add Content Section ── */}
+        {/* ── Add Content Section (all inline) ── */}
         <div className="border-t pt-3 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold">Add Content</h3>
-            <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => navigate("/playlist")}>
-              Full Library <ArrowRight className="h-3 w-3 ml-1" />
-            </Button>
-          </div>
+          <h3 className="text-sm font-semibold">Add Content</h3>
 
           {/* Quick source buttons */}
           <div className="grid grid-cols-4 gap-2">
             {QUICK_SOURCES.map(src => (
               <button
                 key={src.id}
-                onClick={() => navigate(src.navigateTo)}
-                className="flex flex-col items-center gap-1 p-2 rounded-lg border border-transparent hover:border-border hover:bg-muted/50 transition-all group"
+                onClick={() => {
+                  if (src.expandable) {
+                    setExpandedSource(expandedSource === src.id ? null : src.id);
+                  } else {
+                    // Direct add for non-expandable sources
+                    handleQuickAdd(src.id);
+                  }
+                }}
+                className={`flex flex-col items-center gap-1 p-2 rounded-lg border transition-all group ${
+                  expandedSource === src.id ? "border-primary/40 bg-primary/5" : "border-transparent hover:border-border hover:bg-muted/50"
+                }`}
               >
                 <div className={`${src.color} group-hover:scale-110 transition-transform`}>{src.icon}</div>
                 <span className="text-[10px] text-muted-foreground text-center leading-tight">{src.title}</span>
@@ -441,44 +519,85 @@ export default function BasicListenTab() {
             ))}
           </div>
 
-          {/* Podcast quick-add */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Mic className="h-4 w-4 text-orange-400" />
-              <h4 className="text-xs font-semibold">Podcast Episodes</h4>
-              <Badge variant="outline" className="text-[9px]">{PODCAST_EPISODES.length} episodes</Badge>
-            </div>
-            <div className="space-y-1 max-h-48 overflow-y-auto">
-              {PODCAST_EPISODES.map(ep => {
-                const alreadyAdded = items.some(i => 
-                  i.audio_meta && (i.audio_meta as any).episodeNumber === ep.episodeNumber && i.audio_type === "podcast"
-                );
-                return (
-                  <div
-                    key={ep.id}
-                    className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${
-                      alreadyAdded ? "border-primary/20 bg-primary/5 opacity-60" : "border-transparent hover:border-border hover:bg-muted/30"
-                    }`}
+          {/* Expanded inline panel for Commentary / Bible Reading */}
+          {(expandedSource === "commentary" || expandedSource === "reading") && (
+            <Card className="border-primary/20">
+              <CardContent className="p-3 space-y-2">
+                <p className="text-xs font-semibold">
+                  {expandedSource === "commentary" ? "Add Commentary" : "Add Bible Reading"}
+                </p>
+                <div className="flex gap-2">
+                  <select
+                    value={selectedBook}
+                    onChange={(e) => { setSelectedBook(e.target.value); setSelectedChapter(1); }}
+                    className="flex-1 h-8 text-xs rounded-md border bg-background px-2"
                   >
-                    <span className="text-[10px] text-muted-foreground w-5 text-center shrink-0">{ep.episodeNumber}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium truncate">{ep.title}</p>
-                      <p className="text-[10px] text-muted-foreground">{ep.duration}</p>
-                    </div>
-                    <Button
-                      variant={alreadyAdded ? "ghost" : "outline"}
-                      size="sm"
-                      className="h-6 text-[10px] px-2 shrink-0"
-                      disabled={alreadyAdded}
-                      onClick={() => addPodcastToPlaylist(ep)}
-                    >
-                      {alreadyAdded ? <Check className="h-3 w-3" /> : <><Plus className="h-3 w-3 mr-0.5" /> Add</>}
-                    </Button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+                    {BIBLE_BOOKS.map(b => <option key={b} value={b}>{b}</option>)}
+                  </select>
+                  <Input
+                    type="number" min={1} max={150} value={selectedChapter}
+                    onChange={(e) => setSelectedChapter(parseInt(e.target.value) || 1)}
+                    className="w-16 h-8 text-xs"
+                    placeholder="Ch"
+                  />
+                  <Button size="sm" className="h-8 text-xs gap-1" onClick={() => {
+                    const type = expandedSource === "commentary" ? "commentary" : "reading";
+                    addItem({
+                      title: `${selectedBook} ${selectedChapter} (${type === "commentary" ? "Commentary" : "Reading"})`,
+                      description: `${type === "commentary" ? "Audio commentary for" : "Bible reading of"} ${selectedBook} ${selectedChapter}`,
+                      audio_type: type,
+                      audio_url: null,
+                      audio_meta: {
+                        generationType: type === "commentary" ? "chapter-commentary" : "chapter-reading",
+                        book: selectedBook,
+                        chapter: selectedChapter,
+                      },
+                    });
+                    toast.success(`Added ${selectedBook} ${selectedChapter}`);
+                  }}>
+                    <Plus className="h-3 w-3" /> Add
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Podcast quick-add (always visible) */}
+          {expandedSource === "podcast" && (
+            <Card className="border-primary/20">
+              <CardContent className="p-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Mic className="h-4 w-4 text-orange-400" />
+                  <h4 className="text-xs font-semibold">Podcast Episodes</h4>
+                  <Badge variant="outline" className="text-[9px]">{PODCAST_EPISODES.length} episodes</Badge>
+                </div>
+                <div className="space-y-1 max-h-48 overflow-y-auto">
+                  {PODCAST_EPISODES.map(ep => {
+                    const alreadyAdded = items.some(i => 
+                      i.audio_meta && (i.audio_meta as any).episodeNumber === ep.episodeNumber && i.audio_type === "podcast"
+                    );
+                    return (
+                      <div key={ep.id}
+                        className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${
+                          alreadyAdded ? "border-primary/20 bg-primary/5 opacity-60" : "border-transparent hover:border-border hover:bg-muted/30"
+                        }`}>
+                        <span className="text-[10px] text-muted-foreground w-5 text-center shrink-0">{ep.episodeNumber}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium truncate">{ep.title}</p>
+                          <p className="text-[10px] text-muted-foreground">{ep.duration}</p>
+                        </div>
+                        <Button variant={alreadyAdded ? "ghost" : "outline"} size="sm"
+                          className="h-6 text-[10px] px-2 shrink-0" disabled={alreadyAdded}
+                          onClick={() => addPodcastToPlaylist(ep)}>
+                          {alreadyAdded ? <Check className="h-3 w-3" /> : <><Plus className="h-3 w-3 mr-0.5" /> Add</>}
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
 
