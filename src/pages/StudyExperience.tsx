@@ -936,8 +936,9 @@ INSTRUCTIONS FOR RECAP:
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="fixed inset-0 bg-gradient-to-b from-background via-background to-background/90 pointer-events-none" />
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
+      <div className="fixed inset-0 bg-gradient-to-b from-violet-950/30 via-background to-indigo-950/20 pointer-events-none" />
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-500/10 via-transparent to-transparent pointer-events-none" />
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-blue-500/8 via-transparent to-transparent pointer-events-none" />
 
       <Navigation />
 
@@ -949,7 +950,7 @@ INSTRUCTIONS FOR RECAP:
           transition={{ duration: 0.6 }}
           className="text-center mb-10"
         >
-          <h1 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent">
+          <h1 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-violet-300 via-blue-300 to-emerald-300 bg-clip-text text-transparent">
             Ultimate Study Experience <span className="text-primary/60 font-normal">(U.S.E)</span>
           </h1>
           <p className="text-lg text-primary/80 font-medium mb-2">
@@ -962,7 +963,7 @@ INSTRUCTIONS FOR RECAP:
           </p>
 
           {/* Mode toggle */}
-          <div className="inline-flex rounded-lg bg-muted/50 p-1 border border-border/50">
+          <div className="inline-flex rounded-lg bg-muted/50 p-1 border border-violet-500/20 shadow-[0_0_15px_-3px_rgba(139,92,246,0.2)]">
             <button
               onClick={() => handleModeSwitch("jeeves-led")}
               className={cn(
@@ -1183,7 +1184,7 @@ INSTRUCTIONS FOR RECAP:
 
             {/* Analysis stack */}
             {layers.length > 0 && (
-              <div className="space-y-4">
+              <div className="space-y-4 p-4 rounded-2xl border border-violet-500/20 bg-violet-500/5 backdrop-blur-xl shadow-[0_0_30px_-5px_rgba(139,92,246,0.25)] ring-1 ring-violet-400/10">
                 <h3 className="text-sm font-medium text-muted-foreground">
                   Analysis Layers ({layers.length})
                 </h3>
