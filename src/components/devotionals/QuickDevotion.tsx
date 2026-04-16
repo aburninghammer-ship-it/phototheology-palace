@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sparkles, Loader2, X, BookOpen, RefreshCw, Share2, Copy, Mail, MessageCircle, Twitter } from "lucide-react";
+import { Sparkles, Loader2, X, BookOpen, RefreshCw, History, Trash2, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,13 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { FreeAudioButton } from "@/components/audio/FreeAudioButton";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { VoiceRecorder } from "@/components/studies/VoiceRecorder";
+import { useQuickDevotionHistory, QuickDevotionHistoryItem } from "@/hooks/useQuickDevotionHistory";
+import { formatDistanceToNow } from "date-fns";
 
 type DepthLevel = "light" | "standard" | "deep";
 type WritingStyle = "mixed-audience" | "academic" | "pastoral" | "youth";
@@ -49,6 +45,8 @@ function getTodayString(): string {
   return new Date().toISOString().split("T")[0];
 }
 
+type ViewMode = "form" | "result" | "history" | "history-detail";
+
 export function QuickDevotion({ onClose }: QuickDevotionProps) {
   const [theme, setTheme] = useState("");
   const [description, setDescription] = useState("");
@@ -56,11 +54,14 @@ export function QuickDevotion({ onClose }: QuickDevotionProps) {
   const [writingStyle, setWritingStyle] = useState<WritingStyle>("mixed-audience");
   const [isGenerating, setIsGenerating] = useState(false);
   const [devotion, setDevotion] = useState<DevotionContent | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>("form");
+  const [selectedHistoryItem, setSelectedHistoryItem] = useState<QuickDevotionHistoryItem | null>(null);
   const [regenCount, setRegenCount] = useState(() => {
     const data = getRegenData();
     return data.date === getTodayString() ? data.count : 0;
   });
 
+  const { history, isLoading: historyLoading, saveToHistory, deleteFromHistory } = useQuickDevotionHistory();
   const remainingRegens = MAX_REGENERATIONS - regenCount;
 
   const generateDevotion = async (isRegeneration = false) => {
@@ -76,24 +77,38 @@ export function QuickDevotion({ onClose }: QuickDevotionProps) {
 
     setIsGenerating(true);
     try {
-      const fullTheme = description.trim() 
+      const fullTheme = description.trim()
         ? `${theme.trim()} - ${description.trim()}`
         : theme.trim();
-      
+
       const { data, error } = await supabase.functions.invoke("generate-quick-devotion", {
         body: { theme: fullTheme, depth, writingStyle },
       });
 
       if (error) throw error;
       setDevotion(data);
+      setViewMode("result");
+
+      // Save to history (only on first generation, not regeneration)
+      if (!isRegeneration) {
+        const devotionContent = JSON.stringify(data);
+        saveToHistory.mutate({
+          theme: theme.trim(),
+          description: description.trim() || undefined,
+          depth_level: depth,
+          writing_style: writingStyle,
+          devotion_content: devotionContent,
+          scripture_reference: data.scripture_reference,
+        });
+      }
 
       // Track regeneration
       if (isRegeneration) {
         const newCount = regenCount + 1;
         setRegenCount(newCount);
-        localStorage.setItem(REGEN_STORAGE_KEY, JSON.stringify({ 
-          date: getTodayString(), 
-          count: newCount 
+        localStorage.setItem(REGEN_STORAGE_KEY, JSON.stringify({
+          date: getTodayString(),
+          count: newCount
         }));
       }
     } catch (error) {
@@ -109,78 +124,41 @@ export function QuickDevotion({ onClose }: QuickDevotionProps) {
       toast.error(`You've used all ${MAX_REGENERATIONS} regenerations for today.`);
       return;
     }
-    setDevotion(null);
     generateDevotion(true);
   };
 
-  const getShareContent = () => {
-    if (!devotion) return "";
-    const appLink = window.location.origin;
-    const divider = "═".repeat(20);
-    
-    const parts: string[] = [];
-    parts.push(`✨ ${devotion.title} ✨`);
-    parts.push("");
-    parts.push(`📖 ${devotion.scripture_reference}`);
-    parts.push("");
-    parts.push(`"${devotion.scripture_text}"`);
-    parts.push("");
-    parts.push(divider);
-    parts.push("");
-    parts.push("✝️ Christ Connection:");
-    parts.push("");
-    parts.push(devotion.christ_connection);
-    parts.push("");
-    parts.push(divider);
-    parts.push("");
-    parts.push("🎯 Application:");
-    parts.push("");
-    parts.push(devotion.application);
-    parts.push("");
-    parts.push(divider);
-    parts.push("");
-    parts.push(`🧠 Remember: "${devotion.memory_hook}"`);
-    parts.push("");
-    parts.push(divider);
-    parts.push("");
-    parts.push("🙏 Prayer:");
-    parts.push("");
-    parts.push(devotion.prayer);
-    parts.push("");
-    parts.push(divider);
-    parts.push("");
-    parts.push("🌟 Get your own daily devotionals:");
-    parts.push(`📱 ${appLink}`);
-    
-    return parts.join("\n");
+  const handleViewHistoryItem = (item: QuickDevotionHistoryItem) => {
+    setSelectedHistoryItem(item);
+    try {
+      const content = JSON.parse(item.devotion_content) as DevotionContent;
+      setDevotion(content);
+      setTheme(item.theme);
+      setViewMode("history-detail");
+    } catch {
+      toast.error("Failed to load devotion");
+    }
   };
 
-  const handleCopyContent = () => {
-    navigator.clipboard.writeText(getShareContent());
-    toast.success("Devotional copied to clipboard!");
+  const handleDeleteHistoryItem = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    deleteFromHistory.mutate(id, {
+      onSuccess: () => toast.success("Devotion removed from history"),
+      onError: () => toast.error("Failed to delete"),
+    });
   };
 
-  const handleShareViaEmail = () => {
-    if (!devotion) return;
-    const subject = encodeURIComponent(devotion.title);
-    const body = encodeURIComponent(getShareContent());
-    window.open(`mailto:?subject=${subject}&body=${body}`);
+  const handleBackToHistory = () => {
+    setSelectedHistoryItem(null);
+    setDevotion(null);
+    setViewMode("history");
   };
 
-  const handleShareViaSMS = () => {
-    const text = encodeURIComponent(getShareContent());
-    window.open(`sms:?body=${text}`);
-  };
-
-  const handleShareViaTwitter = () => {
-    if (!devotion) return;
-    const text = encodeURIComponent(`📖 ${devotion.title} - ${devotion.scripture_reference}\n\n${window.location.origin}`);
-    window.open(`https://twitter.com/intent/tweet?text=${text}`, "_blank");
-  };
-
-  const handleShareViaWhatsApp = () => {
-    const text = encodeURIComponent(getShareContent());
-    window.open(`https://api.whatsapp.com/send?text=${text}`, "_blank");
+  const handleNewDevotion = () => {
+    setDevotion(null);
+    setTheme("");
+    setDescription("");
+    setSelectedHistoryItem(null);
+    setViewMode("form");
   };
 
   return (
@@ -188,15 +166,81 @@ export function QuickDevotion({ onClose }: QuickDevotionProps) {
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
+            {(viewMode === "history" || viewMode === "history-detail") && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={viewMode === "history-detail" ? handleBackToHistory : handleNewDevotion}
+                className="mr-1"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+            )}
             <Sparkles className="h-5 w-5 text-primary" />
-            Quick Daily Devotion
+            {viewMode === "history" ? "Devotion History" : viewMode === "history-detail" ? "Past Devotion" : "Quick Daily Devotion"}
           </CardTitle>
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <X className="h-5 w-5" />
-          </Button>
+          <div className="flex items-center gap-1">
+            {viewMode === "form" && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setViewMode("history")}
+                title="View history"
+              >
+                <History className="h-5 w-5" />
+              </Button>
+            )}
+            <Button variant="ghost" size="icon" onClick={onClose}>
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {!devotion ? (
+          {viewMode === "history" ? (
+            <div className="space-y-4">
+              {historyLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : !history?.length ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <History className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p>No devotion history yet</p>
+                  <p className="text-sm mt-1">Your quick devotions will appear here</p>
+                  <Button variant="outline" className="mt-4" onClick={handleNewDevotion}>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Generate Your First Devotion
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {history.map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => handleViewHistoryItem(item)}
+                      className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent cursor-pointer transition-colors"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{item.theme}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {item.scripture_reference && `${item.scripture_reference} • `}
+                          {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => handleDeleteHistoryItem(item.id, e)}
+                        className="ml-2 text-muted-foreground hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : viewMode === "form" ? (
 <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="theme">What theme would you like to explore today?</Label>
@@ -325,48 +369,32 @@ export function QuickDevotion({ onClose }: QuickDevotionProps) {
 
               {/* Actions */}
               <div className="flex gap-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="flex-1">
-                      <Share2 className="h-4 w-4 mr-2" />
-                      Share
+                {viewMode === "history-detail" ? (
+                  <>
+                    <Button variant="outline" onClick={handleNewDevotion} className="flex-1">
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      New Devotion
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-48">
-                    <DropdownMenuItem onClick={handleCopyContent}>
-                      <Copy className="h-4 w-4 mr-2" />
-                      Copy Content
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleShareViaEmail}>
-                      <Mail className="h-4 w-4 mr-2" />
-                      Email
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleShareViaSMS}>
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      Text Message
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleShareViaWhatsApp}>
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      WhatsApp
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleShareViaTwitter}>
-                      <Twitter className="h-4 w-4 mr-2" />
-                      Twitter/X
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <Button 
-                  variant="outline" 
-                  onClick={handleRegenerate} 
-                  disabled={remainingRegens <= 0 || isGenerating}
-                  className="flex-1"
-                >
-                  <RefreshCw className={`h-4 w-4 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
-                  Regenerate ({remainingRegens} left)
-                </Button>
-                <Button onClick={onClose} className="flex-1">
-                  Done
-                </Button>
+                    <Button onClick={onClose} className="flex-1">
+                      Done
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      variant="outline"
+                      onClick={handleRegenerate}
+                      disabled={remainingRegens <= 0 || isGenerating}
+                      className="flex-1"
+                    >
+                      <RefreshCw className={`h-4 w-4 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
+                      Regenerate ({remainingRegens} left)
+                    </Button>
+                    <Button onClick={onClose} className="flex-1">
+                      Done
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           )}

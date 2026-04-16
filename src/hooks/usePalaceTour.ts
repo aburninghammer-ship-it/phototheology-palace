@@ -10,46 +10,9 @@ export function usePalaceTour() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkTourStatus = async () => {
-      // Check localStorage first (works for both logged in and anonymous)
-      const localCompleted = localStorage.getItem(TOUR_COMPLETED_KEY);
-      if (localCompleted === "true") {
-        setShowTour(false);
-        setLoading(false);
-        return;
-      }
-
-      // If user is logged in, check profile
-      if (user) {
-        try {
-          const { data } = await supabase
-            .from("profiles")
-            .select("onboarding_completed")
-            .eq("id", user.id)
-            .single();
-
-          if (data?.onboarding_completed) {
-            // User completed general onboarding, but may not have seen palace tour
-            // Check for palace-specific tour completion
-            const palaceTourCompleted = localStorage.getItem(`${TOUR_COMPLETED_KEY}_${user.id}`);
-            setShowTour(palaceTourCompleted !== "true");
-          } else {
-            // User hasn't completed onboarding at all
-            setShowTour(true);
-          }
-        } catch (error) {
-          console.error("Error checking tour status:", error);
-          setShowTour(true);
-        }
-      } else {
-        // Anonymous user - show tour if not seen
-        setShowTour(true);
-      }
-
-      setLoading(false);
-    };
-
-    checkTourStatus();
+    // Palace tour walkthrough disabled
+    setShowTour(false);
+    setLoading(false);
   }, [user]);
 
   const completeTour = async () => {

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Bell, Check, X } from "lucide-react";
 import { Button } from "./ui/button";
 import {
@@ -16,6 +17,7 @@ import { formatDistanceToNow } from "date-fns";
 export function NotificationCenter() {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
 
   const handleNotificationClick = async (notification: any) => {
     console.log('🔔 NotificationCenter: Notification clicked', {
@@ -50,6 +52,7 @@ export function NotificationCenter() {
       }));
       
       console.log('🔔 NotificationCenter: Event dispatched successfully');
+      setOpen(false);
     } else {
       // Handle non-message notifications with navigation links
       // Prefer explicit link field, then metadata.link, then type-specific defaults
@@ -61,6 +64,7 @@ export function NotificationCenter() {
 
       if (link) {
         console.log('🔔 NotificationCenter: Navigating to', link);
+        setOpen(false);
         navigate(link);
       } else {
         console.log('🔔 NotificationCenter: No navigation link found for notification', {
@@ -73,7 +77,7 @@ export function NotificationCenter() {
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
@@ -120,10 +124,10 @@ export function NotificationCenter() {
                   handleNotificationClick(notification);
                 }}
               >
-                <div className="flex items-start justify-between w-full">
-                  <div className="flex-1">
+                <div className="flex items-start justify-between w-full gap-2">
+                  <div className="flex-1 min-w-0">
                     <p className="font-medium text-sm">{notification.title}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-xs text-muted-foreground mt-1 truncate">
                       {notification.message}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -131,7 +135,18 @@ export function NotificationCenter() {
                     </p>
                   </div>
                   {!notification.is_read && (
-                    <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0 mt-1" />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 shrink-0 rounded-full hover:bg-primary/10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        markAsRead(notification.id);
+                      }}
+                      title="Mark as read"
+                    >
+                      <Check className="h-3 w-3 text-primary" />
+                    </Button>
                   )}
                 </div>
               </DropdownMenuItem>

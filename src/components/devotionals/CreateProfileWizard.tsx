@@ -9,9 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { X, ChevronRight, ChevronLeft, User, Heart, Target, Sparkles, AlertCircle } from "lucide-react";
 import { useDevotionalProfiles } from "@/hooks/useDevotionalProfiles";
 import { useDevotionals } from "@/hooks/useDevotionals";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import { CADE_ISSUES, ISSUE_SEVERITY } from "@/lib/cadeIssues";
+import { CADE_ISSUES, KID_FRIENDLY_ISSUES, ISSUE_SEVERITY } from "@/lib/cadeIssues";
 
 interface CreateProfileWizardProps {
   onClose: () => void;
@@ -211,6 +212,7 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
   const [step, setStep] = useState(1);
   const { createProfile, isCreating } = useDevotionalProfiles();
   const { createPlan, generateDevotional, isGenerating } = useDevotionals();
+  const { toast } = useToast();
 
   const [formData, setFormData] = useState({
     category: "individual",
@@ -278,63 +280,96 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
 
   const handleCreate = async () => {
     const tonesString = formData.preferred_tones.join(", ");
-    
-    const profile = await createProfile.mutateAsync({
-      name: formData.name,
-      relationship: getRelationshipForCategory(),
-      age_group: formData.age_group || formData.grade_level || formData.family_dynamic || undefined,
-      avatar_emoji: formData.avatar_emoji,
-      struggles: formData.struggles,
-      current_situation: formData.current_situation || undefined,
-      preferred_tone: tonesString,
-      preferred_themes: formData.preferred_themes,
-      // CADE fields
-      primary_issue: formData.primary_issue || undefined,
-      issue_description: formData.issue_description || undefined,
-      issue_severity: formData.issue_severity || "moderate",
-    });
 
-    if (formData.generatePlan && profile) {
-      // Create and generate a devotional plan for this profile
-      const theme = formData.theme || 
-        (formData.struggles.length > 0 
-          ? `Healing from ${formData.struggles[0]}` 
-          : formData.preferred_themes[0] || "Walking with Christ");
-
-      const plan = await createPlan.mutateAsync({
-        title: `${formData.name}'s Devotional Journey`,
-        description: `A personalized ${formData.duration}-day devotional for ${formData.name}. Tones: ${tonesString}`,
-        theme,
-        format: "room-driven",
-        duration: formData.duration,
-        studyStyle: "study", // Valid DB value; actual tones passed to AI generator
+    let profile;
+    try {
+      profile = await createProfile.mutateAsync({
+        name: formData.name,
+        relationship: getRelationshipForCategory(),
+        age_group: formData.age_group || formData.grade_level || formData.family_dynamic || undefined,
+        avatar_emoji: formData.avatar_emoji,
+        struggles: formData.struggles,
+        current_situation: formData.current_situation || undefined,
+        preferred_tone: tonesString,
+        preferred_themes: formData.preferred_themes,
+        // CADE fields
+        primary_issue: formData.primary_issue || undefined,
+        issue_description: formData.issue_description || undefined,
+        issue_severity: formData.issue_severity || "moderate",
       });
+    } catch (profileError) {
+      console.error("Failed to create profile:", profileError);
+      // Error toast is shown by the mutation's onError handler
+      return;
+    }
 
-      if (plan) {
-        await generateDevotional.mutateAsync({
-          planId: plan.id,
+    if (!profile) {
+      console.error("Profile creation returned null");
+      return;
+    }
+
+    // Profile created successfully - now try to generate the devotional plan
+    if (formData.generatePlan) {
+      try {
+        // Create and generate a devotional plan for this profile
+        const theme = formData.theme ||
+          (formData.struggles.length > 0
+            ? `Healing from ${formData.struggles[0]}`
+            : formData.preferred_themes[0] || "Walking with Christ");
+
+        const plan = await createPlan.mutateAsync({
+          title: `My Devotional Journey`,
+          description: `A personalized ${formData.duration}-day devotional. Tones: ${tonesString}`,
           theme,
           format: "room-driven",
           duration: formData.duration,
-          studyStyle: tonesString,
-          profileName: formData.name,
-          // CADE context (fall back to user-provided context so it can personalize)
-          primaryIssue: formData.primary_issue || (formData.struggles[0] || undefined),
-          issueDescription: (formData.issue_description || formData.current_situation) || undefined,
-          issueSeverity: formData.issue_severity || undefined,
+          studyStyle: "study", // Valid DB value; actual tones passed to AI generator
         });
 
-        // Link the plan to the profile so future days (daily generation) can personalize
-        const { error: linkErr } = await supabase
-          .from("devotional_profiles")
-          .update({ active_plan_id: plan.id })
-          .eq("id", profile.id);
-        if (linkErr) throw linkErr;
-      }
+        if (plan) {
+          try {
+            await generateDevotional.mutateAsync({
+              planId: plan.id,
+              theme,
+              format: "room-driven",
+              duration: formData.duration,
+              studyStyle: tonesString,
+              profileName: formData.name,
+              // CADE context (fall back to user-provided context so it can personalize)
+              primaryIssue: formData.primary_issue || (formData.struggles[0] || undefined),
+              issueDescription: (formData.issue_description || formData.current_situation) || undefined,
+              issueSeverity: formData.issue_severity || undefined,
+            });
 
-      onProfileCreated?.(profile.id);
+            // Link the plan to the profile so future days (daily generation) can personalize
+            const { error: linkErr } = await supabase
+              .from("devotional_profiles")
+              .update({ active_plan_id: plan.id })
+              .eq("id", profile.id);
+            if (linkErr) {
+              console.error("Failed to link plan to profile:", linkErr);
+            }
+          } catch (genError) {
+            console.error("Devotional generation failed (profile still saved):", genError);
+            // Profile was created, just generation failed - user can retry from profile detail page
+            toast({
+              title: "Profile Saved",
+              description: `${formData.name}'s profile was created. Devotional generation is taking longer than expected - you can generate it later from the profile page.`,
+            });
+          }
+        }
+      } catch (planError) {
+        console.error("Plan creation failed (profile still saved):", planError);
+        // Profile was created, just plan failed - user can retry
+        toast({
+          title: "Profile Saved",
+          description: `${formData.name}'s profile was created. You can generate their devotional later from the profile page.`,
+        });
+      }
     }
 
+    // Always call these - profile was successfully created even if generation failed
+    onProfileCreated?.(profile.id);
     onClose();
   };
 
@@ -349,7 +384,7 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
         if (formData.category === "dating" && !formData.dating_stage) return false;
         return true;
       case 2:
-        return formData.struggles.length > 0 || formData.current_situation.trim();
+        return true; // Issues are optional - some people may have none
       case 3:
         return formData.preferred_tones.length > 0 && formData.preferred_themes.length > 0;
       case 4:
@@ -577,32 +612,43 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
                 </p>
               </div>
 
-              {/* CADE Primary Issue Selection */}
-              <div className="space-y-3">
-                <Label className="flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4 text-primary" />
-                  Primary Issue (CADE Engine)
-                </Label>
-                <p className="text-xs text-muted-foreground">
-                  Selecting a primary issue enables our Context-Aware Devotional Engine for laser-focused pastoral care.
-                </p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[200px] overflow-y-auto p-1">
-                  {CADE_ISSUES.map((issue) => (
-                    <Button
-                      key={issue.value}
-                      variant={formData.primary_issue === issue.value ? "default" : "outline"}
-                      className={cn(
-                        "justify-start text-xs h-auto py-2",
-                        formData.primary_issue === issue.value && "ring-2 ring-primary"
-                      )}
-                      onClick={() => setFormData({ ...formData, primary_issue: issue.value })}
-                    >
-                      <span className="mr-1">{issue.emoji}</span>
-                      {issue.label}
-                    </Button>
-                  ))}
-                </div>
-              </div>
+              {/* CADE Primary Issue Selection - Show kid-friendly issues for young children */}
+              {(() => {
+                const isYoungChildren = formData.family_dynamic === "young_children";
+                const issueList = isYoungChildren ? KID_FRIENDLY_ISSUES : CADE_ISSUES;
+                const sectionTitle = isYoungChildren ? "Topic for Kids Devotion" : "Primary Issue (CADE Engine)";
+                const sectionDescription = isYoungChildren 
+                  ? "Select a topic for age-appropriate devotionals that parents can read with their little ones."
+                  : "Selecting a primary issue enables our Context-Aware Devotional Engine for laser-focused pastoral care.";
+                
+                return (
+                  <div className="space-y-3">
+                    <Label className="flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4 text-primary" />
+                      {sectionTitle}
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      {sectionDescription}
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[200px] overflow-y-auto p-1">
+                      {issueList.map((issue) => (
+                        <Button
+                          key={issue.value}
+                          variant={formData.primary_issue === issue.value ? "default" : "outline"}
+                          className={cn(
+                            "justify-start text-xs h-auto py-2",
+                            formData.primary_issue === issue.value && "ring-2 ring-primary"
+                          )}
+                          onClick={() => setFormData({ ...formData, primary_issue: issue.value })}
+                        >
+                          <span className="mr-1">{issue.emoji}</span>
+                          {issue.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Issue Severity */}
               {formData.primary_issue && (

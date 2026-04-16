@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +9,9 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Image, Search, Heart, Trash2, RefreshCw, Loader2, ArrowLeft, MessageCircle, Send, X, Edit, Package, Download, Share2, Globe, FolderOpen, ChevronRight, ChevronDown } from "lucide-react";
+import { Image, Search, Heart, Trash2, RefreshCw, Loader2, ArrowLeft, MessageCircle, Send, X, Edit, Package, Download, Share2, Globe, FolderOpen, ChevronRight, ChevronDown, GraduationCap } from "lucide-react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { BIBLE_IMAGE_LIBRARY_TOUR } from "@/data/guidedTours";
 import { genesisImages } from "@/assets/24fps/genesis";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
@@ -26,6 +29,7 @@ interface BibleImage {
 }
 
 export default function BibleImageLibrary() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [images, setImages] = useState<BibleImage[]>([]);
   const [filteredImages, setFilteredImages] = useState<BibleImage[]>([]);
@@ -36,6 +40,7 @@ export default function BibleImageLibrary() {
   const [activeTab, setActiveTab] = useState<"all" | "favorites" | "by-book" | "genesis-pack">("all");
   const [expandedBooks, setExpandedBooks] = useState<Set<string>>(new Set());
   const [jeevesOpen, setJeevesOpen] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
   const [jeevesPrompt, setJeevesPrompt] = useState("");
   const [jeevesGenerating, setJeevesGenerating] = useState(false);
   const [jeevesMessages, setJeevesMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
@@ -536,35 +541,44 @@ export default function BibleImageLibrary() {
             <div className="flex items-center gap-4">
               <Image className="w-12 h-12 text-white" />
               <div>
-                <h1 className="text-4xl font-bold text-white">Bible Image Library</h1>
-                <p className="text-purple-200 text-lg">Your visual interpretations of Scripture</p>
+                <h1 className="text-4xl font-bold text-white">{t('bibleImageLib.title')}</h1>
+                <p className="text-purple-200 text-lg">{t('bibleImageLib.subtitle')}</p>
               </div>
             </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => { primeAudioForTour(); setTourOpen(true); }}
+              className="text-white/80 hover:text-white hover:bg-white/10 gap-1"
+            >
+              <GraduationCap className="h-4 w-4" /> Tour
+            </Button>
             <Button
               onClick={() => navigate("/palace")}
               variant="outline"
               className="bg-white/10 text-white border-white/20 hover:bg-white/20"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Palace
+              {t('bibleImageLib.backToPalace')}
             </Button>
           </div>
         </div>
       </div>
+      {tourOpen && <GuidedTourOverlay steps={BIBLE_IMAGE_LIBRARY_TOUR} onClose={() => setTourOpen(false)} />}
 
       {/* Stats Cards */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className="bg-white/10 backdrop-blur-sm border-white/20 p-6">
-            <h3 className="text-purple-200 text-sm font-medium mb-2">Total Images</h3>
+            <h3 className="text-purple-200 text-sm font-medium mb-2">{t('bibleImageLib.totalImages')}</h3>
             <p className="text-5xl font-bold text-white">{stats.total}</p>
           </Card>
           <Card className="bg-white/10 backdrop-blur-sm border-white/20 p-6">
-            <h3 className="text-purple-200 text-sm font-medium mb-2">Translation Room</h3>
+            <h3 className="text-purple-200 text-sm font-medium mb-2">{t('bibleImageLib.translationRoom')}</h3>
             <p className="text-5xl font-bold text-white">{stats.translation}</p>
           </Card>
           <Card className="bg-white/10 backdrop-blur-sm border-white/20 p-6">
-            <h3 className="text-purple-200 text-sm font-medium mb-2">24FPS Room</h3>
+            <h3 className="text-purple-200 text-sm font-medium mb-2">{t('bibleImageLib.fps24Room')}</h3>
             <p className="text-5xl font-bold text-white">{stats.fps24}</p>
           </Card>
         </div>
@@ -577,15 +591,15 @@ export default function BibleImageLibrary() {
                 <MessageCircle className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white mb-1">Ask Jeeves for Images</h3>
-                <p className="text-purple-100">Your AI assistant for biblical imagery</p>
+                <h3 className="text-xl font-bold text-white mb-1">{t('bibleImageLib.askJeeves')}</h3>
+                <p className="text-purple-100">{t('bibleImageLib.jeevesDescription')}</p>
               </div>
             </div>
             <Button
               onClick={() => setJeevesOpen(true)}
               className="bg-white text-purple-900 hover:bg-white/90"
             >
-              Chat with Jeeves
+              {t('bibleImageLib.chatWithJeeves')}
             </Button>
           </div>
         </Card>
@@ -595,7 +609,7 @@ export default function BibleImageLibrary() {
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
             <Input
-              placeholder="Search by verse reference or description..."
+              placeholder={t('bibleImageLib.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-12 bg-white/90 backdrop-blur-sm border-white/20 text-foreground placeholder:text-muted-foreground"
@@ -610,69 +624,69 @@ export default function BibleImageLibrary() {
             onClick={() => setActiveFilter("all")}
             className={activeFilter === "all" ? "bg-primary text-primary-foreground" : "bg-white/90 text-foreground border-white/20"}
           >
-            All Images
+            {t('bibleImageLib.allImages')}
           </Button>
           <Button
             variant={activeFilter === "translation" ? "default" : "outline"}
             onClick={() => setActiveFilter("translation")}
             className={activeFilter === "translation" ? "bg-primary text-primary-foreground" : "bg-white/90 text-foreground border-white/20"}
           >
-            Translation Room
+            {t('bibleImageLib.translationRoom')}
           </Button>
           <Button
             variant={activeFilter === "24fps" ? "default" : "outline"}
             onClick={() => setActiveFilter("24fps")}
             className={activeFilter === "24fps" ? "bg-primary text-primary-foreground" : "bg-white/90 text-foreground border-white/20"}
           >
-            24FPS Room
+            {t('bibleImageLib.fps24Room')}
           </Button>
         </div>
 
         {/* Content Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "all" | "favorites" | "by-book" | "genesis-pack")} className="mb-6">
           <TabsList className="bg-white/90 backdrop-blur-sm border-white/20">
-            <TabsTrigger value="all">All Images ({filteredImages.length})</TabsTrigger>
+            <TabsTrigger value="all">{t('bibleImageLib.allImagesTab', { count: filteredImages.length })}</TabsTrigger>
             <TabsTrigger value="by-book">
               <FolderOpen className="w-4 h-4 mr-2" />
-              By Book ({sortedBooks.length})
+              {t('bibleImageLib.byBook', { count: sortedBooks.length })}
             </TabsTrigger>
-            <TabsTrigger value="favorites">Favorites ({images.filter(img => img.is_favorite).length})</TabsTrigger>
+            <TabsTrigger value="favorites">{t('bibleImageLib.favorites', { count: images.filter(img => img.is_favorite).length })}</TabsTrigger>
             <TabsTrigger value="genesis-pack">
               <Package className="w-4 h-4 mr-2" />
-              Genesis Pack
+              {t('bibleImageLib.genesisPack')}
             </TabsTrigger>
             <Dialog>
               <DialogTrigger asChild>
                 <Button className="ml-auto bg-primary text-primary-foreground hover:bg-primary/90">
-                  Create New
+                  {t('bibleImageLib.createNew')}
                 </Button>
               </DialogTrigger>
               <DialogContent className="bg-card text-card-foreground">
                 <DialogHeader>
-                  <DialogTitle>Generate New Image</DialogTitle>
+                  <DialogTitle>{t('bibleImageLib.generateNewImage')}</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Room Type</label>
+                    <label className="text-sm font-medium mb-2 block">{t('bibleImageLib.roomType')}</label>
                     <Tabs value={newImage.room_type} onValueChange={(v) => setNewImage({ ...newImage, room_type: v })}>
                       <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="translation">Translation Room</TabsTrigger>
-                        <TabsTrigger value="24fps">24FPS Room</TabsTrigger>
+                        <TabsTrigger value="translation">{t('bibleImageLib.translationRoom')}</TabsTrigger>
+                        <TabsTrigger value="24fps">{t('bibleImageLib.fps24Room')}</TabsTrigger>
                       </TabsList>
                     </Tabs>
                   </div>
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Verse Reference (Optional)</label>
+                    <label className="text-sm font-medium mb-2 block">{t('bibleImageLib.verseReferenceOptional')}</label>
                     <Input
-                      placeholder="e.g., John 3:16"
+                      placeholder={t('bibleImageLib.verseReferencePlaceholder')}
                       value={newImage.verse_reference}
                       onChange={(e) => setNewImage({ ...newImage, verse_reference: e.target.value })}
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Image Description</label>
+                    <label className="text-sm font-medium mb-2 block">{t('bibleImageLib.imageDescription')}</label>
                     <Textarea
-                      placeholder="Describe the image you want to create..."
+                      placeholder={t('bibleImageLib.imageDescriptionPlaceholder')}
                       value={newImage.description}
                       onChange={(e) => setNewImage({ ...newImage, description: e.target.value })}
                       rows={4}
@@ -686,10 +700,10 @@ export default function BibleImageLibrary() {
                     {generating ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Generating...
+                        {t('bibleImageLib.generating')}
                       </>
                     ) : (
-                      "Generate Image"
+                      t('bibleImageLib.generateImage')
                     )}
                   </Button>
                 </div>
@@ -705,7 +719,7 @@ export default function BibleImageLibrary() {
             ) : filteredImages.length === 0 ? (
               <div className="text-center py-16">
                 <Image className="w-24 h-24 mx-auto text-white/30 mb-4" />
-                <p className="text-white/60 text-lg">No images found</p>
+                <p className="text-white/60 text-lg">{t('bibleImageLib.noImagesFound')}</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -768,7 +782,7 @@ export default function BibleImageLibrary() {
                     <div className="p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xs px-2 py-1 rounded bg-primary/20 text-primary-foreground">
-                          {image.room_type === "24fps" ? "24FPS Room" : "Translation Room"}
+                          {image.room_type === "24fps" ? t('bibleImageLib.fps24Room') : t('bibleImageLib.translationRoom')}
                         </span>
                         {image.verse_reference && (
                           <span className="text-xs text-purple-200">{image.verse_reference}</span>
@@ -790,7 +804,7 @@ export default function BibleImageLibrary() {
             ) : filteredImages.filter(img => img.is_favorite).length === 0 ? (
               <div className="text-center py-16">
                 <Heart className="w-24 h-24 mx-auto text-white/30 mb-4" />
-                <p className="text-white/60 text-lg">No favorite images yet</p>
+                <p className="text-white/60 text-lg">{t('bibleImageLib.noFavorites')}</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -853,7 +867,7 @@ export default function BibleImageLibrary() {
                     <div className="p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xs px-2 py-1 rounded bg-primary/20 text-primary-foreground">
-                          {image.room_type === "24fps" ? "24FPS Room" : "Translation Room"}
+                          {image.room_type === "24fps" ? t('bibleImageLib.fps24Room') : t('bibleImageLib.translationRoom')}
                         </span>
                         {image.verse_reference && (
                           <span className="text-xs text-purple-200">{image.verse_reference}</span>
@@ -875,8 +889,8 @@ export default function BibleImageLibrary() {
             ) : sortedBooks.length === 0 ? (
               <div className="text-center py-16">
                 <FolderOpen className="w-24 h-24 mx-auto text-white/30 mb-4" />
-                <p className="text-white/60 text-lg">No images organized by book yet</p>
-                <p className="text-white/40 text-sm mt-2">Images with verse references will appear here</p>
+                <p className="text-white/60 text-lg">{t('bibleImageLib.noImagesByBook')}</p>
+                <p className="text-white/40 text-sm mt-2">{t('bibleImageLib.imagesWithReferences')}</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -893,7 +907,7 @@ export default function BibleImageLibrary() {
                             <div className="flex items-center gap-3">
                               <FolderOpen className="w-5 h-5 text-amber-400" />
                               <span className="font-semibold text-white">{book}</span>
-                              <span className="text-sm text-purple-200">({bookImages.length} images)</span>
+                              <span className="text-sm text-purple-200">({t('bibleImageLib.imagesCount', { count: bookImages.length })})</span>
                             </div>
                             {isExpanded ? (
                               <ChevronDown className="w-5 h-5 text-white/60" />
@@ -907,8 +921,8 @@ export default function BibleImageLibrary() {
                         {chapters.map(([chapter, chapterImages]) => (
                           <div key={chapter ?? 'no-chapter'} className="space-y-2">
                             <div className="text-sm font-medium text-purple-200 px-2">
-                              {chapter ? `Chapter ${chapter}` : 'No Chapter'}
-                              <span className="text-purple-300 ml-2">({chapterImages.length} images)</span>
+                              {chapter ? t('bibleImageLib.chapterNumber', { number: chapter }) : t('bibleImageLib.noChapter')}
+                              <span className="text-purple-300 ml-2">({t('bibleImageLib.imagesCount', { count: chapterImages.length })})</span>
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                               {chapterImages.map((image) => (
@@ -958,9 +972,9 @@ export default function BibleImageLibrary() {
             <Card className="mb-6 bg-white/10 backdrop-blur-sm border-white/20 p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-xl font-bold text-white mb-2">Genesis 1-50 Complete Pack</h3>
+                  <h3 className="text-xl font-bold text-white mb-2">{t('bibleImageLib.genesisCompletePackTitle')}</h3>
                   <p className="text-purple-200">
-                    Pre-illustrated frames for all 50 chapters of Genesis from the 24FPS Room
+                    {t('bibleImageLib.genesisCompletePackDescription')}
                   </p>
                 </div>
                 <Button
@@ -971,12 +985,12 @@ export default function BibleImageLibrary() {
                   {importingGenesis ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Importing...
+                      {t('bibleImageLib.importing')}
                     </>
                   ) : (
                     <>
                       <Download className="mr-2 h-4 w-4" />
-                      Import All 50
+                      {t('bibleImageLib.importAll50')}
                     </>
                   )}
                 </Button>
@@ -1001,14 +1015,14 @@ export default function BibleImageLibrary() {
                           className="bg-white/20 hover:bg-white/30 text-white"
                         >
                           <Download className="w-4 h-4 mr-2" />
-                          Import
+                          {t('bibleImageLib.import')}
                         </Button>
                       </div>
                     </div>
                     <div className="p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xs px-2 py-1 rounded bg-primary/20 text-primary-foreground">
-                          24FPS Room
+                          {t('bibleImageLib.fps24Room')}
                         </span>
                         <span className="text-xs text-purple-200">Genesis {chapter}</span>
                       </div>
@@ -1037,28 +1051,28 @@ export default function BibleImageLibrary() {
       <Dialog open={!!editingImage} onOpenChange={(open) => !open && setEditingImage(null)}>
         <DialogContent className="bg-card text-card-foreground">
           <DialogHeader>
-            <DialogTitle>Edit Image Details</DialogTitle>
+            <DialogTitle>{t('bibleImageLib.editImageDetails')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium mb-2 block">Verse Reference</label>
+              <label className="text-sm font-medium mb-2 block">{t('bibleImageLib.verseReference')}</label>
               <Input
-                placeholder="e.g., John 3:16"
+                placeholder={t('bibleImageLib.verseReferencePlaceholder')}
                 value={editForm.verse_reference}
                 onChange={(e) => setEditForm({ ...editForm, verse_reference: e.target.value })}
               />
             </div>
             <div>
-              <label className="text-sm font-medium mb-2 block">Description</label>
+              <label className="text-sm font-medium mb-2 block">{t('bibleImageLib.description')}</label>
               <Textarea
-                placeholder="Describe the image..."
+                placeholder={t('bibleImageLib.describeImagePlaceholder')}
                 value={editForm.description}
                 onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                 rows={4}
               />
             </div>
             <Button onClick={saveEdit} className="w-full">
-              Save Changes
+              {t('bibleImageLib.saveChanges')}
             </Button>
           </div>
         </DialogContent>
@@ -1070,7 +1084,7 @@ export default function BibleImageLibrary() {
           <div className="flex items-center justify-between p-4 border-b border-border">
             <div className="flex items-center gap-2">
               <MessageCircle className="w-5 h-5 text-primary" />
-              <h3 className="font-semibold text-card-foreground">Jeeves - Image Assistant</h3>
+              <h3 className="font-semibold text-card-foreground">{t('bibleImageLib.jeevesImageAssistant')}</h3>
             </div>
             <Button
               onClick={() => setJeevesOpen(false)}
@@ -1088,22 +1102,22 @@ export default function BibleImageLibrary() {
                 <>
                   <div className="bg-muted p-3 rounded-lg">
                     <p className="text-sm text-muted-foreground">
-                      👋 Hello! I'm Jeeves, your biblical image assistant. I can help you in two ways:
+                      {t('bibleImageLib.jeevesGreeting')}
                     </p>
                   </div>
                   
                   <div className="bg-muted p-3 rounded-lg">
-                    <p className="text-sm text-muted-foreground font-medium mb-2">📖 Give me a verse reference:</p>
+                    <p className="text-sm text-muted-foreground font-medium mb-2">{t('bibleImageLib.jeevesVersePrompt')}</p>
                     <ul className="text-sm text-muted-foreground space-y-1">
                       <li>• "John 3:16"</li>
                       <li>• "Psalm 23:1"</li>
                       <li>• "Genesis 1:1"</li>
                     </ul>
-                    <p className="text-xs text-muted-foreground mt-2 italic">I'll translate it into a visual description using Translation Room principles!</p>
+                    <p className="text-xs text-muted-foreground mt-2 italic">{t('bibleImageLib.jeevesTranslateNote')}</p>
                   </div>
 
                   <div className="bg-muted p-3 rounded-lg">
-                    <p className="text-sm text-muted-foreground font-medium mb-2">🎨 Or describe what you want:</p>
+                    <p className="text-sm text-muted-foreground font-medium mb-2">{t('bibleImageLib.jeevesDescribePrompt')}</p>
                     <ul className="text-sm text-muted-foreground space-y-1">
                       <li>• "David facing Goliath with his sling"</li>
                       <li>• "Moses parting the Red Sea"</li>
@@ -1130,7 +1144,7 @@ export default function BibleImageLibrary() {
                     <div className="bg-primary/10 p-3 rounded-lg flex items-center gap-2">
                       <Loader2 className="w-4 h-4 animate-spin text-primary" />
                       <p className="text-sm text-primary">
-                        {jeevesState === "generating" ? "Creating your image..." : "Translating verse..."}
+                        {jeevesState === "generating" ? t('bibleImageLib.creatingImage') : t('bibleImageLib.translatingVerse')}
                       </p>
                     </div>
                   )}
@@ -1143,9 +1157,9 @@ export default function BibleImageLibrary() {
             <div className="flex gap-2">
               <Textarea
                 placeholder={
-                  jeevesState === "name" 
-                    ? "Enter a name for this image..." 
-                    : "Enter a verse (e.g., John 3:16) or describe an image..."
+                  jeevesState === "name"
+                    ? t('bibleImageLib.enterImageName')
+                    : t('bibleImageLib.enterVerseOrDescription')
                 }
                 value={jeevesPrompt}
                 onChange={(e) => setJeevesPrompt(e.target.value)}

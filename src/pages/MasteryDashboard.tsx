@@ -19,20 +19,21 @@ import { getGlobalTitle, getNextGlobalTitleMilestone } from "@/utils/masteryCalc
 import { cn } from "@/lib/utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 export default function MasteryDashboard() {
+  const { t } = useTranslation();
   const { data: allMasteries, isLoading: masteriesLoading } = useAllRoomMasteries();
   const { data: globalTitle } = useGlobalMasterTitle();
   const { streak, isLoading: streakLoading } = useMasteryStreak();
   const { partnership, bothCompletedToday } = usePartnership();
   const [openTitles, setOpenTitles] = useState<Record<number, boolean>>({});
-  
+
   const roomsMastered = allMasteries?.filter(m => m.mastery_level === 5).length || 0;
   const totalXp = allMasteries?.reduce((sum, m) => sum + m.xp_current, 0) || 0;
   const currentGlobalTitle = getGlobalTitle(roomsMastered);
   const nextMilestone = getNextGlobalTitleMilestone(roomsMastered);
-  
-  // Demo room for testing XP system
+
   const demoRoom = useMastery("demo-room", 1);
 
   const handleAwardDemoXp = () => {
@@ -52,7 +53,7 @@ export default function MasteryDashboard() {
       <div className="min-h-screen gradient-dreamy">
         <SimplifiedNav />
         <div className="container mx-auto px-4 py-8 max-w-7xl">
-          <div className="text-center py-20">Loading mastery data...</div>
+          <div className="text-center py-20">{t('mastery.loading')}</div>
         </div>
       </div>
     );
@@ -67,35 +68,33 @@ export default function MasteryDashboard() {
           <div>
             <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
               <Crown className="h-10 w-10 text-primary" />
-              Mastery System
+              {t('mastery.title')}
             </h1>
-            <p className="text-muted-foreground">Track your progress and level up in every room</p>
+            <p className="text-muted-foreground">{t('mastery.subtitle')}</p>
           </div>
 
-          {/* Always-visible quick overview so this works on mobile too */}
           <Card className="border-primary/20 bg-card/80">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base">
                 <TrendingUp className="h-4 w-4 text-primary" />
-                How Mastery Works
+                {t('mastery.howItWorks')}
               </CardTitle>
               <CardDescription>
-                Each room has 5 mastery levels (Novice → Apprentice → Adept → Expert → Master). You earn XP
-                by completing drills, exercises, and perfect scores until you reach Level 5 in that room.
+                {t('mastery.howItWorksDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
               <div>
-                <p className="font-semibold mb-1">1. Pick a room</p>
-                <p className="text-muted-foreground">Focus on one Palace room and practice it repeatedly.</p>
+                <p className="font-semibold mb-1">{t('mastery.pickRoom')}</p>
+                <p className="text-muted-foreground">{t('mastery.pickRoomDesc')}</p>
               </div>
               <div>
-                <p className="font-semibold mb-1">2. Earn XP</p>
-                <p className="text-muted-foreground">Drills, exercises, and perfect runs add XP toward the next level.</p>
+                <p className="font-semibold mb-1">{t('mastery.earnXP')}</p>
+                <p className="text-muted-foreground">{t('mastery.earnXPDesc')}</p>
               </div>
               <div>
-                <p className="font-semibold mb-1">3. Reach Level 5</p>
-                <p className="text-muted-foreground">Master multiple rooms to unlock global titles across the Palace.</p>
+                <p className="font-semibold mb-1">{t('mastery.reachLevel5')}</p>
+                <p className="text-muted-foreground">{t('mastery.reachLevel5Desc')}</p>
               </div>
             </CardContent>
           </Card>
@@ -105,14 +104,14 @@ export default function MasteryDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className="border-2 border-primary/20">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Global Title</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('mastery.globalTitle')}</CardTitle>
               <Crown className="h-4 w-4 text-amber-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold mb-2">{currentGlobalTitle}</div>
               {nextMilestone && (
                 <p className="text-xs text-muted-foreground">
-                  {nextMilestone.roomsNeeded} more rooms to {nextMilestone.title}
+                  {t('mastery.moreRoomsTo', { count: nextMilestone.roomsNeeded, title: nextMilestone.title })}
                 </p>
               )}
             </CardContent>
@@ -120,24 +119,24 @@ export default function MasteryDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Rooms Mastered</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('mastery.roomsMastered')}</CardTitle>
               <Trophy className="h-4 w-4 text-yellow-500" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{roomsMastered}</div>
-              <p className="text-xs text-muted-foreground mt-1">Level 5 achievements</p>
+              <p className="text-xs text-muted-foreground mt-1">{t('mastery.level5Achievements')}</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Mastery Streak</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('mastery.masteryStreak')}</CardTitle>
               <Flame className="h-4 w-4 text-orange-500" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{streak?.current_streak || 0}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                Longest: {streak?.longest_streak || 0} days
+                {t('mastery.longestDays', { count: streak?.longest_streak || 0 })}
               </p>
             </CardContent>
           </Card>
@@ -146,29 +145,29 @@ export default function MasteryDashboard() {
         {/* Tabbed Content */}
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="overview">{t('mastery.overview')}</TabsTrigger>
             <TabsTrigger value="partner" className="relative">
               <Users className="h-4 w-4 mr-2" />
-              Partner
+              {t('mastery.partner')}
               {partnership?.status === 'active' && bothCompletedToday && (
                 <span className="absolute -top-1 -right-1 h-2 w-2 bg-green-500 rounded-full animate-pulse" />
               )}
             </TabsTrigger>
             <TabsTrigger value="rooms">
               <Grid3X3 className="h-4 w-4 mr-2" />
-              Rooms
+              {t('mastery.rooms')}
             </TabsTrigger>
             <TabsTrigger value="badges">
               <Award className="h-4 w-4 mr-2" />
-              Badges
+              {t('mastery.badges')}
             </TabsTrigger>
             <TabsTrigger value="map">
               <MapIcon className="h-4 w-4 mr-2" />
-              Map
+              {t('mastery.map')}
             </TabsTrigger>
             <TabsTrigger value="reports">
               <FileText className="h-4 w-4 mr-2" />
-              Reports
+              {t('mastery.reports')}
             </TabsTrigger>
           </TabsList>
 
@@ -178,72 +177,72 @@ export default function MasteryDashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Crown className="h-5 w-5 text-amber-500" />
-                  Floor-Based Mastery System
+                  {t('mastery.floorBasedSystem')}
                 </CardTitle>
                 <CardDescription>
-                  Progress through 8 floors of the Palace, unlocking prestigious titles along the way
+                  {t('mastery.floorBasedDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="text-sm">
                   <p className="mb-4 text-foreground/90">
-                    The mastery system has evolved! Instead of counting total rooms mastered, you now progress floor by floor through the Palace. Click any floor to learn how to master it:
+                    {t('mastery.floorBasedEvolved')}
                   </p>
                   <ul className="space-y-3 mb-4">
                     <li>
                       <Link to="/palace/floor/1" className="flex items-center gap-3 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 hover:bg-blue-500/20 transition-colors cursor-pointer">
                         <Sword className="h-6 w-6 text-blue-500" />
-                        <span><strong className="text-blue-500">Floor 1:</strong> <span className="text-foreground">Blue Master (Furnishing)</span></span>
+                        <span><strong className="text-blue-500">{t('mastery.floor1Title')}</strong></span>
                       </Link>
                     </li>
                     <li>
                       <Link to="/palace/floor/2" className="flex items-center gap-3 p-3 rounded-lg bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-colors cursor-pointer">
                         <Sword className="h-6 w-6 text-red-500" />
-                        <span><strong className="text-red-500">Floor 2:</strong> <span className="text-foreground">Red Master (Investigation)</span></span>
+                        <span><strong className="text-red-500">{t('mastery.floor2Title')}</strong></span>
                       </Link>
                     </li>
                     <li>
                       <Link to="/palace/floor/3" className="flex items-center gap-3 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20 hover:bg-yellow-500/20 transition-colors cursor-pointer">
                         <Sword className="h-6 w-6 text-yellow-600" />
-                        <span><strong className="text-yellow-600 dark:text-yellow-500">Floor 3:</strong> <span className="text-foreground">Gold Master (Freestyle)</span></span>
+                        <span><strong className="text-yellow-600 dark:text-yellow-500">{t('mastery.floor3Title')}</strong></span>
                       </Link>
                     </li>
                     <li>
                       <Link to="/palace/floor/4" className="flex items-center gap-3 p-3 rounded-lg bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-colors cursor-pointer">
                         <Sword className="h-6 w-6 text-purple-500" />
-                        <span><strong className="text-purple-500">Floor 4:</strong> <span className="text-foreground">Purple Master (Next Level)</span></span>
+                        <span><strong className="text-purple-500">{t('mastery.floor4Title')}</strong></span>
                       </Link>
                     </li>
                     <li>
                       <Link to="/palace/floor/5" className="flex items-center gap-3 p-3 rounded-lg bg-gray-500/10 border border-gray-500/20 hover:bg-gray-500/20 transition-colors cursor-pointer">
                         <Sword className="h-6 w-6 text-gray-400" />
-                        <span><strong className="text-gray-700 dark:text-gray-300">Floors 5-6:</strong> <span className="text-foreground">White Master (Vision & Three Heavens)</span></span>
+                        <span><strong className="text-gray-700 dark:text-gray-300">{t('mastery.floor56Title')}</strong></span>
                       </Link>
                     </li>
                     <li>
                       <Link to="/palace/floor/7" className="flex items-center gap-3 p-3 rounded-lg bg-gray-700/10 border border-gray-700/20 hover:bg-gray-700/20 transition-colors cursor-pointer">
                         <Sword className="h-6 w-6 text-gray-600" />
-                        <span><strong className="text-gray-800 dark:text-gray-200">Floor 7:</strong> <span className="text-foreground">Black Candidate (Transformation)</span></span>
+                        <span><strong className="text-gray-800 dark:text-gray-200">{t('mastery.floor7Title')}</strong></span>
                       </Link>
                     </li>
                     <li>
                       <Link to="/palace/floor/8" className="flex items-center gap-3 p-3 rounded-lg bg-black/10 dark:bg-white/10 border border-black/30 dark:border-white/30 hover:bg-black/20 dark:hover:bg-white/20 transition-colors cursor-pointer">
                         <Sword className="h-6 w-6 text-black dark:text-white" />
-                        <span><strong className="text-black dark:text-white">Floor 8:</strong> <span className="text-foreground">Black Master (Reflexive Mastery)</span></span>
+                        <span><strong className="text-black dark:text-white">{t('mastery.floor8Title')}</strong></span>
                       </Link>
                     </li>
                   </ul>
                   <p className="text-foreground/90">
-                    Each floor requires completing specific rooms to mastery, maintaining streaks, and passing comprehensive assessments before advancing to the next level.
+                    {t('mastery.floorAssessmentNote')}
                   </p>
                 </div>
-                <Button 
+                <Button
                   onClick={() => window.location.href = '/mastery'}
                   className="w-full"
                   size="lg"
                 >
                   <Crown className="h-4 w-4 mr-2" />
-                  View Floor Progression System
+                  {t('mastery.viewFloorProgression')}
                 </Button>
               </CardContent>
             </Card>
@@ -253,7 +252,7 @@ export default function MasteryDashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Target className="h-5 w-5 text-primary" />
-                  How to Master Rooms
+                  {t('mastery.howToMasterRooms')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -263,50 +262,50 @@ export default function MasteryDashboard() {
                       1
                     </div>
                     <div>
-                      <p className="font-semibold mb-1">Choose a Room</p>
-                      <p className="text-muted-foreground">Start with any Palace room from Floors 1-8. Each room teaches a specific skill.</p>
+                      <p className="font-semibold mb-1">{t('mastery.chooseRoom')}</p>
+                      <p className="text-muted-foreground">{t('mastery.chooseRoomDesc')}</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-3">
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
                       2
                     </div>
                     <div>
-                      <p className="font-semibold mb-1">Complete Activities</p>
+                      <p className="font-semibold mb-1">{t('mastery.completeActivities')}</p>
                       <p className="text-muted-foreground">
-                        Earn XP by completing drills (+30 XP), exercises (+40 XP), and perfect scores (+20 bonus XP).
+                        {t('mastery.completeActivitiesDesc')}
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-3">
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
                       3
                     </div>
                     <div>
-                      <p className="font-semibold mb-1">Level Up</p>
+                      <p className="font-semibold mb-1">{t('mastery.levelUp')}</p>
                       <p className="text-muted-foreground">
-                        Progress through 5 mastery levels: Novice → Apprentice → Adept → Expert → Master.
+                        {t('mastery.levelUpDesc')}
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-3">
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
                       4
                     </div>
                     <div>
-                      <p className="font-semibold mb-1">Master All Rooms</p>
+                      <p className="font-semibold mb-1">{t('mastery.masterAllRooms')}</p>
                       <p className="text-muted-foreground">
-                        Achieve Level 5 in multiple rooms to unlock global titles and become a Palace Master.
+                        {t('mastery.masterAllRoomsDesc')}
                       </p>
                     </div>
                   </div>
                 </div>
 
                 <div className="p-4 bg-background/50 rounded-lg border">
-                  <p className="text-xs font-semibold mb-2 text-primary">XP Requirements per Level:</p>
+                  <p className="text-xs font-semibold mb-2 text-primary">{t('mastery.xpRequirements')}</p>
                   <div className="grid grid-cols-5 gap-2 text-xs text-center">
                     <div>
                       <div className="font-bold">L1→L2</div>
@@ -325,7 +324,7 @@ export default function MasteryDashboard() {
                       <div className="text-muted-foreground">800 XP</div>
                     </div>
                     <div>
-                      <div className="font-bold">Total</div>
+                      <div className="font-bold">{t('mastery.total')}</div>
                       <div className="text-muted-foreground">1500 XP</div>
                     </div>
                   </div>
@@ -338,10 +337,10 @@ export default function MasteryDashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Zap className="h-5 w-5 text-primary" />
-                  Demo Room - Test the System
+                  {t('mastery.demoRoom')}
                 </CardTitle>
                 <CardDescription>
-                  Try out the mastery system by earning XP in this demo room
+                  {t('mastery.demoRoomDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -351,7 +350,7 @@ export default function MasteryDashboard() {
                       <MasteryBadge level={demoRoom.mastery.mastery_level} size="lg" />
                       <div className="flex-1">
                         <div className="text-sm text-muted-foreground mb-1">
-                          Level {demoRoom.mastery.mastery_level} Progress
+                          {t('mastery.levelProgress', { level: demoRoom.mastery.mastery_level })}
                         </div>
                         <XpProgressBar
                           currentXp={demoRoom.mastery.xp_current}
@@ -361,7 +360,7 @@ export default function MasteryDashboard() {
                         />
                       </div>
                     </div>
-                    
+
                     <div className="flex gap-2">
                       <Button
                         onClick={handleAwardDemoXp}
@@ -369,7 +368,7 @@ export default function MasteryDashboard() {
                         className="flex-1"
                       >
                         <Target className="mr-2 h-4 w-4" />
-                        Complete Perfect Drill (+90 XP)
+                        {t('mastery.completePerfectDrill')}
                       </Button>
                     </div>
 
@@ -378,19 +377,19 @@ export default function MasteryDashboard() {
                         <div className="text-2xl font-bold">
                           {demoRoom.mastery.total_drills_completed}
                         </div>
-                        <div className="text-xs text-muted-foreground">Drills</div>
+                        <div className="text-xs text-muted-foreground">{t('mastery.drills')}</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold">
                           {demoRoom.mastery.total_exercises_completed}
                         </div>
-                        <div className="text-xs text-muted-foreground">Exercises</div>
+                        <div className="text-xs text-muted-foreground">{t('mastery.exercises')}</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold">
                           {demoRoom.mastery.perfect_scores_count}
                         </div>
-                        <div className="text-xs text-muted-foreground">Perfect Scores</div>
+                        <div className="text-xs text-muted-foreground">{t('mastery.perfectScores')}</div>
                       </div>
                     </div>
                   </>
@@ -403,10 +402,10 @@ export default function MasteryDashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5" />
-                  All Rooms Progress
+                  {t('mastery.allRoomsProgress')}
                 </CardTitle>
                 <CardDescription>
-                  Your mastery levels across all Palace rooms
+                  {t('mastery.allRoomsProgressDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -420,7 +419,7 @@ export default function MasteryDashboard() {
                         <MasteryBadge level={mastery.mastery_level} size="md" showTitle={false} />
                         <div className="flex-1 min-w-0">
                           <div className="font-semibold truncate">
-                            Floor {mastery.floor_number} - {mastery.room_id}
+                            {t('mastery.floorRoom', { floor: mastery.floor_number, room: mastery.room_id })}
                           </div>
                           <XpProgressBar
                             currentXp={mastery.xp_current}
@@ -433,7 +432,7 @@ export default function MasteryDashboard() {
                           <div className="text-sm font-semibold">
                             {mastery.total_drills_completed + mastery.total_exercises_completed}
                           </div>
-                          <div className="text-xs text-muted-foreground">activities</div>
+                          <div className="text-xs text-muted-foreground">{t('mastery.activities')}</div>
                         </div>
                       </div>
                     ))}
@@ -441,9 +440,9 @@ export default function MasteryDashboard() {
                 ) : (
                   <div className="text-center py-12 text-muted-foreground">
                     <Target className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p className="text-lg font-medium mb-2">No Progress Yet</p>
+                    <p className="text-lg font-medium mb-2">{t('mastery.noProgressYet')}</p>
                     <p className="text-sm">
-                      Start practicing in Palace rooms to build your mastery!
+                      {t('mastery.startPracticing')}
                     </p>
                   </div>
                 )}

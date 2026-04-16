@@ -12,6 +12,25 @@ const logStep = (step: string, details?: any) => {
   console.log(`[SYNC-STRIPE-SUBSCRIPTIONS] ${step}${detailsStr}`);
 };
 
+// Price ID to tier mapping - PHOTOTHEOLOGY APP ONLY (excludes SamCart/external)
+const priceToTier: Record<string, string> = {
+  // Current subscriptions
+  'price_1SZNyCFGDAd3RU8IPwPJVesp': 'essential',
+  'price_1SZNyVFGDAd3RU8IPgRPqKXH': 'essential',
+  'price_1SZNyiFGDAd3RU8I4JHYEsEi': 'premium',
+  'price_1SZNyuFGDAd3RU8IjeGIvPEb': 'premium',
+  'price_1STVXrFGDAd3RU8Ia2NbKJWo': 'student',
+  // Legacy Phototheology App subscriptions
+  'price_1SKn0VFGDAd3RU8Io19mT9No': 'premium',
+  'price_1SKn12FGDAd3RU8IBpc45ctZ': 'essential',
+  // Church tiers
+  'price_1SNEzoFGDAd3RU8Iwa8PSyLw': 'church',
+  'price_1SNFDxFGDAd3RU8IrvW3c5eS': 'church',
+  'price_1SNFFMFGDAd3RU8IoasLs7ag': 'church',
+};
+
+const appPriceIds = new Set(Object.keys(priceToTier));
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -74,11 +93,72 @@ serve(async (req) => {
       apiVersion: "2025-08-27.basil",
     });
 
-    logStep("Starting Stripe subscription sync...");
+    logStep("Starting Stripe-first subscription sync...");
 
-    const results: any[] = [];
+    // STRIPE-FIRST APPROACH: Fetch ALL active/trialing subscriptions from Stripe with pagination
+    const allStripeSubscriptions: Stripe.Subscription[] = [];
+    let hasMore = true;
+    let startingAfter: string | undefined;
 
-    // Get all users from auth
+    // Fetch active subscriptions with pagination
+    while (hasMore) {
+      const params: Stripe.SubscriptionListParams = {
+        status: "active",
+        limit: 100,
+        expand: ['data.customer', 'data.items.data.price'],
+      };
+      if (startingAfter) params.starting_after = startingAfter;
+
+      const batch = await stripe.subscriptions.list(params);
+      
+      // Filter to only our app's subscriptions
+      const appSubs = batch.data.filter((sub: any) => {
+        const items = sub?.items?.data || [];
+        return items.some((item: any) => {
+          const priceId = item?.price?.id;
+          return typeof priceId === 'string' && appPriceIds.has(priceId);
+        });
+      });
+      
+      allStripeSubscriptions.push(...appSubs);
+      hasMore = batch.has_more;
+      if (batch.data.length > 0) {
+        startingAfter = batch.data[batch.data.length - 1].id;
+      }
+    }
+
+    // Fetch trialing subscriptions with pagination
+    hasMore = true;
+    startingAfter = undefined;
+    while (hasMore) {
+      const params: Stripe.SubscriptionListParams = {
+        status: "trialing",
+        limit: 100,
+        expand: ['data.customer', 'data.items.data.price'],
+      };
+      if (startingAfter) params.starting_after = startingAfter;
+
+      const batch = await stripe.subscriptions.list(params);
+      
+      // Filter to only our app's subscriptions
+      const appSubs = batch.data.filter((sub: any) => {
+        const items = sub?.items?.data || [];
+        return items.some((item: any) => {
+          const priceId = item?.price?.id;
+          return typeof priceId === 'string' && appPriceIds.has(priceId);
+        });
+      });
+      
+      allStripeSubscriptions.push(...appSubs);
+      hasMore = batch.has_more;
+      if (batch.data.length > 0) {
+        startingAfter = batch.data[batch.data.length - 1].id;
+      }
+    }
+
+    logStep(`Fetched ${allStripeSubscriptions.length} active/trialing Stripe subscriptions`);
+
+    // Get all auth users to match by email
     const { data: authData, error: listError } = await supabase.auth.admin.listUsers({
       perPage: 1000,
     });
@@ -89,61 +169,63 @@ serve(async (req) => {
     }
 
     const users = authData?.users || [];
-    logStep(`Found ${users.length} users to check`);
+    const usersByEmail = new Map<string, { id: string; email: string }>();
+    users.forEach(u => {
+      if (u.email) {
+        usersByEmail.set(u.email.toLowerCase(), { id: u.id, email: u.email });
+      }
+    });
 
-    // For each user, check if they have a Stripe subscription
-    for (const authUser of users) {
+    logStep(`Loaded ${users.length} app users for email matching`);
+
+    // Get existing subscriptions from DB
+    const { data: existingSubs } = await supabase
+      .from("user_subscriptions")
+      .select("user_id, stripe_subscription_id, subscription_status, payment_source, is_recurring");
+
+    const existingSubsByUserId = new Map<string, any>();
+    existingSubs?.forEach(sub => {
+      existingSubsByUserId.set(sub.user_id, sub);
+    });
+
+    const results: any[] = [];
+    const unmatchedStripeSubscriptions: any[] = [];
+
+    // Process each Stripe subscription
+    for (const sub of allStripeSubscriptions) {
       try {
-        if (!authUser.email) continue;
+        const customer = sub.customer as Stripe.Customer;
+        const customerEmail = customer.email?.toLowerCase();
 
-        // Search for Stripe customer by email
-        const customers = await stripe.customers.list({
-          email: authUser.email,
-          limit: 1,
-        });
-
-        if (customers.data.length === 0) continue;
-
-        const customer = customers.data[0];
-        
-        // Check for active subscription
-        const subscriptions = await stripe.subscriptions.list({
-          customer: customer.id,
-          status: "active",
-          limit: 1,
-        });
-
-        // Also check trialing
-        const trialingSubscriptions = await stripe.subscriptions.list({
-          customer: customer.id,
-          status: "trialing",
-          limit: 1,
-        });
-
-        const activeSub = subscriptions.data[0] || trialingSubscriptions.data[0];
-
-        if (!activeSub) {
-          results.push({
-            email: authUser.email,
-            status: "no_active_subscription",
+        if (!customerEmail) {
+          unmatchedStripeSubscriptions.push({
+            subscription_id: sub.id,
+            customer_id: customer.id,
+            reason: "no_customer_email",
           });
           continue;
         }
 
-        // Check if already synced in user_subscriptions table
-        const { data: existingSub } = await supabase
-          .from("user_subscriptions")
-          .select("stripe_subscription_id, subscription_status, payment_source, is_recurring")
-          .eq("user_id", authUser.id)
-          .single();
+        const matchedUser = usersByEmail.get(customerEmail);
+        
+        if (!matchedUser) {
+          unmatchedStripeSubscriptions.push({
+            subscription_id: sub.id,
+            customer_id: customer.id,
+            customer_email: customerEmail,
+            reason: "no_matching_app_user",
+          });
+          continue;
+        }
 
-        // Only skip if FULLY synced (same stripe_subscription_id AND payment_source is stripe AND is_recurring is true)
-        if (existingSub?.stripe_subscription_id === activeSub.id && 
+        // Check if already fully synced
+        const existingSub = existingSubsByUserId.get(matchedUser.id);
+        if (existingSub?.stripe_subscription_id === sub.id && 
             existingSub?.payment_source === "stripe" &&
             existingSub?.is_recurring === true &&
             (existingSub?.subscription_status === "active" || existingSub?.subscription_status === "trial")) {
           results.push({
-            email: authUser.email,
+            email: matchedUser.email,
             status: "already_synced",
             current_status: existingSub.subscription_status,
           });
@@ -151,34 +233,26 @@ serve(async (req) => {
         }
 
         // Determine tier from price
-        const priceId = activeSub.items.data[0]?.price?.id;
-        let tier = "premium"; // default
-        
-        // Essential tier price IDs
-        const essentialPrices = [
-          "price_1SZNyCFGDAd3RU8IPwPJVesp", // Essential monthly
-          "price_1SZNyVFGDAd3RU8IPgRPqKXH", // Essential annual
-        ];
-        // Premium tier price IDs (from new pricing)
-        const premiumPrices = [
-          "price_1SZNyiFGDAd3RU8I4JHYEsEi", // Premium monthly
-          "price_1SZNyuFGDAd3RU8IjeGIvPEb", // Premium annual
-          "price_1SKn0VFGDAd3RU8Io19mT9No", // Legacy premium monthly
-          "price_1SKn12FGDAd3RU8IBpc45ctZ", // Legacy premium annual
-          "price_1ONMQ9FGDAd3RU8IcBaBYmoJ", // Older premium
-        ];
+        const priceId = (sub.items.data || [])
+          .map((item: any) => item?.price?.id)
+          .find((id: any) => typeof id === 'string' && appPriceIds.has(id));
 
-        if (essentialPrices.includes(priceId || "")) {
-          tier = "essential";
-        } else if (premiumPrices.includes(priceId || "")) {
-          tier = "premium";
+        if (!priceId) {
+          // Shouldn't happen due to earlier filtering, but keep safe.
+          logStep("Skipping subscription without Phototheology price", { subscriptionId: sub.id });
+          continue;
         }
 
-        const isTrialing = activeSub.status === "trialing";
-        
-        // Safely create renewal date - handle invalid timestamps
+        const tier = priceToTier[priceId];
+        if (!tier) {
+          logStep("Skipping subscription with unmapped Phototheology price", { subscriptionId: sub.id, priceId });
+          continue;
+        }
+        const isTrialing = sub.status === "trialing";
+
+        // Safely create renewal date
         let renewalDateStr: string | null = null;
-        const periodEnd = activeSub.current_period_end;
+        const periodEnd = sub.current_period_end;
         if (periodEnd && typeof periodEnd === 'number' && periodEnd > 0) {
           try {
             const renewalDate = new Date(periodEnd * 1000);
@@ -186,13 +260,13 @@ serve(async (req) => {
               renewalDateStr = renewalDate.toISOString();
             }
           } catch (e) {
-            logStep("Invalid current_period_end", { email: authUser.email, value: periodEnd });
+            logStep("Invalid current_period_end", { email: matchedUser.email, value: periodEnd });
           }
         }
 
-        // Safely create trial end date - handle invalid timestamps
+        // Safely create trial end date
         let trialEndStr: string | null = null;
-        const trialEndVal = activeSub.trial_end;
+        const trialEndVal = sub.trial_end;
         if (trialEndVal && typeof trialEndVal === 'number' && trialEndVal > 0) {
           try {
             const trialEnd = new Date(trialEndVal * 1000);
@@ -200,22 +274,21 @@ serve(async (req) => {
               trialEndStr = trialEnd.toISOString();
             }
           } catch (e) {
-            logStep("Invalid trial_end", { email: authUser.email, value: trialEndVal });
+            logStep("Invalid trial_end", { email: matchedUser.email, value: trialEndVal });
           }
         }
 
-        // Upsert to user_subscriptions table (not profiles!)
+        // Upsert to user_subscriptions table
         const updateData: Record<string, any> = {
-          user_id: authUser.id,
+          user_id: matchedUser.id,
           subscription_status: isTrialing ? "trial" : "active",
           subscription_tier: tier,
           stripe_customer_id: customer.id,
-          stripe_subscription_id: activeSub.id,
+          stripe_subscription_id: sub.id,
           payment_source: "stripe",
           is_recurring: true,
         };
 
-        // Only add dates if they are valid
         if (renewalDateStr) {
           updateData.subscription_renewal_date = renewalDateStr;
         }
@@ -226,33 +299,30 @@ serve(async (req) => {
 
         const { error: upsertError } = await supabase
           .from("user_subscriptions")
-          .upsert(updateData, {
-            onConflict: 'user_id'
-          });
+          .upsert(updateData, { onConflict: 'user_id' });
 
         if (upsertError) {
           results.push({
-            email: authUser.email,
+            email: matchedUser.email,
             status: "error",
             error: upsertError.message,
           });
-          logStep(`Error updating ${authUser.email}`, { error: upsertError });
+          logStep(`Error updating ${matchedUser.email}`, { error: upsertError });
         } else {
           results.push({
-            email: authUser.email,
+            email: matchedUser.email,
             status: "updated",
             tier,
             subscription_status: isTrialing ? "trial" : "active",
             previous_status: existingSub?.subscription_status || "none",
           });
-          logStep(`Updated ${authUser.email}: ${tier} (${isTrialing ? "trial" : "active"})`);
+          logStep(`Updated ${matchedUser.email}: ${tier} (${isTrialing ? "trial" : "active"})`);
         }
-      } catch (userError) {
-        // Catch per-user errors so one bad user doesn't crash the entire sync
-        const errorMsg = userError instanceof Error ? userError.message : String(userError);
-        logStep(`Error processing user ${authUser.email}`, { error: errorMsg });
+      } catch (subError) {
+        const errorMsg = subError instanceof Error ? subError.message : String(subError);
+        logStep(`Error processing subscription ${sub.id}`, { error: errorMsg });
         results.push({
-          email: authUser.email || "unknown",
+          subscription_id: sub.id,
           status: "error",
           error: errorMsg,
         });
@@ -260,11 +330,11 @@ serve(async (req) => {
     }
 
     const summary = {
-      total_users_checked: users.length,
+      total_stripe_subscriptions: allStripeSubscriptions.length,
       updated: results.filter(r => r.status === "updated").length,
       already_synced: results.filter(r => r.status === "already_synced").length,
-      no_subscription: results.filter(r => r.status === "no_active_subscription").length,
       errors: results.filter(r => r.status === "error").length,
+      unmatched_stripe_subscriptions: unmatchedStripeSubscriptions.length,
     };
 
     logStep("Sync completed", summary);
@@ -274,6 +344,7 @@ serve(async (req) => {
       summary, 
       updated_users: results.filter(r => r.status === "updated"),
       errors: results.filter(r => r.status === "error"),
+      unmatched_subscriptions: unmatchedStripeSubscriptions,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

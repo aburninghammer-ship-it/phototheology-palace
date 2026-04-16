@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useChurchMembership } from "@/hooks/useChurchMembership";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ interface TrialUpgradePromptProps {
 export function TrialUpgradePrompt({ variant = 'banner', onDismiss }: TrialUpgradePromptProps) {
   const { user } = useAuth();
   const { subscription, loading: subscriptionLoading } = useSubscription();
+  const { isMember: isChurchMember } = useChurchMembership();
   const navigate = useNavigate();
   const [trialInfo, setTrialInfo] = useState<{ daysLeft: number; hoursLeft: number; isExpired: boolean } | null>(null);
   const [dismissed, setDismissed] = useState(false);
@@ -27,16 +29,60 @@ export function TrialUpgradePrompt({ variant = 'banner', onDismiss }: TrialUpgra
       return;
     }
 
-    // Use subscription hook for reliable paid status check
-    if (subscription.hasAccess && subscription.status !== 'trial') {
-      // User has active paid access - don't show trial prompts
+    // If user has any form of paid access, don't show trial prompts
+    // This respects the Stripe fallback check in useSubscription
+    if (subscription.hasAccess) {
+      setTrialInfo(null);
+      setLoading(false);
+      return;
+    }
+
+    // CRITICAL: Double-check subscription status is actually 'trial' 
+    // If status is 'active', 'patron', or user has church access, skip trial prompts
+    if (subscription.status === 'active' || subscription.tier === 'patron' || subscription.church.hasChurchAccess) {
       setTrialInfo(null);
       setLoading(false);
       return;
     }
 
     const checkTrial = async () => {
-      // Check for trial end date
+      // First, check the profile for any indicators of paid access
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('has_lifetime_access, subscription_status, subscription_tier, payment_source, stripe_subscription_id')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      // CRITICAL: Check ALL indicators of paid access from the profile
+      if (profileData?.has_lifetime_access) {
+        console.log('[TrialUpgradePrompt] User has lifetime access, hiding trial prompt');
+        setTrialInfo(null);
+        setLoading(false);
+        return;
+      }
+
+      if (profileData?.subscription_status === 'active' && profileData?.subscription_tier && profileData.subscription_tier !== 'free') {
+        console.log('[TrialUpgradePrompt] User has active subscription in profile, hiding trial prompt');
+        setTrialInfo(null);
+        setLoading(false);
+        return;
+      }
+
+      if (profileData?.stripe_subscription_id) {
+        console.log('[TrialUpgradePrompt] User has Stripe subscription ID, hiding trial prompt');
+        setTrialInfo(null);
+        setLoading(false);
+        return;
+      }
+
+      if (profileData?.payment_source && !['trial', 'none', ''].includes(profileData.payment_source)) {
+        console.log('[TrialUpgradePrompt] User has paid payment_source:', profileData.payment_source);
+        setTrialInfo(null);
+        setLoading(false);
+        return;
+      }
+
+      // Now check for trial end date
       const { data } = await supabase
         .from('user_subscriptions')
         .select('subscription_status, trial_ends_at')
@@ -71,8 +117,8 @@ export function TrialUpgradePrompt({ variant = 'banner', onDismiss }: TrialUpgra
     navigate('/pricing');
   };
 
-  // Don't show if loading, no trial, dismissed, or already dismissed this session
-  if (loading || !trialInfo || dismissed || sessionStorage.getItem('trial_prompt_dismissed')) {
+  // Don't show if loading, no trial, dismissed, church member, or already dismissed this session
+  if (loading || !trialInfo || dismissed || isChurchMember || sessionStorage.getItem('trial_prompt_dismissed')) {
     return null;
   }
 
@@ -123,7 +169,7 @@ export function TrialUpgradePrompt({ variant = 'banner', onDismiss }: TrialUpgra
 
   if (variant === 'modal') {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 ">
         <Card className="max-w-md mx-4 border-primary/30">
           <CardContent className="pt-6">
             <button 

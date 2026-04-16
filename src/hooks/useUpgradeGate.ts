@@ -79,7 +79,8 @@ export function useUpgradeGate(options: UseUpgradeGateOptions): UpgradeGateResul
   const wasDismissed = sessionDismissals.has(feature);
 
   // Whether to show the modal
-  const shouldShowModal = !hasAccess && showModal && !wasDismissed;
+  // Guard: never show while entitlement checks are still loading (prevents false upgrade prompts)
+  const shouldShowModal = !hasAccess && showModal && !wasDismissed && !freeTier.isLoading;
 
   const dismissModal = useCallback(() => {
     sessionDismissals.add(feature);
@@ -88,6 +89,12 @@ export function useUpgradeGate(options: UseUpgradeGateOptions): UpgradeGateResul
 
   // Check access and trigger modal if needed
   const checkAccess = useCallback((): boolean => {
+    // Don't show paywalls while entitlement checks are still loading
+    // (prevents false "upgrade" prompts during login / slow network)
+    if (freeTier.isLoading) {
+      return true;
+    }
+
     if (hasAccess) {
       return true;
     }
@@ -98,7 +105,7 @@ export function useUpgradeGate(options: UseUpgradeGateOptions): UpgradeGateResul
     }
     
     return false;
-  }, [hasAccess, wasDismissed]);
+  }, [freeTier.isLoading, hasAccess, wasDismissed]);
 
   return {
     hasAccess,

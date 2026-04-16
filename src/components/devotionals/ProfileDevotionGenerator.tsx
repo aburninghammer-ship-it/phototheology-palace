@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Sparkles, Send, Copy, Check, RefreshCw, BookOpen, Church, Link2, Target } from "lucide-react";
+import { Loader2, Sparkles, Send, Copy, Check, RefreshCw, BookOpen, Church, Link2, Target, History, Trash2, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { DevotionalProfile } from "@/hooks/useDevotionalProfiles";
+import { useProfileDevotions, ProfileDevotion } from "@/hooks/useProfileDevotions";
 import { StyledMarkdown } from "@/components/ui/styled-markdown";
+import { formatDistanceToNow } from "date-fns";
 
 interface ProfileDevotionGeneratorProps {
   profile: DevotionalProfile;
@@ -55,6 +57,10 @@ export function ProfileDevotionGenerator({ profile, onDevotionGenerated }: Profi
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedDevotion, setGeneratedDevotion] = useState<GeneratedDevotion | null>(null);
   const [copied, setCopied] = useState(false);
+  const [viewingDevotion, setViewingDevotion] = useState<ProfileDevotion | null>(null);
+
+  // Use the new persistence hook
+  const { devotions, isLoading: devotionsLoading, saveDevotion, deleteDevotion, isSaving } = useProfileDevotions(profile.id);
 
   const generateDevotion = async () => {
     setIsGenerating(true);
@@ -82,15 +88,59 @@ export function ProfileDevotionGenerator({ profile, onDevotionGenerated }: Profi
 
       if (error) throw error;
 
+      // Save to database for persistence
+      await saveDevotion.mutateAsync({
+        title: data.title,
+        scripture_reference: data.scripture_reference,
+        scripture_text: data.scripture_text,
+        devotional_body: data.devotional_body,
+        strike_line: data.strike_line,
+        prayer: data.prayer,
+        memory_hook: data.memory_hook,
+        sanctuary_connection: data.sanctuary_connection,
+        cycle_placement: data.cycle_placement,
+        types_and_symbols: data.types_and_symbols,
+        cross_references: data.cross_references,
+        christ_name: data.christ_name,
+        christ_action: data.christ_action,
+        application: data.application,
+        theme_used: data.theme_used,
+        generated_at: data.generated_at,
+      });
+
       setGeneratedDevotion(data);
       onDevotionGenerated?.(data);
-      toast.success(`Deep Phototheology devotion generated for ${profile.name}`);
+      toast.success(`Deep Phototheology devotion generated and saved for ${profile.name}`);
     } catch (error) {
       console.error("Error generating devotion:", error);
       toast.error("Failed to generate devotion. Please try again.");
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  // Convert a saved ProfileDevotion to the GeneratedDevotion format for display
+  const viewSavedDevotion = (devotion: ProfileDevotion) => {
+    setViewingDevotion(devotion);
+    setGeneratedDevotion({
+      title: devotion.title,
+      scripture_reference: devotion.scripture_reference,
+      scripture_text: devotion.scripture_text,
+      devotional_body: devotion.devotional_body,
+      strike_line: devotion.strike_line || "",
+      prayer: devotion.prayer || "",
+      memory_hook: devotion.memory_hook || "",
+      generated_for: profile.name,
+      theme_used: devotion.theme_used,
+      generated_at: devotion.generated_at,
+      sanctuary_connection: devotion.sanctuary_connection || undefined,
+      cycle_placement: devotion.cycle_placement || undefined,
+      types_and_symbols: devotion.types_and_symbols || undefined,
+      cross_references: devotion.cross_references || undefined,
+      christ_name: devotion.christ_name || undefined,
+      christ_action: devotion.christ_action || undefined,
+      application: devotion.application || undefined,
+    });
   };
 
   const copyToClipboard = async () => {
@@ -125,88 +175,154 @@ export function ProfileDevotionGenerator({ profile, onDevotionGenerated }: Profi
     <div className="space-y-6">
       {/* Generation Form */}
       {!generatedDevotion && (
-        <Card className="border-2 border-dashed border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              Generate Deep Phototheology Devotion for {profile.name}
-            </CardTitle>
-            <CardDescription>
-              Christ-saturated • Sanctuary-mapped • Palace-structured • Theologically dense
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Theme Selection */}
-            <div className="space-y-2">
-              <Label>Theme (optional)</Label>
-              <Input
-                placeholder="e.g., Hope in darkness, Finding peace..."
-                value={theme}
-                onChange={(e) => setTheme(e.target.value)}
-              />
-              <div className="flex flex-wrap gap-1 mt-2">
-                {SUGGESTED_THEMES.slice(0, 5).map((t) => (
-                  <Badge
-                    key={t}
-                    variant={theme === t ? "default" : "outline"}
-                    className="cursor-pointer hover:bg-primary/20 transition-colors"
-                    onClick={() => setTheme(t)}
-                  >
-                    {t}
-                  </Badge>
-                ))}
+        <>
+          <Card className="border-2 border-dashed border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                Generate Deep Phototheology Devotion for {profile.name}
+              </CardTitle>
+              <CardDescription>
+                Christ-saturated • Sanctuary-mapped • Palace-structured • Theologically dense
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Theme Selection */}
+              <div className="space-y-2">
+                <Label>Theme (optional)</Label>
+                <Input
+                  placeholder="e.g., Hope in darkness, Finding peace..."
+                  value={theme}
+                  onChange={(e) => setTheme(e.target.value)}
+                />
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {SUGGESTED_THEMES.slice(0, 5).map((t) => (
+                    <Badge
+                      key={t}
+                      variant={theme === t ? "default" : "outline"}
+                      className="cursor-pointer hover:bg-primary/20 transition-colors text-xs py-1.5 px-2.5 active:scale-95"
+                      onClick={() => setTheme(t)}
+                    >
+                      {t}
+                    </Badge>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Scripture (optional) */}
-            <div className="space-y-2">
-              <Label>Scripture Reference (optional)</Label>
-              <Input
-                placeholder="e.g., Psalm 23, Isaiah 41:10... (leave blank for AI selection)"
-                value={scripture}
-                onChange={(e) => setScripture(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                Leave blank and Jeeves will choose the perfect Scripture for {profile.name}'s situation
-              </p>
-            </div>
+              {/* Scripture (optional) */}
+              <div className="space-y-2">
+                <Label>Scripture Reference (optional)</Label>
+                <Input
+                  placeholder="e.g., Psalm 23, Isaiah 41:10... (leave blank for AI selection)"
+                  value={scripture}
+                  onChange={(e) => setScripture(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Leave blank and Jeeves will choose the perfect Scripture for {profile.name}'s situation
+                </p>
+              </div>
 
-            {/* Profile Context Preview */}
-            <div className="bg-muted/50 rounded-lg p-3 space-y-2">
-              <p className="text-sm font-medium">Context being used:</p>
-              <div className="flex flex-wrap gap-1">
-                {profile.struggles?.map((s) => (
-                  <Badge key={s} variant="secondary" className="text-xs">{s}</Badge>
-                ))}
-                {profile.spiritual_goals?.map((g) => (
-                  <Badge key={g} variant="outline" className="text-xs">{g}</Badge>
-                ))}
-                {profile.preferred_tone && (
-                  <Badge variant="outline" className="text-xs">Tone: {profile.preferred_tone}</Badge>
+              {/* Profile Context Preview */}
+              <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+                <p className="text-sm font-medium">Context being used:</p>
+                <div className="flex flex-wrap gap-1">
+                  {profile.struggles?.map((s) => (
+                    <Badge key={s} variant="secondary" className="text-xs">{s}</Badge>
+                  ))}
+                  {profile.spiritual_goals?.map((g) => (
+                    <Badge key={g} variant="outline" className="text-xs">{g}</Badge>
+                  ))}
+                  {profile.preferred_tone && (
+                    <Badge variant="outline" className="text-xs">Tone: {profile.preferred_tone}</Badge>
+                  )}
+                </div>
+              </div>
+
+              <Button
+                onClick={generateDevotion}
+                disabled={isGenerating || isSaving}
+                className="w-full"
+                size="lg"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Crafting Deep Phototheology Devotion...
+                  </>
+                ) : isSaving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Saving devotion...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Generate Deep Devotion
+                  </>
                 )}
-              </div>
-            </div>
+              </Button>
+            </CardContent>
+          </Card>
 
-            <Button 
-              onClick={generateDevotion} 
-              disabled={isGenerating}
-              className="w-full"
-              size="lg"
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Crafting Deep Phototheology Devotion...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Generate Deep Devotion
-                </>
-              )}
-            </Button>
-          </CardContent>
-        </Card>
+          {/* Saved Devotions History */}
+          {devotions && devotions.length > 0 && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <History className="h-4 w-4" />
+                  Previous Devotions for {profile.name}
+                </CardTitle>
+                <CardDescription>
+                  {devotions.length} saved devotion{devotions.length !== 1 ? "s" : ""}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {devotions.slice(0, 5).map((devotion) => (
+                  <div
+                    key={devotion.id}
+                    className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{devotion.title}</p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span>{devotion.scripture_reference}</span>
+                        <span>•</span>
+                        <span>{formatDistanceToNow(new Date(devotion.created_at), { addSuffix: true })}</span>
+                        {devotion.theme_used && (
+                          <>
+                            <span>•</span>
+                            <Badge variant="outline" className="text-xs py-0">{devotion.theme_used}</Badge>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex gap-1 ml-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => viewSavedDevotion(devotion)}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deleteDevotion.mutate(devotion.id)}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+                {devotions.length > 5 && (
+                  <p className="text-xs text-muted-foreground text-center pt-2">
+                    + {devotions.length - 5} more devotions
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </>
       )}
 
       {/* Generated Devotion Display */}
@@ -366,13 +482,17 @@ export function ProfileDevotionGenerator({ profile, onDevotionGenerated }: Profi
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-2 pt-4 border-t">
+            <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t">
               <Button className="flex-1" onClick={copyToClipboard}>
                 <Send className="h-4 w-4 mr-2" />
-                Share with {profile.name}
+                <span className="hidden sm:inline">Share with {profile.name}</span>
+                <span className="sm:hidden">Share</span>
               </Button>
-              <Button variant="outline" onClick={() => setGeneratedDevotion(null)}>
-                Generate New
+              <Button variant="outline" onClick={() => {
+                setGeneratedDevotion(null);
+                setViewingDevotion(null);
+              }}>
+                {viewingDevotion ? "Back to List" : "Generate New"}
               </Button>
             </div>
           </CardContent>

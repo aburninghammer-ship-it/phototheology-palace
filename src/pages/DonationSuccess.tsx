@@ -1,9 +1,17 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Heart, Home } from "lucide-react";
+import { useEventTracking } from "@/hooks/useEventTracking";
 
 const DonationSuccess = () => {
   const navigate = useNavigate();
+  const { trackPurchaseCompleted } = useEventTracking();
+
+  // Track donation on page load
+  useEffect(() => {
+    trackPurchaseCompleted("donation");
+  }, [trackPurchaseCompleted]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">

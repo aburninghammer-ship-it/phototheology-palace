@@ -4,6 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNotifications } from "@/hooks/useNotifications";
 import { cn } from "@/lib/utils";
+import { LanguageSelector } from "@/components/settings/LanguageSelector";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface MobileNavHeaderProps {
   title?: string;
@@ -86,17 +92,21 @@ export function MobileNavHeader({
 
         {/* Right side - Actions */}
         <div className="flex items-center gap-1">
-          {showPublicLink && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handlePublicSpace}
-              className="h-9 w-9 shrink-0"
-              title="Go to public site"
-            >
-              <Globe className="h-5 w-5" />
-            </Button>
-          )}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 shrink-0"
+                title="Change language"
+              >
+                <Globe className="h-5 w-5" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2" align="end">
+              <LanguageSelector showLabel={false} />
+            </PopoverContent>
+          </Popover>
           {showHome && !isHomePage && (
             <Button
               variant="ghost"

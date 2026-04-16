@@ -213,13 +213,6 @@ export const UserMasterySword: React.FC<UserMasterySwordProps> = ({
               </div>
             </div>
             
-            <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-yellow-500/20 to-amber-600/20 rounded-lg border-2 border-yellow-500/50 mt-2">
-              <Sword className="text-black dark:text-white h-6 w-6 animate-pulse drop-shadow-[0_0_8px_rgba(234,179,8,0.8)]" />
-              <div>
-                <p className="font-bold text-lg">Palace Founder - Special Black Sword</p>
-                <p className="text-sm">Reserved for the founder of the Phototheology Palace with a distinctive golden glow</p>
-              </div>
-            </div>
           </div>
           
           <div className="mt-6 p-4 bg-primary/10 rounded-lg">

@@ -71,6 +71,13 @@ export function PathRoomExercises({ roomId, roomName, floorNumber }: PathRoomExe
     challenge: "bg-red-500/20 text-red-600 dark:text-red-400 border-red-500/30",
   };
 
+  const typeLabels: Record<string, string> = {
+    drill: 'Drill',
+    reflection: 'Reflection',
+    practice: 'Practice',
+    challenge: 'Challenge',
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -107,7 +114,7 @@ export function PathRoomExercises({ roomId, roomName, floorNumber }: PathRoomExe
                       </Badge>
                     </CardTitle>
                     <CardDescription>
-                      Complete these {pathData.name} exercises in this room
+                      Complete these exercises for your {pathData.name} path
                     </CardDescription>
                   </div>
                 </div>
@@ -138,6 +145,7 @@ export function PathRoomExercises({ roomId, roomName, floorNumber }: PathRoomExe
                     onToggle={() => toggleExercise(exercise.id)}
                     pathColor={pathData.color}
                     typeColors={typeColors}
+                    typeLabels={typeLabels}
                   />
                 ))}
               </AnimatePresence>
@@ -153,7 +161,7 @@ export function PathRoomExercises({ roomId, roomName, floorNumber }: PathRoomExe
                     All exercises complete! 🎉
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Return to your path training to continue
+                    Return to your path to continue
                   </p>
                 </motion.div>
               )}
@@ -172,6 +180,7 @@ interface ExerciseItemProps {
   onToggle: () => void;
   pathColor: string;
   typeColors: Record<string, string>;
+  typeLabels: Record<string, string>;
 }
 
 function ExerciseItem({ 
@@ -180,7 +189,8 @@ function ExerciseItem({
   isCompleted, 
   onToggle, 
   pathColor,
-  typeColors 
+  typeColors,
+  typeLabels
 }: ExerciseItemProps) {
   const [showInstructions, setShowInstructions] = useState(false);
 
@@ -213,7 +223,7 @@ function ExerciseItem({
               {exercise.title}
             </span>
             <Badge variant="outline" className={typeColors[exercise.type]}>
-              {exercise.type}
+              {typeLabels[exercise.type] || exercise.type}
             </Badge>
           </div>
           
@@ -233,7 +243,7 @@ function ExerciseItem({
               className="h-6 px-2 text-xs"
               onClick={() => setShowInstructions(!showInstructions)}
             >
-              {showInstructions ? "Hide" : "Show"} instructions
+              {showInstructions ? 'Hide Instructions' : 'Show Instructions'}
               <ArrowRight className={`ml-1 h-3 w-3 transition-transform ${showInstructions ? "rotate-90" : ""}`} />
             </Button>
           </div>

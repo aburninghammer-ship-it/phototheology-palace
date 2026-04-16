@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,12 +7,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
+import {
   Lightbulb, Send, BookOpen, Target, TrendingUp, Sparkles, Building2, Link2, Loader2,
   ChevronDown, AlertTriangle, CheckCircle2, BookMarked, Layers, Shield, GraduationCap,
   Church, Cross, Moon, Scale, Compass, Save, Download, Copy, Gem, FolderOpen, MessageSquare,
-  Zap, ArrowRight, FileText, Brain, Clock, Star, RefreshCw, CalendarDays, Box, Focus, MessageCircle
+  Zap, ArrowRight, FileText, Brain, Clock, Star, RefreshCw, CalendarDays, Box, Focus, MessageCircle, X
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { ExportToStudyButton } from "@/components/ExportToStudyButton";
 import { QuickShareButton } from "@/components/social/QuickShareButton";
 import { supabase } from "@/integrations/supabase/client";
@@ -179,6 +180,8 @@ const normalizeFurtherStudy = (item: string | FurtherStudyItem): FurtherStudyIte
 };
 
 const AnalyzeThoughts = () => {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
   const [input, setInput] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -196,6 +199,7 @@ const AnalyzeThoughts = () => {
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [lastAutoSaved, setLastAutoSaved] = useState<Date | null>(null);
   const [scholarMode, setScholarMode] = useState(false);
+  const [sparksExpanded, setSparksExpanded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const { isAdmin } = useIsAdmin();
@@ -228,15 +232,25 @@ const AnalyzeThoughts = () => {
       );
     }
   }, [result]);
-  
-  // Auto-save input to localStorage every 15 seconds
+
+  // Also generate sparks while typing (debounced) - so users get sparks as they study
   useEffect(() => {
-    if (input.trim()) {
+    if (input.length > 200 && !isAnalyzing) {
+      const timer = setTimeout(() => {
+        generateSpark(input.slice(-500), undefined);
+      }, 45000); // 45 seconds after typing stops
+      return () => clearTimeout(timer);
+    }
+  }, [input, isAnalyzing, generateSpark]);
+  
+  // Auto-save input to localStorage every 15 seconds (only when no result yet)
+  useEffect(() => {
+    if (input.trim() && !result) {
       // Clear existing timer
       if (autoSaveTimerRef.current) {
         clearTimeout(autoSaveTimerRef.current);
       }
-      
+
       // Set new timer
       autoSaveTimerRef.current = setTimeout(() => {
         try {
@@ -253,13 +267,13 @@ const AnalyzeThoughts = () => {
         }
       }, 15000); // 15 seconds
     }
-    
+
     return () => {
       if (autoSaveTimerRef.current) {
         clearTimeout(autoSaveTimerRef.current);
       }
     };
-  }, [input, loadedStudyTitle]);
+  }, [input, loadedStudyTitle, result]);
   
   // Restore draft on mount
   useEffect(() => {
@@ -404,12 +418,9 @@ const AnalyzeThoughts = () => {
     const analysisMode = scholarMode ? 'analyze-thoughts-scholar' : 'analyze-thoughts';
     
     try {
-      console.log(`[AnalyzeThoughts] Invoking jeeves with mode: ${analysisMode}`);
       const { data, error } = await supabase.functions.invoke('jeeves', {
         body: { mode: analysisMode, message: input }
       });
-
-      console.log('[AnalyzeThoughts] Response:', { data, error });
 
       if (error) {
         console.error('[AnalyzeThoughts] Edge function error:', error);
@@ -431,6 +442,11 @@ const AnalyzeThoughts = () => {
         return;
       }
 
+      // Ensure overallScore is a valid number (AI might return string or null)
+      const rawScore = analysisResult.overallScore;
+      const parsedScore = typeof rawScore === 'string' ? parseFloat(rawScore) : (typeof rawScore === 'number' ? rawScore : 0);
+      analysisResult.overallScore = !isNaN(parsedScore) ? parsedScore : 0;
+      
       setResult(analysisResult);
       
       // Auto-save to history and get the saved ID
@@ -469,6 +485,7 @@ const AnalyzeThoughts = () => {
     // Reconstruct result from saved analysis
     setResult({
       summary: analysis.summary || "",
+      narrativeAnalysis: analysis.narrative_analysis || undefined,
       overallScore: analysis.overall_score || 0,
       categories: (analysis.categories as AnalysisResult['categories']) || {
         biblicalAccuracy: 0, theologicalDepth: 0, christCenteredness: 0,
@@ -643,29 +660,64 @@ const AnalyzeThoughts = () => {
       
       <Navigation />
 
-      {/* Sparks Container */}
+      {/* Sparks Container - Small non-blocking badge that expands on click */}
       {sparks.length > 0 && (
-        <div className="fixed top-20 right-4 z-50">
-          <SparkContainer
-            sparks={sparks}
-            onOpen={openSpark}
-            onSave={saveSpark}
-            onDismiss={dismissSpark}
-            onExplore={exploreSpark}
-            position="floating"
-          />
+        <div className="fixed bottom-24 right-4 md:top-20 md:bottom-auto z-50">
+          {sparksExpanded ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-gradient-to-br from-amber-500/30 to-orange-500/30 backdrop-blur-lg rounded-2xl p-4 border-2 border-amber-400/50 shadow-xl shadow-amber-500/30 max-w-xs"
+            >
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-amber-300" />
+                  <span className="text-sm font-semibold text-amber-100">Insights</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0 text-amber-200 hover:text-white hover:bg-amber-500/30"
+                  onClick={() => setSparksExpanded(false)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              <SparkContainer
+                sparks={sparks}
+                onOpen={openSpark}
+                onSave={saveSpark}
+                onDismiss={dismissSpark}
+                onExplore={exploreSpark}
+                position="floating"
+                maxDisplay={5}
+              />
+            </motion.div>
+          ) : (
+            <motion.button
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setSparksExpanded(true)}
+              className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-amber-500/80 to-orange-500/80 backdrop-blur-lg rounded-full border border-amber-400/50 shadow-lg shadow-amber-500/30 text-white hover:from-amber-500 hover:to-orange-500 transition-all"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span className="text-sm font-semibold">{sparks.length}</span>
+            </motion.button>
+          )}
         </div>
       )}
 
       {/* Spark Settings */}
-      <div className="fixed bottom-4 right-4 z-40">
+      <div className="fixed bottom-28 md:bottom-4 right-4 z-40">
         <SparkSettings
           preferences={sparkPreferences}
           onUpdate={updateSparkPreferences}
         />
       </div>
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
+      <div className="container mx-auto px-4 py-8 pt-24 md:pt-28 pb-32 md:pb-8 max-w-4xl relative z-10">
         {/* Header */}
         <motion.div 
           className="text-center mb-10"
@@ -675,12 +727,12 @@ const AnalyzeThoughts = () => {
           <div className="inline-flex items-center justify-center gap-3 mb-4 px-6 py-3 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30">
             <Lightbulb className="h-8 w-8 text-amber-400 animate-pulse" />
             <h1 className="text-3xl md:text-4xl font-serif font-bold bg-gradient-to-r from-amber-200 via-purple-200 to-blue-200 bg-clip-text text-transparent">
-              Analyze My Thoughts
+              {t('analyze.title', 'Analyze My Thoughts')}
             </h1>
           </div>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Share your biblical ideas and receive comprehensive feedback grounded in 
-            <span className="text-purple-400 font-medium"> Phototheology principles</span>.
+            {t('analyze.subtitle', 'Share your biblical ideas and receive comprehensive feedback grounded in')}
+            <span className="text-purple-400 font-medium"> {t('analyze.ptPrinciples', 'Phototheology principles')}</span>.
           </p>
         </motion.div>
 
@@ -690,9 +742,9 @@ const AnalyzeThoughts = () => {
             <CardHeader className="border-b border-border/50">
               <CardTitle className="flex items-center gap-2 text-xl">
                 <Sparkles className="h-5 w-5 text-amber-400" />
-                <span className="bg-gradient-to-r from-amber-200 to-purple-200 bg-clip-text text-transparent">Share Your Thoughts</span>
+                <span className="bg-gradient-to-r from-amber-200 to-purple-200 bg-clip-text text-transparent">{t('analyze.shareYourThoughts', 'Share Your Thoughts')}</span>
               </CardTitle>
-              <CardDescription>Enter a biblical concept, interpretation, or theological idea</CardDescription>
+              <CardDescription>{t('analyze.enterConcept', 'Enter a biblical concept, interpretation, or theological idea')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-5 pt-6">
               {/* Load Study/Note + Import File */}
@@ -701,7 +753,7 @@ const AnalyzeThoughts = () => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm" className="bg-sky-500/10 border-sky-500/30 hover:bg-sky-500/20">
                       <FileText className="h-4 w-4 mr-2 text-sky-400" />
-                      Load Study or Note
+                      {t('analyze.loadStudy', 'Load Study or Note')}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-72">
@@ -757,7 +809,7 @@ const AnalyzeThoughts = () => {
                   ) : (
                     <>
                       <FolderOpen className="h-4 w-4 mr-2" />
-                      Import PDF/DOCX
+                      {t('analyze.importFile', 'Import PDF/DOCX')}
                     </>
                   )}
                 </Button>
@@ -770,9 +822,19 @@ const AnalyzeThoughts = () => {
                 )}
               </div>
 
+              {/* Mobile Voice Input - Prominent */}
+              <div className="md:hidden py-4 flex flex-col items-center border-b border-purple-500/20 mb-4">
+                <p className="text-sm text-muted-foreground mb-3">{t('analyze.speakThoughts', 'Speak your thoughts')}</p>
+                <VoiceInput 
+                  onTranscript={handleVoiceTranscript} 
+                  disabled={isAnalyzing} 
+                  variant="large"
+                />
+              </div>
+
               <div className="relative">
                 <Textarea
-                  placeholder="Example: I believe the sanctuary in Hebrews represents Christ's mediatorial work in heaven..."
+                  placeholder={t('analyze.placeholder', "Example: I believe the sanctuary in Hebrews represents Christ's mediatorial work in heaven...")}
                   value={input}
                   onChange={(e) => { setInput(e.target.value); setLoadedStudyTitle(null); }}
                   className="min-h-[150px] bg-background/50 border-purple-500/20 focus:border-purple-500/50 pr-12"
@@ -785,7 +847,10 @@ const AnalyzeThoughts = () => {
                     <span className="text-xs text-muted-foreground/50">Saved</span>
                   )}
                   <span className="text-xs text-muted-foreground/50">{input.length}</span>
-                  <VoiceInput onTranscript={handleVoiceTranscript} disabled={isAnalyzing} />
+                  {/* Desktop Voice Input - Icon */}
+                  <div className="hidden md:block">
+                    <VoiceInput onTranscript={handleVoiceTranscript} disabled={isAnalyzing} />
+                  </div>
                 </div>
               </div>
               
@@ -832,10 +897,10 @@ const AnalyzeThoughts = () => {
                   </div>
                   <div>
                     <p className={`font-medium transition-colors ${scholarMode ? 'text-amber-200' : 'text-foreground'}`}>
-                      Scholar Mode
+                       {t('analyze.scholarMode', 'Scholar Mode')}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Deep exegetical analysis with verse-by-verse breakdown, scholarly assessment, & typological precision
+                      {t('analyze.scholarDesc', 'Deep exegetical analysis with verse-by-verse breakdown, scholarly assessment, & typological precision')}
                     </p>
                   </div>
                 </div>
@@ -864,12 +929,12 @@ const AnalyzeThoughts = () => {
                 {isAnalyzing ? (
                   <>
                     <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                    {scholarMode ? 'Performing Deep Analysis...' : 'Analyzing...'}
+                     {scholarMode ? t('analyze.deepAnalyzing', 'Performing Deep Analysis...') : t('analyze.analyzing', 'Analyzing...')}
                   </>
                 ) : (
                   <>
                     {scholarMode ? <GraduationCap className="h-5 w-5 mr-2" /> : <Send className="h-5 w-5 mr-2" />}
-                    {scholarMode ? 'Scholar Analysis' : 'Analyze My Thoughts'}
+                    {scholarMode ? t('analyze.scholarAnalysis', 'Scholar Analysis') : t('analyze.title', 'Analyze My Thoughts')}
                   </>
                 )}
               </Button>
@@ -892,6 +957,24 @@ const AnalyzeThoughts = () => {
             >
               {/* Action Buttons */}
               <motion.div className="flex flex-wrap gap-3 justify-center items-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+                {/* New Analysis Button */}
+                <Button 
+                  onClick={() => {
+                    setInput("");
+                    setResult(null);
+                    setSelectedHistoryId(undefined);
+                    setCurrentAnalysisId(undefined);
+                    setFollowUpConversation([]);
+                    setLoadedStudyTitle(null);
+                    setCheckedItems([]);
+                    localStorage.removeItem('analyze-thoughts-draft');
+                  }}
+                  variant="outline" 
+                  className="bg-primary/10 border-primary/30 text-primary hover:bg-primary/20"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  New Analysis
+                </Button>
                 <div className="flex flex-col items-center gap-1">
                   <Button 
                     onClick={handleSaveToGems} 
@@ -936,6 +1019,23 @@ const AnalyzeThoughts = () => {
                   variant="outline"
                   size="sm"
                 />
+                {/* Drill this Thought - Deep Multi-Route Analysis */}
+                <Button 
+                  onClick={() => {
+                    // Navigate to drill tab with thought pre-loaded and auto-start
+                    navigate('/drill-drill', { 
+                      state: { 
+                        thought: input, 
+                        autoStart: true 
+                      } 
+                    });
+                  }}
+                  variant="outline" 
+                  className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border-orange-500/30 text-orange-300 hover:text-orange-200 hover:bg-orange-500/30"
+                >
+                  <Target className="h-4 w-4 mr-2" />
+                  Drill this Thought
+                </Button>
                 {/* Creator-only: Add to Jeeves Knowledge Bank */}
                 {isAdmin && (
                   <Button 
@@ -1148,29 +1248,29 @@ const AnalyzeThoughts = () => {
 
               {/* Palace Mapping - Enhanced with Practice Prompts */}
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}>
-                <Card className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-purple-500/20">
-                  <CardHeader className="border-b border-border/50">
-                    <CardTitle className="flex items-center gap-2"><Building2 className="h-5 w-5 text-purple-400" /><span className="bg-gradient-to-r from-purple-200 to-blue-200 bg-clip-text text-transparent">Palace Mapping</span></CardTitle>
+                <Card className="bg-gradient-to-br from-purple-900/40 to-blue-900/40 border-purple-400/30">
+                  <CardHeader className="border-b border-purple-400/20">
+                    <CardTitle className="flex items-center gap-2"><Building2 className="h-5 w-5 text-purple-300" /><span className="text-white font-bold">Palace Mapping</span></CardTitle>
                   </CardHeader>
                   <CardContent className="pt-6">
                     <div className="grid gap-4">
                       {(result.palaceRooms || []).map((r, i) => (
                         <motion.div 
                           key={i} 
-                          className="p-4 rounded-xl bg-background/30 border border-purple-500/10 hover:border-purple-500/30 transition-all"
+                          className="p-4 rounded-xl bg-background/60 border border-purple-400/20 hover:border-purple-400/40 transition-all"
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: 0.9 + i * 0.1 }}
                         >
                           <div className="flex items-start gap-3">
-                            <Badge variant="outline" className="font-mono bg-purple-500/20 text-purple-300 border-purple-500/30 shrink-0">{r.code}</Badge>
+                            <Badge variant="outline" className="font-mono bg-purple-600/30 text-white border-purple-400/40 shrink-0">{r.code}</Badge>
                             <div className="flex-1">
-                              <p className="font-medium text-purple-200 mb-1">{r.name}</p>
-                              <p className="text-sm text-muted-foreground mb-2">{r.relevance}</p>
+                              <p className="font-semibold text-foreground mb-1">{r.name}</p>
+                              <p className="text-sm text-foreground/80 mb-2">{r.relevance}</p>
                               {r.practicePrompt && (
-                                <div className="flex items-start gap-2 mt-3 p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                                <div className="flex items-start gap-2 mt-3 p-3 rounded-lg bg-amber-500/15 border border-amber-400/30">
                                   <Zap className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
-                                  <p className="text-sm text-amber-200/90 italic">{r.practicePrompt}</p>
+                                  <p className="text-sm text-foreground/90 italic">{r.practicePrompt}</p>
                                 </div>
                               )}
                             </div>
@@ -1301,10 +1401,10 @@ const AnalyzeThoughts = () => {
                         {result.furtherStudy.map((item, i) => {
                           const study = normalizeFurtherStudy(item);
                           return (
-                            <Link
+                            <button
                               key={i}
-                              to={`/encyclopedia?search=${encodeURIComponent(study.topic)}`}
-                              className="block p-3 rounded-lg bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 hover:border-purple-500/40 transition-all cursor-pointer group active:scale-[0.98]"
+                              onClick={() => navigate(`/encyclopedia?search=${encodeURIComponent(study.topic)}`)}
+                              className="block w-full text-left p-3 rounded-lg bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 hover:border-purple-500/40 transition-all cursor-pointer group active:scale-[0.98]"
                             >
                               <div className="flex items-center justify-between gap-2">
                                 <p className="font-medium text-sm sm:text-base text-purple-200 group-hover:text-purple-100 flex-1">{study.topic}</p>
@@ -1313,7 +1413,7 @@ const AnalyzeThoughts = () => {
                               {study.whyItMatters && (
                                 <p className="text-xs sm:text-sm text-muted-foreground mt-1">{study.whyItMatters}</p>
                               )}
-                            </Link>
+                            </button>
                           );
                         })}
                       </div>

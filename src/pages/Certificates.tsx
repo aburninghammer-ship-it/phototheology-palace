@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Award, Download, Share2, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 interface Certificate {
   id: string;
@@ -19,6 +20,7 @@ interface Certificate {
 }
 
 export default function Certificates() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [certificates, setCertificates] = useState<Certificate[]>([]);
@@ -59,7 +61,7 @@ export default function Certificates() {
       if (error) throw error;
 
       toast({
-        title: !currentStatus ? "Certificate is now public" : "Certificate is now private",
+        title: !currentStatus ? t('certificates.toasts.madePublic') : t('certificates.toasts.madePrivate'),
       });
 
       loadCertificates();
@@ -72,8 +74,8 @@ export default function Certificates() {
     const url = `${window.location.origin}/certificate/${shareToken}`;
     navigator.clipboard.writeText(url);
     toast({
-      title: "Link copied!",
-      description: "Share your achievement with others",
+      title: t('certificates.toasts.linkCopied'),
+      description: t('certificates.toasts.shareDescription'),
     });
   };
 
@@ -82,7 +84,7 @@ export default function Certificates() {
       <div className="min-h-screen gradient-dreamy">
         <SimplifiedNav />
         <div className="container mx-auto px-4 py-8 max-w-4xl">
-          <p className="text-center text-foreground/80">Loading certificates...</p>
+          <p className="text-center text-foreground/80">{t('certificates.loading')}</p>
         </div>
       </div>
     );
@@ -95,10 +97,10 @@ export default function Certificates() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2 flex items-center gap-2">
             <Award className="h-8 w-8" />
-            My Certificates
+            {t('certificates.title')}
           </h1>
           <p className="text-foreground/80">
-            Your achievements and completed courses
+            {t('certificates.subtitle')}
           </p>
         </div>
 
@@ -107,7 +109,7 @@ export default function Certificates() {
             <CardContent className="text-center py-12">
               <Award className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
               <p className="text-muted-foreground">
-                Complete courses to earn certificates
+                {t('certificates.empty')}
               </p>
             </CardContent>
           </Card>
@@ -125,7 +127,7 @@ export default function Certificates() {
                         {cert.course_name}
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        Completed {new Date(cert.issued_at).toLocaleDateString()}
+                        {t('certificates.completed', { date: new Date(cert.issued_at).toLocaleDateString() })}
                       </p>
                     </div>
                     <Award className="h-12 w-12 text-primary" />
@@ -139,7 +141,7 @@ export default function Certificates() {
                       onClick={() => shareCertificate(cert.share_token)}
                     >
                       <Share2 className="h-4 w-4 mr-2" />
-                      Share
+                      {t('certificates.actions.share')}
                     </Button>
                     <Button
                       variant="outline"
@@ -149,18 +151,18 @@ export default function Certificates() {
                       {cert.is_public ? (
                         <>
                           <EyeOff className="h-4 w-4 mr-2" />
-                          Make Private
+                          {t('certificates.actions.makePrivate')}
                         </>
                       ) : (
                         <>
                           <Eye className="h-4 w-4 mr-2" />
-                          Make Public
+                          {t('certificates.actions.makePublic')}
                         </>
                       )}
                     </Button>
                     <Button variant="outline" size="sm">
                       <Download className="h-4 w-4 mr-2" />
-                      Download
+                      {t('certificates.actions.download')}
                     </Button>
                   </div>
                 </CardContent>

@@ -1,5 +1,8 @@
 project_id = "tdjtumtdkjicnhlpqqzd"
 
+[functions.generate-war-college-day]
+verify_jwt = false
+
 [functions.deal-pt-cards]
 verify_jwt = false
 
@@ -212,8 +215,104 @@ verify_jwt = false
 [functions.live-sermon-commentary]
 verify_jwt = false
 
-[functions.elevenlabs-scribe-token]
-verify_jwt = false
+# ElevenLabs removed - using OpenAI TTS only
 
 [functions.send-engagement-email]
 verify_jwt = false
+
+[functions.generate-audio-commentary]
+verify_jwt = false
+
+[functions.clear-commentary-cache]
+verify_jwt = true
+
+[functions.freestyle-mentor]
+verify_jwt = false
+
+[functions.transcribe-audio]
+verify_jwt = false
+
+[functions.sermon-to-ppt]
+verify_jwt = false
+
+[functions.polish-sermon]
+verify_jwt = false
+
+[functions.generate-slide-image]
+verify_jwt = false
+
+[functions.refine-slide]
+verify_jwt = false
+
+[functions.gamma-export]
+verify_jwt = false
+
+[functions.send-campaign-email]
+verify_jwt = true
+
+[functions.send-bulk-email]
+verify_jwt = true
+
+[functions.fix-subscription-mismatch]
+verify_jwt = true
+
+[functions.sermon-simmer]
+verify_jwt = false
+
+[functions.room-66-generate]
+verify_jwt = false
+
+[functions.record-analytics-snapshot]
+verify_jwt = false
+
+[functions.send-welcome-email]
+verify_jwt = false
+
+[functions.mind-map-analyze]
+verify_jwt = false
+
+[functions.mind-map-study]
+verify_jwt = false
+
+[functions.sms-webhook]
+verify_jwt = false
+
+[functions.sms-send-devotionals]
+verify_jwt = false
+
+[functions.batch-generate-devotional-days]
+verify_jwt = false
+
+[functions.generate-infographic]
+verify_jwt = false
+
+[functions.generate-study-series]
+verify_jwt = false
+
+[functions.generate-daily-cards]
+verify_jwt = false
+
+[functions.generate-epic-commentary]
+verify_jwt = false
+
+[functions.batch-generate-epic]
+verify_jwt = true
+
+[functions.get-subscriber-stats]
+verify_jwt = false
+
+[functions.get-pdf-purchases]
+verify_jwt = false
+
+[functions.generate-daily-paths]
+verify_jwt = false
+
+[functions.generate-discipleship-packet]
+verify_jwt = false
+
+[functions.analyze-sermon-palace]
+verify_jwt = false
+
+[functions.challenge-share-preview]
+verify_jwt = false
+

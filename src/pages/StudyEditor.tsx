@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ import { useCollaborativeStudy } from "@/hooks/useCollaborativeStudy";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { RichTextEditor } from "@/components/studies/RichTextEditor";
 import { FormattedStudyView } from "@/components/studies/FormattedStudyView";
+import { ShareToProfileButton } from "@/components/social/ShareToProfileButton";
 
 interface JeevesMessage {
   role: "user" | "assistant";
@@ -61,6 +63,7 @@ interface Study {
 }
 
 const StudyEditor = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -146,8 +149,8 @@ const StudyEditor = () => {
     } catch (error) {
       console.error("Error fetching study:", error);
       toast({
-        title: "Error",
-        description: "Failed to load study",
+        title: t('studyEditor.error'),
+        description: t('studyEditor.failedToLoadStudy'),
         variant: "destructive",
       });
       navigate("/my-studies");
@@ -204,8 +207,8 @@ const StudyEditor = () => {
   const saveStudy = async () => {
     if (!canEdit) {
       toast({
-        title: "Permission denied",
-        description: "You only have view access to this study",
+        title: t('studyEditor.permissionDenied'),
+        description: t('studyEditor.viewOnlyAccess'),
         variant: "destructive",
       });
       return;
@@ -215,7 +218,7 @@ const StudyEditor = () => {
     try {
       // Auto-format the content before saving
       const formattedContent = await formatContent(content);
-      
+
       const { error } = await supabase
         .from("user_studies")
         .update({
@@ -237,14 +240,14 @@ const StudyEditor = () => {
       setHasChanges(false);
       setLastSaved(new Date());
       toast({
-        title: "Study saved & formatted",
-        description: "Your study has been beautifully formatted",
+        title: t('studyEditor.studySavedFormatted'),
+        description: t('studyEditor.beautifullyFormatted'),
       });
     } catch (error: any) {
       console.error("Error saving study:", error);
-      const errorMessage = error?.message || error?.details || "Failed to save study";
+      const errorMessage = error?.message || error?.details || t('studyEditor.failedToSaveStudy');
       toast({
-        title: "Error",
+        title: t('studyEditor.error'),
         description: errorMessage,
         variant: "destructive",
       });
@@ -256,8 +259,8 @@ const StudyEditor = () => {
   const formatAndSaveStudy = async () => {
     if (!canEdit) {
       toast({
-        title: "Permission denied",
-        description: "You only have view access to this study",
+        title: t('studyEditor.permissionDenied'),
+        description: t('studyEditor.viewOnlyAccess'),
         variant: "destructive",
       });
       return;
@@ -266,7 +269,7 @@ const StudyEditor = () => {
     setIsFormatting(true);
     try {
       const formattedContent = await formatContent(content);
-      
+
       const { error } = await supabase
         .from("user_studies")
         .update({
@@ -284,14 +287,14 @@ const StudyEditor = () => {
       setHasChanges(false);
       setLastSaved(new Date());
       toast({
-        title: "Formatted!",
-        description: "Your study has been beautifully formatted and saved",
+        title: t('studyEditor.formatted'),
+        description: t('studyEditor.formattedAndSaved'),
       });
     } catch (error: any) {
       console.error("Error formatting study:", error);
       toast({
-        title: "Error",
-        description: error?.message || "Failed to format study",
+        title: t('studyEditor.error'),
+        description: error?.message || t('studyEditor.failedToFormatStudy'),
         variant: "destructive",
       });
     } finally {
@@ -307,7 +310,7 @@ const StudyEditor = () => {
     
     // Title
     doc.setFontSize(18);
-    doc.text(title || "Untitled Study", margin, margin);
+    doc.text(title || t('studyEditor.untitledStudy'), margin, margin);
     
     // Tags
     if (tags.length > 0) {
@@ -324,8 +327,8 @@ const StudyEditor = () => {
     doc.save(`${title || "study"}.pdf`);
     
     toast({
-      title: "Export successful",
-      description: "Study exported as PDF",
+      title: t('studyEditor.exportSuccessful'),
+      description: t('studyEditor.exportedAsPdf'),
     });
   };
 
@@ -349,8 +352,8 @@ const StudyEditor = () => {
     URL.revokeObjectURL(url);
     
     toast({
-      title: "Export successful",
-      description: "Study exported as Markdown",
+      title: t('studyEditor.exportSuccessful'),
+      description: t('studyEditor.exportedAsMarkdown'),
     });
   };
 
@@ -374,8 +377,8 @@ const StudyEditor = () => {
     URL.revokeObjectURL(url);
     
     toast({
-      title: "Export successful",
-      description: "Study exported as text file",
+      title: t('studyEditor.exportSuccessful'),
+      description: t('studyEditor.exportedAsText'),
     });
   };
 
@@ -464,14 +467,14 @@ const StudyEditor = () => {
       if (error) throw error;
 
       toast({
-        title: "Added to Knowledge Bank",
-        description: "This study will now inform Jeeves' future responses and analysis.",
+        title: t('studyEditor.addedToKnowledgeBank'),
+        description: t('studyEditor.knowledgeBankDescription'),
       });
     } catch (error) {
       console.error("Error adding to knowledge bank:", error);
       toast({
-        title: "Error",
-        description: "Failed to add to knowledge bank",
+        title: t('studyEditor.error'),
+        description: t('studyEditor.failedToAddToKnowledgeBank'),
         variant: "destructive",
       });
     } finally {
@@ -485,7 +488,7 @@ const StudyEditor = () => {
         <Navigation />
         <div className="container mx-auto px-4 py-24 text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
-          <p className="mt-4 text-muted-foreground">Loading study...</p>
+          <p className="mt-4 text-muted-foreground">{t('studyEditor.loadingStudy')}</p>
         </div>
       </div>
     );
@@ -504,7 +507,7 @@ const StudyEditor = () => {
             className="gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Studies
+            {t('studyEditor.backToStudies')}
           </Button>
           
           <div className="flex items-center gap-2">
@@ -532,24 +535,32 @@ const StudyEditor = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-2">
                   <Download className="w-4 h-4" />
-                  Export
+                  {t('studyEditor.export')}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem onClick={exportAsPDF}>
-                  Export as PDF
+                  {t('studyEditor.exportAsPdf')}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={exportAsMarkdown}>
-                  Export as Markdown
+                  {t('studyEditor.exportAsMarkdown')}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={exportAsText}>
-                  Export as Text
+                  {t('studyEditor.exportAsText')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             
             <ShareStudyDialog title={title} content={content} />
-            
+            <ShareToProfileButton
+              sharedContent={{
+                source_type: "bible_study",
+                source_id: id,
+                source_title: title || "Untitled Study",
+                source_excerpt: content.replace(/<[^>]*>/g, "").slice(0, 300),
+              }}
+            />
+
             {/* Admin-only: Add to Knowledge Bank */}
             {isAdmin && (
               <Button
@@ -557,17 +568,17 @@ const StudyEditor = () => {
                 onClick={handleAddToKnowledgeBank}
                 disabled={isAddingToKnowledgeBank || !content.trim()}
                 className="gap-2 bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/30 text-amber-700 dark:text-amber-400"
-                title="Add this study to Jeeves' knowledge bank for future PT applications"
+                title={t('studyEditor.addToKnowledgeBankTooltip')}
               >
                 {isAddingToKnowledgeBank ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Adding...
+                    {t('studyEditor.adding')}
                   </>
                 ) : (
                   <>
                     <Brain className="w-4 h-4" />
-                    Add to Knowledge Bank
+                    {t('studyEditor.addToKnowledgeBank')}
                   </>
                 )}
               </Button>
@@ -583,12 +594,12 @@ const StudyEditor = () => {
                   {isFormatting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Jeeves is formatting...
+                      {t('studyEditor.jeevesFormatting')}
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-4 h-4 text-primary" />
-                      Format Notes
+                      {t('studyEditor.formatNotes')}
                     </>
                   )}
                 </Button>
@@ -608,11 +619,11 @@ const StudyEditor = () => {
                 </Button>
                 <div className="flex items-center gap-2">
                   {isAutoSaving && (
-                    <span className="text-xs text-emerald-500 animate-pulse">Auto-saving...</span>
+                    <span className="text-xs text-emerald-500 animate-pulse">{t('studyEditor.autoSaving')}</span>
                   )}
                   {!isAutoSaving && lastSaved && !hasChanges && (
                     <span className="text-xs text-muted-foreground">
-                      Saved {lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {t('studyEditor.savedAt', { time: lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) })}
                     </span>
                   )}
                 </div>
@@ -624,12 +635,12 @@ const StudyEditor = () => {
                   {saving ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Saving...
+                      {t('studyEditor.saving')}
                     </>
                   ) : (
                     <>
                       <Save className="w-4 h-4" />
-                      Save
+                      {t('studyEditor.save')}
                     </>
                   )}
                 </Button>
@@ -649,14 +660,14 @@ const StudyEditor = () => {
                   setTitle(e.target.value);
                   setHasChanges(true);
                 }}
-                placeholder="Study Title"
+                placeholder={t('studyEditor.studyTitlePlaceholder')}
                 className="text-3xl font-bold border-0 px-0 focus-visible:ring-0 mb-6"
               />
 
               {/* Tags */}
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-sm font-medium">Tags</span>
+                  <span className="text-sm font-medium">{t('studyEditor.tags')}</span>
                 </div>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {tags.map((tag) => (
@@ -678,11 +689,11 @@ const StudyEditor = () => {
                     value={tagInput}
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="Add a tag..."
+                    placeholder={t('studyEditor.addTagPlaceholder')}
                     className="max-w-xs"
                   />
                   <Button onClick={addTag} variant="outline" size="sm">
-                    Add
+                    {t('studyEditor.add')}
                   </Button>
                 </div>
               </div>
@@ -691,8 +702,8 @@ const StudyEditor = () => {
               <Tabs defaultValue="formatted" className="w-full">
                 <div className="flex items-center justify-between mb-4">
                   <TabsList className="grid w-fit grid-cols-2">
-                    <TabsTrigger value="formatted">📖 Formatted View</TabsTrigger>
-                    <TabsTrigger value="edit">✏️ Edit Mode</TabsTrigger>
+                    <TabsTrigger value="formatted">{t('studyEditor.formattedView')}</TabsTrigger>
+                    <TabsTrigger value="edit">{t('studyEditor.editMode')}</TabsTrigger>
                   </TabsList>
                   {content && (
                     <QuickAudioButton 
@@ -720,7 +731,7 @@ const StudyEditor = () => {
                     content={content}
                     onChange={handleContentChange}
                     disabled={!canEdit}
-                    placeholder={canEdit ? "Start writing your study notes here..." : "View only - you cannot edit this study"}
+                    placeholder={canEdit ? t('studyEditor.startWritingPlaceholder') : t('studyEditor.viewOnlyPlaceholder')}
                   />
                 </TabsContent>
               </Tabs>
@@ -751,15 +762,15 @@ const StudyEditor = () => {
           {isAutoSaving ? (
             <p className="text-sm text-muted-foreground flex items-center justify-center gap-2">
               <Loader2 className="w-3 h-3 animate-spin" />
-              Auto-saving...
+              {t('studyEditor.autoSaving')}
             </p>
           ) : lastSaved ? (
             <p className="text-sm text-muted-foreground">
-              Last saved: {lastSaved.toLocaleTimeString()}
+              {t('studyEditor.lastSaved', { time: lastSaved.toLocaleTimeString() })}
             </p>
           ) : hasChanges ? (
             <p className="text-sm text-muted-foreground">
-              You have unsaved changes (auto-saves every 30s)
+              {t('studyEditor.unsavedChanges')}
             </p>
           ) : null}
         </div>

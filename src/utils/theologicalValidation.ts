@@ -162,8 +162,8 @@ export function validateTheologicalContent(content: string): ValidationResult {
     if (frogsAsPlagues) {
       errors.push(
         'CRITICAL VIOLATION: The three unclean spirits like frogs (Rev 16:13-14) are NOT part of the seven plagues. ' +
-        'The plagues are God\'s judgments. The frogs represent Satan\'s miracle-working campaign to gather the world BEFORE the seventh plague. ' +
-        'Frogs reference Egypt\'s last successful counterfeit—Satan\'s final imitation before he is unmasked.'
+        'The plagues are God\'s judgments poured out AFTER probation closes. The frogs represent Satan\'s miracle-working deception that gathers the world BEFORE the close of probation — ' +
+        'the verses explain HOW the wicked were united, culminating in the sixth plague crisis. Frogs reference Egypt\'s last successful counterfeit—Satan\'s final imitation before he is unmasked.'
       );
     }
   }
@@ -518,10 +518,12 @@ export function getTheologicalRules(): Array<{ id: string; rule: string; rationa
     },
     {
       id: 'three-frogs-not-plagues',
-      rule: 'The three unclean spirits (frogs) are NOT part of the seven plagues',
+      rule: 'The three unclean spirits (frogs) are NOT part of the seven plagues — they describe pre-probation deception',
       rationale:
-        'The frogs (Rev 16:13-14) represent Satan\'s miracle-working campaign to gather the world BEFORE the seventh plague. ' +
-        'Frogs reference Egypt\'s last successful counterfeit - Satan\'s final imitation before being unmasked.',
+        'The frogs (Rev 16:13-14) represent Satan\'s miracle-working deception that gathers the world BEFORE the close of probation. ' +
+        'The verses explain how the wicked were united, culminating in the sixth plague crisis. The sixth plague itself (drying up of Euphrates) is God\'s judgment, not Satan\'s work. ' +
+        'Frogs reference Egypt\'s last successful counterfeit - Satan\'s final imitation before being unmasked. ' +
+        'This CANNOT be used as evidence that Satan appears after the close of probation.',
     },
     {
       id: 'daniel-11-40-satan-appearing',

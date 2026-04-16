@@ -58,19 +58,22 @@ export const InstallPrompt = () => {
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 100, opacity: 0 }}
-        className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50"
+        className="fixed bottom-24 md:bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50"
       >
-        <Card className="shadow-2xl border-2 border-primary/20">
-          <CardContent className="p-4">
+        <Card className="bg-gradient-to-br from-violet-500/15 via-purple-500/10 to-fuchsia-500/15 backdrop-blur-xl border-2 border-violet-500/40 shadow-[0_8px_32px_-4px_rgba(139,92,246,0.5),0_0_0_1px_rgba(255,255,255,0.1)_inset] rounded-2xl">
+          <CardContent className="p-4 relative">
+            {/* Glassy shine effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/5 rounded-2xl pointer-events-none" />
+
             <button
               onClick={handleDismiss}
-              className="absolute top-2 right-2 text-muted-foreground hover:text-foreground"
+              className="absolute top-2 right-2 text-muted-foreground hover:text-foreground z-10"
             >
               <X className="h-4 w-4" />
             </button>
 
-            <div className="flex items-start gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-primary to-purple-600">
+            <div className="flex items-start gap-4 relative z-10">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 shadow-lg shadow-violet-500/30">
                 <Smartphone className="h-6 w-6 text-white" />
               </div>
               

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import { Progress } from "@/components/ui/progress";
 export default function MemoryGameComplete() {
   const { listId } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const location = useLocation();
   const { analyzeVerse, updateVersePTInsights, saveCrossReferences, analyzing } = usePTAnalysis();
   
@@ -52,7 +54,7 @@ export default function MemoryGameComplete() {
       }
     } catch (error) {
       console.error("Error loading verses:", error);
-      toast.error("Failed to load verses");
+      toast.error(t('memory.game.failedToLoadVerses'));
     }
   };
 
@@ -65,7 +67,7 @@ export default function MemoryGameComplete() {
     const verse = verseList[index];
     setCurrentVerse(verse);
     
-    toast.loading("Analyzing verse with PT principles...", { id: "analyzing" });
+    toast.loading(t('memory.game.complete.analyzing'), { id: "analyzing" });
     
     const insights = await analyzeVerse(verse.verse_reference, verse.verse_text);
     
@@ -97,7 +99,7 @@ export default function MemoryGameComplete() {
 
   const handleViewCrossReference = (verseRef: string) => {
     // TODO: Implement cross-reference viewer
-    toast.info(`Cross-reference: ${verseRef}`);
+    toast.info(t('memory.game.complete.crossReference', { verseRef }));
   };
 
   if (!completed && verses.length === 0) {
@@ -107,7 +109,7 @@ export default function MemoryGameComplete() {
           <CardContent className="pt-6">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Loading...</p>
+              <p className="text-muted-foreground">{t('common.loading')}</p>
             </div>
           </CardContent>
         </Card>
@@ -124,9 +126,9 @@ export default function MemoryGameComplete() {
             <CardContent className="pt-6">
               <div className="text-center space-y-4">
                 <Sparkles className="h-16 w-16 text-primary mx-auto" />
-                <h2 className="text-2xl font-bold">Unlocking PT Insights</h2>
+                <h2 className="text-2xl font-bold">{t('memory.game.complete.unlockingInsights')}</h2>
                 <p className="text-muted-foreground">
-                  Analyzing verse {currentVerseIndex + 1} of {verses.length}
+                  {t('memory.game.complete.analyzingVerse', { current: currentVerseIndex + 1, total: verses.length })}
                 </p>
                 <Progress value={((currentVerseIndex) / verses.length) * 100} className="h-2" />
               </div>
@@ -136,25 +138,25 @@ export default function MemoryGameComplete() {
           <Card className="text-center">
             <CardContent className="pt-8 pb-8">
               <Trophy className="h-20 w-20 text-primary mx-auto mb-4" />
-              <h2 className="text-3xl font-bold mb-2">Great Work!</h2>
+              <h2 className="text-3xl font-bold mb-2">{t('memory.game.complete.greatWork')}</h2>
               <p className="text-muted-foreground mb-6">
-                {gameResults ? `You scored ${gameResults.score}/${gameResults.total}` : 'Game completed!'}
+                {gameResults ? t('memory.game.complete.youScored', { score: gameResults.score, total: gameResults.total }) : t('memory.game.complete.gameCompleted')}
               </p>
               
               {verses.length > 0 && (
                 <p className="text-sm text-muted-foreground mb-6">
-                  You've unlocked {verses.length} new PT insight{verses.length !== 1 ? 's' : ''}!
+                  {t('memory.game.complete.unlockedInsights', { count: verses.length })}
                 </p>
               )}
 
               <div className="flex gap-3 justify-center">
                 <Button variant="outline" onClick={() => navigate("/memory")}>
                   <Home className="h-4 w-4 mr-2" />
-                  Back to Memory
+                  {t('memory.game.backToMemory')}
                 </Button>
                 <Button onClick={() => navigate(`/memory/play/${listId}`)}>
                   <ArrowRight className="h-4 w-4 mr-2" />
-                  Play Again
+                  {t('memory.game.complete.playAgain')}
                 </Button>
               </div>
             </CardContent>

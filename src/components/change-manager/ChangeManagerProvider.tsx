@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useChurchMembership } from '@/hooks/useChurchMembership';
 import { useChangeSpine, shouldRedirectToOrientation, shouldEscalateUpgrade } from '@/hooks/useChangeSpine';
 
 interface ChangeManagerProviderProps {
@@ -20,6 +21,8 @@ const EXEMPT_ROUTES = [
   '/privacy',
   '/terms',
   '/welcome',
+  '/pt-onboarding',
+  '/fix-billing',
 ];
 
 // Routes that ARE part of the guided path (allowed even before orientation complete)
@@ -27,7 +30,7 @@ const GUIDED_PATH_ROUTES = [
   '/gatehouse',
   '/bible',
   '/jeeves',
-  '/gems-room',
+  '/give-me-a-gem',
   '/palace',
 ];
 
@@ -41,10 +44,14 @@ export const ChangeManagerProvider = ({ children }: ChangeManagerProviderProps) 
   const navigate = useNavigate();
   const location = useLocation();
   const changeSpine = useChangeSpine();
+  const { isMember: isChurchMember } = useChurchMembership();
 
   useEffect(() => {
     // Skip if loading or no user
     if (changeSpine.isLoading || !user) return;
+
+    // Skip all change management for church members
+    if (isChurchMember) return;
 
     // Skip all change management for existing users
     if (!changeSpine.isNewUser) return;
@@ -89,22 +96,23 @@ export const ChangeManagerProvider = ({ children }: ChangeManagerProviderProps) 
  */
 export const useChangeManager = () => {
   const changeSpine = useChangeSpine();
+  const { isMember: isChurchMember } = useChurchMembership();
 
   return {
     ...changeSpine,
     
-    // Convenience methods for components - only apply to new users
-    shouldShowGuidedPath: changeSpine.isNewUser && !changeSpine.hasAchievedFirstWin && !changeSpine.isLoading,
-    shouldPromptFirstWin: changeSpine.isNewUser && changeSpine.hasCompletedOrientation && !changeSpine.hasAchievedFirstWin,
-    shouldEscalateUpgrade: shouldEscalateUpgrade(changeSpine),
+    // Convenience methods for components - never apply to church members
+    shouldShowGuidedPath: !isChurchMember && changeSpine.isNewUser && !changeSpine.hasAchievedFirstWin && !changeSpine.isLoading,
+    shouldPromptFirstWin: !isChurchMember && changeSpine.isNewUser && changeSpine.hasCompletedOrientation && !changeSpine.hasAchievedFirstWin,
+    shouldEscalateUpgrade: !isChurchMember && shouldEscalateUpgrade(changeSpine),
     
     // Get identity messaging
     getIdentityMessage: () => {
       if (changeSpine.phase === 'orientation') return "Welcome, Seeker";
-      if (changeSpine.phase === 'first_win') return "Palace Student";
-      if (changeSpine.phase === 'reinforcement') return "Disciple in Training";
-      if (changeSpine.phase === 'commitment') return "Sanctuary Walker";
-      return "Student";
+      if (changeSpine.phase === 'first_win') return "Explorer in Training";
+      if (changeSpine.phase === 'reinforcement') return "Rising Architect";
+      if (changeSpine.phase === 'commitment') return "Sanctuary Architect";
+      return "Seeker";
     },
     
     // Get encouragement message based on phase

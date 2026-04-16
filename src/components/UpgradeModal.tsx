@@ -123,7 +123,7 @@ export const UpgradeModal = ({
           <div className="flex justify-center">
             <Badge variant="secondary" className="gap-1">
               <Sparkles className="h-3 w-3" />
-              14-day free trial available
+              30-day free trial available
             </Badge>
           </div>
         </div>
@@ -132,7 +132,7 @@ export const UpgradeModal = ({
         <div className="flex flex-col gap-2">
           <Button onClick={handleStartTrial} className="gradient-palace w-full">
             <Sparkles className="mr-2 h-4 w-4" />
-            Start 14-Day Free Trial
+            Start 30-Day Free Trial
           </Button>
           
           <Button onClick={handleUpgrade} variant="outline" className="w-full">

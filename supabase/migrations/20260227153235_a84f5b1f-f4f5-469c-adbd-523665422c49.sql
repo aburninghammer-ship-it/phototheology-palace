@@ -1,0 +1,1 @@
+ALTER TYPE public.ministry_role ADD VALUE IF NOT EXISTS 'bible_worker';

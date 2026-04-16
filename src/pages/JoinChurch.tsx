@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { Loader2, Building2, CheckCircle, AlertCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function JoinChurch() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -19,7 +21,9 @@ export default function JoinChurch() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // Read code from URL on mount
+  const [autoSubmitted, setAutoSubmitted] = useState(false);
+
+  // Read code from URL on mount and auto-submit if user is logged in
   useEffect(() => {
     const codeFromUrl = searchParams.get('code');
     if (codeFromUrl) {
@@ -27,16 +31,29 @@ export default function JoinChurch() {
     }
   }, [searchParams]);
 
+  // Auto-submit when user is logged in and code is present from URL
+  useEffect(() => {
+    const codeFromUrl = searchParams.get('code');
+    if (user && codeFromUrl && !autoSubmitted && !loading && !success) {
+      setAutoSubmitted(true);
+      // Trigger form submission programmatically
+      const form = document.getElementById('join-church-form') as HTMLFormElement;
+      if (form) {
+        form.requestSubmit();
+      }
+    }
+  }, [user, searchParams, autoSubmitted, loading, success]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!invitationCode.trim()) {
-      toast.error("Please enter an invitation code");
+      toast.error(t('church.errorEnterInvitationCode'));
       return;
     }
 
     if (!user) {
-      toast.error("You must be logged in to join a church");
+      toast.error(t('church.errorMustBeLoggedInToJoin'));
       // Preserve the invitation code in the redirect so they can return after login
       navigate(`/auth?redirect=/join-church?code=${encodeURIComponent(invitationCode.trim())}`);
       return;
@@ -64,27 +81,51 @@ export default function JoinChurch() {
 
           if (!accessError && hasAccess) {
             setSuccess(true);
-            toast.success("You're already in this church. Redirecting...");
+            toast.success(t('church.alreadyInChurch'));
             setTimeout(() => navigate("/living-manna"), 1000);
             return;
           }
         }
 
-        toast.error(result.error || "Failed to accept invitation");
+        toast.error(result.error || t('church.errorFailedToAcceptInvitation'));
         return;
       }
 
 
+      // Update profile to reflect church membership access
+      // This prevents stale trial/expired status from triggering upgrade prompts or emails
+      if (result.church_id) {
+        const { data: churchData } = await supabase.rpc('has_church_access', { _user_id: user.id });
+        const churchTier = Array.isArray(churchData) ? churchData[0]?.church_tier : null;
+
+        await supabase
+          .from('profiles')
+          .update({
+            subscription_status: 'active',
+            subscription_tier: churchTier || 'premium',
+            payment_source: 'church' as any,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', user.id);
+      }
+
       setSuccess(true);
-      toast.success(result.message || "Successfully joined church!");
-      
+      toast.success(result.message || t('church.successfullyJoined'));
+
       // Redirect to Living Manna church space after a short delay
       setTimeout(() => {
         navigate("/living-manna");
       }, 2000);
     } catch (error: any) {
       console.error('Error accepting invitation:', error);
-      toast.error(error.message || "Failed to accept invitation");
+      // Handle duplicate key = user already in this church
+      if (error.message?.includes('church_members_church_id_user_id_key') || error.message?.includes('duplicate key')) {
+        setSuccess(true);
+        toast.success(t('church.alreadyInChurch', 'You are already a member of this church!'));
+        setTimeout(() => navigate("/living-manna"), 1000);
+        return;
+      }
+      toast.error(error.message || t('church.errorFailedToAcceptInvitation'));
     } finally {
       setLoading(false);
     }
@@ -99,12 +140,12 @@ export default function JoinChurch() {
               <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mb-4">
                 <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
               </div>
-              <h2 className="text-2xl font-bold mb-2">Welcome to Your Church!</h2>
+              <h2 className="text-2xl font-bold mb-2">{t('church.welcomeToYourChurch')}</h2>
               <p className="text-muted-foreground mb-6">
-                You've successfully joined your church organization. You now have full access to Phototheology.
+                {t('church.welcomeDescription')}
               </p>
               <p className="text-sm text-muted-foreground">
-                Redirecting you to the dashboard...
+                {t('common.redirecting')}
               </p>
             </div>
           </CardContent>
@@ -116,15 +157,15 @@ export default function JoinChurch() {
   return (
     <>
       <Helmet>
-        <title>Join Your Church | Phototheology</title>
-        <meta name="description" content="Join your church's Phototheology community. Enter your invitation code to access Living Manna and connect with your congregation." />
-        <meta property="og:title" content="You're Invited to Join Phototheology" />
-        <meta property="og:description" content="Your church has invited you to join their Phototheology community. Accept your invitation to start your journey." />
+        <title>{t('church.joinChurchPageTitle')}</title>
+        <meta name="description" content={t('church.joinChurchMetaDescription')} />
+        <meta property="og:title" content={t('church.joinChurchOgTitle')} />
+        <meta property="og:description" content={t('church.joinChurchOgDescription')} />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://phototheology.app/og-invite.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="You're Invited to Join Phototheology" />
-        <meta name="twitter:description" content="Your church has invited you to join their Phototheology community." />
+        <meta name="twitter:title" content={t('church.joinChurchOgTitle')} />
+        <meta name="twitter:description" content={t('church.joinChurchTwitterDescription')} />
       </Helmet>
       <div className="min-h-screen gradient-dreamy flex items-center justify-center p-4">
       <Card className="max-w-md w-full">
@@ -132,15 +173,15 @@ export default function JoinChurch() {
           <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
             <Building2 className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl">Join Your Church</CardTitle>
+          <CardTitle className="text-2xl">{t('church.joinYourChurch')}</CardTitle>
           <CardDescription>
-            Enter the invitation code you received from your church administrator
+            {t('church.joinChurchDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form id="join-church-form" onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="invitation-code">Invitation Code</Label>
+              <Label htmlFor="invitation-code">{t('church.invitationCode')}</Label>
               <Input
                 id="invitation-code"
                 placeholder="CHURCH-XXXXXXXX"
@@ -150,14 +191,14 @@ export default function JoinChurch() {
                 disabled={loading}
               />
               <p className="text-xs text-muted-foreground mt-1">
-                Enter the code exactly as it appears in your invitation
+                {t('church.invitationCodeHint')}
               </p>
             </div>
 
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Once you join, you'll have access to all Phototheology features through your church's subscription.
+                {t('church.joinAccessDescription')}
               </AlertDescription>
             </Alert>
 
@@ -165,12 +206,12 @@ export default function JoinChurch() {
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Joining Church...
+                  {t('church.joiningChurch')}
                 </>
               ) : (
                 <>
                   <Building2 className="h-4 w-4 mr-2" />
-                  Join Church
+                  {t('church.joinChurch')}
                 </>
               )}
             </Button>
@@ -178,9 +219,9 @@ export default function JoinChurch() {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Don't have an invitation code?{" "}
+              {t('church.noInvitationCode')}{" "}
               <Button variant="link" className="p-0 h-auto" onClick={() => navigate("/")}>
-                Contact your church administrator
+                {t('church.contactChurchAdmin')}
               </Button>
             </p>
           </div>

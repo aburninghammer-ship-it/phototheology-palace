@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.76.0";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
+import { getContentBehavioralEngine } from '../_shared/content-behavioral-engine.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -143,9 +145,9 @@ const CADE_ISSUE_GUIDANCE: Record<string, { sanctuary: Record<string, string>; h
       "Peter began to sink when he took his eyes off Jesus (Matthew 14:30) - the key is where we focus."
     ],
     actionSteps: [
-      "Breath prayer: Inhale 'Fear not,' exhale 'I am with you'",
+      "Claim a promise: Memorize a specific 'Fear not' verse to speak aloud when anxiety rises",
       "Scripture reframing: When a fearful thought comes, counter it with a specific Bible verse",
-      "Physical grounding: Feel your feet on the floor, remind yourself you are safe in this moment",
+      "Prayer journal: Write out your fears before God, then write His promises back to yourself",
       "Name the fear specifically - vague fears are harder to fight than named ones"
     ]
   }
@@ -155,9 +157,33 @@ const CADE_ISSUE_GUIDANCE: Record<string, { sanctuary: Record<string, string>; h
 const CADE_SAFETY_PROMPT = `
 CRITICAL SDA DOCTRINAL SAFETY RULES - NEVER VIOLATE:
 
-NEVER:
-- Identify the scapegoat as Jesus/Christ
-- Identify Daniel 8's little horn as Antiochus Epiphanes  
+⚠️ ABSOLUTE THEOLOGICAL PROHIBITIONS (NON-NEGOTIABLE):
+1. AZAZEL = SATAN, NOT CHRIST:
+   - In Leviticus 16, Azazel (scapegoat) represents SATAN
+   - The LORD's goat = Christ; Azazel = Satan bearing guilt for sin
+   - NEVER identify Azazel/scapegoat as Jesus
+
+2. LITTLE HORN = ROME/PAPACY, NOT ANTIOCHUS:
+   - Daniel 7 & 8 little horn = Rome (pagan then papal)
+   - NEVER identify little horn as Antiochus Epiphanes
+
+3. TWO-PHASE SANCTUARY MINISTRY:
+   - Christ entered HOLY PLACE (first apartment) at ASCENSION in 31 AD
+   - Christ entered MOST HOLY PLACE (second apartment) in 1844
+   - NEVER say Christ went to Most Holy Place at resurrection/ascension
+   - Hebrews contrasts earthly vs heavenly, NOT Holy vs Most Holy
+
+4. DAY OF ATONEMENT = 1844, NOT THE CROSS:
+   - Christ's death fulfills PASSOVER (spring feast)
+   - Day of Atonement (fall feast) points to 1844 judgment ministry
+   - NEVER equate Christ's death with Day of Atonement fulfillment
+
+5. FEAST TYPOLOGY:
+   - Spring feasts (Passover, Unleavened Bread, Firstfruits, Pentecost) = First Advent
+   - Fall feasts (Trumpets, Atonement, Tabernacles) = Second Advent ministry
+   - Passover = Death, Firstfruits = Resurrection, NOT Day of Atonement!
+
+ALSO NEVER:
 - Set dates for the Second Coming
 - Teach secret rapture theology
 - Reference conspiracy theories (QAnon, Illuminati, etc.)
@@ -199,17 +225,21 @@ serve(async (req) => {
       format: body.format 
     }));
     
-    const { 
-      planId, 
-      theme, 
-      format, 
-      duration, 
-      studyStyle, 
+    const {
+      planId,
+      theme,
+      format,
+      duration,
+      studyStyle,
       profileName,
       // CADE fields
       primaryIssue,
       issueDescription,
-      issueSeverity
+      issueSeverity,
+      // Extension fields
+      isExtension = false,
+      startFromDay = 1,
+      existingDuration = 0
     } = body;
 
     capturedPlanId = planId;
@@ -297,15 +327,37 @@ serve(async (req) => {
     // Build personalization note - capitalize name properly
     const capitalizedName = profileName ? profileName.charAt(0).toUpperCase() + profileName.slice(1).toLowerCase() : "";
     
+    // Check for children's devotional context
+    const isChildDevotional = body.ageGroup?.toLowerCase()?.includes("child") || 
+                              body.ageGroup?.toLowerCase()?.includes("kid") ||
+                              body.ageGroup?.toLowerCase() === "children" ||
+                              body.targetAudience?.toLowerCase()?.includes("child") ||
+                              body.targetAudience?.toLowerCase()?.includes("kid");
+    
     let personalizationNote = "";
     if (capitalizedName) {
-      personalizationNote = `\n\nCRITICAL PERSONALIZATION (NON-NEGOTIABLE):
-- This devotional is for a SPECIFIC PERSON named ${capitalizedName}
+      if (isChildDevotional) {
+        personalizationNote = `\n\nCRITICAL PERSONALIZATION FOR CHILD (NON-NEGOTIABLE):
+- This devotional is written DIRECTLY TO a child named ${capitalizedName}
+- A parent/leader will READ THIS TO ${capitalizedName}—so address the child as "you"
+- Use their name ${capitalizedName} 2–3 times TOTAL (opening greeting, mid encouragement, closing)
+- Use SIMPLE vocabulary and SHORT sentences a child can understand
+- Use vivid, imagination-sparking descriptions and concrete examples
+- Make Jesus feel real, close, and loving to ${capitalizedName}'s young heart
+- Include a simple question or activity ${capitalizedName} can respond to
+- Avoid abstract theological concepts—use story and image instead
+- Sound warm and inviting, like a favorite teacher or loving grandparent
+- NEVER use "Dear ${capitalizedName}" - just start naturally`;
+      } else {
+        personalizationNote = `\n\nCRITICAL PERSONALIZATION (NON-NEGOTIABLE):
+- This devotional is written DIRECTLY TO ${capitalizedName}—they are the READER
+- Do NOT write ABOUT ${capitalizedName} for someone else. You are addressing THEM directly.
 - Use their name ${capitalizedName} 2–3 times TOTAL in the devotional (opening, mid-devotional encouragement, closing charge)
 - Refer to their situation in plain language at least once (paraphrase the provided situation details; don't be vague)
-- Sound like a caring pastor writing a personal note, not a template
-- NEVER use “Dear ${capitalizedName}” or “Dear friend”
+- Sound like a caring pastor writing a personal letter TO ${capitalizedName}, not about them
+- NEVER use "Dear ${capitalizedName}" or "Dear friend"
 - Always capitalize their name correctly: ${capitalizedName}`;
+      }
     }
 
     // Build CADE context-aware section
@@ -350,7 +402,7 @@ ${issueGuidance?.actionSteps?.map(a => `   - ${a}`).join("\n") || "   - Provide 
     }
 
     // Master Phototheology Devotional System Prompt - essay-style flowing paragraphs
-    const systemPrompt = `You are Jeeves, the Phototheology devotional writer. Write devotionals that are theologically rich, contemplative, and structurally intelligent.
+    let systemPrompt = `You are Jeeves, the Phototheology devotional writer. Write devotionals that are theologically rich, contemplative, and structurally intelligent.
 
 ${CADE_SAFETY_PROMPT}
 
@@ -401,14 +453,26 @@ ${formatInstructions}${personalizationNote}${cadeSection}
 OUTPUT FORMAT - Return a JSON array of devotional days:
 {
   "day_number": number,
-  "title": "Evocative, non-generic title (3-6 words)",
+  "title": "UNIQUE evocative title (3-6 words) - specific to THIS day's central insight, avoid generic phrases like 'Walking in Faith', 'Trust His Plan'",
   "scripture_reference": "Primary passage reference (e.g., Exodus 16:22-30)",
   "devotional_text": "The full 3-5 paragraph essay-style devotional (500-750 words). Flowing prose with Scripture woven naturally into the text. NO section headers. NO bullet points. Just continuous, contemplative reading.",
   "memory_hook": "One-line quotable insight or 'strike line' that pierces the heart"
 }`;
 
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: `${theme || 'devotional spiritual growth'}`.slice(0, 4000),
+      matchCount: 3,
+      supabaseClient: supabase,
+    });
+    if (ragResult.chunkCount > 0) {
+      systemPrompt += ragResult.corpusContext;
+    }
+
     const forPersonNote = capitalizedName
-      ? `\nThis devotional is written PERSONALLY for: ${capitalizedName}. Address ${capitalizedName} BY NAME 2-3 times total (opening, mid, closing). Always capitalize their name properly.`
+      ? isChildDevotional
+        ? `\nThis devotional is written DIRECTLY TO a child named ${capitalizedName}. A parent will read it TO them. Address ${capitalizedName} BY NAME 2-3 times. Use simple language and vivid imagery. Make Jesus feel close and real to a young heart.`
+        : `\nThis devotional is written DIRECTLY TO ${capitalizedName}—they are the READER, not someone else. Address ${capitalizedName} BY NAME 2-3 times total (opening, mid, closing). Always capitalize their name properly.`
       : "";
 
     const contextNote = resolvedIssueDescription ? `\nSITUATION DETAILS: ${resolvedIssueDescription}` : "";
@@ -416,9 +480,13 @@ OUTPUT FORMAT - Return a JSON array of devotional days:
       ? `\nPRIMARY STRUGGLE: ${resolvedPrimaryIssue}${resolvedIssueDescription ? ` - ${resolvedIssueDescription}` : ""}`
       : "";
 
-const userPrompt = `Create a ${duration}-day devotional on the theme: "${theme}"
+const extensionNote = isExtension
+      ? `\n\nIMPORTANT: This is an EXTENSION of an existing devotional that had ${existingDuration} days. You are creating days ${startFromDay} through ${startFromDay + duration - 1}. Continue building on the established theme with fresh insights - do not repeat earlier content. Maintain the same spiritual trajectory while exploring new facets of the theme.`
+      : "";
+
+    const userPrompt = `Create a ${duration}-day devotional on the theme: "${theme}"
 Format: ${format}
-Study Style: ${studyStyle}${forPersonNote}${issueNote}${contextNote}
+Study Style: ${studyStyle}${forPersonNote}${issueNote}${contextNote}${extensionNote}
 
 CRITICAL REQUIREMENTS:
 - Use 2-3 Scripture passages that at first appear unrelated, but when placed side by side reveal a coherent and illuminating truth
@@ -482,7 +550,7 @@ Generate as a JSON array with day_number: 1.`;
                           type: "object",
                           properties: {
                             day_number: { type: "integer" },
-                            title: { type: "string", description: "Evocative, non-generic title (3-6 words)" },
+                            title: { type: "string", description: "UNIQUE evocative title (3-6 words) - specific to THIS day's insight, avoid generic phrases like 'Walking in Faith', 'Trust His Plan', etc." },
                             scripture_reference: { type: "string", description: "Primary passage reference" },
                             devotional_text: { type: "string", description: "The full 3-5 paragraph essay-style devotional (500-750 words). Flowing prose. NO section headers. NO bullet points." },
                             memory_hook: { type: "string", description: "One-line quotable insight or strike line" },
@@ -505,6 +573,7 @@ Generate as a JSON array with day_number: 1.`;
               },
             ],
             tool_choice: { type: "function", function: { name: "create_devotional_days" } },
+            max_tokens: 8192,
           }),
         signal: controller.signal,
       });
@@ -635,22 +704,28 @@ Generate as a JSON array with day_number: 1.`;
     
     console.log("Day 1 generated successfully");
 
-    // Clear any existing devotional days for this plan so regeneration doesn't fail
-    console.log("Clearing any existing devotional days for this plan...");
-    const { error: deleteError } = await supabase
-      .from("devotional_days")
-      .delete()
-      .eq("plan_id", planId);
+    // Clear existing days only if NOT extending (extension adds to existing days)
+    if (!isExtension) {
+      console.log("Clearing any existing devotional days for this plan...");
+      const { error: deleteError } = await supabase
+        .from("devotional_days")
+        .delete()
+        .eq("plan_id", planId);
 
-    if (deleteError) {
-      console.error("Delete error while clearing existing days:", deleteError);
-      throw new Error("Failed to reset existing devotional days before regeneration");
+      if (deleteError) {
+        console.error("Delete error while clearing existing days:", deleteError);
+        throw new Error("Failed to reset existing devotional days before regeneration");
+      }
+    } else {
+      console.log("Extension mode: keeping existing days, will append new ones");
     }
 
     console.log("Inserting days into database...");
+    // For extensions, adjust day numbers to continue from existing days
+    const dayOffset = isExtension ? (startFromDay - 1) : 0;
     const daysToInsert = days.map((day: any) => ({
       plan_id: planId,
-      day_number: day.day_number,
+      day_number: day.day_number + dayOffset,
       title: day.title,
       scripture_reference: day.scripture_reference,
       devotional_text: day.devotional_text,
@@ -673,12 +748,27 @@ Generate as a JSON array with day_number: 1.`;
       throw new Error("Failed to save devotional days");
     }
 
-    // Update plan status to active
-    const startedAt = new Date().toISOString();
-    await supabase
-      .from("devotional_plans")
-      .update({ status: "active", started_at: startedAt })
-      .eq("id", planId);
+    // Update plan status
+    if (isExtension) {
+      // For extensions: update duration and ensure status is active
+      const newTotalDuration = existingDuration + duration;
+      console.log(`Extension complete: updating duration from ${existingDuration} to ${newTotalDuration}`);
+      await supabase
+        .from("devotional_plans")
+        .update({
+          status: "active",
+          duration: newTotalDuration,
+          completed_at: null // Clear completed status
+        })
+        .eq("id", planId);
+    } else {
+      // For new plans: set to active with start date
+      const startedAt = new Date().toISOString();
+      await supabase
+        .from("devotional_plans")
+        .update({ status: "active", started_at: startedAt })
+        .eq("id", planId);
+    }
 
     // Get user info for notification
     const { data: planData } = await supabase
@@ -688,23 +778,31 @@ Generate as a JSON array with day_number: 1.`;
       .single();
 
     if (planData) {
-      // Create persistent in-app notification that devotional is ready
+      // Create persistent in-app notification
+      const notificationTitle = isExtension
+        ? "🎉 Devotional Extended!"
+        : "🎉 Your Devotional is Ready!";
+      const notificationMessage = isExtension
+        ? `"${planData.title}" has been extended by ${duration} days. Day ${startFromDay} is now available!`
+        : `"${planData.title}" has been generated. Day 1 is now available!`;
+
       await supabase
         .from("notifications")
         .insert({
           user_id: planData.user_id,
-          type: "devotional_ready",
-          title: "🎉 Your Devotional is Ready!",
-          message: `"${planData.title}" has been generated. Day 1 is now available!`,
+          type: isExtension ? "devotional_extended" : "devotional_ready",
+          title: notificationTitle,
+          message: notificationMessage,
           link: `/devotionals/${planId}`,
           metadata: {
             plan_id: planId,
-            duration: days.length,
+            duration: isExtension ? existingDuration + duration : days.length,
+            extended_by: isExtension ? duration : undefined,
             theme,
           },
         });
-      
-      console.log("Created devotional ready notification for user:", planData.user_id);
+
+      console.log(`Created ${isExtension ? "extension" : "devotional ready"} notification for user:`, planData.user_id);
 
       // Get user email for welcome email
       const { data: userData } = await supabase.auth.admin.getUserById(planData.user_id);

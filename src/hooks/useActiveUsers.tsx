@@ -41,15 +41,14 @@ export const useActiveUsers = () => {
 
     const fetchActiveUsers = async () => {
       if (!isSubscribed) return;
-      
+
       try {
-        // Use 60 minutes window to account for users with cached old code
-        // who haven't refreshed yet to get the presence tracker updates
-        const sixtyMinutesAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+        // Use 1 hour window to show more users active
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
         const { data, count, error } = await supabase
           .from("profiles")
           .select("id, username, display_name, avatar_url, last_seen, current_floor, master_title", { count: "exact" })
-          .gte("last_seen", sixtyMinutesAgo)
+          .gte("last_seen", oneHourAgo)
           .order("last_seen", { ascending: false });
         
         if (!error && isSubscribed && data) {
@@ -71,11 +70,11 @@ export const useActiveUsers = () => {
     // Update last_seen for authenticated users
     updateLastSeen();
     
-    // Update every 30 seconds for more responsive count
+    // Update every 15 seconds for real-time count
     const interval = setInterval(() => {
       updateLastSeen();
       fetchActiveUsers();
-    }, 30000);
+    }, 15000);
 
     // Set up realtime subscription for profile updates (works for all users)
     realtimeChannel = supabase

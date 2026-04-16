@@ -22,10 +22,9 @@ const TRIAL_FEATURES = [
   "Unlimited Jeeves AI Conversations",
   "All Premium Games & Courses",
   "Art of War Dojo Complete",
-  "Audio Bible Reader/Commentary",
   "Treasure Hunts & Escape Rooms",
   "Bible Study Leader Tools",
-  "Full access for 14 days"
+  "Full access for 7 days"
 ];
 
 const SUBSCRIPTION_BENEFITS = [
@@ -40,12 +39,12 @@ const SUBSCRIPTION_BENEFITS = [
 
 const FAQ_ITEMS = [
   {
-    question: "How does the 14-day free trial work?",
-    answer: "Sign up and get full access to all Premium features for 14 days — no restrictions. After your trial, choose a plan that fits your needs. We believe you should experience the full value before deciding."
+    question: "How does the 7-day free trial work?",
+    answer: "Sign up and get full access to all Premium features for 7 days — no restrictions. After your trial, choose a plan that fits your needs. We believe you should experience the full value before deciding."
   },
   {
-    question: "What's the difference between the suite and the card deck/courses?",
-    answer: "The Phototheology Bible Learning Suite is a standalone digital platform. The physical card deck and video courses are separate products that complement the suite but are not required. The suite contains the complete Palace method — you don't need anything else to master it."
+    question: "What's the difference between PhototheologyOS and the card deck/courses?",
+    answer: "PhototheologyOS is a standalone digital platform — the Operating System for Biblical Thinking. The physical card deck and video courses are separate products that complement it but are not required. PhototheologyOS contains the complete Palace method — you don't need anything else to master it."
   },
   {
     question: "How is this different from YouVersion or Logos?",
@@ -74,7 +73,7 @@ export const TransparencySection = () => {
         <div className="text-center mb-12">
           <Badge className="mb-4 gradient-palace text-white border-0">
             <Sparkles className="h-3 w-3 mr-1" />
-            14-Day Free Trial
+            7-Day Free Trial
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Try Everything Before You Decide
@@ -86,7 +85,7 @@ export const TransparencySection = () => {
 
         {/* Comparison Cards */}
         <div className="grid md:grid-cols-2 gap-6 mb-12">
-          {/* 14-Day Free Trial */}
+          {/* 7-Day Free Trial */}
           <Card className="border-2 border-primary/50 bg-gradient-to-br from-primary/5 to-accent/5">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
@@ -95,11 +94,11 @@ export const TransparencySection = () => {
                     <Gift className="h-3 w-3 mr-1" />
                     Start Here
                   </Badge>
-                  <CardTitle className="text-2xl">14-Day Free Trial</CardTitle>
+                  <CardTitle className="text-2xl">7-Day Free Trial</CardTitle>
                 </div>
                 <div className="text-right">
                   <p className="text-3xl font-bold">$0</p>
-                  <p className="text-sm text-muted-foreground">for 14 days</p>
+                  <p className="text-sm text-muted-foreground">for 7 days</p>
                 </div>
               </div>
             </CardHeader>

@@ -164,10 +164,10 @@ export function VoiceChatInviteNotification() {
             exit={{ opacity: 0, x: 100, scale: 0.8 }}
             transition={{ type: "spring", damping: 20 }}
           >
-            <Card className="p-4 bg-card border-primary/20 shadow-lg">
+            <Card className="p-4 bg-gradient-to-br from-green-500/15 via-emerald-500/10 to-teal-500/15 backdrop-blur-xl border-2 border-green-500/40 shadow-[0_8px_32px_-4px_rgba(34,197,94,0.5),0_0_0_1px_rgba(255,255,255,0.1)_inset] rounded-2xl">
               <div className="flex items-start gap-3">
-                <div className="p-2 rounded-full bg-primary/10">
-                  <Phone className="h-5 w-5 text-primary animate-pulse" />
+                <div className="p-2 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg shadow-green-500/30">
+                  <Phone className="h-5 w-5 text-white animate-pulse" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm">Voice Chat Invite</p>

@@ -6,6 +6,7 @@ import { Flame, Calendar, Sparkles, Gamepad2, Calculator } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Footer } from "@/components/Footer";
+import { useTranslation } from "react-i18next";
 
 interface StreakData {
   activity: string;
@@ -17,38 +18,39 @@ interface StreakData {
 }
 
 export default function Streaks() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [streaks, setStreaks] = useState<StreakData[]>([
     {
-      activity: "Daily Study",
+      activity: t('streaks.activities.dailyStudy.name'),
       icon: <Calendar className="h-6 w-6" />,
       currentStreak: 0,
       longestStreak: 0,
-      description: "Completing at least one exercise or study note per day.",
+      description: t('streaks.activities.dailyStudy.description'),
       color: "border-orange-500"
     },
     {
-      activity: "Gem Creation",
+      activity: t('streaks.activities.gemCreation.name'),
       icon: <Sparkles className="h-6 w-6" />,
       currentStreak: 0,
       longestStreak: 0,
-      description: 'Creating at least one high-quality "Gem" per day.',
+      description: t('streaks.activities.gemCreation.description'),
       color: "border-orange-500"
     },
     {
-      activity: "Chain Chess",
+      activity: t('streaks.activities.chainChess.name'),
       icon: <Gamepad2 className="h-6 w-6" />,
       currentStreak: 0,
       longestStreak: 0,
-      description: "Winning at least one game of Chain Chess per day.",
+      description: t('streaks.activities.chainChess.description'),
       color: "border-gray-400"
     },
     {
-      activity: "Equations",
+      activity: t('streaks.activities.equations.name'),
       icon: <Calculator className="h-6 w-6" />,
       currentStreak: 0,
       longestStreak: 0,
-      description: "Completing one round of the Equations game per day.",
+      description: t('streaks.activities.equations.description'),
       color: "border-gray-400"
     }
   ]);
@@ -60,49 +62,57 @@ export default function Streaks() {
   }, [user]);
 
   const fetchStreakData = async () => {
-    // Fetch user streak data from database
+    // Fetch user streak data from profiles
     const { data: userData } = await supabase
       .from('profiles')
       .select('daily_study_streak, longest_study_streak, gem_creation_streak, longest_gem_streak, chain_chess_streak, longest_chess_streak, equations_streak, longest_equations_streak')
       .eq('id', user?.id)
       .single();
 
-    if (userData) {
-      setStreaks([
-        {
-          activity: "Daily Study",
-          icon: <Calendar className="h-6 w-6" />,
-          currentStreak: userData.daily_study_streak || 0,
-          longestStreak: userData.longest_study_streak || 0,
-          description: "Completing at least one exercise or study note per day.",
-          color: userData.daily_study_streak > 0 ? "border-orange-500" : "border-gray-400"
-        },
-        {
-          activity: "Gem Creation",
-          icon: <Sparkles className="h-6 w-6" />,
-          currentStreak: userData.gem_creation_streak || 0,
-          longestStreak: userData.longest_gem_streak || 0,
-          description: 'Creating at least one high-quality "Gem" per day.',
-          color: userData.gem_creation_streak > 0 ? "border-orange-500" : "border-gray-400"
-        },
-        {
-          activity: "Chain Chess",
-          icon: <Gamepad2 className="h-6 w-6" />,
-          currentStreak: userData.chain_chess_streak || 0,
-          longestStreak: userData.longest_chess_streak || 0,
-          description: "Winning at least one game of Chain Chess per day.",
-          color: userData.chain_chess_streak > 0 ? "border-gray-400" : "border-gray-400"
-        },
-        {
-          activity: "Equations",
-          icon: <Calculator className="h-6 w-6" />,
-          currentStreak: userData.equations_streak || 0,
-          longestStreak: userData.longest_equations_streak || 0,
-          description: "Completing one round of the Equations game per day.",
-          color: userData.equations_streak > 0 ? "border-gray-400" : "border-gray-400"
-        }
-      ]);
-    }
+    // Also fetch reading_streaks as primary source of truth for study streaks
+    const { data: readingData } = await supabase
+      .from('reading_streaks')
+      .select('current_streak, longest_streak')
+      .eq('user_id', user?.id)
+      .maybeSingle();
+
+    const studyStreak = readingData?.current_streak || userData?.daily_study_streak || 0;
+    const longestStudy = readingData?.longest_streak || userData?.longest_study_streak || 0;
+
+    setStreaks([
+      {
+        activity: t('streaks.activities.dailyStudy.name'),
+        icon: <Calendar className="h-6 w-6" />,
+        currentStreak: studyStreak,
+        longestStreak: longestStudy,
+        description: t('streaks.activities.dailyStudy.description'),
+        color: studyStreak > 0 ? "border-orange-500" : "border-gray-400"
+      },
+      {
+        activity: t('streaks.activities.gemCreation.name'),
+        icon: <Sparkles className="h-6 w-6" />,
+        currentStreak: userData?.gem_creation_streak || 0,
+        longestStreak: userData?.longest_gem_streak || 0,
+        description: t('streaks.activities.gemCreation.description'),
+        color: (userData?.gem_creation_streak || 0) > 0 ? "border-orange-500" : "border-gray-400"
+      },
+      {
+        activity: t('streaks.activities.chainChess.name'),
+        icon: <Gamepad2 className="h-6 w-6" />,
+        currentStreak: userData?.chain_chess_streak || 0,
+        longestStreak: userData?.longest_chess_streak || 0,
+        description: t('streaks.activities.chainChess.description'),
+        color: (userData?.chain_chess_streak || 0) > 0 ? "border-purple-500" : "border-gray-400"
+      },
+      {
+        activity: t('streaks.activities.equations.name'),
+        icon: <Calculator className="h-6 w-6" />,
+        currentStreak: userData?.equations_streak || 0,
+        longestStreak: userData?.longest_equations_streak || 0,
+        description: t('streaks.activities.equations.description'),
+        color: (userData?.equations_streak || 0) > 0 ? "border-blue-500" : "border-gray-400"
+      }
+    ]);
   };
 
   return (
@@ -113,15 +123,15 @@ export default function Streaks() {
         <div className="text-center space-y-4 mb-12">
           <Badge variant="outline" className="px-6 py-2 text-base border-orange-500">
             <Flame className="h-5 w-5 text-orange-500 mr-2" />
-            My Streaks
+            {t('streaks.badge')}
           </Badge>
-          
+
           <h1 className="text-5xl md:text-6xl font-bold">
-            Consistency is Key
+            {t('streaks.title')}
           </h1>
-          
+
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Track your momentum and build powerful study habits.
+            {t('streaks.subtitle')}
           </p>
         </div>
 
@@ -141,7 +151,7 @@ export default function Streaks() {
                       {streak.currentStreak}
                     </div>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Current Streak
+                      {t('streaks.currentStreak')}
                     </p>
                   </div>
                   <div className="h-20 w-px bg-border" />
@@ -150,7 +160,7 @@ export default function Streaks() {
                       {streak.longestStreak}
                     </div>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Longest Streak
+                      {t('streaks.longestStreak')}
                     </p>
                   </div>
                 </div>

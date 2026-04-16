@@ -28,6 +28,12 @@ interface EmailRequest {
  * Consolidated email function that handles all email types
  * Replaces 8 separate email functions with a single unified handler
  */
+// HTML escape helper to prevent injection
+function escapeHtml(str: string): string {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -42,7 +48,39 @@ const handler = async (req: Request): Promise<Response> => {
     const resend = new Resend(resendApiKey);
     const { type, data }: EmailRequest = await req.json();
 
-    console.log(`Sending ${type} email with data:`, data);
+    // ===== MANDATORY AUTH CHECK (except for service-triggered types) =====
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Admin-only types require admin check
+    const adminOnlyTypes: EmailType[] = ['admin-signup', 'daily-challenge', 'engagement', 'renewal-reminder', 'signup-notification', 'partner-nudge', 'purchase-notification', 'devotional-ready'];
+    if (adminOnlyTypes.includes(type)) {
+      const { data: adminCheck } = await supabaseAdmin
+        .from('admin_users').select('id').eq('user_id', user.id).maybeSingle();
+      if (!adminCheck) {
+        return new Response(JSON.stringify({ error: 'Admin access required' }), {
+          status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+    // ===== END AUTH CHECK =====
+
+    console.log(`Sending ${type} email`);
 
     let emailConfig: {
       from: string;
@@ -71,7 +109,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "daily-challenge":
         emailConfig = {
-          from: "Phototheology <daily@phototheology.com>",
+          from: "Phototheology <daily@thephototheologyapp.com>",
           to: data.email,
           subject: `🎯 Your Daily Challenge for ${data.date}`,
           html: `
@@ -90,7 +128,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "engagement":
         emailConfig = {
-          from: "Phototheology <hello@phototheology.com>",
+          from: "Phototheology <hello@thephototheologyapp.com>",
           to: data.email,
           subject: data.subject || "We miss you at Phototheology!",
           html: `
@@ -110,7 +148,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "feedback":
         emailConfig = {
-          from: "Phototheology <feedback@phototheology.com>",
+          from: "Phototheology <feedback@thephototheologyapp.com>",
           to: ["aburninghammer@gmail.com"],
           subject: `💬 New Feedback from ${data.userName}`,
           html: `
@@ -141,7 +179,7 @@ const handler = async (req: Request): Promise<Response> => {
         if (authError || !user) throw new Error('Unauthorized');
 
         emailConfig = {
-          from: "Phototheology <invite@phototheology.com>",
+          from: "Phototheology <invite@thephototheologyapp.com>",
           to: data.recipientEmail,
           subject: `${data.senderName || 'Someone'} invited you to Phototheology!`,
           html: `
@@ -164,7 +202,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "partner-nudge":
         emailConfig = {
-          from: "Phototheology <partners@phototheology.com>",
+          from: "Phototheology <partners@thephototheologyapp.com>",
           to: data.email,
           subject: `👥 Your study partner ${data.partnerName} is waiting!`,
           html: `
@@ -183,7 +221,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "purchase-notification":
         emailConfig = {
-          from: "Phototheology <billing@phototheology.com>",
+          from: "Phototheology <billing@thephototheologyapp.com>",
           to: ["aburninghammer@gmail.com"],
           subject: `💰 New Purchase: ${data.amount} - ${data.userName}`,
           html: `
@@ -202,7 +240,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "renewal-reminder":
         emailConfig = {
-          from: "Phototheology <billing@phototheology.com>",
+          from: "Phototheology <billing@thephototheologyapp.com>",
           to: data.email,
           subject: `🔔 Your Phototheology subscription ${data.daysUntilRenewal <= 0 ? 'has renewed' : 'renews soon'}`,
           html: `
@@ -221,14 +259,14 @@ const handler = async (req: Request): Promise<Response> => {
               Manage Subscription
             </a>
             <hr>
-            <p style="color: #666; font-size: 12px;">Questions? Contact support@phototheology.com</p>
+            <p style="color: #666; font-size: 12px;">Questions? Contact support@thephototheologyapp.com</p>
           `,
         };
         break;
 
       case "devotional-ready":
         emailConfig = {
-          from: "Phototheology <devotionals@phototheology.com>",
+          from: "Phototheology <devotionals@thephototheologyapp.com>",
           to: data.email,
           subject: `🎉 Your Devotional "${data.planTitle}" is Ready!`,
           html: `
@@ -273,7 +311,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "signup-notification":
         emailConfig = {
-          from: "Phototheology <welcome@phototheology.com>",
+          from: "Phototheology <welcome@thephototheologyapp.com>",
           to: data.email,
           subject: "🎉 Welcome to Phototheology!",
           html: `

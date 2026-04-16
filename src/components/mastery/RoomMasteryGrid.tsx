@@ -3,10 +3,11 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAllRoomMasteries, RoomMastery } from "@/hooks/useMastery";
-import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { Link } from "react-router-dom";
 import { Target, Star, Lock, ChevronRight, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from 'react-i18next';
 
 const MASTERY_COLORS = {
   1: { bg: "bg-slate-500/20", border: "border-slate-500/30", text: "text-slate-500" },
@@ -16,18 +17,20 @@ const MASTERY_COLORS = {
   5: { bg: "bg-gradient-to-r from-amber-400/20 to-yellow-300/20", border: "border-yellow-500/50", text: "text-yellow-500" },
 };
 
-const LEVEL_NAMES = ["", "Novice", "Apprentice", "Practitioner", "Expert", "Master"];
-
 interface RoomMasteryGridProps {
   filterFloor?: number;
   showTrainButton?: boolean;
 }
 
-export const RoomMasteryGrid: React.FC<RoomMasteryGridProps> = ({ 
+export const RoomMasteryGrid: React.FC<RoomMasteryGridProps> = ({
   filterFloor,
-  showTrainButton = true 
+  showTrainButton = true
 }) => {
+  const { t } = useTranslation();
+  const { translatedFloors } = useTranslatedPalaceData();
   const { data: masteries, isLoading } = useAllRoomMasteries();
+
+  const LEVEL_NAMES = ["", t('masteryGrid.novice'), t('masteryGrid.apprentice'), t('masteryGrid.practitioner'), t('masteryGrid.expert'), t('masteryGrid.master')];
 
   const getMasteryForRoom = (roomId: string): RoomMastery | undefined => {
     return masteries?.find(m => m.room_id === roomId);
@@ -38,15 +41,15 @@ export const RoomMasteryGrid: React.FC<RoomMasteryGridProps> = ({
     return Math.min((mastery.xp_current / mastery.xp_required) * 100, 100);
   };
 
-  const floors = filterFloor 
-    ? palaceFloors.filter(f => f.number === filterFloor)
-    : palaceFloors;
+  const floors = filterFloor
+    ? translatedFloors.filter(f => f.number === filterFloor)
+    : translatedFloors;
 
   if (isLoading) {
     return (
       <Card>
         <CardContent className="py-8 text-center text-muted-foreground">
-          Loading room mastery data...
+          {t('masteryGrid.loading')}
         </CardContent>
       </Card>
     );
@@ -58,7 +61,7 @@ export const RoomMasteryGrid: React.FC<RoomMasteryGridProps> = ({
         <Card key={floor.number} className="overflow-hidden">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2">
-              <span className="text-lg font-bold">Floor {floor.number}</span>
+              <span className="text-lg font-bold">{t('masteryGrid.floor', { number: floor.number })}</span>
               <Badge variant="outline">{floor.name}</Badge>
             </CardTitle>
             <CardDescription>{floor.subtitle}</CardDescription>
@@ -69,8 +72,8 @@ export const RoomMasteryGrid: React.FC<RoomMasteryGridProps> = ({
                 const mastery = getMasteryForRoom(room.id);
                 const level = mastery?.mastery_level || 0;
                 const progress = getProgressPercentage(mastery);
-                const colors = level > 0 
-                  ? MASTERY_COLORS[level as keyof typeof MASTERY_COLORS] 
+                const colors = level > 0
+                  ? MASTERY_COLORS[level as keyof typeof MASTERY_COLORS]
                   : { bg: "bg-muted/50", border: "border-border", text: "text-muted-foreground" };
 
                 return (
@@ -82,7 +85,6 @@ export const RoomMasteryGrid: React.FC<RoomMasteryGridProps> = ({
                       colors.border
                     )}
                   >
-                    {/* Room Header */}
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
@@ -97,16 +99,15 @@ export const RoomMasteryGrid: React.FC<RoomMasteryGridProps> = ({
                       </div>
                       {level > 0 && (
                         <Badge className={cn("text-xs", colors.text, "bg-background/80")}>
-                          L{level}
+                          {t('masteryGrid.level', { level })}
                         </Badge>
                       )}
                     </div>
 
-                    {/* Progress Bar */}
                     <div className="mb-2">
                       <div className="flex items-center justify-between text-xs mb-1">
                         <span className={level > 0 ? colors.text : "text-muted-foreground"}>
-                          {level > 0 ? LEVEL_NAMES[level] : "Not Started"}
+                          {level > 0 ? LEVEL_NAMES[level] : t('masteryGrid.notStarted')}
                         </span>
                         {mastery && level < 5 && (
                           <span className="text-muted-foreground">
@@ -114,21 +115,19 @@ export const RoomMasteryGrid: React.FC<RoomMasteryGridProps> = ({
                           </span>
                         )}
                       </div>
-                      <Progress 
-                        value={progress} 
+                      <Progress
+                        value={progress}
                         className={cn("h-1.5", level === 5 && "bg-yellow-200")}
                       />
                     </div>
 
-                    {/* Stats */}
                     {mastery && (
                       <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
-                        <span>{mastery.total_drills_completed} drills</span>
-                        <span>{mastery.total_exercises_completed} exercises</span>
+                        <span>{t('masteryGrid.drillsCount', { count: mastery.total_drills_completed })}</span>
+                        <span>{t('masteryGrid.exercisesCount', { count: mastery.total_exercises_completed })}</span>
                       </div>
                     )}
 
-                    {/* Train Button */}
                     {showTrainButton && (
                       <Button
                         asChild
@@ -138,7 +137,7 @@ export const RoomMasteryGrid: React.FC<RoomMasteryGridProps> = ({
                       >
                         <Link to={`/palace/floor/${floor.number}/room/${room.id}`}>
                           <Zap className="h-3 w-3 mr-1" />
-                          {level > 0 ? "Continue Training" : "Start Training"}
+                          {level > 0 ? t('masteryGrid.continueTraining') : t('masteryGrid.startTraining')}
                           <ChevronRight className="h-3 w-3 ml-1" />
                         </Link>
                       </Button>

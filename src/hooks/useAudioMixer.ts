@@ -1,194 +1,251 @@
-import { useState, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+/**
+ * useAudioMixer - Mix one or more speech tracks (concatenated) with one or
+ * more music tracks (chained to cover full speech length) using Web Audio API.
+ */
 
-interface AudioSegment {
-  audioUrl?: string;
-  audioContent?: string; // base64
-  duration?: number;
+import { useState } from 'react';
+
+function writeString(view: DataView, offset: number, str: string) {
+  for (let i = 0; i < str.length; i++) {
+    view.setUint8(offset + i, str.charCodeAt(i));
+  }
 }
 
-interface MixerOptions {
-  musicUrl: string;
-  musicVolume?: number; // 0-1, default 0.15
-  segments: AudioSegment[];
-  gapBetweenSegments?: number; // seconds, default 1
+function encodeWav(buffer: AudioBuffer): Blob {
+  const numChannels = buffer.numberOfChannels;
+  const sampleRate = buffer.sampleRate;
+  const bitsPerSample = 16;
+  const length = buffer.length * numChannels;
+  const interleaved = new Int16Array(length);
+
+  for (let ch = 0; ch < numChannels; ch++) {
+    const channelData = buffer.getChannelData(ch);
+    for (let i = 0; i < buffer.length; i++) {
+      const sample = Math.max(-1, Math.min(1, channelData[i]));
+      interleaved[i * numChannels + ch] = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+    }
+  }
+
+  const dataSize = interleaved.length * 2;
+  const arrayBuffer = new ArrayBuffer(44 + dataSize);
+  const view = new DataView(arrayBuffer);
+
+  writeString(view, 0, 'RIFF');
+  view.setUint32(4, 36 + dataSize, true);
+  writeString(view, 8, 'WAVE');
+  writeString(view, 12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true); // PCM
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * numChannels * bitsPerSample / 8, true);
+  view.setUint16(32, numChannels * bitsPerSample / 8, true);
+  view.setUint16(34, bitsPerSample, true);
+  writeString(view, 36, 'data');
+  view.setUint32(40, dataSize, true);
+
+  new Int16Array(arrayBuffer, 44).set(interleaved);
+
+  return new Blob([arrayBuffer], { type: 'audio/wav' });
 }
 
-export const useAudioMixer = () => {
+/** Concatenate multiple AudioBuffers into one, normalising to the same sample rate / channel count */
+function concatBuffers(buffers: AudioBuffer[], sampleRate: number, numChannels: number): AudioBuffer {
+  const totalLength = buffers.reduce((sum, b) => sum + b.length, 0);
+  const result = new AudioContext().createBuffer(numChannels, totalLength, sampleRate);
+
+  let offset = 0;
+  for (const buf of buffers) {
+    for (let ch = 0; ch < numChannels; ch++) {
+      const srcCh = ch < buf.numberOfChannels ? buf.getChannelData(ch) : new Float32Array(buf.length);
+      result.getChannelData(ch).set(srcCh, offset);
+    }
+    offset += buf.length;
+  }
+  return result;
+}
+
+export function useAudioMixer() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchAudioBuffer = async (
-    audioContext: OfflineAudioContext | AudioContext,
-    url?: string,
-    base64Content?: string,
-    useProxy = false
-  ): Promise<AudioBuffer | null> => {
-    try {
-      let arrayBuffer: ArrayBuffer;
+  /**
+   * Mix one or more speech URLs (concatenated in order) with one or more
+   * music URLs (chained to cover the full speech length) and return a WAV blob.
+   *
+   * @param speechUrls  Single URL or array of speech audio URLs (max 5 for Epic)
+   * @param musicUrls   Single URL or array of music track URLs to chain in sequence
+   * @param musicVolume 0–1 gain for the music layer
+   * @param _filename   Target filename (unused here, returned to caller)
+   */
+  const mixAndDownload = async (
+    speechUrls: string | string[],
+    musicUrls: string | string[],
+    musicVolume: number,
+    _filename: string
+  ): Promise<Blob | null> => {
+    const speechList = Array.isArray(speechUrls)
+      ? speechUrls.filter(Boolean)
+      : speechUrls ? [speechUrls] : [];
+    const musicList = Array.isArray(musicUrls)
+      ? musicUrls.filter(Boolean)
+      : musicUrls ? [musicUrls] : [];
 
-      if (base64Content) {
-        // Decode base64
-        const binaryString = atob(base64Content);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-          bytes[i] = binaryString.charCodeAt(i);
-        }
-        arrayBuffer = bytes.buffer;
-      } else if (url) {
-        // Use proxy for external URLs to avoid CORS issues
-        if (useProxy && (url.includes('pixabay.com') || url.includes('cdn.') || !url.startsWith(window.location.origin))) {
-          console.log("Using proxy for:", url);
-          const { data, error } = await supabase.functions.invoke("fetch-audio-proxy", {
-            body: { url },
-          });
-          
-          if (error || !data?.audioContent) {
-            throw new Error(error?.message || "Failed to fetch via proxy");
-          }
-          
-          // Decode base64 from proxy
-          const binaryString = atob(data.audioContent);
-          const bytes = new Uint8Array(binaryString.length);
-          for (let i = 0; i < binaryString.length; i++) {
-            bytes[i] = binaryString.charCodeAt(i);
-          }
-          arrayBuffer = bytes.buffer;
-        } else {
-          const response = await fetch(url);
-          if (!response.ok) throw new Error(`Failed to fetch: ${url}`);
-          arrayBuffer = await response.arrayBuffer();
-        }
-      } else {
-        return null;
+    if (speechList.length === 0) {
+      setError('No speech audio provided');
+      return null;
+    }
+
+    setIsProcessing(true);
+    setError(null);
+    setProgress(0);
+
+    try {
+      // ── Fetch all speech files ────────────────────────────────────────────
+      setProgress(5);
+      const speechResponses = await Promise.all(speechList.map(url => fetch(url)));
+      for (const r of speechResponses) {
+        if (!r.ok) throw new Error(`Failed to fetch speech audio: ${r.url}`);
+      }
+      setProgress(15);
+
+      const speechArrayBuffers = await Promise.all(speechResponses.map(r => r.arrayBuffer()));
+      setProgress(25);
+
+      // ── Decode speech audio ───────────────────────────────────────────────
+      const decodeCtx = new AudioContext();
+      const speechBuffers = await Promise.all(
+        speechArrayBuffers.map(ab => decodeCtx.decodeAudioData(ab.slice(0)))
+      );
+      await decodeCtx.close();
+      setProgress(35);
+
+      // Normalise to highest channel count / sample rate among speech tracks
+      const sampleRate = Math.max(...speechBuffers.map(b => b.sampleRate));
+      const numChannels = Math.max(Math.max(...speechBuffers.map(b => b.numberOfChannels)), 2);
+
+      // Concatenate speech if multiple chapters
+      const speechBuffer = speechBuffers.length === 1
+        ? speechBuffers[0]
+        : concatBuffers(speechBuffers, sampleRate, numChannels);
+      setProgress(45);
+
+      // ── No music branch ───────────────────────────────────────────────────
+      if (musicList.length === 0) {
+        const wavBlob = encodeWav(speechBuffer);
+        setProgress(100);
+        setIsProcessing(false);
+        return wavBlob;
       }
 
-      return await audioContext.decodeAudioData(arrayBuffer);
-    } catch (err) {
-      console.error("Error fetching audio buffer:", err);
+      // ── Fetch all music files ─────────────────────────────────────────────
+      setProgress(50);
+      const musicResponses = await Promise.all(musicList.map(url => fetch(url)));
+      for (const r of musicResponses) {
+        if (!r.ok) throw new Error(`Failed to fetch music audio: ${r.url}`);
+      }
+
+      const musicArrayBuffers = await Promise.all(musicResponses.map(r => r.arrayBuffer()));
+      setProgress(58);
+
+      const decodeCtx2 = new AudioContext();
+      const musicBuffers = await Promise.all(
+        musicArrayBuffers.map(ab => decodeCtx2.decodeAudioData(ab.slice(0)))
+      );
+      await decodeCtx2.close();
+      setProgress(65);
+
+      // ── Build offline context ─────────────────────────────────────────────
+      const fadeOutDuration = 3;
+      const totalLength = speechBuffer.length + Math.floor(fadeOutDuration * sampleRate);
+      const offlineCtx = new OfflineAudioContext(numChannels, totalLength, sampleRate);
+
+      // ── Speech source ─────────────────────────────────────────────────────
+      const speechSource = offlineCtx.createBufferSource();
+      speechSource.buffer = speechBuffer;
+      const speechGain = offlineCtx.createGain();
+      speechGain.gain.setValueAtTime(1.0, 0);
+      const speechEnd = speechBuffer.length / sampleRate;
+      speechGain.gain.setValueAtTime(1.0, Math.max(0, speechEnd - 0.5));
+      speechGain.gain.linearRampToValueAtTime(0, speechEnd);
+      speechSource.connect(speechGain);
+      speechGain.connect(offlineCtx.destination);
+      speechSource.start(0);
+
+      // ── Music source(s) — chained to cover the full speech length ─────────
+      // We schedule each music track back-to-back; the last one loops until
+      // the speech ends, then all fade out together.
+      const crossfadeTime = 1.5; // seconds cross-fade between songs
+
+      let musicOffset = 0;
+      for (let mi = 0; mi < musicBuffers.length; mi++) {
+        const mb = musicBuffers[mi];
+        const isLast = mi === musicBuffers.length - 1;
+
+        // Apply crossfade within the buffer for seamless looping
+        const crossfadeSamples = Math.min(
+          Math.floor(sampleRate * 2),
+          Math.floor(mb.length / 4)
+        );
+        const xfadedBuf = offlineCtx.createBuffer(mb.numberOfChannels, mb.length, sampleRate);
+        for (let ch = 0; ch < mb.numberOfChannels; ch++) {
+          const src = mb.getChannelData(ch);
+          const dst = xfadedBuf.getChannelData(ch);
+          dst.set(src);
+          for (let i = 0; i < crossfadeSamples; i++) {
+            const t = i / crossfadeSamples;
+            const tailIdx = mb.length - crossfadeSamples + i;
+            dst[i] = src[i] * t + src[tailIdx] * (1 - t);
+            dst[tailIdx] = src[tailIdx] * t + src[i] * (1 - t);
+          }
+        }
+
+        const musicSrc = offlineCtx.createBufferSource();
+        musicSrc.buffer = xfadedBuf;
+        musicSrc.loop = isLast; // only the last track loops to fill remaining time
+
+        const musicGainNode = offlineCtx.createGain();
+
+        // Fade-in: crossfade from previous track (or from silence at start)
+        const fadeInStart = mi === 0 ? 0 : musicOffset - crossfadeTime;
+        musicGainNode.gain.setValueAtTime(mi === 0 ? musicVolume : 0, Math.max(0, fadeInStart));
+        if (mi > 0) {
+          musicGainNode.gain.linearRampToValueAtTime(musicVolume, musicOffset);
+        }
+
+        // Fade-out when speech ends
+        musicGainNode.gain.setValueAtTime(musicVolume, speechEnd);
+        musicGainNode.gain.linearRampToValueAtTime(0, speechEnd + fadeOutDuration);
+
+        musicSrc.connect(musicGainNode);
+        musicGainNode.connect(offlineCtx.destination);
+
+        const startAt = Math.max(0, musicOffset - (mi === 0 ? 0 : crossfadeTime));
+        musicSrc.start(startAt);
+
+        musicOffset += mb.duration;
+
+        // If we've covered enough time for speech and this isn't the last track, stop
+        if (!isLast && musicOffset >= speechEnd + fadeOutDuration) break;
+      }
+
+      setProgress(75);
+
+      // ── Render ────────────────────────────────────────────────────────────
+      const renderedBuffer = await offlineCtx.startRendering();
+      setProgress(88);
+
+      const wavBlob = encodeWav(renderedBuffer);
+      setProgress(100);
+      setIsProcessing(false);
+      return wavBlob;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Unknown error');
+      setIsProcessing(false);
       return null;
     }
   };
-
-  const mixAndDownload = useCallback(async (options: MixerOptions): Promise<Blob | null> => {
-    const { musicUrl, musicVolume = 0.15, segments, gapBetweenSegments = 1 } = options;
-
-    setIsProcessing(true);
-    setProgress(0);
-    setError(null);
-
-    try {
-      // First, use a regular AudioContext to decode all audio
-      const tempContext = new AudioContext();
-      
-      // Fetch music only if URL is provided
-      let musicBuffer: AudioBuffer | null = null;
-      if (musicUrl) {
-        setProgress(5);
-        console.log("Fetching music...");
-        musicBuffer = await fetchAudioBuffer(tempContext, musicUrl, undefined, true);
-        if (!musicBuffer) {
-          console.warn("Failed to load background music, continuing without it");
-        }
-      }
-
-      // Fetch all speech segments
-      const speechBuffers: AudioBuffer[] = [];
-      for (let i = 0; i < segments.length; i++) {
-        setProgress(5 + (i / segments.length) * 40);
-        console.log(`Fetching segment ${i + 1}/${segments.length}...`);
-        
-        const segment = segments[i];
-        const buffer = await fetchAudioBuffer(
-          tempContext,
-          segment.audioUrl,
-          segment.audioContent
-        );
-        if (buffer) {
-          speechBuffers.push(buffer);
-        }
-      }
-
-      if (speechBuffers.length === 0) {
-        throw new Error("No audio segments to mix");
-      }
-
-      // Calculate total duration
-      const totalSpeechDuration = speechBuffers.reduce(
-        (acc, buf) => acc + buf.duration + gapBetweenSegments,
-        0
-      );
-      const totalDuration = musicBuffer 
-        ? Math.max(totalSpeechDuration, musicBuffer.duration)
-        : totalSpeechDuration;
-
-      console.log(`Total duration: ${totalDuration}s`);
-      setProgress(50);
-
-      // Create offline context for mixing
-      const sampleRate = 44100;
-      const offlineContext = new OfflineAudioContext(
-        2, // stereo
-        Math.ceil(totalDuration * sampleRate),
-        sampleRate
-      );
-
-      // Add music track only if we have one
-      if (musicBuffer) {
-        const musicSource = offlineContext.createBufferSource();
-        musicSource.buffer = musicBuffer;
-        musicSource.loop = totalDuration > musicBuffer.duration;
-        
-        const musicGain = offlineContext.createGain();
-        musicGain.gain.value = musicVolume;
-        
-        musicSource.connect(musicGain);
-        musicGain.connect(offlineContext.destination);
-        musicSource.start(0);
-      }
-
-      // Add speech segments sequentially
-      let currentTime = 0;
-      for (const buffer of speechBuffers) {
-        const source = offlineContext.createBufferSource();
-        source.buffer = buffer;
-        
-        const gain = offlineContext.createGain();
-        gain.gain.value = 1.0;
-        
-        source.connect(gain);
-        gain.connect(offlineContext.destination);
-        source.start(currentTime);
-        
-        currentTime += buffer.duration + gapBetweenSegments;
-      }
-
-      setProgress(70);
-      console.log("Rendering mixed audio...");
-
-      // Render
-      const renderedBuffer = await offlineContext.startRendering();
-      
-      setProgress(85);
-      console.log("Encoding to WAV...");
-
-      // Encode to WAV
-      const wavBlob = encodeWAV(renderedBuffer);
-      
-      setProgress(100);
-      await tempContext.close();
-
-      return wavBlob;
-    } catch (err) {
-      console.error("Error mixing audio:", err);
-      setError(err instanceof Error ? err.message : "Failed to mix audio");
-      return null;
-    } finally {
-      setIsProcessing(false);
-    }
-  }, []);
 
   return {
     mixAndDownload,
@@ -196,70 +253,4 @@ export const useAudioMixer = () => {
     progress,
     error,
   };
-};
-
-// WAV encoding utilities
-function encodeWAV(audioBuffer: AudioBuffer): Blob {
-  const numChannels = audioBuffer.numberOfChannels;
-  const sampleRate = audioBuffer.sampleRate;
-  const format = 1; // PCM
-  const bitDepth = 16;
-  
-  const bytesPerSample = bitDepth / 8;
-  const blockAlign = numChannels * bytesPerSample;
-  
-  const samples = interleave(audioBuffer);
-  const dataLength = samples.length * bytesPerSample;
-  const buffer = new ArrayBuffer(44 + dataLength);
-  const view = new DataView(buffer);
-  
-  // WAV header
-  writeString(view, 0, 'RIFF');
-  view.setUint32(4, 36 + dataLength, true);
-  writeString(view, 8, 'WAVE');
-  writeString(view, 12, 'fmt ');
-  view.setUint32(16, 16, true); // chunk size
-  view.setUint16(20, format, true);
-  view.setUint16(22, numChannels, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * blockAlign, true);
-  view.setUint16(32, blockAlign, true);
-  view.setUint16(34, bitDepth, true);
-  writeString(view, 36, 'data');
-  view.setUint32(40, dataLength, true);
-  
-  // Write samples
-  const offset = 44;
-  for (let i = 0; i < samples.length; i++) {
-    const sample = Math.max(-1, Math.min(1, samples[i]));
-    const intSample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
-    view.setInt16(offset + i * 2, intSample, true);
-  }
-  
-  return new Blob([buffer], { type: 'audio/wav' });
-}
-
-function interleave(audioBuffer: AudioBuffer): Float32Array {
-  const numChannels = audioBuffer.numberOfChannels;
-  const length = audioBuffer.length;
-  const result = new Float32Array(length * numChannels);
-  
-  const channels: Float32Array[] = [];
-  for (let c = 0; c < numChannels; c++) {
-    channels.push(audioBuffer.getChannelData(c));
-  }
-  
-  for (let i = 0; i < length; i++) {
-    for (let c = 0; c < numChannels; c++) {
-      result[i * numChannels + c] = channels[c][i];
-    }
-  }
-  
-  return result;
-}
-
-function writeString(view: DataView, offset: number, string: string) {
-  for (let i = 0; i < string.length; i++) {
-    view.setUint8(offset + i, string.charCodeAt(i));
-  }
 }

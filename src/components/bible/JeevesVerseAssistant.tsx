@@ -6,9 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { Bot, Sparkles, Send, Loader2, X } from "lucide-react";
+import { Bot, Sparkles, Send, Loader2, X, Copy, BookmarkPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { palaceFloors } from "@/data/palaceData";
+
 import { JeevesResponseValidator } from "./JeevesResponseValidator";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 
@@ -69,6 +69,79 @@ export const JeevesVerseAssistant = ({ book, chapter, verse, verseText, onClose 
       { id: "2H", tag: "2H", name: "Second Day of Lord", purpose: "70 AD, 'this generation,' church as temple" },
       { id: "3H", tag: "3H", name: "Third Day of Lord", purpose: "Global, final judgment/new creation" },
     ],
+  };
+
+  const copyResponse = () => {
+    if (!response) return;
+    navigator.clipboard.writeText(response);
+    toast({
+      title: "Copied",
+      description: "Response copied to clipboard",
+    });
+  };
+
+  const saveToMyStudies = async () => {
+    if (!response) return;
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "Please log in to save",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const date = new Date().toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      // Find selected principle from any category
+      let selectedPrinciple = null;
+      for (const category of Object.values(principles)) {
+        const found = category.find((p: any) => p.id === selectedRoom);
+        if (found) {
+          selectedPrinciple = found;
+          break;
+        }
+      }
+
+      const principleInfo = selectedPrinciple
+        ? `**Principle:** ${selectedPrinciple.name} (${selectedPrinciple.tag})\n\n`
+        : '';
+
+      const content = `# Jeeves Verse Analysis\n\n**Date:** ${date}\n\n**Verse:** ${book} ${chapter}:${verse}\n\n${principleInfo}---\n\n## Verse Text\n\n> ${verseText}\n\n## Question\n\n${question}\n\n## Jeeves Response\n\n${response}\n`;
+
+      const tags = ['jeeves', 'verse-analysis', book.toLowerCase()];
+      if (selectedPrinciple) {
+        tags.push(selectedPrinciple.tag.toLowerCase());
+      }
+
+      const { error } = await supabase.from('user_studies').insert({
+        user_id: user.id,
+        title: `${book} ${chapter}:${verse} — ${question.slice(0, 40)}${question.length > 40 ? '...' : ''}`,
+        content,
+        tags: [...tags, 'jeeves_response'],
+      });
+
+      if (error) throw error;
+      toast({
+        title: "Saved",
+        description: "Response saved to My Studies",
+      });
+    } catch (error) {
+      console.error("Error saving response:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save response",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleAskJeeves = async () => {
@@ -283,7 +356,7 @@ export const JeevesVerseAssistant = ({ book, chapter, verse, verseText, onClose 
         {/* Response Display */}
         {response && (
           <>
-            <JeevesResponseValidator 
+            <JeevesResponseValidator
               response={response}
               onValidated={(isValid) => {
                 if (!isValid) {
@@ -293,9 +366,33 @@ export const JeevesVerseAssistant = ({ book, chapter, verse, verseText, onClose 
             />
             <ScrollArea className="h-[300px]">
               <div className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl border-2 border-primary/30 animate-fade-in space-y-3">
-                <div className="flex items-center gap-2 mb-3">
-                  <Bot className="h-5 w-5 text-primary" />
-                  <span className="font-semibold text-foreground">Jeeves responds:</span>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Bot className="h-5 w-5 text-primary" />
+                    <span className="font-semibold text-foreground">Jeeves responds:</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={copyResponse}
+                      className="h-7 gap-1 text-xs text-muted-foreground hover:text-foreground"
+                      title="Copy response"
+                    >
+                      <Copy className="h-3 w-3" />
+                      Copy
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={saveToMyStudies}
+                      className="h-7 gap-1 text-xs text-muted-foreground hover:text-emerald-500"
+                      title="Save to My Studies"
+                    >
+                      <BookmarkPlus className="h-3 w-3" />
+                      Save
+                    </Button>
+                  </div>
                 </div>
                 <div className="prose prose-sm max-w-none text-foreground">
                   {formatJeevesResponse(response)}

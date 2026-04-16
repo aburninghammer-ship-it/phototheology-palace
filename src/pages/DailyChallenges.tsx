@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { DAILY_CHALLENGES_TOUR } from "@/data/guidedTours";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +12,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useOutputSpark } from "@/hooks/useOutputSpark";
-import { Flame, BookOpen, ChefHat, Calculator, Brain, Target, Lightbulb, Zap } from "lucide-react";
+import { Flame, BookOpen, ChefHat, Calculator, Brain, Target, Lightbulb, Zap, Archive, CheckCircle2, ChevronLeft, ChevronRight, Clock, Trophy, Globe, GraduationCap } from "lucide-react";
+import { PostToPublicChallengeButton } from "@/components/challenges/PostToPublicChallengeButton";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
@@ -21,17 +25,45 @@ import { FruitCheckChallenge } from "@/components/challenges/FruitCheckChallenge
 import { SubjectConnectionChallenge } from "@/components/challenges/SubjectConnectionChallenge";
 import { ChefRecipeChallenge } from "@/components/challenges/ChefRecipeChallenge";
 import { EquationDecodeChallenge } from "@/components/challenges/EquationDecodeChallenge";
+import { InlineEquationGenerator } from "@/components/challenges/InlineEquationGenerator";
 import { SeventyQuestionsChallenge } from "@/components/challenges/SeventyQuestionsChallenge";
 import { PrincipleStudyChallenge } from "@/components/challenges/PrincipleStudyChallenge";
+import { CommunityChallengeFeed } from "@/components/challenges/CommunityChallengeFeed";
+import { ChallengeInlineSubmissions } from "@/components/challenges/ChallengeInlineSubmissions";
+
+interface ChallengeSubmission {
+  id: string;
+  challenge_id: string;
+  user_id: string;
+  content: string;
+  submission_data: any;
+  principle_applied: string;
+  time_spent: number;
+  created_at: string;
+  challenge?: {
+    id: string;
+    title: string;
+    description: string;
+    challenge_subtype: string;
+    challenge_tier: string;
+    principle_used: string;
+    day_in_rotation: number;
+  };
+}
 
 const DailyChallenges = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const { triggerOutputSpark } = useOutputSpark();
   const [dailyChallenge, setDailyChallenge] = useState<any>(null);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [startTime] = useState(Date.now());
+  const [archiveSubmissions, setArchiveSubmissions] = useState<ChallengeSubmission[]>([]);
+  const [archiveLoading, setArchiveLoading] = useState(false);
+  const [archiveMonth, setArchiveMonth] = useState(new Date());
+  const [tourOpen, setTourOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -40,38 +72,133 @@ const DailyChallenges = () => {
   }, [user]);
 
   const fetchDailyChallenge = async () => {
-    const now = new Date();
-    
-    // Get today's challenge based on 30-day rotation
-    const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
-    const rotationDay = (dayOfYear % 30) + 1; // 30-day rotation
+    try {
+      const now = new Date();
+      
+      // Get today's challenge based on 30-day rotation
+      const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+      const rotationDay = (dayOfYear % 30) + 1; // 30-day rotation
+      console.log("[DailyChallenge] Fetching rotation day:", rotationDay, "dayOfYear:", dayOfYear);
 
-    const { data: challenges, error } = await supabase
-      .from("challenges")
-      .select("*")
-      .eq("day_in_rotation", rotationDay)
-      .order("created_at", { ascending: false })
-      .limit(1);
-
-    if (error) {
-      console.error("Error fetching challenges:", error);
-      return;
-    }
-
-    const todayChallenge = challenges?.[0] || null;
-    setDailyChallenge(todayChallenge);
-    
-    if (todayChallenge && user) {
-      const { data: submission } = await supabase
-        .from("challenge_submissions")
+      const { data: challenges, error } = await supabase
+        .from("challenges")
         .select("*")
-        .eq("challenge_id", todayChallenge.id)
-        .eq("user_id", user.id)
-        .gte("created_at", new Date(now.setHours(0, 0, 0, 0)).toISOString())
-        .maybeSingle();
+        .eq("day_in_rotation", rotationDay)
+        .order("created_at", { ascending: false })
+        .limit(1);
 
-      setHasSubmitted(!!submission);
+      if (error) {
+        console.error("[DailyChallenge] Error fetching:", error);
+        return;
+      }
+
+      console.log("[DailyChallenge] Found challenges:", challenges?.length, challenges?.[0]?.title);
+
+      if (!challenges || challenges.length === 0) {
+        // Fallback: try fetching any available challenge
+        console.warn("[DailyChallenge] No challenge for rotation day", rotationDay, "— fetching fallback");
+        const { data: fallback } = await supabase
+          .from("challenges")
+          .select("*")
+          .eq("challenge_type", "daily")
+          .order("created_at", { ascending: false })
+          .limit(1);
+        
+        if (fallback && fallback.length > 0) {
+          setDailyChallenge(fallback[0]);
+          return;
+        }
+      }
+
+      const todayChallenge = challenges?.[0] || null;
+      setDailyChallenge(todayChallenge);
+      
+      if (todayChallenge && user) {
+        const { data: submission } = await supabase
+          .from("challenge_submissions")
+          .select("*")
+          .eq("challenge_id", todayChallenge.id)
+          .eq("user_id", user.id)
+          .gte("created_at", new Date(new Date().setHours(0, 0, 0, 0)).toISOString())
+          .maybeSingle();
+
+        setHasSubmitted(!!submission);
+      }
+    } catch (err) {
+      console.error("[DailyChallenge] Unexpected error:", err);
     }
+  };
+
+  const fetchArchiveSubmissions = async () => {
+    if (!user) return;
+
+    setArchiveLoading(true);
+    try {
+      const startOfMonth = new Date(archiveMonth.getFullYear(), archiveMonth.getMonth(), 1);
+      const endOfMonth = new Date(archiveMonth.getFullYear(), archiveMonth.getMonth() + 1, 0, 23, 59, 59);
+
+      const { data, error } = await supabase
+        .from("challenge_submissions")
+        .select(`
+          id,
+          challenge_id,
+          user_id,
+          content,
+          submission_data,
+          principle_applied,
+          time_spent,
+          created_at,
+          challenges:challenge_id (
+            id,
+            title,
+            description,
+            challenge_subtype,
+            challenge_tier,
+            principle_used,
+            day_in_rotation
+          )
+        `)
+        .eq("user_id", user.id)
+        .gte("created_at", startOfMonth.toISOString())
+        .lte("created_at", endOfMonth.toISOString())
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      // Transform the data to flatten the challenges relation
+      const transformedData = (data || []).map((item: any) => ({
+        ...item,
+        challenge: item.challenges
+      }));
+
+      setArchiveSubmissions(transformedData);
+    } catch (error) {
+      console.error("Error fetching archive:", error);
+    } finally {
+      setArchiveLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchArchiveSubmissions();
+  }, [archiveMonth, user]);
+
+  const goToPreviousMonth = () => {
+    setArchiveMonth(new Date(archiveMonth.getFullYear(), archiveMonth.getMonth() - 1, 1));
+  };
+
+  const goToNextMonth = () => {
+    const nextMonth = new Date(archiveMonth.getFullYear(), archiveMonth.getMonth() + 1, 1);
+    if (nextMonth <= new Date()) {
+      setArchiveMonth(nextMonth);
+    }
+  };
+
+  const formatTimeSpent = (seconds: number) => {
+    if (seconds < 60) return `${seconds}s`;
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
   };
 
   const handleChallengeSubmit = async (submissionData: any) => {
@@ -103,8 +230,8 @@ const DailyChallenges = () => {
       });
 
       toast({
-        title: "Challenge Complete! 🎉",
-        description: "Added to your Growth Journal. +25 points! Check back tomorrow for the next challenge!",
+        title: t('dailyChallengesPage.challengeComplete') + " 🎉",
+        description: t('dailyChallengesPage.challengeCompleteDesc'),
       });
 
       setHasSubmitted(true);
@@ -131,10 +258,12 @@ const DailyChallenges = () => {
   };
 
   const getShareContent = () => {
+    const siteUrl = 'https://phototheologybible.com';
+
     if (!dailyChallenge) return {
-      title: 'Daily Phototheology Challenge',
-      content: 'Join me in today\'s Bible study challenge!',
-      url: `${window.location.origin}/daily-challenges`
+      title: t('dailyChallengesPage.dailyPhototheologyChallenge'),
+      content: t('dailyChallengesPage.joinTodaysChallenge'),
+      url: `${siteUrl}/daily-challenges`
     };
 
     const challengeTypeLabel = dailyChallenge.challenge_subtype?.replace(/-/g, ' ')
@@ -142,10 +271,27 @@ const DailyChallenges = () => {
       .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ') || 'Challenge';
 
+    const principle = dailyChallenge.principle_used || 'biblical principles';
+
+    const explanation = t('dailyChallengesPage.dailyChallengesExplanation');
+
+    const details: string[] = [
+      `🔥 ${t('dailyChallengesPage.tryThisChallenge')}`,
+      `💡 ${explanation}`,
+      `📖 ${challengeTypeLabel} — training ${principle}`,
+    ];
+    if (dailyChallenge.description) {
+      details.push(dailyChallenge.description);
+    }
+    if (dailyChallenge.verses && Array.isArray(dailyChallenge.verses) && dailyChallenge.verses.length > 0) {
+      details.push(dailyChallenge.verses.join('\n\n'));
+    }
+    details.push(`✨ ${t('dailyChallengesPage.tryItYourself')}\n\n${siteUrl}/daily-challenges`);
+
     return {
-      title: `${challengeTypeLabel} - Daily Phototheology Challenge`,
-      content: dailyChallenge.description || `Today's challenge: ${challengeTypeLabel}. Training ${dailyChallenge.principle_used || 'biblical principles'}. Join me in deepening our understanding of Scripture!`,
-      url: `${window.location.origin}/daily-challenges`
+      title: `🔥 Daily ${challengeTypeLabel} Challenge`,
+      content: details.join('\n\n'),
+      url: `${siteUrl}/daily-challenges`
     };
   };
 
@@ -184,7 +330,7 @@ const DailyChallenges = () => {
           <Card>
             <CardContent className="py-8">
               <p className="text-muted-foreground text-center">
-                Challenge type not yet implemented. Check back soon!
+                {t('dailyChallengesPage.challengeNotImplemented')}
               </p>
             </CardContent>
           </Card>
@@ -196,42 +342,42 @@ const DailyChallenges = () => {
 
   const challengeSteps = [
     {
-      title: "Complete Daily Challenges",
-      description: "Each day brings a new Phototheology challenge designed to sharpen your Bible study skills and deepen your understanding of Scripture.",
+      title: t('dailyChallengesPage.stepCompleteChallenges'),
+      description: t('dailyChallengesPage.stepCompleteChallengesDesc'),
       highlights: [
-        "30-day rotating challenge system",
-        "Dimension drills, chef recipes, and equation decoding",
-        "Progress tracked in your Growth Journal"
+        t('dailyChallengesPage.stepCompleteChallengesH1'),
+        t('dailyChallengesPage.stepCompleteChallengesH2'),
+        t('dailyChallengesPage.stepCompleteChallengesH3'),
       ],
       icon: Flame
     },
     {
-      title: "Choose Your Challenge Type",
-      description: "Switch between Daily Challenges, Chef Challenges, and Equations to train different aspects of Phototheology thinking.",
+      title: t('dailyChallengesPage.stepChooseType'),
+      description: t('dailyChallengesPage.stepChooseTypeDesc'),
       highlights: [
-        "Daily challenges for reflexive training",
-        "Chef challenges to create biblical recipes",
-        "Equations to decode symbolic meanings"
+        t('dailyChallengesPage.stepChooseTypeH1'),
+        t('dailyChallengesPage.stepChooseTypeH2'),
+        t('dailyChallengesPage.stepChooseTypeH3'),
       ],
       icon: Target
     },
     {
-      title: "Learn the Principles",
-      description: "Each challenge focuses on specific Phototheology principles like the 5 Dimensions, Connect 6, or Sanctuary mapping.",
+      title: t('dailyChallengesPage.stepLearnPrinciples'),
+      description: t('dailyChallengesPage.stepLearnPrinciplesDesc'),
       highlights: [
-        "70 Questions methodology",
-        "Christ-chapter discoveries",
-        "Fruit check evaluations"
+        t('dailyChallengesPage.stepLearnPrinciplesH1'),
+        t('dailyChallengesPage.stepLearnPrinciplesH2'),
+        t('dailyChallengesPage.stepLearnPrinciplesH3'),
       ],
       icon: Lightbulb
     },
     {
-      title: "Track Your Growth",
-      description: "Completed challenges are saved to your Growth Journal where you can review your insights and track your spiritual development.",
+      title: t('dailyChallengesPage.stepTrackGrowth'),
+      description: t('dailyChallengesPage.stepTrackGrowthDesc'),
       highlights: [
-        "View past submissions and AI feedback",
-        "Share your insights with the community",
-        "Build a record of your spiritual journey"
+        t('dailyChallengesPage.stepTrackGrowthH1'),
+        t('dailyChallengesPage.stepTrackGrowthH2'),
+        t('dailyChallengesPage.stepTrackGrowthH3'),
       ],
       icon: Zap
     }
@@ -240,22 +386,26 @@ const DailyChallenges = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={DAILY_CHALLENGES_TOUR} onClose={() => setTourOpen(false)} />}
       <main className="container mx-auto px-4 pt-36 pb-8">
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <h1 className="text-4xl font-bold flex items-center gap-2">
               <Flame className="h-8 w-8 text-orange-500" />
-              Challenges
+              {t('dailyChallengesPage.challenges')}
             </h1>
             <div className="flex gap-2">
-              <HowItWorksDialog 
-                title="How to Use Daily Challenges" 
+              <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+                <GraduationCap className="h-4 w-4" /> Tour
+              </Button>
+              <HowItWorksDialog
+                title={t('dailyChallengesPage.howToUseTitle')}
                 steps={challengeSteps}
                 gradient="from-orange-500 via-amber-500 to-yellow-500"
               />
               <Button onClick={() => navigate("/growth-journal")} variant="outline" className="gap-2">
                 <BookOpen className="h-4 w-4" />
-                Growth Journal
+                {t('dailyChallengesPage.growthJournal')}
               </Button>
               <EnhancedSocialShare {...getShareContent()} />
             </div>
@@ -270,29 +420,34 @@ const DailyChallenges = () => {
           )}
 
           <Tabs defaultValue="daily" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="daily" className="gap-2">
                 <Flame className="h-4 w-4" />
-                Daily Challenge
+                {t('dailyChallengesPage.daily')}
               </TabsTrigger>
               <TabsTrigger value="chef" className="gap-2">
                 <ChefHat className="h-4 w-4" />
-                Chef Challenge
+                {t('dailyChallengesPage.chef')}
               </TabsTrigger>
               <TabsTrigger value="equations" className="gap-2">
                 <Calculator className="h-4 w-4" />
-                Equations
+                {t('dailyChallengesPage.equations')}
+              </TabsTrigger>
+              <TabsTrigger value="leaderboard" className="gap-2">
+                <Trophy className="h-4 w-4" />
+                {t('dailyChallengesPage.leaderboard')}
+              </TabsTrigger>
+              <TabsTrigger value="archive" className="gap-2">
+                <Archive className="h-4 w-4" />
+                {t('dailyChallengesPage.archive')}
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="daily" className="space-y-6">
               <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 rounded-lg border border-primary/20">
-                <h2 className="font-semibold mb-2">About Daily Challenges</h2>
+                <h2 className="font-semibold mb-2">{t('dailyChallengesPage.aboutDailyChallenges')}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Each day brings a new challenge designed to train you in Phototheology principles. 
-                  Complete challenges to build your Growth Journal and develop reflexive biblical thinking.
-                  We rotate through 30 different Bible study challenges: dimension drills, chef recipes, 
-                  equation decoding, 70 questions, principle studies, and more!
+                  {t('dailyChallengesPage.aboutDailyChallengesDesc')}
                 </p>
               </div>
 
@@ -308,41 +463,57 @@ const DailyChallenges = () => {
                         {dailyChallenge.challenge_tier}
                       </Badge>
                     </div>
-                    <EnhancedSocialShare 
-                      {...getShareContent()} 
-                      buttonText="Share This Challenge"
+                    <EnhancedSocialShare
+                      {...getShareContent()}
+                      buttonText={t('dailyChallengesPage.shareThisChallenge')}
                       buttonVariant="default"
                     />
                   </div>
 
                   {renderChallenge()}
+                  {dailyChallenge && (
+                    <div className="flex justify-center mt-4">
+                      <PostToPublicChallengeButton
+                        challengeType="daily"
+                        title={dailyChallenge.title}
+                        content={dailyChallenge.description || dailyChallenge.title}
+                        difficulty={dailyChallenge.challenge_tier}
+                      />
+                    </div>
+                  )}
                 </>
               ) : (
                 <Card>
                   <CardContent className="py-12 text-center">
                     <p className="text-muted-foreground">
-                      No challenge available right now. Challenges are generated daily. Check back soon!
+                      {t('dailyChallengesPage.noChallengeAvailable')}
                     </p>
                   </CardContent>
                 </Card>
               )}
+
+              <ChallengeInlineSubmissions
+                challengeType="daily"
+                challengeTitle={dailyChallenge?.title || t('dailyChallengesPage.dailyChallenge')}
+                challengeDescription={dailyChallenge?.description || ""}
+                difficulty={dailyChallenge?.challenge_tier}
+              />
             </TabsContent>
 
             <TabsContent value="chef" className="space-y-6">
               <div className="bg-gradient-to-r from-orange-500/10 to-amber-500/5 p-4 rounded-lg border border-orange-500/20">
                 <h2 className="font-semibold mb-2 flex items-center gap-2">
                   <ChefHat className="h-5 w-5 text-orange-600" />
-                  About Chef Challenges
+                  {t('dailyChallengesPage.aboutChefChallenges')}
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  Create "biblical recipes" – coherent mini-sermons using only Bible verse references.
-                  Chain verses together to build theological meals that nourish the soul.
+                  {t('dailyChallengesPage.chefChallengesDesc')}
                 </p>
               </div>
-              <ChefRecipeChallenge 
+              <ChefRecipeChallenge
                 challenge={{
-                  title: "Chef Challenge",
-                  description: "Create a biblical recipe by connecting verses that build a complete theological thought.",
+                  title: t('dailyChallengesPage.chefChallenge'),
+                  description: t('dailyChallengesPage.chefChallengeDesc'),
                   verses: [],
                   ui_config: {
                     theme: "Faith Journey",
@@ -356,41 +527,215 @@ const DailyChallenges = () => {
               <div className="text-center">
                 <Button variant="outline" onClick={() => navigate("/games/chef-challenge")} className="gap-2">
                   <ChefHat className="h-4 w-4" />
-                  View Full Chef Challenge Mode
+                  {t('dailyChallengesPage.viewFullChefMode')}
                 </Button>
               </div>
+              <ChallengeInlineSubmissions
+                challengeType="chef"
+                challengeTitle={t('dailyChallengesPage.chefChallenge')}
+                challengeDescription={t('dailyChallengesPage.chefChallengeDesc')}
+              />
             </TabsContent>
 
             <TabsContent value="equations" className="space-y-6">
-              <div className="bg-gradient-to-r from-primary/10 to-indigo-500/5 p-4 rounded-lg border border-primary/20">
-                <h2 className="font-semibold mb-2 flex items-center gap-2">
-                  <Calculator className="h-5 w-5 text-primary" />
-                  About Equation Challenges
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  Decode biblical equations using palace principles and symbols.
-                  Discover how Scripture speaks in symbolic language that points to Christ.
-                </p>
-              </div>
+              <Card className="border-border bg-card">
+                <CardContent className="space-y-3 p-5">
+                  <div className="flex items-center gap-2">
+                    <Calculator className="h-5 w-5 text-primary" />
+                    <h2 className="font-semibold">{t('dailyChallengesPage.buildEquationChallenge')}</h2>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {t('dailyChallengesPage.equationInstructions')}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <InlineEquationGenerator onSubmit={handleChallengeSubmit} />
+
+              <Card className="border-border bg-card">
+                <CardContent className="space-y-3 p-5">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-primary" />
+                    <h3 className="font-semibold">{t('dailyChallengesPage.ptExample')}</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {t('dailyChallengesPage.ptExampleDesc')}
+                  </p>
+                </CardContent>
+              </Card>
+
               <EquationDecodeChallenge 
                 challenge={{
-                  title: "Equation Challenge",
-                  description: "Decode this biblical equation to discover its deeper meaning.",
-                  verses: ["John 3:16"],
+                  title: "Sample Equation — John 3:16",
+                  passage_reference: "John 3:16",
+                  description: "Decode this PT equation to discover how Palace principles reveal Christ in this verse.",
+                  verses: ["For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life."],
                   ui_config: {
-                    equation: "🌍 + ❤️ + 🎁 = ∞",
-                    verse_context: "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life."
+                    equation: "CR + ST + @CyC + DR + BL = FRt",
+                    verse_text: "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.",
+                    hints: [
+                      "CR = Concentration Room — Where is Christ? He is the gift given for the world",
+                      "ST = Symbols/Types Room — 'Only begotten Son' is the antitype of the Passover lamb sacrificed for deliverance",
+                      "@CyC = Cyrus–Christ Cycle — The ultimate Deliverer fulfills the covenant promise of Genesis 3:15",
+                      "DR = Dimensions Room — Literal (God gave), Christ (the Son), Me (whosoever believeth), Church (the world), Heaven (everlasting life)",
+                      "BL = Blue Room (Sanctuary) — The gift follows the sanctuary pattern: altar (sacrifice), mercy seat (grace), ark (covenant)",
+                      "FRt = Fruit Room — The fruit of this truth is love, assurance, and everlasting life"
+                    ]
                   }
                 }}
                 onSubmit={handleChallengeSubmit}
                 hasSubmitted={false}
               />
-              <div className="text-center">
-                <Button variant="outline" onClick={() => navigate("/equations-challenge")} className="gap-2">
-                  <Calculator className="h-4 w-4" />
-                  View Full Equations Challenge Mode
+
+              <ChallengeInlineSubmissions
+                challengeType="equation"
+                challengeTitle={t('dailyChallengesPage.equationChallenge')}
+                challengeDescription={t('dailyChallengesPage.equationChallengeDesc')}
+              />
+            </TabsContent>
+
+            <TabsContent value="leaderboard" className="space-y-6">
+              <CommunityChallengeFeed />
+              <div className="flex justify-center gap-3">
+                <Button variant="outline" onClick={() => navigate("/community-challenges")} className="gap-2">
+                  <Trophy className="h-4 w-4" />
+                  {t('dailyChallengesPage.viewFullLeaderboard')}
+                </Button>
+                <Button onClick={() => navigate("/challenge-board")} className="gap-2">
+                  <Globe className="h-4 w-4" />
+                  {t('dailyChallengesPage.publicChallengeBoard')}
                 </Button>
               </div>
+            </TabsContent>
+
+            <TabsContent value="archive" className="space-y-6">
+              <div className="bg-gradient-to-r from-purple-500/10 to-violet-500/5 p-4 rounded-lg border border-purple-500/20">
+                <h2 className="font-semibold mb-2 flex items-center gap-2">
+                  <Archive className="h-5 w-5 text-purple-600" />
+                  {t('dailyChallengesPage.challengeArchive')}
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  {t('dailyChallengesPage.challengeArchiveDesc')}
+                </p>
+              </div>
+
+              {/* Month Navigation */}
+              <div className="flex items-center justify-between">
+                <Button variant="outline" onClick={goToPreviousMonth}>
+                  <ChevronLeft className="mr-2 h-4 w-4" />
+                  {t('common.previous')}
+                </Button>
+                <h3 className="text-lg font-semibold">
+                  {archiveMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                </h3>
+                <Button
+                  variant="outline"
+                  onClick={goToNextMonth}
+                  disabled={archiveMonth.getFullYear() === new Date().getFullYear() && archiveMonth.getMonth() === new Date().getMonth()}
+                >
+                  {t('common.next')}
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+
+              {archiveLoading ? (
+                <div className="text-center py-12">{t('dailyChallengesPage.loadingArchive')}</div>
+              ) : archiveSubmissions.length > 0 ? (
+                <div className="grid gap-4">
+                  {archiveSubmissions.map((submission) => (
+                    <Card key={submission.id} className="hover:border-primary/50 transition-colors">
+                      <CardContent className="py-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge variant="outline">
+                                {new Date(submission.created_at).toLocaleDateString('en-US', {
+                                  weekday: 'short',
+                                  month: 'short',
+                                  day: 'numeric'
+                                })}
+                              </Badge>
+                              {submission.challenge?.challenge_tier && (
+                                <Badge variant={
+                                  submission.challenge.challenge_tier === "Quick" ? "default" :
+                                  submission.challenge.challenge_tier === "Core" ? "secondary" :
+                                  "outline"
+                                }>
+                                  {submission.challenge.challenge_tier}
+                                </Badge>
+                              )}
+                              <Badge variant="secondary" className="text-xs">
+                                <CheckCircle2 className="mr-1 h-3 w-3" />
+                                {t('dailyChallengesPage.completed')}
+                              </Badge>
+                            </div>
+                            <h4 className="font-semibold text-lg">
+                              {submission.challenge?.title || 'Challenge'}
+                            </h4>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {submission.challenge?.description?.slice(0, 150) || t('dailyChallengesPage.noDescription')}
+                              {(submission.challenge?.description?.length || 0) > 150 ? '...' : ''}
+                            </p>
+                            <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
+                              {submission.principle_applied && (
+                                <span className="flex items-center gap-1">
+                                  <Brain className="h-4 w-4" />
+                                  {submission.principle_applied}
+                                </span>
+                              )}
+                              {submission.time_spent > 0 && (
+                                <span className="flex items-center gap-1">
+                                  <Clock className="h-4 w-4" />
+                                  {formatTimeSpent(submission.time_spent)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Show submission preview */}
+                        {submission.submission_data && (
+                          <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+                            <p className="text-xs text-muted-foreground mb-1">{t('dailyChallengesPage.yourResponse')}</p>
+                            <p className="text-sm line-clamp-3">
+                              {typeof submission.submission_data === 'string'
+                                ? submission.submission_data
+                                : submission.submission_data.answer ||
+                                  submission.submission_data.response ||
+                                  submission.submission_data.insights?.join(', ') ||
+                                  JSON.stringify(submission.submission_data).slice(0, 200)}
+                            </p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <Card>
+                  <CardContent className="text-center py-12">
+                    <Archive className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                    <p className="text-muted-foreground">{t('dailyChallengesPage.noChallengesThisMonth')}</p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {t('dailyChallengesPage.completeChallengesPrompt')}
+                    </p>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        const tabs = document.querySelector('[data-state="active"][value="archive"]');
+                        if (tabs) {
+                          const dailyTab = document.querySelector('[value="daily"]') as HTMLElement;
+                          dailyTab?.click();
+                        }
+                      }}
+                      className="mt-4"
+                    >
+                      <Flame className="mr-2 h-4 w-4" />
+                      {t('dailyChallengesPage.startTodaysChallenge')}
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
             </TabsContent>
           </Tabs>
         </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ type SortOption = "latest" | "most_commented" | "needs_feedback";
 type CategoryFilter = "all" | "general" | "prayer" | "study" | "questions";
 
 const CommunityOptimized = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
@@ -45,6 +47,7 @@ const CommunityOptimized = () => {
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [likedPostIds, setLikedPostIds] = useState<Set<string>>(new Set());
 
   // Use our optimized hooks
   const {
@@ -87,6 +90,21 @@ const CommunityOptimized = () => {
       }, 500);
     }
   }, [searchParams]);
+
+  // Fetch user's liked post IDs
+  useEffect(() => {
+    if (!user?.id) return;
+    const fetchLikes = async () => {
+      const { data } = await supabase
+        .from("community_post_likes")
+        .select("post_id")
+        .eq("user_id", user.id);
+      if (data) {
+        setLikedPostIds(new Set(data.map((d: any) => d.post_id)));
+      }
+    };
+    fetchLikes();
+  }, [user?.id]);
 
   // Real-time subscriptions - optimized to update specific posts only
   useEffect(() => {
@@ -181,7 +199,7 @@ const CommunityOptimized = () => {
         addPost(data as any);
       }
 
-      toast({ title: "Post created successfully!" });
+      toast({ title: t('community.postCreated') });
       setNewTitle("");
       setNewContent("");
       setNewCategory("general");
@@ -189,7 +207,7 @@ const CommunityOptimized = () => {
       setShowNewPost(false);
     } catch (error: any) {
       toast({
-        title: "Error creating post",
+        title: t('community.errorCreatingPost'),
         description: error.message,
         variant: "destructive",
       });
@@ -246,7 +264,7 @@ const CommunityOptimized = () => {
     if (error) throw error;
 
     removeCommentOptimistic(commentId);
-    toast({ title: "Comment deleted" });
+    toast({ title: t('community.commentDeleted') });
   };
 
   const handleDeletePost = async (postId: string) => {
@@ -259,7 +277,7 @@ const CommunityOptimized = () => {
 
     if (error) {
       toast({
-        title: "Error deleting post",
+        title: t('community.errorDeletingPost'),
         description: error.message,
         variant: "destructive",
       });
@@ -267,12 +285,58 @@ const CommunityOptimized = () => {
     }
 
     removePost(postId);
-    toast({ title: "Post deleted" });
+    toast({ title: t('community.postDeleted') });
   };
 
   const handleLikePost = async (postId: string) => {
-    // TODO: Implement like functionality
-    console.log("Like post:", postId);
+    if (!user) return;
+    const alreadyLiked = likedPostIds.has(postId);
+    const post = posts.find(p => p.id === postId);
+    const currentLikes = post?.likes ?? 0;
+
+    if (alreadyLiked) {
+      // Optimistic unlike
+      setLikedPostIds(prev => { const next = new Set(prev); next.delete(postId); return next; });
+      updatePost(postId, { likes: Math.max(0, currentLikes - 1) } as any);
+
+      const { error } = await supabase
+        .from("community_post_likes")
+        .delete()
+        .eq("post_id", postId)
+        .eq("user_id", user.id);
+
+      if (error) {
+        // Revert on failure
+        setLikedPostIds(prev => new Set(prev).add(postId));
+        updatePost(postId, { likes: currentLikes } as any);
+      } else {
+        // Update the denormalized count
+        await supabase
+          .from("community_posts")
+          .update({ likes: Math.max(0, currentLikes - 1) })
+          .eq("id", postId);
+      }
+    } else {
+      // Optimistic like
+      setLikedPostIds(prev => new Set(prev).add(postId));
+      updatePost(postId, { likes: currentLikes + 1 } as any);
+
+      const { error } = await supabase
+        .from("community_post_likes")
+        .insert({ post_id: postId, user_id: user.id });
+
+      if (error) {
+        // Revert on failure
+        setLikedPostIds(prev => { const next = new Set(prev); next.delete(postId); return next; });
+        updatePost(postId, { likes: currentLikes } as any);
+      } else {
+        // Update the denormalized count
+        await supabase
+          .from("community_posts")
+          .update({ likes: currentLikes + 1 })
+          .eq("id", postId);
+      }
+    }
   };
 
   if (!user) return null;
@@ -303,15 +367,15 @@ const CommunityOptimized = () => {
                   <div>
                     <h1 className="text-3xl sm:text-5xl font-bold flex items-center gap-3 mb-2">
                       <Sparkles className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
-                      Community Hub
+                      {t('community.title')}
                     </h1>
                     <p className="text-muted-foreground text-sm sm:text-lg">
-                      Connect, share insights, and grow together in faith
+                      {t('community.description')}
                     </p>
                     <div className="flex items-center gap-2 mt-3 flex-wrap">
                       <Badge variant="outline" className="flex items-center gap-1">
                         <Users className="h-3 w-3" />
-                        {activeCount} active now
+                        {t('community.activeNow', { count: activeCount })}
                       </Badge>
                     </div>
                   </div>
@@ -337,7 +401,7 @@ const CommunityOptimized = () => {
                     className="shadow-lg"
                   >
                     <Plus className="mr-2 h-5 w-5" />
-                    <span className="hidden sm:inline">New Post</span>
+                    <span className="hidden sm:inline">{t('community.newPost')}</span>
                   </Button>
                 </div>
               </div>
@@ -360,10 +424,10 @@ const CommunityOptimized = () => {
                   <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <Users className="h-5 w-5 text-primary" />
-                    Active Now ({activeCount})
+                    {t('community.activeNowTitle', { count: activeCount })}
                   </CardTitle>
                 </div>
-                <CardDescription>Connect with members online</CardDescription>
+                <CardDescription>{t('community.connectWithMembers')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
@@ -392,17 +456,17 @@ const CommunityOptimized = () => {
           {showNewPost && (
             <Card>
               <CardHeader>
-                <CardTitle>Create New Post</CardTitle>
-                <CardDescription>Share your thoughts with the community</CardDescription>
+                <CardTitle>{t('community.createNewPost')}</CardTitle>
+                <CardDescription>{t('community.shareYourThoughts')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <Input
-                  placeholder="Post title..."
+                  placeholder={t('community.postTitlePlaceholder')}
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                 />
                 <Textarea
-                  placeholder="What's on your mind?"
+                  placeholder={t('community.whatsOnYourMind')}
                   value={newContent}
                   onChange={(e) => setNewContent(e.target.value)}
                   className="min-h-[150px]"
@@ -413,25 +477,25 @@ const CommunityOptimized = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="general">General</SelectItem>
-                      <SelectItem value="prayer">Prayer Request</SelectItem>
-                      <SelectItem value="study">Bible Study</SelectItem>
-                      <SelectItem value="questions">Questions</SelectItem>
+                      <SelectItem value="general">{t('community.categoryGeneral')}</SelectItem>
+                      <SelectItem value="prayer">{t('community.categoryPrayerRequest')}</SelectItem>
+                      <SelectItem value="study">{t('community.categoryBibleStudy')}</SelectItem>
+                      <SelectItem value="questions">{t('community.categoryQuestions')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <TagInput
                     tags={newTags}
                     onChange={setNewTags}
-                    placeholder="Add tags..."
+                    placeholder={t('community.addTagsPlaceholder')}
                   />
                 </div>
                 <div className="flex gap-2">
                   <Button onClick={createPost} disabled={!newTitle.trim() || !newContent.trim()}>
                     <Plus className="mr-2 h-4 w-4" />
-                    Create Post
+                    {t('community.createPost')}
                   </Button>
                   <Button variant="outline" onClick={() => setShowNewPost(false)}>
-                    Cancel
+                    {t('common.cancel')}
                   </Button>
                 </div>
               </CardContent>
@@ -445,11 +509,11 @@ const CommunityOptimized = () => {
                 <SelectValue placeholder="Filter by category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="general">General</SelectItem>
-                <SelectItem value="prayer">Prayer</SelectItem>
-                <SelectItem value="study">Bible Study</SelectItem>
-                <SelectItem value="questions">Questions</SelectItem>
+                <SelectItem value="all">{t('community.allCategories')}</SelectItem>
+                <SelectItem value="general">{t('community.categoryGeneral')}</SelectItem>
+                <SelectItem value="prayer">{t('community.categoryPrayer')}</SelectItem>
+                <SelectItem value="study">{t('community.categoryBibleStudy')}</SelectItem>
+                <SelectItem value="questions">{t('community.categoryQuestions')}</SelectItem>
               </SelectContent>
             </Select>
 
@@ -458,9 +522,9 @@ const CommunityOptimized = () => {
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="latest">Latest</SelectItem>
-                <SelectItem value="most_commented">Most Commented</SelectItem>
-                <SelectItem value="needs_feedback">Needs Feedback</SelectItem>
+                <SelectItem value="latest">{t('community.sortLatest')}</SelectItem>
+                <SelectItem value="most_commented">{t('community.sortMostCommented')}</SelectItem>
+                <SelectItem value="needs_feedback">{t('community.sortNeedsFeedback')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -477,6 +541,7 @@ const CommunityOptimized = () => {
                     commentCount={post.id === expandedPostId ? comments.length : 0}
                     currentUserId={user?.id}
                     isExpanded={expandedPostId === post.id}
+                    isLiked={likedPostIds.has(post.id)}
                     onExpand={() => setExpandedPostId(
                       expandedPostId === post.id ? null : post.id
                     )}
@@ -500,7 +565,7 @@ const CommunityOptimized = () => {
               {posts.length === 0 && !postsLoading && (
                 <Card className="p-12 text-center">
                   <p className="text-muted-foreground">
-                    No posts found. Be the first to create one!
+                    {t('community.noPostsFound')}
                   </p>
                 </Card>
               )}
@@ -513,7 +578,7 @@ const CommunityOptimized = () => {
                     variant="outline"
                     size="lg"
                   >
-                    {postsLoading ? "Loading..." : "Load More Posts"}
+                    {postsLoading ? t('common.loading') : t('community.loadMorePosts')}
                   </Button>
                 </div>
               )}

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Mic, Square, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -13,40 +13,80 @@ export const VoiceRecorder = ({ onTranscription }: VoiceRecorderProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const streamRef = useRef<MediaStream | null>(null);
   const { toast } = useToast();
+
+  // Get the best supported MIME type for the current browser
+  const getSupportedMimeType = useCallback(() => {
+    const types = [
+      'audio/webm;codecs=opus',
+      'audio/webm',
+      'audio/mp4',
+      'audio/ogg',
+      'audio/wav',
+      ''  // Empty string = browser default
+    ];
+    
+    for (const type of types) {
+      if (type === '' || MediaRecorder.isTypeSupported(type)) {
+        console.log('VoiceRecorder using MIME type:', type || 'browser default');
+        return type;
+      }
+    }
+    return '';
+  }, []);
 
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
-          channelCount: 1,
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true
         }
       });
       
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
-      });
-      
-      mediaRecorderRef.current = mediaRecorder;
+      streamRef.current = stream;
       chunksRef.current = [];
       
+      const mimeType = getSupportedMimeType();
+      const options: MediaRecorderOptions = mimeType ? { mimeType } : {};
+      
+      const mediaRecorder = new MediaRecorder(stream, options);
+      mediaRecorderRef.current = mediaRecorder;
+      
       mediaRecorder.ondataavailable = (event) => {
+        console.log('VoiceRecorder chunk received, size:', event.data.size);
         if (event.data.size > 0) {
           chunksRef.current.push(event.data);
         }
       };
       
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
-        await transcribeAudio(audioBlob);
+        console.log('VoiceRecorder stopped, chunks:', chunksRef.current.length);
+        const mimeTypeForBlob = mimeType || 'audio/webm';
+        const audioBlob = new Blob(chunksRef.current, { type: mimeTypeForBlob });
+        console.log('VoiceRecorder blob created, size:', audioBlob.size);
+        
+        if (audioBlob.size > 0) {
+          await transcribeAudio(audioBlob);
+        } else {
+          toast({
+            title: "No audio recorded",
+            description: "Please try again and speak clearly",
+            variant: "destructive",
+          });
+          setIsProcessing(false);
+        }
         
         // Stop all tracks
-        stream.getTracks().forEach(track => track.stop());
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(track => track.stop());
+          streamRef.current = null;
+        }
       };
       
+      // Start recording without timeslice for better mobile compatibility
       mediaRecorder.start();
       setIsRecording(true);
       
@@ -66,9 +106,10 @@ export const VoiceRecorder = ({ onTranscription }: VoiceRecorderProps) => {
 
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
+      console.log('Stopping VoiceRecorder...');
+      setIsProcessing(true);
       mediaRecorderRef.current.stop();
       setIsRecording(false);
-      setIsProcessing(true);
     }
   };
 

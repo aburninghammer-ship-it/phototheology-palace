@@ -3,11 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getVerseAnnotations } from "@/services/bibleApi";
 import { VerseAnnotation } from "@/types/bible";
-import { X, ExternalLink, Heart, BookOpen, Layers, Calendar, Building2, Save, Loader2, Sparkles, Link as LinkIcon } from "lucide-react";
+import { X, ExternalLink, Heart, BookOpen, Layers, Calendar, Building2, Save, Loader2, Sparkles, Link as LinkIcon, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -94,6 +93,8 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose, onHig
   const [principleLoading, setPrincipleLoading] = useState(false);
   const [selectedPrinciple, setSelectedPrinciple] = useState<string>("");
   const [activeTab, setActiveTab] = useState<string>("lenses");
+  const [rawCommentary, setRawCommentary] = useState<string>("");
+  const [rawCommentaryLoading, setRawCommentaryLoading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -204,10 +205,42 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose, onHig
     }
   };
 
+  const generateRawCommentary = async () => {
+    setRawCommentaryLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('jeeves', {
+        body: {
+          mode: 'raw-commentary',
+          book,
+          chapter,
+          verseText: { verse, text: verseText }
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.content) {
+        setRawCommentary(data.content);
+      }
+    } catch (error) {
+      console.error('Error generating raw commentary:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate commentary. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setRawCommentaryLoading(false);
+    }
+  };
+
   const handleTabChange = (value: string) => {
     setActiveTab(value);
     if (value === "scripture-links" && scriptureLinks.length === 0 && !scriptureLinksLoading) {
       generateScriptureLinks();
+    }
+    if (value === "raw" && !rawCommentary && !rawCommentaryLoading) {
+      generateRawCommentary();
     }
   };
 
@@ -364,25 +397,25 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose, onHig
 
   if (loading || !annotation) {
     return (
-      <Card className="sticky top-24">
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div>
-              <CardTitle className="font-serif text-xl">
+      <Card className="lg:sticky lg:top-24">
+        <CardHeader className="pb-2 sm:pb-4">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <CardTitle className="font-serif text-lg sm:text-xl truncate">
                 {book} {chapter}:{verse}
               </CardTitle>
-              <CardDescription>Analyzing with AI...</CardDescription>
+              <CardDescription className="text-xs sm:text-sm">Analyzing with AI...</CardDescription>
             </div>
-            <Button variant="ghost" size="sm" onClick={onClose}>
+            <Button variant="ghost" size="sm" onClick={onClose} className="px-2">
               <X className="h-4 w-4" />
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <div className="flex items-center justify-center py-6 sm:py-8">
+            <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-primary"></div>
           </div>
-          <p className="text-sm text-muted-foreground text-center">
+          <p className="text-xs sm:text-sm text-muted-foreground text-center">
             Analyzing through the Palace framework...
           </p>
         </CardContent>
@@ -391,54 +424,65 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose, onHig
   }
 
   return (
-    <Card className="sticky top-24 shadow-elegant hover:shadow-hover transition-smooth animate-scale-in">
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="font-serif text-xl">
+    <Card className="lg:sticky lg:top-24 shadow-elegant hover:shadow-hover transition-smooth animate-scale-in flex flex-col lg:max-h-[calc(100vh-7rem)]">
+      <CardHeader className="pb-2 sm:pb-4 flex-shrink-0">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            <CardTitle className="font-serif text-lg sm:text-xl truncate">
               {book} {chapter}:{verse}
             </CardTitle>
-            <CardDescription>Principle Analysis</CardDescription>
+            <CardDescription className="text-xs sm:text-sm">Principle Analysis</CardDescription>
           </div>
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
+          <div className="flex gap-1 sm:gap-2 flex-shrink-0">
+            <Button
+              variant="outline"
+              size="sm"
               onClick={loadAnnotation}
               disabled={loading}
-              className="hover:bg-primary/10"
+              className="hover:bg-primary/10 px-2 sm:px-3 text-xs sm:text-sm"
             >
-              Refresh
+              <span className="hidden sm:inline">Refresh</span>
+              <Loader2 className="h-3 w-3 sm:hidden" />
             </Button>
-            <Button variant="ghost" size="sm" onClick={onClose} className="hover:bg-destructive/10">
+            <Button variant="ghost" size="sm" onClick={onClose} className="hover:bg-destructive/10 px-2">
               <X className="h-4 w-4" />
             </Button>
           </div>
         </div>
       </CardHeader>
-      
-      <CardContent>
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="flex w-full flex-wrap gap-1 h-auto p-1">
-            <TabsTrigger value="lenses" className="flex-1 min-w-[100px]">
-              <Layers className="h-4 w-4 mr-1" />
-              Lenses
-            </TabsTrigger>
-            <TabsTrigger value="scripture-links" className="flex-1 min-w-[120px]">
-              <LinkIcon className="h-4 w-4 mr-1" />
-              Scripture Link
-            </TabsTrigger>
-            <TabsTrigger value="principle-links" className="flex-1 min-w-[130px]">
-              <ExternalLink className="h-4 w-4 mr-1" />
-              Principle Links
-            </TabsTrigger>
-            <TabsTrigger value="christ" className="flex-1 min-w-[90px]">
-              <Heart className="h-4 w-4 mr-1" />
-              Christ
-            </TabsTrigger>
-          </TabsList>
-          
-          <ScrollArea className="h-[500px] mt-4">
+
+      <CardContent className="flex-1 min-h-0 flex flex-col pt-0 sm:pt-2">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex-1 min-h-0 flex flex-col">
+          {/* TabsList has its own horizontal scroll + arrow buttons built in */}
+          <div className="flex-shrink-0">
+            <TabsList>
+              <TabsTrigger value="lenses" className="px-3 text-xs sm:text-sm">
+                <Layers className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                Lenses
+              </TabsTrigger>
+              <TabsTrigger value="raw" className="px-3 text-xs sm:text-sm">
+                <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                Raw
+              </TabsTrigger>
+              <TabsTrigger value="scripture-links" className="px-3 text-xs sm:text-sm">
+                <LinkIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                <span className="hidden sm:inline">Scripture Link</span>
+                <span className="sm:hidden">Links</span>
+              </TabsTrigger>
+              <TabsTrigger value="principle-links" className="px-3 text-xs sm:text-sm">
+                <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                <span className="hidden sm:inline">Principle Links</span>
+                <span className="sm:hidden">Scan</span>
+              </TabsTrigger>
+              <TabsTrigger value="christ" className="px-3 text-xs sm:text-sm">
+                <Heart className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                Christ
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          {/* Scrollable content area - native overflow, fills remaining card space */}
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden mt-2 sm:mt-4 pr-1">
             <TabsContent value="lenses" className="space-y-4 mt-0">
               {/* Room Analysis Summary */}
               {annotation.roomsUsed && annotation.roomsUsed.length > 0 && (
@@ -609,7 +653,47 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose, onHig
                 </div>
               )}
             </TabsContent>
-            
+
+            <TabsContent value="raw" className="space-y-4 mt-0">
+              {rawCommentaryLoading && (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                  <span className="ml-2 text-muted-foreground">Generating commentary...</span>
+                </div>
+              )}
+
+              {!rawCommentaryLoading && rawCommentary && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-medium">Plain Text Commentary</span>
+                    </div>
+                    <Button onClick={generateRawCommentary} size="sm" variant="outline">
+                      <Sparkles className="h-4 w-4 mr-1" />
+                      Regenerate
+                    </Button>
+                  </div>
+                  <div className="p-4 rounded-lg border bg-muted/30">
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                      {rawCommentary}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {!rawCommentaryLoading && !rawCommentary && (
+                <div className="text-center py-8 text-muted-foreground">
+                  <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p className="text-sm mb-4">Get a plain commentary on this verse's meaning without additional filters.</p>
+                  <Button onClick={generateRawCommentary} size="sm">
+                    <Sparkles className="h-4 w-4 mr-1" />
+                    Generate Commentary
+                  </Button>
+                </div>
+              )}
+            </TabsContent>
+
             <TabsContent value="scripture-links" className="space-y-4">
               {scriptureLinksLoading && (
                 <div className="flex items-center justify-center py-8">
@@ -641,8 +725,8 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose, onHig
               )}
             </TabsContent>
 
-            <TabsContent value="principle-links" className="space-y-4">
-              <div className="flex gap-2 items-center">
+            <TabsContent value="principle-links" className="space-y-3 sm:space-y-4">
+              <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
                 <Select value={selectedPrinciple} onValueChange={(value) => {
                   setSelectedPrinciple(value);
                   setPrincipleResults([]);
@@ -651,39 +735,43 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose, onHig
                     onHighlight([]);
                   }
                 }}>
-                  <SelectTrigger className="flex-1">
+                  <SelectTrigger className="w-full sm:flex-1 text-xs sm:text-sm">
                     <SelectValue placeholder="Select a principle..." />
                   </SelectTrigger>
                   <SelectContent>
                     {PRINCIPLES.map((p) => (
-                      <SelectItem key={p.code} value={p.code}>
+                      <SelectItem key={p.code} value={p.code} className="text-xs sm:text-sm">
                         {p.name} ({p.code})
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                <Button 
-                  onClick={generatePrincipleLinks}
-                  disabled={!selectedPrinciple || principleLoading}
-                  size="sm"
-                >
-                  <Sparkles className="h-4 w-4 mr-1" />
-                  {principleLoading ? "Analyzing..." : "Scan Chapter"}
-                </Button>
-                {principleResults.length > 0 && (
+                <div className="flex gap-2">
                   <Button
-                    variant="ghost"
+                    onClick={generatePrincipleLinks}
+                    disabled={!selectedPrinciple || principleLoading}
                     size="sm"
-                    onClick={() => {
-                      setPrincipleResults([]);
-                      if (onHighlight) {
-                        onHighlight([]);
-                      }
-                    }}
+                    className="flex-1 sm:flex-none text-xs sm:text-sm"
                   >
-                    Clear
+                    <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    {principleLoading ? "..." : "Scan"}
                   </Button>
-                )}
+                  {principleResults.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs sm:text-sm"
+                      onClick={() => {
+                        setPrincipleResults([]);
+                        if (onHighlight) {
+                          onHighlight([]);
+                        }
+                      }}
+                    >
+                      Clear
+                    </Button>
+                  )}
+                </div>
               </div>
 
               {principleLoading && (
@@ -732,26 +820,27 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose, onHig
                 </div>
               )}
             </TabsContent>
-          </ScrollArea>
+          </div>
         </Tabs>
 
-        <div className="flex gap-2 mt-4 pt-4 border-t">
+        {/* Bottom action buttons - responsive layout */}
+        <div className="flex flex-col xs:flex-row gap-2 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t flex-shrink-0">
           <Button
             onClick={handleSaveAsGem}
             variant="outline"
             size="sm"
-            className="flex-1"
+            className="flex-1 text-xs sm:text-sm"
           >
-            <Save className="h-4 w-4 mr-2" />
+            <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
             Save as Gem
           </Button>
           <Button
             onClick={handleExportStudy}
             variant="outline"
             size="sm"
-            className="flex-1"
+            className="flex-1 text-xs sm:text-sm"
           >
-            <BookOpen className="h-4 w-4 mr-2" />
+            <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
             Export Study
           </Button>
         </div>

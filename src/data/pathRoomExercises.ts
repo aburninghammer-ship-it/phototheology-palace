@@ -28,12 +28,12 @@ export const pathRoomExercises: Record<string, Record<PathType, PathRoomExercise
       {
         id: "sr-v-1",
         title: "Scene Builder",
-        description: "Create vivid mental images of 3 Bible stories",
+        description: "Store 3 Bible stories as vivid mental movies in your Palace",
         instructions: [
           "Pick 3 stories from Genesis 1-11",
-          "For each story, imagine the setting with colors, sounds, and textures",
-          "Draw a simple sketch or describe the scene in detail",
-          "Connect visual elements to key theological points"
+          "For each story, visualize the scenes — who is there, what happens, what is said, what is felt",
+          "Draw a simple sketch or describe each scene in vivid detail",
+          "Replay each story as a mental movie — if you can see it, you own it"
         ],
         duration: "15 min",
         type: "practice",
@@ -42,12 +42,12 @@ export const pathRoomExercises: Record<string, Record<PathType, PathRoomExercise
       {
         id: "sr-v-2",
         title: "Story Sequence Gallery",
-        description: "Build a visual timeline of story events",
+        description: "Furnish your Palace with a complete scene sequence",
         instructions: [
           "Choose one chapter from Genesis",
-          "Create 5 distinct 'frames' for major events",
-          "Add symbolic visual elements to each frame",
-          "Practice recalling the story through your images"
+          "Store 5 distinct scenes — vivid moments you can picture",
+          "Add concrete visual elements to each scene (who, what, where)",
+          "Replay the full movie — each scene is furniture in your Palace"
         ],
         duration: "20 min",
         type: "drill",
@@ -70,12 +70,12 @@ export const pathRoomExercises: Record<string, Record<PathType, PathRoomExercise
       {
         id: "sr-v-4",
         title: "Story Map Creation",
-        description: "Draw a geographic or conceptual map of the story",
+        description: "Map the story's movement to store it geographically in your Palace",
         instructions: [
           "Identify key locations in the story",
-          "Sketch a simple map showing movement",
+          "Sketch a simple map showing movement between scenes",
           "Add symbols for important events at each location",
-          "Use the map to retell the story"
+          "Use the map to replay and retell the stored story"
         ],
         duration: "15 min",
         type: "practice",
@@ -100,7 +100,7 @@ export const pathRoomExercises: Record<string, Record<PathType, PathRoomExercise
       {
         id: "sr-a-1",
         title: "Story Structure Analysis",
-        description: "Break down the narrative structure",
+        description: "Collect and store the narrative structure as scenes",
         instructions: [
           "Identify the exposition, rising action, climax, resolution",
           "List key characters and their roles",

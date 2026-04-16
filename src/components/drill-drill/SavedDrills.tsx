@@ -69,10 +69,13 @@ export const SavedDrills = () => {
   };
 
   const viewDrill = (drill: SavedDrill) => {
+    const isThought = drill.verse_reference?.startsWith("Thought:");
     const session: DrillSession = {
       id: drill.id,
       verse: drill.verse_reference,
       verseText: drill.verse_text,
+      thought: isThought ? drill.drill_data?.thought : undefined,
+      drillType: isThought ? "thought" : "verse",
       mode: drill.mode as any,
       difficulty: (drill.drill_data?.difficulty || "intermediate") as any,
       responses: drill.drill_data?.responses || [],

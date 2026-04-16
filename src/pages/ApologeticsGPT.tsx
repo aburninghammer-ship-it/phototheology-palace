@@ -2,8 +2,10 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles, Shield, Book } from "lucide-react";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 const ApologeticsGPT = () => {
+  const { t } = useTranslation();
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://studio.pickaxe.co/api/embed/bundle.js';
@@ -23,20 +25,20 @@ const ApologeticsGPT = () => {
               <div className="text-center space-y-2">
                 <h1 className="text-5xl font-bold flex items-center justify-center gap-2 text-primary">
                   <Shield className="h-10 w-10" />
-                  Apologetics GPT
+                  {t('gpt.apologetics.title')}
                 </h1>
-                <p className="text-xl text-muted-foreground">AI-Powered Defense of the Faith</p>
+                <p className="text-xl text-muted-foreground">{t('gpt.apologetics.subtitle')}</p>
                 <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
                   <Sparkles className="h-4 w-4" />
-                  <span>Equip yourself to defend biblical truth with confidence</span>
+                  <span>{t('gpt.apologetics.tagline')}</span>
                 </div>
               </div>
     
               <Card className="border-2 border-primary/20">
                 <CardHeader className="bg-gradient-to-r from-blue-500/10 to-green-500/10">
-                  <CardTitle className="text-2xl">Chat with Apologetics GPT</CardTitle>
+                  <CardTitle className="text-2xl">{t('gpt.apologetics.chatTitle')}</CardTitle>
               <CardDescription className="text-base">
-                Get answers to tough questions about faith, science, history, and biblical reliability. Learn to defend the gospel with grace and truth.
+                {t('gpt.apologetics.chatDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6">

@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getContentBehavioralEngine } from "../_shared/content-behavioral-engine.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -37,8 +38,14 @@ HEBREWS SANCTUARY DOCTRINE:
 
 For each verse, provide deep analysis across these dimensions:
 
-**CHRIST-CENTERED INTERPRETATION**:
+**CHRIST-CENTERED INTERPRETATION (MAGNUM OPUS DEPTH)**:
 Every text must reveal Christ (John 5:39, Luke 24:27). Show HOW Christ appears in this specific verse.
+Do NOT stop at one Christ connection. Build a CASCADING chain of 3-5 layered connections where each insight opens the door to the next. Example: Genesis 22 → Abraham's sacrifice = Father giving Son → Isaac carrying wood = Christ carrying cross → "God will provide himself a lamb" = prophetic utterance → ram caught in thicket = substitutionary atonement → Mount Moriah = future temple site = Golgotha.
+Apply these advanced patterns when relevant:
+- Structural-Timeline: How does this verse fit in Christ's ministry progression (Prophet → Priest → Judge → King)?
+- Reversed-Trap: If the verse describes opposition, show how the trap reversed on the trapper.
+- "What-If" Shadow: If an OT figure failed here, frame it as what Christ's story would have looked like if He had failed.
+- Sharp Preaching Line: Produce one quotable synthesis that captures the verse's deepest Christ-connection.
 
 **PT DIMENSIONS** (5D Analysis):
 1D = Literal (what text says plainly)
@@ -57,10 +64,12 @@ Every text must reveal Christ (John 5:39, Luke 24:27). Show HOW Christ appears i
 @Sp = Spirit (Pentecost → Mission)
 @Re = Remnant (Final witness → Second Coming)
 
-**THREE HEAVENS** (Day of the LORD stages):
-1H (DoL¹/NE¹) = Babylon destroys Jerusalem → Post-exilic restoration
-2H (DoL²/NE²) = 70 AD → New Covenant/Heavenly sanctuary order
-3H (DoL³/NE³) = Final judgment → Literal New Creation
+**THREE HEAVENS** (Day of the LORD judgment cycles - NOT atmospheric layers!):
+⚠️ CRITICAL GUARDRAIL: Never interpret as atmosphere/physical world/spiritual realm!
+1H (DoL¹/NE¹) = FIRST Day of the LORD: Babylon destroys Jerusalem (586 BC) → Post-exilic restoration under Cyrus
+2H (DoL²/NE²) = SECOND Day of the LORD: Rome destroys Jerusalem (70 AD) → New Covenant/Church as living temple
+3H (DoL³/NE³) = THIRD Day of the LORD: Final cosmic judgment → Literal New Heaven and Earth (Rev 21-22)
+These are prophetic stages of covenant history, NOT cosmological layers!
 
 **SANCTUARY CONNECTIONS** (Blueprint of Salvation):
 Gate, Altar, Laver, Lampstand, Table, Incense, Veil, Ark
@@ -72,6 +81,16 @@ DAY OF ATONEMENT GUARDRAIL (CRITICAL):
 - Just as Pentecost was fulfilled 50 days AFTER Christ's death, the Day of Atonement points to 1844
 - The cross fulfills PASSOVER; Day of Atonement fulfillment began in 1844
 - NEVER suggest Christ's death fulfills the Day of Atonement
+
+AZAZEL GUARDRAIL (NON-NEGOTIABLE):
+- In Leviticus 16, Azazel (scapegoat) represents SATAN, NOT Christ
+- The LORD's goat = Christ; Azazel = Satan bearing guilt for sin
+- NEVER identify Azazel/scapegoat as Jesus - that is heresy
+
+LITTLE HORN GUARDRAIL (NON-NEGOTIABLE):
+- Daniel 7 little horn = Papal Rome rising from the 10 divisions
+- Daniel 8 little horn = Rome (pagan then papal) attacking the sanctuary
+- NEVER identify little horn as Antiochus Epiphanes - that is preterism
 
 **FEAST CONNECTIONS** (Israel's Calendar → Christ):
 Passover, Unleavened Bread, Firstfruits, Pentecost, Trumpets, Atonement, Tabernacles
@@ -115,7 +134,9 @@ Return ONLY valid JSON with this structure:
   "cross_references": [
     {"verse": "John 1:29", "reason": "Both show Christ as Lamb", "principles": ["@Mo", "Altar", "2D"]},
     {"verse": "Romans 5:8", "reason": "God's love demonstrated in Christ", "principles": ["@CyC", "2D", "3D"]}
-  ]
+  ],
+  "cascade_chain": ["Connection 1 leading to Connection 2 leading to Connection 3..."],
+  "sharp_line": "One quotable synthesis capturing the verse's deepest Christ-connection"
 }`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -127,7 +148,7 @@ Return ONLY valid JSON with this structure:
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: systemPrompt + "\n\n" + getContentBehavioralEngine() },
           { role: "user", content: `Analyze this verse using PT principles:\n\nReference: ${verse_reference}\nText: ${verse_text}` }
         ],
         temperature: 0.7,

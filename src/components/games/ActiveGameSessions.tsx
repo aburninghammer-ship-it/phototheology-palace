@@ -12,7 +12,7 @@ import { toast } from "sonner";
 // Game type to display info mapping
 const gameTypeInfo: Record<string, { name: string; icon: string; route: string }> = {
   principle_sprint: { name: "Principle Sprint", icon: "⚡", route: "/games/principle-sprint" },
-  connection_dash: { name: "Connection Dash", icon: "🔗", route: "/games/connection-dash" },
+  
   story_room: { name: "Story Room", icon: "📚", route: "/games/story-room" },
   observation_room: { name: "Observation Detective", icon: "🔍", route: "/games/observation-room" },
   equation_builder: { name: "Equation Builder", icon: "🧮", route: "/games/equation-builder" },

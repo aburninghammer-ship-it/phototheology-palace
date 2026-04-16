@@ -1,95 +1,167 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Download, RefreshCw } from 'lucide-react';
-import { hardReloadApp, PWA_UPDATE_COOLDOWN_KEY } from '@/lib/pwa';
 
-// Key for tracking recent updates to prevent prompt spam
-const UPDATE_COOLDOWN_KEY = PWA_UPDATE_COOLDOWN_KEY;
-const UPDATE_COOLDOWN_MS = 30 * 1000; // 30 seconds cooldown after update (reduced from 5 min)
+const DISMISSED_BUILD_PREFIX = 'pwa_update_dismissed_build:';
+const AUTO_REFRESHED_BUILD_PREFIX = 'pwa_auto_refreshed_build:';
+export const MANUAL_UPDATE_REQUIRED_EVENT = 'pt:manual-update-required';
+const BUILD_CHECK_INTERVAL_MS = 30_000;
+const INITIAL_BUILD_CHECK_DELAY_MS = 4_000;
 
-function getCooldownUntil(): number | null {
+const isMetaWebView =
+  /FBAN|FBAV|FB_IAB|FBIOS|Instagram/i.test(navigator.userAgent) &&
+  !/OculusBrowser|Meta Quest/i.test(navigator.userAgent);
+
+const isInIframe = (() => {
   try {
-    const raw = localStorage.getItem(UPDATE_COOLDOWN_KEY);
-    if (!raw) return null;
+    return window.self !== window.top;
+  } catch {
+    return true;
+  }
+})();
 
-    const until = Number(raw);
-    if (!Number.isFinite(until)) {
-      localStorage.removeItem(UPDATE_COOLDOWN_KEY);
-      return null;
+const isPreviewHost =
+  window.location.hostname.includes('id-preview--') ||
+  window.location.hostname.includes('lovableproject.com');
+
+const isPreviewContext = isPreviewHost || isInIframe;
+
+function readCurrentBuildTag(): string | null {
+  return document.querySelector('meta[name="app-build"]')?.getAttribute('content') ?? null;
+}
+
+async function fetchLatestBuildTag(): Promise<string | null> {
+  const url = `${window.location.origin}/?__buildcheck=${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const html = await fetch(url, {
+    cache: 'no-store',
+    headers: {
+      'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate',
+      Pragma: 'no-cache',
+    },
+  }).then((response) => response.text());
+
+  const match = html.match(/<meta\s+name=["']app-build["']\s+content=["']([^"']+)["']/i);
+  return match?.[1] ?? null;
+}
+
+function dismissBuild(build: string | null): void {
+  if (!build) return;
+  sessionStorage.setItem(`${DISMISSED_BUILD_PREFIX}${build}`, '1');
+}
+
+function isBuildDismissed(build: string | null): boolean {
+  if (!build) return false;
+  return sessionStorage.getItem(`${DISMISSED_BUILD_PREFIX}${build}`) === '1';
+}
+
+function hasAutoRefreshedBuild(build: string | null): boolean {
+  if (!build) return false;
+  return sessionStorage.getItem(`${AUTO_REFRESHED_BUILD_PREFIX}${build}`) === '1';
+}
+
+function markAutoRefreshedBuild(build: string | null): void {
+  if (!build) return;
+  sessionStorage.setItem(`${AUTO_REFRESHED_BUILD_PREFIX}${build}`, '1');
+}
+
+async function forceHardRefresh(queryKey: string, value: string) {
+  try {
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map((registration) => registration.unregister()));
     }
 
-    // Guardrail: prevent a bad timestamp from blocking updates indefinitely
-    const maxFuture = Date.now() + 60 * 60 * 1000; // 1 hour
-    if (until > maxFuture) {
-      localStorage.removeItem(UPDATE_COOLDOWN_KEY);
-      return null;
+    if ('caches' in window) {
+      const cacheKeys = await caches.keys();
+      await Promise.all(cacheKeys.map((key) => caches.delete(key)));
     }
-
-    return until;
-  } catch {
-    return null;
+  } finally {
+    const target = new URL(window.location.href);
+    target.searchParams.set(queryKey, value);
+    window.location.replace(target.toString());
   }
-}
-
-function isInCooldown(): boolean {
-  const until = getCooldownUntil();
-  return typeof until === 'number' && Date.now() < until;
-}
-
-function setCooldown(ms: number = UPDATE_COOLDOWN_MS): void {
-  try {
-    localStorage.setItem(UPDATE_COOLDOWN_KEY, String(Date.now() + ms));
-  } catch {
-    // Ignore storage failures (private mode, quota, etc.)
-  }
-}
-
-async function hardReload(): Promise<void> {
-  await hardReloadApp();
 }
 
 export function PWAUpdatePrompt() {
   const [showReload, setShowReload] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
-  const updateIntervalRef = useRef<number | null>(null);
+  const [pendingBuild, setPendingBuild] = useState<string | null>(null);
+
+  const detectPreviewUpdate = useCallback(async (): Promise<string | null> => {
+    if (!isPreviewContext) return null;
+
+    const currentBuild = readCurrentBuildTag();
+    const latestBuild = await fetchLatestBuildTag().catch(() => null);
+
+    if (!currentBuild || !latestBuild || latestBuild === currentBuild) {
+      return null;
+    }
+
+    return latestBuild;
+  }, []);
+
+  const openReloadPrompt = useCallback(
+    ({ build = null, resetDismissal = false }: { build?: string | null; resetDismissal?: boolean } = {}) => {
+      if (!isPreviewContext) return false;
+
+      const normalizedBuild = build ?? pendingBuild;
+
+      if (!resetDismissal && normalizedBuild && isBuildDismissed(normalizedBuild)) {
+        return false;
+      }
+
+      if (build) {
+        setPendingBuild(build);
+      }
+
+      setShowReload(true);
+      return true;
+    },
+    [pendingBuild],
+  );
+
+  const checkForWaitingServiceWorker = useCallback(async () => {
+    if (!isPreviewContext || !('serviceWorker' in navigator)) return false;
+
+    const registration = await navigator.serviceWorker.getRegistration().catch(() => undefined);
+    if (!registration) return false;
+
+    if (!registration.waiting) {
+      await registration.update().catch(() => undefined);
+    }
+
+    const refreshedRegistration = await navigator.serviceWorker.getRegistration().catch(() => undefined);
+    if (!refreshedRegistration?.waiting) return false;
+
+    const nextBuild = await detectPreviewUpdate();
+    if (!nextBuild) return false;
+
+    return openReloadPrompt({ build: nextBuild });
+  }, [detectPreviewUpdate, openReloadPrompt]);
 
   const {
     offlineReady: [offlineReady, setOfflineReady],
     needRefresh: [needRefresh, setNeedRefresh],
-    updateServiceWorker,
   } = useRegisterSW({
-    onRegisteredSW(swUrl, r) {
+    onRegisteredSW(swUrl, registration) {
       console.log('SW registered:', swUrl);
-      registrationRef.current = r ?? null;
 
-      if (updateIntervalRef.current) {
-        window.clearInterval(updateIntervalRef.current);
-        updateIntervalRef.current = null;
+        if (registration?.waiting) {
+          void checkForWaitingServiceWorker();
+        return;
       }
 
-      if (r) {
-        // Check for updates every 2 minutes
-        updateIntervalRef.current = window.setInterval(() => {
-          console.log('Checking for SW update...');
-          r.update();
-        }, 2 * 60 * 1000);
-
-        // Also check immediately on load
-        r.update();
-      }
+      void checkForWaitingServiceWorker();
     },
     onNeedRefresh() {
-      console.log('New content available, checking cooldown...');
-      // Only show prompt if not in cooldown period
-      if (!isInCooldown()) {
-        console.log('Showing update prompt');
-        setShowReload(true);
-      } else {
-        console.log('In cooldown period, skipping prompt');
-      }
+      console.log('New content available, showing reload prompt');
+      void detectPreviewUpdate().then((nextBuild) => {
+        if (nextBuild) {
+          openReloadPrompt({ build: nextBuild, resetDismissal: true });
+        }
+      });
     },
     onOfflineReady() {
       console.log('App ready for offline use');
@@ -99,173 +171,275 @@ export function PWAUpdatePrompt() {
     },
   });
 
-  useEffect(() => {
-    return () => {
-      if (updateIntervalRef.current) window.clearInterval(updateIntervalRef.current);
-    };
+  const activateWaitingServiceWorker = useCallback(async () => {
+    if (!('serviceWorker' in navigator)) return false;
+
+    const registration = await navigator.serviceWorker.getRegistration();
+    await registration?.update().catch(() => undefined);
+
+    const refreshedRegistration = await navigator.serviceWorker.getRegistration();
+    const waitingWorker = refreshedRegistration?.waiting;
+
+    if (!waitingWorker) return false;
+
+    return await new Promise<boolean>((resolve) => {
+      let settled = false;
+
+      const cleanup = () => {
+        navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
+        window.clearTimeout(timeoutId);
+      };
+
+      const finish = (didActivate: boolean) => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        resolve(didActivate);
+      };
+
+      const handleControllerChange = () => finish(true);
+
+      const timeoutId = window.setTimeout(() => finish(false), 4_000);
+
+      navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
+      waitingWorker.postMessage({ type: 'SKIP_WAITING' });
+    });
   }, []);
 
   useEffect(() => {
-    // Only show if needRefresh is true AND not in cooldown
-    if (needRefresh && !isInCooldown()) {
-      setShowReload(true);
-    }
-  }, [needRefresh]);
+    if (!isPreviewContext || !('serviceWorker' in navigator)) return;
 
-  // Failsafe: if a SW is already waiting (but callbacks didn't fire), surface the prompt
-  useEffect(() => {
-    const t = window.setTimeout(async () => {
-      try {
-        if (!('serviceWorker' in navigator)) return;
-        const reg = await navigator.serviceWorker.getRegistration();
-        if (!reg) return;
+    void checkForWaitingServiceWorker();
 
-        await reg.update();
-        if (reg.waiting && !isInCooldown()) setShowReload(true);
-      } catch {
-        // ignore
+    const handleVisibilityCheck = () => {
+      if (document.visibilityState === 'visible') {
+        void checkForWaitingServiceWorker();
       }
-    }, 1500);
+    };
 
-    return () => window.clearTimeout(t);
-  }, []);
+    const intervalId = window.setInterval(() => {
+      void checkForWaitingServiceWorker();
+    }, 15_000);
+
+    window.addEventListener('focus', handleVisibilityCheck);
+    document.addEventListener('visibilitychange', handleVisibilityCheck);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', handleVisibilityCheck);
+      document.removeEventListener('visibilitychange', handleVisibilityCheck);
+    };
+  }, [checkForWaitingServiceWorker]);
+
+  useEffect(() => {
+    if (needRefresh) {
+      void detectPreviewUpdate().then((nextBuild) => {
+        if (nextBuild) {
+          openReloadPrompt({ build: nextBuild, resetDismissal: true });
+        }
+      });
+    }
+  }, [detectPreviewUpdate, needRefresh, openReloadPrompt]);
+
+  useEffect(() => {
+    const handleManualUpdateRequired = () => {
+      void detectPreviewUpdate().then((nextBuild) => {
+        if (nextBuild) {
+          openReloadPrompt({ build: nextBuild, resetDismissal: true });
+        }
+      });
+    };
+
+    window.addEventListener(MANUAL_UPDATE_REQUIRED_EVENT, handleManualUpdateRequired);
+    return () => window.removeEventListener(MANUAL_UPDATE_REQUIRED_EVENT, handleManualUpdateRequired);
+  }, [openReloadPrompt]);
+
+  useEffect(() => {
+    if (isMetaWebView || !isPreviewContext) return;
+
+    const currentBuild = readCurrentBuildTag();
+    if (!currentBuild) return;
+
+    let cancelled = false;
+
+    const checkForPublishedUpdate = async () => {
+      try {
+        const nextBuild = await fetchLatestBuildTag();
+        if (
+          cancelled ||
+          !nextBuild ||
+          nextBuild === currentBuild ||
+          isBuildDismissed(nextBuild) ||
+          hasAutoRefreshedBuild(nextBuild)
+        ) {
+          return;
+        }
+
+        if ('serviceWorker' in navigator) {
+          await navigator.serviceWorker
+            .getRegistration()
+            .then((registration) => registration?.update())
+            .catch(() => undefined);
+        }
+
+        openReloadPrompt({ build: nextBuild, resetDismissal: true });
+      } catch {
+        // Ignore transient network/cache issues and retry on next poll.
+      }
+    };
+
+    const timeoutId = window.setTimeout(() => {
+      void checkForPublishedUpdate();
+    }, INITIAL_BUILD_CHECK_DELAY_MS);
+
+    const intervalId = window.setInterval(() => {
+      void checkForPublishedUpdate();
+    }, BUILD_CHECK_INTERVAL_MS);
+
+    const handleVisibilityCheck = () => {
+      if (document.visibilityState === 'visible') {
+        void checkForPublishedUpdate();
+      }
+    };
+
+    window.addEventListener('focus', handleVisibilityCheck);
+    document.addEventListener('visibilitychange', handleVisibilityCheck);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', handleVisibilityCheck);
+      document.removeEventListener('visibilitychange', handleVisibilityCheck);
+    };
+  }, [openReloadPrompt]);
 
   const handleUpdate = useCallback(async () => {
     if (isUpdating) return;
+
     setIsUpdating(true);
 
     try {
-      // Mark cooldown immediately to avoid prompt spam
-      setCooldown();
+      if (isMetaWebView) {
+        await forceHardRefresh('__meta_refresh', `manual-${Date.now()}`);
+        return;
+      }
 
-      // Preferred path: ask the waiting SW to activate and reload.
-      // If that fails (or no SW), fall back to a full hard reload.
-      await updateServiceWorker(true);
+      if (await activateWaitingServiceWorker()) {
+        window.location.reload();
+        return;
+      }
+
+      markAutoRefreshedBuild(pendingBuild);
+      await forceHardRefresh('__app_refresh', pendingBuild ? `manual-${pendingBuild}` : `manual-${Date.now()}`);
     } catch (error) {
-      console.error('SW apply failed, falling back to hard reload:', error);
-      await hardReload();
+      console.error('Error during update:', error);
+      await forceHardRefresh('__app_refresh', `fallback-${Date.now()}`);
     } finally {
-      // If reload didn't happen for any reason, re-enable the UI
       setIsUpdating(false);
     }
-  }, [isUpdating, updateServiceWorker]);
+  }, [activateWaitingServiceWorker, isUpdating, pendingBuild]);
 
-  // Also check for updates when user returns to the app (mobile + desktop)
-  // Auto-apply updates if a SW is waiting when user returns
-  useEffect(() => {
-    const checkAndAutoApply = async () => {
-      try {
-        if (!('serviceWorker' in navigator)) return;
-
-        const reg = registrationRef.current ?? (await navigator.serviceWorker.getRegistration());
-        if (!reg) return;
-        registrationRef.current = reg;
-
-        await reg.update();
-
-        const hasWaiting = !!(reg.waiting ?? (await navigator.serviceWorker.getRegistration())?.waiting);
-        if ((needRefresh || hasWaiting) && !isInCooldown()) {
-          console.log('Auto-applying update on return...');
-          await handleUpdate();
-        }
-      } catch {
-        // ignore
-      }
-    };
-
-    const onFocus = () => void checkAndAutoApply();
-    const onVisibility = () => {
-      if (document.visibilityState === 'visible') void checkAndAutoApply();
-    };
-
-    window.addEventListener('focus', onFocus);
-    document.addEventListener('visibilitychange', onVisibility);
-    return () => {
-      window.removeEventListener('focus', onFocus);
-      document.removeEventListener('visibilitychange', onVisibility);
-    };
-  }, [handleUpdate, needRefresh]);
-
-  const close = () => {
+  const close = useCallback(() => {
+    dismissBuild(pendingBuild);
     setOfflineReady(false);
     setNeedRefresh(false);
     setShowReload(false);
-    // Short cooldown when user dismisses (15 seconds)
-    setCooldown(15 * 1000);
-  };
+  }, [pendingBuild, setNeedRefresh, setOfflineReady]);
 
-  if (!offlineReady && !showReload) return null;
+  const showUpdatePrompt = isPreviewContext && showReload;
 
-  return (
-    <div className="fixed bottom-24 md:bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-[100] sm:max-w-md animate-in slide-in-from-bottom-4">
-      {offlineReady && !showReload && (
-        <Alert className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-primary/20">
-          <Download className="h-4 w-4 text-primary" />
-          <AlertTitle className="text-foreground">App ready for offline use</AlertTitle>
-          <AlertDescription className="mt-2 flex flex-col sm:flex-row items-start sm:items-center gap-2">
-            <span className="flex-1 text-sm text-muted-foreground">The app is now available offline</span>
-            <Button onClick={close} variant="outline" size="sm" className="w-full sm:w-auto">
-              Dismiss
-            </Button>
-          </AlertDescription>
-        </Alert>
-      )}
-      
-      {showReload && (
-        <Alert className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-primary/20">
-          <RefreshCw className="h-4 w-4 text-primary" />
-          <AlertTitle className="text-foreground">New version available</AlertTitle>
-          <AlertDescription className="mt-2 flex flex-col sm:flex-row items-start sm:items-center gap-2">
-            <span className="flex-1 text-sm text-muted-foreground">Click reload to update to the latest version</span>
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Button 
-                onClick={handleUpdate} 
-                variant="default" 
-                size="sm"
-                className="flex-1 sm:flex-initial"
-                disabled={isUpdating}
-              >
-                <RefreshCw className={`h-3 w-3 mr-1 ${isUpdating ? 'animate-spin' : ''}`} />
-                {isUpdating ? 'Updating...' : 'Reload'}
-              </Button>
-              <Button
-                onClick={hardReload}
-                variant="outline"
-                size="sm"
-                className="flex-1 sm:flex-initial"
-                disabled={isUpdating}
-              >
-                Force Update
-              </Button>
-              <Button onClick={close} variant="outline" size="sm" className="flex-1 sm:flex-initial" disabled={isUpdating}>
-                Later
-              </Button>
-            </div>
-          </AlertDescription>
-        </Alert>
-      )}
-    </div>
+  if (!offlineReady && !showUpdatePrompt) return null;
+
+  return createPortal(
+    <>
+      {offlineReady || showUpdatePrompt ? (
+        <div
+          className="fixed inset-0 z-[2147483647] flex items-center justify-center p-4 overflow-visible"
+          style={{ pointerEvents: 'none' }}
+        >
+          <div
+            style={{ pointerEvents: 'auto' }}
+            className="w-[min(92vw,22rem)] max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl border border-border bg-card/95 p-5 shadow-2xl backdrop-blur-xl animate-in zoom-in-95 fade-in-0"
+          >
+            {offlineReady && !showReload ? (
+              <>
+                <div className="mb-2 flex items-center gap-2">
+                  <Download className="h-5 w-5 text-accent" />
+                  <h3 className="text-base font-bold text-foreground">Ready Offline</h3>
+                </div>
+                <p className="mb-4 break-words text-sm leading-relaxed text-muted-foreground">
+                  The app is now available offline. You can use it without an internet connection.
+                </p>
+                <Button onClick={close} variant="outline" size="sm" className="w-full">
+                  Dismiss
+                </Button>
+              </>
+            ) : (
+              <>
+                <div className="mb-2 flex items-center gap-2">
+                  <RefreshCw className="h-5 w-5 text-primary" />
+                  <h3 className="text-base font-bold text-foreground">New Version Available</h3>
+                </div>
+                <p className="mb-4 break-words text-sm leading-relaxed text-muted-foreground">
+                  A new version is ready. Tap reload now to get the latest features and fixes.
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleUpdate}
+                    variant="default"
+                    size="sm"
+                    className="flex-1"
+                    disabled={isUpdating}
+                  >
+                    <RefreshCw className={`mr-1 h-3 w-3 ${isUpdating ? 'animate-spin' : ''}`} />
+                    {isUpdating ? 'Updating...' : 'Reload Now'}
+                  </Button>
+                  <Button onClick={close} variant="outline" size="sm" className="flex-1" disabled={isUpdating}>
+                    Later
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      ) : null}
+    </>,
+    document.body,
   );
 }
 
-// Export a hook for manual update checking from other components
 export function useCheckForUpdates() {
   const [isChecking, setIsChecking] = useState(false);
   const [updateAvailable, setUpdateAvailable] = useState(false);
 
   const checkForUpdates = useCallback(async () => {
     setIsChecking(true);
+
     try {
+      const currentBuild = readCurrentBuildTag();
+      const latestBuild = await fetchLatestBuildTag().catch(() => null);
+
+      if (
+        currentBuild &&
+        latestBuild &&
+        latestBuild !== currentBuild &&
+        !isBuildDismissed(latestBuild)
+      ) {
+        setUpdateAvailable(true);
+        return true;
+      }
+
       if ('serviceWorker' in navigator) {
         const registration = await navigator.serviceWorker.getRegistration();
-        if (registration) {
-          await registration.update();
-          if (registration.waiting) {
-            setUpdateAvailable(true);
-            return true;
-          }
+        await registration?.update();
+
+        if (registration?.waiting) {
+          setUpdateAvailable(true);
+          return true;
         }
       }
+
       return false;
     } catch (error) {
       console.error('Error checking for updates:', error);
@@ -276,29 +450,13 @@ export function useCheckForUpdates() {
   }, []);
 
   const applyUpdate = useCallback(async () => {
-    setCooldown();
-    if ('serviceWorker' in navigator) {
-      const registration = await navigator.serviceWorker.getRegistration();
-      if (registration?.waiting) {
-        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-        window.location.reload();
-      }
-    }
-  }, []);
-
-  // Force update - bypasses cooldown, clears all caches, unregisters SW and reloads
-  const forceUpdate = useCallback(async () => {
-    console.log('Force update initiated...');
-
-    // Clear cooldown
-    try {
-      localStorage.removeItem(UPDATE_COOLDOWN_KEY);
-    } catch {
-      // ignore
+    if (isMetaWebView) {
+      await forceHardRefresh('__meta_refresh', `hook-${Date.now()}`);
+      return;
     }
 
-    await hardReload();
+    await forceHardRefresh('__app_refresh', `hook-${Date.now()}`);
   }, []);
 
-  return { checkForUpdates, applyUpdate, forceUpdate, isChecking, updateAvailable };
+  return { checkForUpdates, applyUpdate, isChecking, updateAvailable };
 }

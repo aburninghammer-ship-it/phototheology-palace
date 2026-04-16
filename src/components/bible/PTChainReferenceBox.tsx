@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,13 +43,24 @@ const PRINCIPLES = [
   { value: "horizons", label: "Three Heavens (1H-3H)" },
 ];
 
-export const PTChainReferenceBox = () => {
-  const [verseInput, setVerseInput] = useState("");
+interface PTChainReferenceBoxProps {
+  initialVerse?: string;
+}
+
+export const PTChainReferenceBox = ({ initialVerse }: PTChainReferenceBoxProps) => {
+  const [verseInput, setVerseInput] = useState(initialVerse || "");
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<ChainReferenceResult[]>([]);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [selectedPrinciple, setSelectedPrinciple] = useState<string>("types");
   const { toast } = useToast();
+
+  // Update verse input when initialVerse prop changes
+  useEffect(() => {
+    if (initialVerse) {
+      setVerseInput(initialVerse);
+    }
+  }, [initialVerse]);
 
   const analyzeVerse = async () => {
     if (!verseInput.trim()) {
@@ -186,12 +197,17 @@ export const PTChainReferenceBox = () => {
         <Button
           onClick={analyzeVerse}
           disabled={loading || !verseInput.trim()}
-          className="w-full gradient-royal text-white shadow-blue"
+          className="w-full gradient-royal text-white shadow-blue disabled:opacity-50"
         >
           {loading ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               Finding Chain References...
+            </>
+          ) : !verseInput.trim() ? (
+            <>
+              <Search className="h-4 w-4 mr-2" />
+              Enter a Verse Above to Search
             </>
           ) : (
             <>

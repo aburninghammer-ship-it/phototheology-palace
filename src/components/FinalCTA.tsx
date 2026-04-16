@@ -23,7 +23,7 @@ export const FinalCTA = () => {
             onClick={() => navigate("/pricing")}
             className="text-lg px-8 py-6 h-auto group gradient-palace"
           >
-            Start 14-Day Free Trial
+            Start 7-Day Free Trial
             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </Button>
           
@@ -50,7 +50,7 @@ export const FinalCTA = () => {
         </div>
 
         <p className="text-sm text-muted-foreground pt-4">
-          Full premium access for 14 days • Cancel anytime
+          Full premium access for 7 days • Cancel anytime
         </p>
 
         <p className="text-sm text-muted-foreground/80 pt-2">

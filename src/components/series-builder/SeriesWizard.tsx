@@ -44,7 +44,7 @@ export const SeriesWizard = ({ onComplete, onCancel }: SeriesWizardProps) => {
       case 2:
         return formData.lessonCount >= 4 && formData.lessonCount <= 12 && formData.themeSubject.trim();
       case 3:
-        return formData.generatedOutline && formData.generatedOutline.length > 0;
+        return Boolean(formData.seriesId);
       case 4:
         return true;
       default:

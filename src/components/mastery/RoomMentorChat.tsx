@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRoomMentor } from "@/hooks/useRoomMentor";
 import { Swords, Send, Trash2 } from "lucide-react";
 import { MasteryBadge } from "./MasteryBadge";
+import { useTranslation } from 'react-i18next';
 
 interface RoomMentorChatProps {
   roomId: string;
@@ -18,6 +19,7 @@ export const RoomMentorChat: React.FC<RoomMentorChatProps> = ({
   roomName,
   masteryLevel,
 }) => {
+  const { t } = useTranslation();
   const [input, setInput] = useState("");
   const { messages, isStreaming, sendMessage, clearMessages } = useRoomMentor(
     roomId,
@@ -34,7 +36,7 @@ export const RoomMentorChat: React.FC<RoomMentorChatProps> = ({
 
   const handleSend = async () => {
     if (!input.trim() || isStreaming) return;
-    
+
     await sendMessage(input);
     setInput("");
   };
@@ -55,8 +57,8 @@ export const RoomMentorChat: React.FC<RoomMentorChatProps> = ({
               <Swords className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <CardTitle>Mentor Mode</CardTitle>
-              <CardDescription>Sparring with Jeeves in {roomName}</CardDescription>
+              <CardTitle>{t('roomMentor.title')}</CardTitle>
+              <CardDescription>{t('roomMentor.sparringWith', { roomName })}</CardDescription>
             </div>
           </div>
           <MasteryBadge level={masteryLevel} size="sm" />
@@ -66,11 +68,11 @@ export const RoomMentorChat: React.FC<RoomMentorChatProps> = ({
         {messages.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
             <Swords className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p className="font-medium mb-2">Ready to Spar?</p>
+            <p className="font-medium mb-2">{t('roomMentor.readyToSpar')}</p>
             <p className="text-sm">
-              Jeeves will challenge your understanding and test your reasoning.
+              {t('roomMentor.challengeDesc')}
               <br />
-              Defend your interpretations and strengthen your faith!
+              {t('roomMentor.defendDesc')}
             </p>
           </div>
         )}
@@ -116,7 +118,7 @@ export const RoomMentorChat: React.FC<RoomMentorChatProps> = ({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Defend your interpretation..."
+            placeholder={t('roomMentor.placeholder')}
             disabled={isStreaming}
             spellCheck={true}
           />

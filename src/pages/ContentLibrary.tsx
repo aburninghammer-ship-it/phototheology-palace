@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -62,6 +63,7 @@ const CONTENT_LIBRARY: ContentItem[] = [
 ];
 
 export default function ContentLibrary() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
@@ -96,17 +98,17 @@ export default function ContentLibrary() {
 
   const handleDownload = (item: ContentItem) => {
     if (item.premium) {
-      toast({ title: "Premium Content", description: "Upgrade to access this content", variant: "destructive" });
+      toast({ title: t('content.premiumContent'), description: t('content.upgradeToAccess'), variant: "destructive" });
       return;
     }
-    toast({ title: "Download Started", description: `Downloading "${item.title}"` });
+    toast({ title: t('content.downloadStarted'), description: t('content.downloading', { title: item.title }) });
   };
 
   const handleUseTemplate = (item: ContentItem) => {
     if (item.type === "devotional") {
       navigate("/devotionals");
     } else {
-      toast({ title: "Opening...", description: `Loading "${item.title}"` });
+      toast({ title: t('content.opening'), description: t('content.loadingItem', { title: item.title }) });
     }
   };
 
@@ -121,10 +123,10 @@ export default function ContentLibrary() {
           <div className="text-center space-y-2">
             <h1 className="text-4xl font-bold flex items-center justify-center gap-3">
               <Sparkles className="h-10 w-10 text-primary" />
-              Content Library
+              {t('content.title')}
             </h1>
             <p className="text-xl text-muted-foreground">
-              Pre-built devotionals, study guides, videos & templates
+              {t('content.description')}
             </p>
           </div>
 
@@ -132,7 +134,7 @@ export default function ContentLibrary() {
           <div className="space-y-4">
             <h2 className="text-2xl font-bold flex items-center gap-2">
               <Star className="h-6 w-6 text-yellow-500" />
-              Featured
+              {t('content.featured')}
             </h2>
             <div className="grid md:grid-cols-3 gap-4">
               {featuredItems.map((item, index) => (
@@ -177,7 +179,7 @@ export default function ContentLibrary() {
                           )}
                         </div>
                         <Button size="sm" onClick={() => handleUseTemplate(item)}>
-                          Use
+                          {t('content.use')}
                         </Button>
                       </div>
                     </CardContent>
@@ -192,7 +194,7 @@ export default function ContentLibrary() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search content..."
+                placeholder={t('content.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -207,7 +209,7 @@ export default function ContentLibrary() {
                   onClick={() => setSelectedCategory(cat)}
                   className="whitespace-nowrap"
                 >
-                  {cat === "all" ? "All" : cat}
+                  {cat === "all" ? t('common.all') : cat}
                 </Button>
               ))}
             </div>
@@ -216,11 +218,11 @@ export default function ContentLibrary() {
           {/* Content Tabs */}
           <Tabs defaultValue="all" className="space-y-6">
             <TabsList>
-              <TabsTrigger value="all">All Content</TabsTrigger>
-              <TabsTrigger value="devotional">Devotionals</TabsTrigger>
-              <TabsTrigger value="study-guide">Study Guides</TabsTrigger>
-              <TabsTrigger value="video">Videos</TabsTrigger>
-              <TabsTrigger value="template">Templates</TabsTrigger>
+              <TabsTrigger value="all">{t('content.tabs.allContent')}</TabsTrigger>
+              <TabsTrigger value="devotional">{t('content.tabs.devotionals')}</TabsTrigger>
+              <TabsTrigger value="study-guide">{t('content.tabs.studyGuides')}</TabsTrigger>
+              <TabsTrigger value="video">{t('content.tabs.videos')}</TabsTrigger>
+              <TabsTrigger value="template">{t('content.tabs.templates')}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="all" className="space-y-4">
@@ -240,7 +242,7 @@ export default function ContentLibrary() {
                             {item.type}
                           </Badge>
                           {item.premium && (
-                            <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500">Premium</Badge>
+                            <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500">{t('content.premium')}</Badge>
                           )}
                         </div>
                         <CardTitle className="text-base">{item.title}</CardTitle>
@@ -250,14 +252,14 @@ export default function ContentLibrary() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
                             {item.duration && <span>{item.duration}</span>}
-                            {item.downloads && <span>{item.downloads.toLocaleString()} downloads</span>}
+                            {item.downloads && <span>{t('content.downloadsCount', { defaultValue: '{{count}} downloads', count: item.downloads })}</span>}
                           </div>
                           <div className="flex gap-2">
                             <Button variant="outline" size="sm" onClick={() => handleDownload(item)}>
                               <Download className="h-3 w-3" />
                             </Button>
                             <Button size="sm" onClick={() => handleUseTemplate(item)}>
-                              Use
+                              {t('content.use')}
                             </Button>
                           </div>
                         </div>
@@ -286,10 +288,10 @@ export default function ContentLibrary() {
                         <CardContent>
                           <div className="flex items-center justify-between">
                             <span className="text-xs text-muted-foreground">
-                              {item.duration || `${item.downloads?.toLocaleString()} downloads`}
+                              {item.duration || t('content.downloadsCount', { defaultValue: '{{count}} downloads', count: item.downloads || 0 })}
                             </span>
                             <Button size="sm" onClick={() => handleUseTemplate(item)}>
-                              Use
+                              {t('content.use')}
                             </Button>
                           </div>
                         </CardContent>

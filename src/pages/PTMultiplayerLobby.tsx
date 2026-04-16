@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +14,7 @@ import { TextShareButton } from "@/components/TextShareButton";
 const PTMultiplayerLobby = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   
   const [studyTopic, setStudyTopic] = useState("");
   const [gameMode, setGameMode] = useState("free-for-all");
@@ -21,7 +23,7 @@ const PTMultiplayerLobby = () => {
 
   const handleCreateGame = async () => {
     if (!studyTopic.trim()) {
-      toast({ title: "Study topic required", variant: "destructive" });
+      toast({ title: t('multiplayer.studyTopicRequired'), variant: "destructive" });
       return;
     }
 
@@ -62,15 +64,19 @@ const PTMultiplayerLobby = () => {
           cards_remaining: 7
         });
 
-      if (playerError) throw playerError;
+      if (playerError) {
+        // Clean up orphaned game record
+        await supabase.from('pt_multiplayer_games').delete().eq('id', game.id);
+        throw playerError;
+      }
 
-      toast({ title: "Game created!", description: "Waiting for players to join..." });
+      toast({ title: t('multiplayer.gameCreated'), description: t('multiplayer.waitingForPlayers') });
       navigate(`/pt-multiplayer/${game.id}`);
 
     } catch (error: any) {
       console.error("Error creating game:", error);
       toast({
-        title: "Error creating game",
+        title: t('multiplayer.errorCreatingGame'),
         description: error.message,
         variant: "destructive"
       });
@@ -80,13 +86,13 @@ const PTMultiplayerLobby = () => {
   };
 
   const gameModes = [
-    { id: "free-for-all", label: "Free-For-All", icon: Users, desc: "Everyone competes individually", gradient: "from-blue-500 to-cyan-500" },
-    { id: "1v1-jeeves", label: "1v1 vs Jeeves", icon: Target, desc: "You vs AI Jeeves opponent", gradient: "from-purple-500 to-pink-500" },
-    { id: "team", label: "Team Mode", icon: Crown, desc: "Form teams and collaborate", gradient: "from-orange-500 to-amber-500" },
-    { id: "team-vs-jeeves", label: "Team vs Jeeves", icon: Swords, desc: "Your team vs AI Jeeves", gradient: "from-rose-500 to-red-500" },
-    { id: "council", label: "Council Mode", icon: Target, desc: "Debate before Jeeves judges", gradient: "from-violet-500 to-purple-500" },
-    { id: "boss", label: "Boss Mode", icon: Swords, desc: "Unite against AI Boss", gradient: "from-red-600 to-orange-600" },
-    { id: "battle-royale", label: "Battle Royale", icon: Zap, desc: "Chaos and random crises", gradient: "from-yellow-500 to-green-500" }
+    { id: "free-for-all", label: t('multiplayer.modeFreeForAll'), icon: Users, desc: t('multiplayer.modeFreeForAllDesc'), gradient: "from-blue-500 to-cyan-500" },
+    { id: "1v1-jeeves", label: t('multiplayer.mode1v1Jeeves'), icon: Target, desc: t('multiplayer.mode1v1JeevesDesc'), gradient: "from-purple-500 to-pink-500" },
+    { id: "team", label: t('multiplayer.modeTeam'), icon: Crown, desc: t('multiplayer.modeTeamDesc'), gradient: "from-orange-500 to-amber-500" },
+    { id: "team-vs-jeeves", label: t('multiplayer.modeTeamVsJeeves'), icon: Swords, desc: t('multiplayer.modeTeamVsJeevesDesc'), gradient: "from-rose-500 to-red-500" },
+    { id: "council", label: t('multiplayer.modeCouncil'), icon: Target, desc: t('multiplayer.modeCouncilDesc'), gradient: "from-violet-500 to-purple-500" },
+    { id: "boss", label: t('multiplayer.modeBoss'), icon: Swords, desc: t('multiplayer.modeBossDesc'), gradient: "from-red-600 to-orange-600" },
+    { id: "battle-royale", label: t('multiplayer.modeBattleRoyale'), icon: Zap, desc: t('multiplayer.modeBattleRoyaleDesc'), gradient: "from-yellow-500 to-green-500" }
   ];
 
   return (
@@ -99,7 +105,7 @@ const PTMultiplayerLobby = () => {
             className="text-white hover:bg-white/10"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Deck
+            {t('multiplayer.backToDeck')}
           </Button>
           
           <TextShareButton
@@ -116,29 +122,29 @@ const PTMultiplayerLobby = () => {
             <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 shadow-lg shadow-blue-500/50">
               <Gamepad2 className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-4xl font-bold text-white">PT Multiplayer Card Study</h1>
+            <h1 className="text-4xl font-bold text-white">{t('multiplayer.ptMultiplayerCardStudy')}</h1>
           </div>
           <p className="text-gray-300 text-lg">
-            Competitive Bible study where Jeeves judges every move
+            {t('multiplayer.competitiveBibleStudy')}
           </p>
         </div>
 
         <Card className="p-8 bg-black/40 backdrop-blur-sm border-white/10">
           <h2 className="text-3xl font-bold mb-6 text-white bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-            Create New Game
+            {t('multiplayer.createNewGame')}
           </h2>
           
           <div className="space-y-6">
             {/* Study Topic */}
             <div>
               <Label htmlFor="topic" className="text-lg mb-2 block text-white font-semibold">
-                📖 Study Topic
+                {t('multiplayer.studyTopicLabel')}
               </Label>
               <Input
                 id="topic"
                 value={studyTopic}
                 onChange={(e) => setStudyTopic(e.target.value)}
-                placeholder="e.g., John 3:16, Daniel 7, The Sanctuary, Revelation 12"
+                placeholder={t('multiplayer.studyTopicPlaceholder')}
                 className="text-lg py-6 bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-cyan-400 focus:ring-cyan-400"
               />
             </div>
@@ -146,7 +152,7 @@ const PTMultiplayerLobby = () => {
             {/* Game Mode */}
             <div>
               <Label className="text-lg mb-3 block text-white font-semibold">
-                🎮 Game Mode
+                {t('multiplayer.gameModeLabel')}
               </Label>
               <RadioGroup value={gameMode} onValueChange={setGameMode}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -234,7 +240,7 @@ const PTMultiplayerLobby = () => {
             {/* Max Players */}
             <div>
               <Label htmlFor="maxPlayers" className="text-lg mb-2 block text-white font-semibold">
-                👥 Max Players: <span className="text-cyan-400">{maxPlayers}</span>
+                {t('multiplayer.maxPlayersLabel')} <span className="text-cyan-400">{maxPlayers}</span>
               </Label>
               <input
                 type="range"
@@ -260,12 +266,12 @@ const PTMultiplayerLobby = () => {
               {creating ? (
                 <>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Creating Game...
+                  {t('multiplayer.creatingGame')}
                 </>
               ) : (
                 <>
                   <Gamepad2 className="w-5 h-5 mr-2" />
-                  Create Game
+                  {t('multiplayer.createGame')}
                 </>
               )}
             </Button>
@@ -275,36 +281,36 @@ const PTMultiplayerLobby = () => {
         {/* Rules Summary */}
         <Card className="mt-6 p-6 bg-black/40 backdrop-blur-sm border-white/10">
           <h3 className="font-bold text-xl mb-4 text-white flex items-center gap-2">
-            <span className="text-2xl">📘</span> Quick Rules
+            <span className="text-2xl">📘</span> {t('multiplayer.quickRules')}
           </h3>
           <ul className="space-y-3 text-sm text-gray-300">
             <li className="flex items-start gap-2">
               <span className="text-green-400 mt-0.5">✓</span>
-              <span>Each player starts with 7 cards</span>
+              <span>{t('multiplayer.rule1')}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-blue-400 mt-0.5">✓</span>
-              <span>Play a card and explain how it advances the study</span>
+              <span>{t('multiplayer.rule2')}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-purple-400 mt-0.5">✓</span>
-              <span>Jeeves judges: ✔ Approved, △ Partial, or ✘ Rejected</span>
+              <span>{t('multiplayer.rule3')}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-cyan-400 mt-0.5">✓</span>
-              <span>Approved = discard card + points</span>
+              <span>{t('multiplayer.rule4')}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-orange-400 mt-0.5">✓</span>
-              <span>Rejected = draw 1 card</span>
+              <span>{t('multiplayer.rule5')}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-red-400 mt-0.5">✓</span>
-              <span>3 rejections in a row = skip next turn</span>
+              <span>{t('multiplayer.rule6')}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-yellow-400 mt-0.5">✓</span>
-              <span>First to 0 cards wins (or highest score in Council Mode)</span>
+              <span>{t('multiplayer.rule7')}</span>
             </li>
           </ul>
         </Card>

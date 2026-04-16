@@ -1,4 +1,6 @@
 import { Navigation } from "@/components/Navigation";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { READING_PLANS_TOUR } from "@/data/guidedTours";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,6 +13,7 @@ import { readingPlansSteps } from "@/config/howItWorksSteps";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
+import { GraduationCap } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -20,8 +23,10 @@ import { RecommendedPlans } from "@/components/reading-plans/RecommendedPlans";
 import { CustomPlanBuilder } from "@/components/reading-plans/CustomPlanBuilder";
 import { Progress } from "@/components/ui/progress";
 import { Calendar, Target, Layers } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 
 export default function ReadingPlans() {
+  const { t } = useTranslation();
   const { plans, userProgress, allProgress, loading, startPlan, refetch, refetchProgress } = useReadingPlans();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -30,6 +35,7 @@ export default function ReadingPlans() {
   const [selectedTranslation, setSelectedTranslation] = useState("kjv");
   const [showTranslationDialog, setShowTranslationDialog] = useState(false);
   const [showCustomBuilder, setShowCustomBuilder] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
 
   const handleOpenTranslationDialog = (planId: string) => {
     setSelectedPlanId(planId);
@@ -85,32 +91,36 @@ export default function ReadingPlans() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={READING_PLANS_TOUR} onClose={() => setTourOpen(false)} />}
       
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header */}
         <div className="text-center mb-12">
           <Building2 className="h-16 w-16 text-primary mx-auto mb-4" />
           <h1 className="text-4xl font-bold mb-4 text-foreground">
-            Phototheology Reading Plans
+            {t('readingPlans.title')}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-4">
-            Journey through Scripture using the 8-Floor Palace method
+            {t('readingPlans.subtitle')}
           </p>
-          <div className="flex justify-center mb-4">
-            <HowItWorksDialog title="How to Use Reading Plans" steps={readingPlansSteps} />
+          <div className="flex justify-center gap-2 mb-4">
+            <HowItWorksDialog title={t('readingPlans.howToUse')} steps={readingPlansSteps} />
+            <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+              <GraduationCap className="h-4 w-4" /> Guided Tour
+            </Button>
           </div>
           <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <Layers className="h-4 w-4 text-primary" />
-              <span>Interactive Floor Exercises</span>
+              <span>{t('readingPlans.interactiveFloorExercises')}</span>
             </div>
             <div className="flex items-center gap-2">
               <Target className="h-4 w-4 text-primary" />
-              <span>Christ-Centered Study</span>
+              <span>{t('readingPlans.christCenteredStudy')}</span>
             </div>
             <div className="flex items-center gap-2">
               <BookOpen className="h-4 w-4 text-primary" />
-              <span>Room-by-Room Learning</span>
+              <span>{t('readingPlans.roomByRoomLearning')}</span>
             </div>
           </div>
         </div>
@@ -122,10 +132,10 @@ export default function ReadingPlans() {
             <div className="flex items-center justify-between mb-4 relative z-10">
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-foreground mb-1">
-                  Current Plan: {activePlan.name}
+                  {t('readingPlans.currentPlan', { name: activePlan.name })}
                 </h3>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Day {userProgress.current_day} of {activePlan.duration_days} days
+                  {t('readingPlans.dayOfDays', { current: userProgress.current_day, total: activePlan.duration_days })}
                 </p>
                 <div className="flex items-center gap-3">
                   <Progress value={activeProgressPercent} className="h-3 flex-1 max-w-xs" />
@@ -134,7 +144,7 @@ export default function ReadingPlans() {
               </div>
               <Button onClick={() => navigate("/daily-reading")} size="lg">
                 <Play className="h-4 w-4 mr-2" />
-                Continue Reading
+                {t('readingPlans.continueReading')}
               </Button>
             </div>
           </Card>
@@ -161,7 +171,7 @@ export default function ReadingPlans() {
           <div className="flex justify-end mb-6">
             <Button onClick={() => setShowCustomBuilder(true)} variant="outline">
               <Plus className="h-4 w-4 mr-2" />
-              Create Custom Plan
+              {t('readingPlans.createCustomPlan')}
             </Button>
           </div>
         )}
@@ -171,24 +181,24 @@ export default function ReadingPlans() {
           <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="monthly" className="flex items-center gap-2">
               <BookOpen className="h-4 w-4" />
-              Monthly
+              {t('readingPlans.monthly')}
             </TabsTrigger>
             <TabsTrigger value="yearly" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              Year-Long
+              {t('readingPlans.yearLong')}
             </TabsTrigger>
             <TabsTrigger value="custom" className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
-              My Plans {customPlans.length > 0 && `(${customPlans.length})`}
+              {t('readingPlans.myPlans')} {customPlans.length > 0 && `(${customPlans.length})`}
             </TabsTrigger>
           </TabsList>
 
           {/* Monthly Book Plans */}
           <TabsContent value="monthly">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold mb-2 text-foreground">Master One Book at a Time</h2>
+              <h2 className="text-2xl font-bold mb-2 text-foreground">{t('readingPlans.masterOneBook')}</h2>
               <p className="text-muted-foreground">
-                Spend a month deeply exploring a single Bible book with daily Palace exercises
+                {t('readingPlans.masterOneBookDesc')}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -208,9 +218,9 @@ export default function ReadingPlans() {
           {/* Year-Long Plans */}
           <TabsContent value="yearly">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold mb-2 text-foreground">Complete Bible Journey</h2>
+              <h2 className="text-2xl font-bold mb-2 text-foreground">{t('readingPlans.completeBibleJourney')}</h2>
               <p className="text-muted-foreground">
-                Read through the entire Bible with structured Palace study over a full year
+                {t('readingPlans.completeBibleJourneyDesc')}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -230,9 +240,9 @@ export default function ReadingPlans() {
           {/* Custom Plans */}
           <TabsContent value="custom">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold mb-2 text-foreground">My Custom Plans</h2>
+              <h2 className="text-2xl font-bold mb-2 text-foreground">{t('readingPlans.myCustomPlans')}</h2>
               <p className="text-muted-foreground">
-                Your personalized reading plans tailored to your study goals
+                {t('readingPlans.myCustomPlansDesc')}
               </p>
             </div>
             {customPlans.length > 0 ? (
@@ -253,13 +263,13 @@ export default function ReadingPlans() {
                 <GlassBubbles />
                 <div className="relative z-10">
                   <Plus className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-lg font-semibold mb-2">No Custom Plans Yet</h3>
+                  <h3 className="text-lg font-semibold mb-2">{t('readingPlans.noCustomPlansYet')}</h3>
                   <p className="text-muted-foreground mb-4">
-                    Create your own reading plan with your choice of books and pace
+                    {t('readingPlans.createYourOwnPlan')}
                   </p>
                   <Button onClick={() => setShowCustomBuilder(true)}>
                     <Plus className="h-4 w-4 mr-2" />
-                    Create Your First Plan
+                    {t('readingPlans.createYourFirstPlan')}
                   </Button>
                 </div>
               </Card>
@@ -270,7 +280,7 @@ export default function ReadingPlans() {
         {plans.length === 0 && (
           <Card variant="glass" className="p-12 text-center">
             <GlassBubbles />
-            <p className="text-muted-foreground relative z-10">No reading plans available yet</p>
+            <p className="text-muted-foreground relative z-10">{t('readingPlans.noPlansAvailable')}</p>
           </Card>
         )}
       </div>
@@ -279,17 +289,17 @@ export default function ReadingPlans() {
       <Dialog open={showTranslationDialog} onOpenChange={setShowTranslationDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Choose Your Bible Translation</DialogTitle>
+            <DialogTitle>{t('readingPlans.chooseTranslation')}</DialogTitle>
             <DialogDescription>
-              Select the translation you'd like to use for this reading plan
+              {t('readingPlans.selectTranslationDesc')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="translation">Translation</Label>
+              <Label htmlFor="translation">{t('readingPlans.translation')}</Label>
               <Select value={selectedTranslation} onValueChange={setSelectedTranslation}>
                 <SelectTrigger id="translation">
-                  <SelectValue placeholder="Select a translation" />
+                  <SelectValue placeholder={t('readingPlans.selectATranslation')} />
                 </SelectTrigger>
                 <SelectContent>
                   {BIBLE_TRANSLATIONS.map((translation) => (
@@ -303,10 +313,10 @@ export default function ReadingPlans() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowTranslationDialog(false)}>
-              Cancel
+              {t('readingPlans.cancel')}
             </Button>
             <Button onClick={handleStartPlan}>
-              Start Plan
+              {t('readingPlans.startPlan')}
             </Button>
           </DialogFooter>
         </DialogContent>

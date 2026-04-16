@@ -1,414 +1,466 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Book, CheckCircle2, Circle, BookOpen, Sparkles, Users } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
+import { Book, CheckCircle2, Circle, BookOpen, Sparkles, ExternalLink, ChevronDown, ChevronRight, Flame, Trophy, GraduationCap, Lock, Calendar } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
-import { phototheologyCourse, kidsPhototheologyCourse } from "@/data/phototheologyCourseData";
+import { phototheologyCourse, FLOOR_META } from "@/data/phototheologyCourseData";
+import { courseAssignments } from "@/data/courseAssignments";
+import { useCourseProgress } from "@/hooks/useCourseProgress";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 export default function PhototheologyCourse() {
-  const [completedDays, setCompletedDays] = useState<number[]>([]);
+  const { completedDays, reflections, loading, toggleDay, saveReflection, courseStartDate, isDayUnlocked, isDayCompletable, getUnlockedDay } = useCourseProgress("phototheology");
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
-  const [ageGroup, setAgeGroup] = useState<'adult' | 'ages-5-8' | 'ages-9-12' | 'ages-13-16'>('adult');
+  const [expandedWeeks, setExpandedWeeks] = useState<number[]>([1]);
+  const [reflectionDraft, setReflectionDraft] = useState("");
 
-  const toggleDayCompletion = (day: number) => {
-    setCompletedDays(prev =>
-      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
-    );
+  const currentCourse = phototheologyCourse;
+
+  const selectedDayData = useMemo(() => {
+    if (!selectedDay) return null;
+    return phototheologyCourse.find(d => d.day === selectedDay);
+  }, [selectedDay]);
+
+  const weeks = useMemo(() => Array.from(new Set(currentCourse.map(d => d.week))), [currentCourse]);
+  const completionPct = currentCourse.length > 0 ? Math.round((completedDays.filter(d => currentCourse.some(c => c.day === d)).length / currentCourse.length) * 100) : 0;
+  const completedCount = completedDays.filter(d => currentCourse.some(c => c.day === d)).length;
+
+  const currentStreak = useMemo(() => {
+    const sorted = [...completedDays].sort((a, b) => b - a);
+    let streak = 0;
+    for (let i = 0; i < sorted.length; i++) {
+      if (i === 0 || sorted[i] === sorted[i - 1] - 1) streak++;
+      else break;
+    }
+    return streak;
+  }, [completedDays]);
+
+  const toggleWeek = (w: number) => setExpandedWeeks(prev => prev.includes(w) ? prev.filter(x => x !== w) : [...prev, w]);
+
+  const handleSelectDay = (day: number) => {
+    setSelectedDay(day);
+    const data = phototheologyCourse.find(d => d.day === day);
+    if (data) setReflectionDraft(reflections[day] || "");
   };
 
-  const currentCourse = ageGroup === 'adult' 
-    ? phototheologyCourse 
-    : kidsPhototheologyCourse.filter(day => day.ageGroup === ageGroup);
-
-  const selectedDayData = selectedDay
-    ? (ageGroup === 'adult' 
-        ? phototheologyCourse.find(d => d.day === selectedDay)
-        : kidsPhototheologyCourse.find(d => d.day === selectedDay && d.ageGroup === ageGroup))
-    : null;
-
-  const weeks = Array.from(new Set(currentCourse.map(day => day.week)));
-  const completionPercentage = Math.round((completedDays.length / currentCourse.length) * 100);
+  const getFloorForWeek = (weekNum: number) => {
+    const day = currentCourse.find(d => d.week === weekNum);
+    return day ? FLOOR_META.find(f => f.number === day.floorNumber) : null;
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
+    <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/10">
       <Navigation />
-      
       <main className="container mx-auto px-4 py-8 mt-16">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
+          {/* Hero Header */}
           <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Book className="h-12 w-12 text-primary" />
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                50-Day Phototheology Course
-              </h1>
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5">
+                <GraduationCap className="h-10 w-10 text-primary" />
+              </div>
             </div>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Build your Memory Palace: An 8-floor journey to master Christ-centered visual Bible study
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent mb-2">
+              The Phototheology Course
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              90 days through all 8 floors of the Palace — from memory to mastery
             </p>
-            
+
+            {/* Stats Row */}
+            <div className="flex items-center justify-center gap-6 mt-6 flex-wrap">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">{completedCount}</div>
+                <div className="text-xs text-muted-foreground">Days Done</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">{completionPct}%</div>
+                <div className="text-xs text-muted-foreground">Complete</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-orange-500 flex items-center gap-1 justify-center">
+                  <Flame className="h-5 w-5" />{currentStreak}
+                </div>
+                <div className="text-xs text-muted-foreground">Streak</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">{currentCourse.length}</div>
+                <div className="text-xs text-muted-foreground">Total Days</div>
+              </div>
+            </div>
+
+            {/* Time-Lock Info */}
+            <div className="mt-3 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+              <Lock className="h-3 w-3" />
+              <span>
+                {courseStartDate
+                  ? `Day ${getUnlockedDay()} of 90 unlocked · Started ${courseStartDate.toLocaleDateString()}`
+                  : "Complete Day 1 to begin your 90-day journey"}
+              </span>
+            </div>
+
             {/* Progress Bar */}
-            <div className="mt-6 max-w-md mx-auto">
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-muted-foreground">Progress</span>
-                <span className="font-semibold text-primary">{completionPercentage}%</span>
-              </div>
-              <div className="h-3 bg-secondary rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-primary to-primary/60 transition-all duration-500"
-                  style={{ width: `${completionPercentage}%` }}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                {completedDays.length} of {currentCourse.length} days completed
-              </p>
+            <div className="mt-3 max-w-md mx-auto">
+              <Progress value={completionPct} className="h-3" />
             </div>
           </div>
 
-          {/* Age Group Selector */}
-          <div className="flex justify-center gap-2 mb-8 flex-wrap">
-            <Button
-              variant={ageGroup === 'adult' ? 'default' : 'outline'}
-              onClick={() => {
-                setAgeGroup('adult');
-                setSelectedDay(null);
-                setCompletedDays([]);
-              }}
-              className="gap-2"
-            >
-              <BookOpen className="h-4 w-4" />
-              Adult Course
-            </Button>
-            <Button
-              variant={ageGroup === 'ages-5-8' ? 'default' : 'outline'}
-              onClick={() => {
-                setAgeGroup('ages-5-8');
-                setSelectedDay(null);
-                setCompletedDays([]);
-              }}
-              className="gap-2"
-            >
-              <Users className="h-4 w-4" />
-              Ages 5-8
-            </Button>
-            <Button
-              variant={ageGroup === 'ages-9-12' ? 'default' : 'outline'}
-              onClick={() => {
-                setAgeGroup('ages-9-12');
-                setSelectedDay(null);
-                setCompletedDays([]);
-              }}
-              className="gap-2"
-            >
-              <Users className="h-4 w-4" />
-              Ages 9-12
-            </Button>
-            <Button
-              variant={ageGroup === 'ages-13-16' ? 'default' : 'outline'}
-              onClick={() => {
-                setAgeGroup('ages-13-16');
-                setSelectedDay(null);
-                setCompletedDays([]);
-              }}
-              className="gap-2"
-            >
-              <Users className="h-4 w-4" />
-              Ages 13-16
-            </Button>
+
+          {/* Floor Overview */}
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 mb-6">
+            {FLOOR_META.map(floor => {
+              const floorDays = currentCourse.filter(d => d.floorNumber === floor.number);
+              const floorCompleted = floorDays.filter(d => completedDays.includes(d.day)).length;
+              const floorPct = floorDays.length > 0 ? Math.round((floorCompleted / floorDays.length) * 100) : 0;
+              return (
+                <div key={floor.number} className={cn("rounded-lg p-2 text-center bg-gradient-to-br border border-border/50", floor.color)}>
+                  <div className="text-xl">{floor.icon}</div>
+                  <div className="text-[10px] font-semibold truncate">{floor.name}</div>
+                  <div className="text-[9px] text-muted-foreground">Wk {floor.weeks}</div>
+                  <Progress value={floorPct} className="h-1.5 mt-1" />
+                  <div className="text-[9px] text-muted-foreground mt-0.5">{floorPct}%</div>
+                </div>
+              );
+            })}
           </div>
 
-          {/* Course Structure Info */}
-          <Card className="mb-8 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
-                Your Memory Palace Structure
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-4 gap-4 text-sm">
-                <div className="space-y-1">
-                  <div className="font-semibold text-primary">Floor 1 (Days 1-7)</div>
-                  <div className="text-muted-foreground">Foundations & Furnishing</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="font-semibold text-primary">Floor 2 (Days 8-14)</div>
-                  <div className="text-muted-foreground">Detective Skills</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="font-semibold text-primary">Floor 3 (Days 15-21)</div>
-                  <div className="text-muted-foreground">Freestyle Connections</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="font-semibold text-primary">Floor 4 (Days 22-28)</div>
-                  <div className="text-muted-foreground">Christ-Centered Depth</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="font-semibold text-primary">Floors 5-6 (Days 29-35)</div>
-                  <div className="text-muted-foreground">Vision & Cycles</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="font-semibold text-primary">Floors 7-8 (Days 36-42)</div>
-                  <div className="text-muted-foreground">Synthesis & Ascension</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="font-semibold text-primary">Week 7 (Days 43-49)</div>
-                  <div className="text-muted-foreground">Advanced Application</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="font-semibold text-primary">Day 50</div>
-                  <div className="text-muted-foreground">Mastery & Legacy</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
+          {/* Main Content */}
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Days List */}
             <div className="lg:col-span-1">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Course Days</CardTitle>
-                  <CardDescription>
-                    {ageGroup === 'adult' 
-                      ? 'Select a day to view details'
-                      : `Kids version for ${String(ageGroup).replace('ages-', 'ages ')}`
-                    }
+              <Card className="border-border/50">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">Course Days</CardTitle>
+                  <CardDescription className="text-xs">
+                    90-day journey through the Palace
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <ScrollArea className="h-[600px] pr-4">
-                    {weeks.map(weekNum => (
-                      <div key={weekNum} className="mb-6">
-                        <h3 className="font-semibold text-sm text-muted-foreground mb-3 sticky top-0 bg-card py-2">
-                          Week {weekNum}
-                        </h3>
-                        <div className="space-y-2">
-                          {currentCourse
-                            .filter(day => day.week === weekNum)
-                            .map(day => (
-                              <Button
-                                key={day.day}
-                                variant={selectedDay === day.day ? 'default' : 'ghost'}
-                                className="w-full justify-start gap-3 h-auto py-3"
-                                onClick={() => setSelectedDay(day.day)}
-                              >
-                                <div
-                                  className="cursor-pointer"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    toggleDayCompletion(day.day);
-                                  }}
+                <CardContent className="p-0">
+                  <ScrollArea className="h-[600px]">
+                    <div className="px-4 pb-4 space-y-1">
+                      {weeks.map(weekNum => {
+                        const floorMeta = getFloorForWeek(weekNum);
+                        const weekDays = currentCourse.filter(d => d.week === weekNum);
+                        const weekCompleted = weekDays.filter(d => completedDays.includes(d.day)).length;
+                        const isExpanded = expandedWeeks.includes(weekNum);
+
+                        return (
+                          <div key={weekNum}>
+                            <button
+                              onClick={() => toggleWeek(weekNum)}
+                              className="w-full flex items-center gap-2 py-2 px-2 rounded-md hover:bg-muted/50 transition-colors text-left"
+                            >
+                              {isExpanded ? <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" /> : <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />}
+                              <span className="text-sm font-semibold flex-1">
+                                {floorMeta?.icon} Week {weekNum}
+                              </span>
+                              <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                                {weekCompleted}/{weekDays.length}
+                              </Badge>
+                            </button>
+                            <AnimatePresence>
+                              {isExpanded && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{ duration: 0.2 }}
+                                  className="overflow-hidden"
                                 >
-                                  {completedDays.includes(day.day) ? (
-                                    <CheckCircle2 className="h-5 w-5 text-green-500" />
-                                  ) : (
-                                    <Circle className="h-5 w-5 text-muted-foreground" />
-                                  )}
-                                </div>
-                                <div className="flex-1 text-left">
-                                  <div className="font-semibold">Day {day.day}</div>
-                                  <div className="text-xs text-muted-foreground line-clamp-1">
-                                    {day.title}
+                                  <div className="ml-5 space-y-0.5 pb-2">
+                                    {weekDays.map(day => {
+                                      const unlocked = isDayUnlocked(day.day);
+                                      const completable = isDayCompletable(day.day);
+                                      return (
+                                      <button
+                                        key={day.day}
+                                        onClick={() => handleSelectDay(day.day)}
+                                        className={cn(
+                                          "w-full flex items-center gap-2 py-1.5 px-2 rounded-md text-left transition-colors text-sm",
+                                          selectedDay === day.day ? "bg-primary/10 text-primary" : "hover:bg-muted/50",
+                                          !unlocked && "opacity-50"
+                                        )}
+                                      >
+                                        <button
+                                          onClick={(e) => { e.stopPropagation(); toggleDay(day.day); }}
+                                          className="shrink-0"
+                                          disabled={!unlocked}
+                                        >
+                                          {completedDays.includes(day.day) ? (
+                                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                          ) : !unlocked ? (
+                                            <Lock className="h-4 w-4 text-muted-foreground/30" />
+                                          ) : (
+                                            <Circle className="h-4 w-4 text-muted-foreground/40" />
+                                          )}
+                                        </button>
+                                        <div className="flex-1 min-w-0">
+                                          <div className="text-xs font-medium truncate">
+                                            Day {day.day}: {unlocked ? day.title : "🔒 Locked"}
+                                          </div>
+                                        </div>
+                                      </button>
+                                      );
+                                    })}
+                                    
                                   </div>
-                                </div>
-                              </Button>
-                            ))}
-                        </div>
-                      </div>
-                    ))}
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </ScrollArea>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Day Details */}
+            {/* Day Detail */}
             <div className="lg:col-span-2">
               {selectedDayData ? (
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="outline">Day {selectedDayData.day}</Badge>
-                          {selectedDayData.room && (
-                            <Badge variant="secondary">{selectedDayData.room}</Badge>
-                          )}
-                          {ageGroup !== 'adult' && (
-                            <Badge className="bg-purple-500">{String(ageGroup).replace('ages-', 'Ages ')}</Badge>
-                          )}
-                        </div>
-                        <CardTitle className="text-2xl mb-2">{selectedDayData.title}</CardTitle>
-                        <CardDescription className="text-base">{selectedDayData.floor}</CardDescription>
-                      </div>
-                      <Button
-                        variant={completedDays.includes(selectedDayData.day) ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => toggleDayCompletion(selectedDayData.day)}
-                        className="ml-4"
-                      >
-                        {completedDays.includes(selectedDayData.day) ? (
-                          <>
-                            <CheckCircle2 className="h-4 w-4 mr-2" />
-                            Completed
-                          </>
-                        ) : (
-                          <>
-                            <Circle className="h-4 w-4 mr-2" />
-                            Mark Complete
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <ScrollArea className="h-[600px] pr-4">
-                      <div className="space-y-6">
-                        {/* Focus */}
-                        <div>
-                          <h3 className="font-semibold text-primary mb-2 flex items-center gap-2">
-                            <Sparkles className="h-4 w-4" />
-                            Focus
-                          </h3>
-                          <p className="text-muted-foreground">{selectedDayData.focus}</p>
-                        </div>
-
-                        {/* Scripture */}
-                        <div className="bg-primary/5 p-4 rounded-lg border border-primary/10">
-                          <h3 className="font-semibold text-primary mb-2">
-                            Scripture: {selectedDayData.scripture}
-                          </h3>
-                          <p className="italic text-foreground">"{selectedDayData.scriptureText}"</p>
-                        </div>
-
-                        {/* Activity */}
-                        <div>
-                          <h3 className="font-semibold text-primary mb-2">Activity (10-20 min)</h3>
-                          <p className="text-foreground whitespace-pre-line">{selectedDayData.activity}</p>
-                          
-                          {'simplifiedActivity' in selectedDayData && selectedDayData.simplifiedActivity && (
-                            <div className="mt-4 p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
-                              <h4 className="font-semibold text-purple-700 dark:text-purple-300 mb-2">
-                                Simplified Activity
-                              </h4>
-                              <p className="text-sm">{String(selectedDayData.simplifiedActivity)}</p>
-                            </div>
-                          )}
-                          
-                          {'funElement' in selectedDayData && selectedDayData.funElement && (
-                            <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                              <h4 className="font-semibold text-yellow-700 dark:text-yellow-300 mb-2">
-                                🎉 Fun Element
-                              </h4>
-                              <p className="text-sm">{String(selectedDayData.funElement)}</p>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Reflection */}
-                        <div className="bg-secondary/50 p-4 rounded-lg">
-                          <h3 className="font-semibold mb-2">Reflection Question</h3>
-                          <p className="text-muted-foreground italic">{selectedDayData.reflection}</p>
-                        </div>
-
-                        {/* Prayer */}
-                        <div className="bg-gradient-to-br from-primary/10 to-transparent p-4 rounded-lg border border-primary/20">
-                          <h3 className="font-semibold text-primary mb-2">Prayer</h3>
-                          <p className="italic text-foreground">"{selectedDayData.prayer}"</p>
-                        </div>
-
-                        {/* Tips for this stage */}
-                        <div className="border-t pt-4 mt-6">
-                          <h3 className="font-semibold mb-2">Daily Tips</h3>
-                          <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-                            <li>Use KJV Bible for all references</li>
-                            <li>Keep a dedicated notebook for your palace journey</li>
-                            <li>Visualize adding this lesson to your mental palace</li>
-                            <li>Track cross-references and historicist insights where noted</li>
-                            {selectedDayData.day === 50 && (
-                              <li className="text-primary font-semibold">
-                                🎉 Congratulations on completing the 50-day journey! Your palace is built. Now continue daily.
-                              </li>
+                (() => {
+                  const dayUnlocked = isDayUnlocked(selectedDayData.day);
+                  const dayCompletable = isDayCompletable(selectedDayData.day);
+                  return (
+                <motion.div
+                  key={selectedDay}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Card className="border-border/50">
+                    <CardHeader className="pb-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-2 flex-wrap">
+                            <Badge variant="outline" className="text-xs">Day {selectedDayData.day}</Badge>
+                            <Badge className="bg-primary/10 text-primary text-xs border-0">
+                              {FLOOR_META.find(f => f.number === selectedDayData.floorNumber)?.icon} Floor {selectedDayData.floorNumber}
+                            </Badge>
+                            {selectedDayData.roomCode && (
+                              <Badge variant="secondary" className="text-xs">{selectedDayData.roomCode}</Badge>
                             )}
-                          </ul>
+                            {!dayUnlocked && (
+                              <Badge variant="destructive" className="text-xs gap-1">
+                                <Lock className="h-3 w-3" /> Locked
+                              </Badge>
+                            )}
+                          </div>
+                          <CardTitle className="text-2xl leading-tight">{selectedDayData.title}</CardTitle>
+                          <CardDescription className="mt-1">{selectedDayData.floor}</CardDescription>
                         </div>
+                        {dayUnlocked ? (
+                          <Button
+                            variant={completedDays.includes(selectedDayData.day) ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => toggleDay(selectedDayData.day)}
+                            disabled={!dayCompletable && !completedDays.includes(selectedDayData.day)}
+                            className={cn("shrink-0", completedDays.includes(selectedDayData.day) && "bg-green-600 hover:bg-green-700")}
+                          >
+                            {completedDays.includes(selectedDayData.day) ? (
+                              <><CheckCircle2 className="h-4 w-4 mr-1.5" /> Done</>
+                            ) : !dayCompletable ? (
+                              <><Lock className="h-4 w-4 mr-1.5" /> Complete Previous</>
+                            ) : (
+                              <><Circle className="h-4 w-4 mr-1.5" /> Complete</>
+                            )}
+                          </Button>
+                        ) : (
+                          <Badge variant="outline" className="text-xs py-2 px-3 gap-1.5">
+                            <Calendar className="h-3.5 w-3.5" />
+                            Unlocks in {selectedDayData.day - getUnlockedDay()} day{selectedDayData.day - getUnlockedDay() !== 1 ? 's' : ''}
+                          </Badge>
+                        )}
                       </div>
-                    </ScrollArea>
-                  </CardContent>
-                </Card>
+                    </CardHeader>
+                    <CardContent>
+                      {!dayUnlocked ? (
+                        <div className="text-center py-16 space-y-4">
+                          <div className="p-4 rounded-full bg-muted w-fit mx-auto">
+                            <Lock className="h-10 w-10 text-muted-foreground" />
+                          </div>
+                          <h3 className="text-lg font-semibold">This Day is Locked</h3>
+                          <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                            Day {selectedDayData.day} unlocks in {selectedDayData.day - getUnlockedDay()} day{selectedDayData.day - getUnlockedDay() !== 1 ? 's' : ''}.
+                            The Phototheology Course is designed to be completed over 90 real days — one day at a time, building depth through patience.
+                          </p>
+                          <p className="text-xs text-muted-foreground italic">"Line upon line, precept upon precept" — Isaiah 28:10</p>
+                        </div>
+                      ) : (
+                      <ScrollArea className="h-[550px] pr-4">
+                        <div className="space-y-5">
+                          {/* Focus */}
+                          <div>
+                            <h3 className="text-sm font-semibold text-primary mb-1.5 flex items-center gap-1.5">
+                              <Sparkles className="h-3.5 w-3.5" /> Focus
+                            </h3>
+                            <p className="text-sm text-muted-foreground leading-relaxed">{selectedDayData.focus}</p>
+                          </div>
+
+                          {/* Scripture */}
+                          <div className="bg-primary/5 p-4 rounded-lg border border-primary/10">
+                            <h3 className="text-sm font-semibold text-primary mb-1.5">
+                              📖 {selectedDayData.scripture}
+                            </h3>
+                            <p className="italic text-sm leading-relaxed">"{selectedDayData.scriptureText}"</p>
+                          </div>
+
+                          {/* Activity */}
+                          <div>
+                            <h3 className="text-sm font-semibold text-primary mb-1.5">📝 Today's Activity</h3>
+                            <p className="text-sm leading-relaxed whitespace-pre-line">{selectedDayData.activity}</p>
+
+                            {'simplifiedActivity' in selectedDayData && selectedDayData.simplifiedActivity && (
+                              <div className="mt-3 p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
+                                <h4 className="text-xs font-semibold text-purple-700 dark:text-purple-300 mb-1">Simplified Version</h4>
+                                <p className="text-xs">{String(selectedDayData.simplifiedActivity)}</p>
+                              </div>
+                            )}
+                            {'funElement' in selectedDayData && selectedDayData.funElement && (
+                              <div className="mt-2 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                                <h4 className="text-xs font-semibold text-yellow-700 dark:text-yellow-300 mb-1">🎮 Fun Element</h4>
+                                <p className="text-xs">{String(selectedDayData.funElement)}</p>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Practice Tools */}
+                          {(selectedDayData.practiceLink || (selectedDayData.practiceTools && selectedDayData.practiceTools.length > 0)) && (
+                            <div className="space-y-2">
+                              <h3 className="text-sm font-semibold text-primary flex items-center gap-1.5">
+                                🛠️ Practice Tools
+                              </h3>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                {selectedDayData.practiceLink && (
+                                  <Link to={selectedDayData.practiceLink}>
+                                    <Button variant="outline" size="sm" className="gap-2 w-full">
+                                      <ExternalLink className="h-3.5 w-3.5" />
+                                      {selectedDayData.practiceLinkLabel || "Open Practice Tool"}
+                                    </Button>
+                                  </Link>
+                                )}
+                                {selectedDayData.practiceTools?.map((tool, idx) => (
+                                  <Link key={idx} to={tool.link}>
+                                    <Button variant="outline" size="sm" className="gap-2 w-full">
+                                      <ExternalLink className="h-3.5 w-3.5" />
+                                      {tool.label}
+                                    </Button>
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Assignments */}
+                          {courseAssignments[selectedDayData.day] && (
+                            <div className="space-y-3">
+                              <h3 className="text-sm font-semibold text-primary flex items-center gap-1.5">
+                                📋 Today's Assignments
+                              </h3>
+                              <div className="space-y-2">
+                                {courseAssignments[selectedDayData.day].map((assignment, idx) => (
+                                  <Link key={idx} to={assignment.route} className="block">
+                                    <div className="flex items-start gap-3 p-3 rounded-lg border border-border/60 bg-card hover:bg-accent/50 transition-colors group">
+                                      <span className="text-lg mt-0.5">{assignment.icon}</span>
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-xs font-semibold text-primary">{assignment.tool}</span>
+                                          <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        </div>
+                                        <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{assignment.task}</p>
+                                      </div>
+                                    </div>
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Reflection */}
+                          <div className="bg-secondary/50 p-4 rounded-lg">
+                            <h3 className="text-sm font-semibold mb-1.5">💭 Reflection Question</h3>
+                            <p className="text-sm text-muted-foreground italic mb-3">{selectedDayData.reflection}</p>
+                            <Textarea
+                              placeholder="Write your reflection here... (saved automatically when you mark complete)"
+                              value={reflectionDraft}
+                              onChange={(e) => {
+                                setReflectionDraft(e.target.value);
+                                saveReflection(selectedDayData.day, e.target.value);
+                              }}
+                              className="min-h-[80px] text-sm bg-background/50"
+                            />
+                          </div>
+
+                          {/* Prayer */}
+                          <div className="bg-gradient-to-br from-primary/10 to-transparent p-4 rounded-lg border border-primary/20">
+                            <h3 className="text-sm font-semibold text-primary mb-1.5">🙏 Prayer</h3>
+                            <p className="italic text-sm leading-relaxed">"{selectedDayData.prayer}"</p>
+                          </div>
+
+                          {/* Navigation */}
+                          <div className="flex justify-between pt-2">
+                            <Button
+                              variant="ghost" size="sm"
+                              disabled={selectedDayData.day <= 1}
+                              onClick={() => handleSelectDay(selectedDayData.day - 1)}
+                            >
+                              ← Previous Day
+                            </Button>
+                            <Button
+                              variant="ghost" size="sm"
+                              disabled={selectedDayData.day >= currentCourse.length}
+                              onClick={() => handleSelectDay(selectedDayData.day + 1)}
+                            >
+                              Next Day →
+                            </Button>
+                          </div>
+                        </div>
+                      </ScrollArea>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+                  );
+                })()
               ) : (
-                <Card className="h-full flex items-center justify-center">
-                  <CardContent className="text-center py-12">
-                    <Book className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <Card className="h-full flex items-center justify-center border-border/50">
+                  <CardContent className="text-center py-16">
+                    <div className="p-4 rounded-full bg-primary/10 w-fit mx-auto mb-4">
+                      <Book className="h-12 w-12 text-primary/60" />
+                    </div>
                     <h3 className="text-xl font-semibold mb-2">Select a Day to Begin</h3>
-                    <p className="text-muted-foreground">
-                      Choose a day from the list to view the lesson details and start building your memory palace
+                    <p className="text-muted-foreground text-sm max-w-sm mx-auto">
+                      Choose a day from the course outline to view the lesson, activity, and reflection.
                     </p>
+                    <Button className="mt-6" onClick={() => handleSelectDay(1)}>
+                      Start Day 1 →
+                    </Button>
                   </CardContent>
                 </Card>
               )}
             </div>
           </div>
 
-          {/* Course Goals */}
-          <Card className="mt-8">
-            <CardHeader>
-              <CardTitle>Course Goals</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-semibold mb-3 text-primary">By the End of This Course You Will:</h3>
-                  <ul className="space-y-2">
-                    <li className="flex gap-2">
-                      <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                      <span>Build a complete mental palace with 8 floors and 38 rooms</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                      <span>Master the 5 dimensions, 8 cycles, and key patterns of Scripture</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                      <span>Develop skills in observation, symbolism, prophecy, and application</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                      <span>Achieve reflexive mastery where Christ shines through all study</span>
-                    </li>
-                  </ul>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-3 text-primary">Daily Structure:</h3>
-                  <ul className="space-y-2">
-                    <li className="flex gap-2">
-                      <span className="font-semibold text-primary shrink-0">Focus:</span>
-                      <span className="text-muted-foreground">Key concept or room for the day</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="font-semibold text-primary shrink-0">Scripture:</span>
-                      <span className="text-muted-foreground">KJV anchor verses</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="font-semibold text-primary shrink-0">Activity:</span>
-                      <span className="text-muted-foreground">Practical exercise (10-20 minutes)</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="font-semibold text-primary shrink-0">Reflection:</span>
-                      <span className="text-muted-foreground">Journal prompt to internalize</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="font-semibold text-primary shrink-0">Prayer:</span>
-                      <span className="text-muted-foreground">Christ-centered close</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Completion Celebration */}
+          {completionPct === 100 && (
+            <Card className="mt-8 border-primary/30 bg-gradient-to-br from-primary/10 to-transparent">
+              <CardContent className="text-center py-8">
+                <Trophy className="h-16 w-16 text-primary mx-auto mb-4" />
+                <h2 className="text-2xl font-bold mb-2">🎉 Palace Complete!</h2>
+                <p className="text-muted-foreground max-w-lg mx-auto">
+                  You've completed all 90 days of the Phototheology Course. The palace is now inside you.
+                  Continue using the tools and rooms to deepen your mastery every day.
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </main>
     </div>

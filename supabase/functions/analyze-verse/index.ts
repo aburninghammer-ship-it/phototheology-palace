@@ -1,6 +1,41 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { getContentBehavioralEngine } from "../_shared/content-behavioral-engine.ts";
 
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+
+// Canonical room code → full name mapping to prevent AI hallucinating wrong names
+const CANONICAL_ROOMS: Record<string, string> = {
+  "SR": "Story Room", "IR": "Imagination Room", "24FPS": "24 Frames Per Second", "24F": "24 Frames Per Second",
+  "BR": "Bible Rendered", "TR": "Translation Room", "GR": "Gems Room",
+  "OR": "Observation Room", "DC": "Def-Com Room", "ST": "Symbols/Types Room",
+  "QR": "Questions Room", "QA": "Q&A Chains Room",
+  "NF": "Nature Freestyle", "PF": "Personal Freestyle", "BF": "Bible Freestyle",
+  "HF": "History Freestyle", "LR": "Listening Room",
+  "CR": "Concentration Room", "DR": "Dimensions Room", "C6": "Connect-6 Room",
+  "TRm": "Theme Room", "TZ": "Time Zone Room", "PRm": "Patterns Room",
+  "P||": "Parallels Room", "P‖": "Parallels Room", "FRt": "Fruit Room",
+  "CEC": "Christ in Every Chapter", "R66": "Room 66",
+  "BL": "Blue/Sanctuary Room", "PR": "Prophecy Room", "3A": "Three Angels Room",
+  "FE": "Feasts Room", "MATH": "Mathematics Room",
+  "123H": "Three Heavens Room", "1H": "First Heaven", "2H": "Second Heaven", "3H": "Third Heaven",
+  "JR": "Juice Room",
+  "FRm": "Fire Room", "MR": "Meditation Room", "SRm": "Speed Room",
+};
+
+// Extract room code from AI output like "CEC (Christ-Exposed Covenant)" → "CEC"
+function extractRoomCode(roomStr: string): string | null {
+  const match = roomStr.match(/^([A-Za-z0-9@‖|]+)/);
+  return match ? match[1] : null;
+}
+
+// Normalize a room string to use canonical name
+function normalizeRoomName(roomStr: string): string {
+  const code = extractRoomCode(roomStr);
+  if (code && CANONICAL_ROOMS[code]) {
+    return `${code} (${CANONICAL_ROOMS[code]})`;
+  }
+  return roomStr; // Return as-is if not recognized
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -84,20 +119,36 @@ FLOOR 5: VISION (Sanctuary, Prophecy & Feasts)
 🔹 BL (Blue/Sanctuary Room): Which sanctuary article/service?
    • Gate, Altar, Laver, Lampstand, Table, Incense, Veil, Ark
    • Daily service or Day of Atonement
+   ⚠️ CRITICAL SANCTUARY TWO-PHASE MINISTRY:
+   - Christ entered the HOLY PLACE (first apartment) at His ASCENSION in 31 AD
+   - Christ entered the MOST HOLY PLACE (second apartment) in 1844
+   - NEVER say Christ went to the Most Holy Place at resurrection/ascension!
+   - Hebrews contrasts EARTHLY vs HEAVENLY sanctuary, NOT Holy vs Most Holy Place
 🔹 PR (Prophecy Room): Daniel-Revelation symbols, timelines, parallel visions
 🔹 3A (Three Angels Room): How does this proclaim everlasting gospel/judgment/Babylon/Beast warning?
 🔹 FE (Feasts Room): Which feast does this fulfill/foreshadow?
    • Passover, Unleavened Bread, Firstfruits, Pentecost, Trumpets, Atonement, Tabernacles
+   ⚠️ CRITICAL FEAST TYPOLOGY: Spring feasts (Passover, Unleavened Bread, Firstfruits, Pentecost) = Christ's FIRST ADVENT
+   - Passover = Christ's DEATH (NOT Day of Atonement!)
+   - Unleavened Bread = Christ's BURIAL
+   - Firstfruits = Christ's RESURRECTION
+   - Pentecost = Holy Spirit outpouring
+   Fall feasts (Trumpets, Atonement, Tabernacles) = Christ's SECOND ADVENT ministry
+   - Day of Atonement = 1844 heavenly ministry, NOT the cross!
+   NEVER equate Jesus's death/resurrection with Day of Atonement - that is PASSOVER/FIRSTFRUITS
 🔹 CEC (Christ in Every Chapter): Christ title/role, what He does, crosslink
 🔹 R66 (Room 66): How does this theme develop Genesis→Revelation?
 
 ═══════════════════════════════════════════════════════════════
 FLOOR 6: THREE HEAVENS & CYCLES (Horizons & History)
 ═══════════════════════════════════════════════════════════════
+⚠️ CRITICAL: Three Heavens are DAY-OF-THE-LORD JUDGMENT CYCLES, NOT atmospheric layers!
 🔹 123H (Three Heavens/Horizons Room): Which prophetic horizon?
-   • 1H = Babylon/return (Cyrus, post-exilic)
-   • 2H = 70 AD, 'this generation', church as temple
-   • 3H = Global, final judgment, new creation
+   • 1H (DoL¹/NE¹) = Babylon destroys Jerusalem (586 BC) → Post-exilic restoration under Cyrus
+   • 2H (DoL²/NE²) = Rome destroys Jerusalem (70 AD) → New Covenant order, church as living temple
+   • 3H (DoL³/NE³) = Final global judgment → Literal New Heaven and Earth (Rev 21-22)
+   ❌ NEVER: atmosphere/physical world/spiritual realm interpretation
+   ✅ ALWAYS: prophetic stages of covenant history marked by judgment and renewal
 🔹 @ (Eight Cycles Room): Which covenant cycle?
    • @Ad (Adam), @No (Noah), @Ab (Abraham), @Mo (Moses)
    • @Cy (Cyrus), @CyC (Christ), @Sp (Spirit/Church), @Re (Return)
@@ -199,7 +250,7 @@ ANALYSIS REQUIREMENTS:
 2) ALWAYS write room abbreviations with full names in parentheses: "SR (Story Room)", "DC (Def-Com Room)", "DR (Dimensions Room)"
 3) When using DC (Def-Com Room), MUST include Hebrew/Greek definitions with Strong's numbers AND cite standard commentaries (Gill, Clarke, Matthew Henry, Barnes)
 4) For DR (Dimensions Room), clarify which dimensions: 1D=Literal, 2D=Christ, 3D=Me, 4D=Church, 5D=Heaven
-5) Provide specific insights for EACH room`
+5) Provide specific insights for EACH room\n\n` + getContentBehavioralEngine()
           },
           {
             role: 'user',
@@ -313,12 +364,20 @@ ANALYSIS REQUIREMENTS:
     
     const analysis = JSON.parse(toolCall.function.arguments);
 
+    // Normalize room names to prevent AI hallucinations
+    const normalizedRoomsUsed = (analysis.roomsUsed || []).map(normalizeRoomName);
+
+    const normalizedRoomAnalysis: Record<string, string> = {};
+    for (const [key, value] of Object.entries(analysis.roomAnalysis || {})) {
+      normalizedRoomAnalysis[normalizeRoomName(key)] = value as string;
+    }
+
     return new Response(
       JSON.stringify({
         verseId: `${book}-${chapter}-${verse}`,
-        roomsUsed: analysis.roomsUsed || [],
+        roomsUsed: normalizedRoomsUsed,
         floorsCovered: analysis.floorsCovered || [],
-        roomAnalysis: analysis.roomAnalysis || {},
+        roomAnalysis: normalizedRoomAnalysis,
         principles: {
           dimensions: analysis.dimensions || [],
           cycles: analysis.cycles || [],

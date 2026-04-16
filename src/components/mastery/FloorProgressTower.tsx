@@ -4,95 +4,97 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ChevronDown, Crown } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 
 interface FloorProgressTowerProps {
   floors: any[];
   globalTitle: any;
 }
 
-const MASTER_TITLE_GROUPS = [
-  {
-    title: "BLUE MASTER",
-    floors: [1],
-    floorLabel: "Floor 1",
-    color: "blue",
-    bg: "bg-blue-500",
-    text: "text-blue-500",
-    requirements: "Complete Floor 1 assessment",
-    rewards: "Blue Master title"
-  },
-  {
-    title: "RED MASTER",
-    floors: [2],
-    floorLabel: "Floor 2",
-    color: "red",
-    bg: "bg-red-500",
-    text: "text-red-500",
-    requirements: "7-day global streak + Floor 2 assessment",
-    rewards: "Red Master title + Red Challenges"
-  },
-  {
-    title: "GOLD MASTER",
-    floors: [3],
-    floorLabel: "Floor 3",
-    color: "yellow",
-    bg: "bg-yellow-500",
-    text: "text-yellow-500",
-    requirements: "14-day global streak + Floor 3 assessment",
-    rewards: "Gold Master title + advanced chain tools"
-  },
-  {
-    title: "PURPLE MASTER",
-    floors: [4],
-    floorLabel: "Floor 4",
-    color: "purple",
-    bg: "bg-purple-500",
-    text: "text-purple-500",
-    requirements: "21-day global streak + Floor 4 assessment",
-    rewards: "Purple Master title + create-your-own drills"
-  },
-  {
-    title: "WHITE MASTER",
-    floors: [5, 6],
-    floorLabel: "Floors 5-6",
-    color: "white",
-    bg: "bg-white border border-border",
-    text: "text-white",
-    requirements: "30-day global streak + Floors 5 & 6 assessments",
-    rewards: "White Master title + Temple Mode + prophecy maps"
-  },
-  {
-    title: "BLACK CANDIDATE",
-    floors: [7],
-    floorLabel: "Floor 7",
-    color: "gray",
-    bg: "bg-gray-800",
-    text: "text-gray-300",
-    requirements: "45-day global streak + Floor 7 assessment",
-    rewards: "Black Candidate title + Shadow Chains"
-  },
-  {
-    title: "BLACK MASTER",
-    floors: [8],
-    floorLabel: "Floor 8",
-    color: "black",
-    bg: "bg-black",
-    text: "text-white",
-    requirements: "60-day global streak + Floor 8 exam (95% required)",
-    rewards: "Black Master title + Black Palace Mode + Prophetic Lattice Engine + Mentor privileges + 8th-floor Revelation Chamber"
-  }
-];
-
 export const FloorProgressTower: React.FC<FloorProgressTowerProps> = ({
   floors,
   globalTitle,
 }) => {
+  const { t } = useTranslation();
   const [openSections, setOpenSections] = useState<number[]>([]);
   const navigate = useNavigate();
 
+  const MASTER_TITLE_GROUPS = [
+    {
+      title: t('floorTower.blueMaster'),
+      floors: [1],
+      floorLabel: t('floorTower.floor1'),
+      color: "blue",
+      bg: "bg-blue-500",
+      text: "text-blue-500",
+      requirements: t('floorTower.floor1Req'),
+      rewards: t('floorTower.floor1Reward')
+    },
+    {
+      title: t('floorTower.redMaster'),
+      floors: [2],
+      floorLabel: t('floorTower.floor2'),
+      color: "red",
+      bg: "bg-red-500",
+      text: "text-red-500",
+      requirements: t('floorTower.floor2Req'),
+      rewards: t('floorTower.floor2Reward')
+    },
+    {
+      title: t('floorTower.goldMaster'),
+      floors: [3],
+      floorLabel: t('floorTower.floor3'),
+      color: "yellow",
+      bg: "bg-yellow-500",
+      text: "text-yellow-500",
+      requirements: t('floorTower.floor3Req'),
+      rewards: t('floorTower.floor3Reward')
+    },
+    {
+      title: t('floorTower.purpleMaster'),
+      floors: [4],
+      floorLabel: t('floorTower.floor4'),
+      color: "purple",
+      bg: "bg-purple-500",
+      text: "text-purple-500",
+      requirements: t('floorTower.floor4Req'),
+      rewards: t('floorTower.floor4Reward')
+    },
+    {
+      title: t('floorTower.whiteMaster'),
+      floors: [5, 6],
+      floorLabel: t('floorTower.floors56'),
+      color: "white",
+      bg: "bg-white border border-border",
+      text: "text-white",
+      requirements: t('floorTower.floors56Req'),
+      rewards: t('floorTower.floors56Reward')
+    },
+    {
+      title: t('floorTower.blackCandidate'),
+      floors: [7],
+      floorLabel: t('floorTower.floor7'),
+      color: "gray",
+      bg: "bg-gray-800",
+      text: "text-gray-300",
+      requirements: t('floorTower.floor7Req'),
+      rewards: t('floorTower.floor7Reward')
+    },
+    {
+      title: t('floorTower.blackMaster'),
+      floors: [8],
+      floorLabel: t('floorTower.floor8'),
+      color: "black",
+      bg: "bg-black",
+      text: "text-white",
+      requirements: t('floorTower.floor8Req'),
+      rewards: t('floorTower.floor8Reward')
+    }
+  ];
+
   const toggleSection = (index: number) => {
-    setOpenSections(prev => 
-      prev.includes(index) 
+    setOpenSections(prev =>
+      prev.includes(index)
         ? prev.filter(i => i !== index)
         : [...prev, index]
     );
@@ -112,10 +114,10 @@ export const FloorProgressTower: React.FC<FloorProgressTowerProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Crown className="h-6 w-6" />
-          Global Master Titles
+          {t('floorTower.globalMasterTitles')}
         </CardTitle>
         <CardDescription>
-          Master rooms to unlock prestigious titles across the Palace
+          {t('floorTower.masterRoomsDesc')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -145,20 +147,19 @@ export const FloorProgressTower: React.FC<FloorProgressTowerProps> = ({
                   <CollapsibleContent className="animate-accordion-down">
                     <div className="px-4 pb-4 space-y-2">
                       <div>
-                        <span className="font-bold">Requirements: </span>
+                        <span className="font-bold">{t('floorTower.requirements')}: </span>
                         <span className="text-muted-foreground">{group.requirements}</span>
                       </div>
                       <div>
-                        <span className="font-bold">Reward: </span>
+                        <span className="font-bold">{t('floorTower.reward')}: </span>
                         <span className="text-muted-foreground">{group.rewards}</span>
                       </div>
-                      
-                      {/* Floor links */}
+
                       <div className="mt-3 space-y-1">
                         {group.floors.map(floorNum => {
                           const floor = floors.find(f => f.floor_number === floorNum);
                           if (!floor) return null;
-                          
+
                           return (
                             <button
                               key={floorNum}
@@ -166,7 +167,7 @@ export const FloorProgressTower: React.FC<FloorProgressTowerProps> = ({
                               className="w-full text-left p-2 rounded hover:bg-accent/50 transition-colors flex items-center justify-between group"
                             >
                               <span className="text-sm">
-                                Floor {floorNum}: {floor.rooms_completed}/{floor.rooms_required} rooms
+                                {t('floorTower.floorRooms', { floor: floorNum, completed: floor.rooms_completed, required: floor.rooms_required })}
                               </span>
                               {floor.floor_completed_at && (
                                 <Badge variant="default" className="bg-green-500 text-xs">✓</Badge>
@@ -175,26 +176,26 @@ export const FloorProgressTower: React.FC<FloorProgressTowerProps> = ({
                           );
                         })}
                       </div>
-                      
+
                       {!status.allComplete && status.anyUnlocked && (
                         <p className="text-sm text-muted-foreground mt-2">
-                          Progress: {status.groupFloors.filter(f => f?.floor_completed_at).length}/{status.groupFloors.length} floors completed
+                          {t('floorTower.progress', { completed: status.groupFloors.filter(f => f?.floor_completed_at).length, total: status.groupFloors.length })}
                         </p>
                       )}
                       {!status.anyUnlocked && (
                         <p className="text-sm text-muted-foreground mt-2">
-                          Complete previous floors to unlock
+                          {t('floorTower.completePreviousFloors')}
                         </p>
                       )}
-                      
+
                       {status.isActive && !status.allComplete && (
                         <Badge variant="default" className="mt-2">
-                          Current Level
+                          {t('floorTower.currentLevel')}
                         </Badge>
                       )}
                       {status.allComplete && (
                         <Badge variant="default" className="mt-2 bg-green-500">
-                          ✓ Completed
+                          {t('floorTower.completed')}
                         </Badge>
                       )}
                     </div>

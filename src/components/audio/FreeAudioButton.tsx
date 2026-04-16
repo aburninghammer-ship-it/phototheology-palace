@@ -121,6 +121,7 @@ export function FreeAudioButton({
         utterance.rate = 0.95; // Slightly slower for comprehension
         utterance.pitch = 1;
         utterance.volume = 1;
+        utterance.lang = 'en-US'; // Force English to prevent Hebrew detection
 
         const voice = getBestVoice();
         if (voice) {

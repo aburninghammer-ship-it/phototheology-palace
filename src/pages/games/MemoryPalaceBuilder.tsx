@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -11,6 +13,7 @@ import { toast } from "sonner";
 export default function MemoryPalaceBuilder() {
   const { listId } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [verses, setVerses] = useState<any[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [palaceData, setPalaceData] = useState<Record<string, any>>({});
@@ -29,7 +32,7 @@ export default function MemoryPalaceBuilder() {
       .order("order_index");
 
     if (error) {
-      toast.error("Failed to load verses");
+      toast.error(t('games.memoryPalaceBuilder.errorLoadVerses'));
       navigate("/memory");
       return;
     }
@@ -83,11 +86,11 @@ export default function MemoryPalaceBuilder() {
       });
 
     if (error) {
-      toast.error("Failed to save location");
+      toast.error(t('games.memoryPalaceBuilder.errorSaveLocation'));
       return;
     }
 
-    toast.success("Location saved!");
+    toast.success(t('games.memoryPalaceBuilder.locationSaved'));
     
     if (currentIndex < verses.length - 1) {
       const nextIndex = currentIndex + 1;
@@ -106,7 +109,7 @@ export default function MemoryPalaceBuilder() {
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center">
         <Card>
           <CardContent className="pt-6">
-            <p>Loading verses...</p>
+            <p>{t('games.memoryPalaceBuilder.loadingVerses')}</p>
           </CardContent>
         </Card>
       </div>
@@ -122,7 +125,7 @@ export default function MemoryPalaceBuilder() {
         <div className="mb-6 flex items-center justify-between">
           <Button variant="ghost" onClick={() => navigate("/memory")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            {t('common.back')}
           </Button>
           <div className="text-sm font-medium">
             {currentIndex + 1} / {verses.length}
@@ -133,10 +136,10 @@ export default function MemoryPalaceBuilder() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Home className="h-5 w-5 text-primary" />
-              <CardTitle>Build Your Memory Palace</CardTitle>
+              <CardTitle>{t('games.memoryPalaceBuilder.title')}</CardTitle>
             </div>
             <CardDescription>
-              Associate each verse with a specific location in your imaginary palace
+              {t('games.memoryPalaceBuilder.description')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -149,39 +152,38 @@ export default function MemoryPalaceBuilder() {
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  Location in Your Palace
+                  {t('games.memoryPalaceBuilder.locationLabel')}
                 </label>
                 <Textarea
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  placeholder="e.g., The front door, the living room couch, the kitchen window..."
+                  placeholder={t('games.memoryPalaceBuilder.locationPlaceholder')}
                   className="min-h-[80px]"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Choose a specific, memorable location you can visualize clearly
+                  {t('games.memoryPalaceBuilder.locationHint')}
                 </p>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Visual Association</label>
+                <label className="text-sm font-medium">{t('games.memoryPalaceBuilder.visualLabel')}</label>
                 <Textarea
                   value={visualization}
                   onChange={(e) => setVisualization(e.target.value)}
-                  placeholder="Describe a vivid, memorable image connecting this verse to the location..."
+                  placeholder={t('games.memoryPalaceBuilder.visualPlaceholder')}
                   className="min-h-[120px]"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Make it bizarre, emotional, or exaggerated to make it stick!
+                  {t('games.memoryPalaceBuilder.visualHint')}
                 </p>
               </div>
 
               <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-lg">
                 <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-2">
-                  💡 Memory Palace Tip
+                  {t('games.memoryPalaceBuilder.tipTitle')}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  The weirder and more vivid your visualization, the better you'll remember it. 
-                  Use all your senses - what do you see, hear, smell, or feel in this location?
+                  {t('games.memoryPalaceBuilder.tipDescription')}
                 </p>
               </div>
             </div>
@@ -192,11 +194,12 @@ export default function MemoryPalaceBuilder() {
               className="w-full"
             >
               <Save className="mr-2 h-4 w-4" />
-              {currentIndex < verses.length - 1 ? "Save & Next" : "Save & Practice"}
+              {currentIndex < verses.length - 1 ? t('games.memoryPalaceBuilder.saveAndNext') : t('games.memoryPalaceBuilder.saveAndPractice')}
             </Button>
           </CardContent>
         </Card>
       </div>
+      <FloatingGameChat gameType="memory-palace-builder" />
     </div>
   );
 }

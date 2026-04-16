@@ -2,14 +2,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Room } from "@/data/palaceData";
-import { 
-  Sparkles, BookOpen, Target, Lightbulb, Lock, Clock, Zap,
-  ChevronDown, ChevronUp, Play, CheckCircle2, AlertTriangle
+import {
+  Sparkles, BookOpen, Target, Lightbulb, Clock, Zap,
+  ChevronDown, ChevronUp, Play, CheckCircle2, AlertTriangle, Lock as LockIcon
 } from "lucide-react";
 import * as Icons from "lucide-react";
 import { JeevesAssistant } from "@/components/JeevesAssistant";
-import { useRoomUnlock } from "@/hooks/useRoomUnlock";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useState } from "react";
 
@@ -39,43 +37,27 @@ export const RoomCardEnhanced = ({ room, floorNumber }: RoomCardEnhancedProps) =
   const gradients = roomGradients[floorNumber - 1] || ["gradient-palace"];
   const roomIndex = room.id.charCodeAt(0) % gradients.length;
   const gradient = gradients[roomIndex];
-  const { isUnlocked, loading, missingPrerequisites } = useRoomUnlock(floorNumber, room.id);
-  
+
+  // Rooms are never locked
+  const isUnlocked = true;
+
   const [methodExpanded, setMethodExpanded] = useState(false);
   const [pitfallsExpanded, setPitfallsExpanded] = useState(false);
-  
+
   const timeInfo = room.estimatedTime ? timeEstimates[room.estimatedTime] : timeEstimates.standard;
   const TimeIcon = timeInfo.icon;
-  
+
   // Get the icon component
-  const RoomIcon = room.icon && Icons[room.icon as keyof typeof Icons] 
+  const RoomIcon = room.icon && Icons[room.icon as keyof typeof Icons]
     ? (Icons[room.icon as keyof typeof Icons] as any)
     : BookOpen;
-  
+
   return (
     <div className="grid lg:grid-cols-3 gap-8 p-1">
       {/* Room Details */}
       <div className="lg:col-span-2">
-        {!isUnlocked && !loading && (
-          <Alert className="mb-6 border-2 border-destructive/30 bg-gradient-to-br from-destructive/10 to-destructive/5 shadow-elegant backdrop-blur-sm animate-fade-in">
-            <Lock className="h-5 w-5 text-destructive" />
-            <AlertDescription>
-              <strong className="text-lg font-serif">Room Locked</strong>
-              <p className="text-sm mt-2 text-muted-foreground">Complete these rooms first:</p>
-              <ul className="list-disc list-inside mt-3 space-y-1">
-                {missingPrerequisites.map((prereq, idx) => (
-                  <li key={idx} className="text-sm font-medium">{prereq}</li>
-                ))}
-              </ul>
-            </AlertDescription>
-          </Alert>
-        )}
-        
         <Card className={`group relative overflow-hidden border-2 transition-all duration-500 animate-scale-in
-          ${!isUnlocked 
-            ? 'opacity-50 grayscale' 
-            : 'hover:shadow-2xl hover:shadow-primary/20 hover:border-primary/50 hover:-translate-y-1'
-          }
+          hover:shadow-2xl hover:shadow-primary/20 hover:border-primary/50 hover:-translate-y-1
           bg-gradient-to-br from-card via-card/95 to-muted/30 backdrop-blur-sm`}>
           
           {/* Animated gradient border */}
@@ -98,7 +80,7 @@ export const RoomCardEnhanced = ({ room, floorNumber }: RoomCardEnhancedProps) =
                   </Badge>
                 </div>
                 <CardTitle className="font-serif text-3xl lg:text-4xl group-hover:text-primary transition-all duration-300 flex items-center gap-3 leading-tight">
-                  {!isUnlocked && <Lock className="h-6 w-6 text-destructive animate-pulse" />}
+                  {!isUnlocked && <LockIcon className="h-6 w-6 text-destructive animate-pulse" />}
                   <span className="bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">{room.name}</span>
                   {isUnlocked && <Sparkles className="h-6 w-6 text-accent opacity-0 group-hover:opacity-100 transition-all duration-500 animate-pulse" />}
                 </CardTitle>
@@ -274,7 +256,7 @@ export const RoomCardEnhanced = ({ room, floorNumber }: RoomCardEnhancedProps) =
               <CardHeader className="relative">
                 <CardTitle className="flex items-center gap-3 text-xl">
                   <div className="p-2 bg-muted rounded-lg">
-                    <Lock className="h-6 w-6 text-muted-foreground" />
+                    <LockIcon className="h-6 w-6 text-muted-foreground" />
                   </div>
                   <span className="font-serif">Locked</span>
                 </CardTitle>

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useGuilds } from "@/hooks/useGuilds";
@@ -8,6 +9,7 @@ import { Navigation } from "@/components/Navigation";
 import { Users, Sword, Shield, Loader2, Heart, Sparkles } from "lucide-react";
 
 const Guilds = () => {
+  const { t } = useTranslation();
   const { guilds, myGuilds, isLoading, createGuild, joinGuild, leaveGuild, isCreating, isJoining } = useGuilds();
 
   if (isLoading) {
@@ -19,7 +21,7 @@ const Guilds = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-palace-purple/5 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-palace-purple/5 relative overflow-x-hidden">
       <Navigation />
       
       {/* Animated background glow effects */}
@@ -33,10 +35,10 @@ const Guilds = () => {
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-palace-purple via-palace-pink to-palace-blue bg-clip-text text-transparent">
-            Community & Partnerships
+            {t('guilds.title')}
           </h1>
           <p className="text-muted-foreground text-lg">
-            Join forces with other believers to master the Palace together
+            {t('guilds.subtitle')}
           </p>
         </div>
 
@@ -50,11 +52,11 @@ const Guilds = () => {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <CardTitle className="text-2xl">Training Partner Mode</CardTitle>
+                  <CardTitle className="text-2xl">{t('guilds.trainingPartnerMode')}</CardTitle>
                   <Sparkles className="h-5 w-5 text-palace-pink animate-pulse" />
                 </div>
                 <CardDescription className="text-base">
-                  1-on-1 accountability for 65% better retention!
+                  {t('guilds.trainingPartnerDescription')}
                 </CardDescription>
               </div>
             </div>
@@ -67,8 +69,8 @@ const Guilds = () => {
         {/* Guild Tabs */}
         <Tabs defaultValue="all" className="w-full">
           <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-6 bg-background/50 backdrop-blur-sm">
-            <TabsTrigger value="all">All Guilds</TabsTrigger>
-            <TabsTrigger value="my-guilds">My Guilds ({myGuilds?.length || 0})</TabsTrigger>
+            <TabsTrigger value="all">{t('guilds.allGuilds')}</TabsTrigger>
+            <TabsTrigger value="my-guilds">{t('guilds.myGuilds', { count: myGuilds?.length || 0 })}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="all" className="space-y-6">
@@ -78,7 +80,7 @@ const Guilds = () => {
                   <Users className="w-5 h-5 text-primary" />
                   <div>
                     <div className="text-2xl font-bold">{guilds?.length || 0}</div>
-                    <div className="text-xs text-muted-foreground">Total Guilds</div>
+                    <div className="text-xs text-muted-foreground">{t('guilds.totalGuilds')}</div>
                   </div>
                 </CardContent>
               </Card>
@@ -90,9 +92,9 @@ const Guilds = () => {
               <Card variant="glass">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    🏰 Houses
+                    🏰 {t('guilds.houses')}
                   </CardTitle>
-                  <CardDescription>Family-style communities (8-15 members)</CardDescription>
+                  <CardDescription>{t('guilds.housesDescription')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
@@ -104,9 +106,9 @@ const Guilds = () => {
               <Card variant="glass">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Sword className="w-5 h-5" /> Orders
+                    <Sword className="w-5 h-5" /> {t('guilds.orders')}
                   </CardTitle>
-                  <CardDescription>Mission-focused groups (15-25 members)</CardDescription>
+                  <CardDescription>{t('guilds.ordersDescription')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
@@ -118,9 +120,9 @@ const Guilds = () => {
               <Card variant="glass">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Shield className="w-5 h-5" /> Squads
+                    <Shield className="w-5 h-5" /> {t('guilds.squads')}
                   </CardTitle>
-                  <CardDescription>Small teams (4-8 members)</CardDescription>
+                  <CardDescription>{t('guilds.squadsDescription')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
@@ -146,7 +148,7 @@ const Guilds = () => {
             {guilds?.length === 0 && (
               <Card variant="glass">
                 <CardContent className="pt-6 text-center">
-                  <p className="text-muted-foreground mb-4">No guilds yet. Be the first to create one!</p>
+                  <p className="text-muted-foreground mb-4">{t('guilds.noGuildsYet')}</p>
                   <CreateGuildDialog onCreate={createGuild} isCreating={isCreating} />
                 </CardContent>
               </Card>
@@ -167,7 +169,7 @@ const Guilds = () => {
             ) : (
               <Card variant="glass">
                 <CardContent className="pt-6 text-center">
-                  <p className="text-muted-foreground mb-4">You haven't joined any guilds yet.</p>
+                  <p className="text-muted-foreground mb-4">{t('guilds.notJoinedYet')}</p>
                   <CreateGuildDialog onCreate={createGuild} isCreating={isCreating} />
                 </CardContent>
               </Card>

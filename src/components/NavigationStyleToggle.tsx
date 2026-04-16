@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { LayoutGrid, Menu } from "lucide-react";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
@@ -9,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export const NavigationStyleToggle = () => {
+  const { t } = useTranslation();
   const { preferences, updatePreference } = useUserPreferences();
 
   const handleStyleChange = (style: "full" | "simplified") => {
@@ -25,7 +27,7 @@ export const NavigationStyleToggle = () => {
           ) : (
             <Menu className="h-4 w-4" />
           )}
-          <span className="hidden sm:inline">Nav Style</span>
+          <span className="hidden sm:inline">{t('navStyle.label')}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -34,7 +36,7 @@ export const NavigationStyleToggle = () => {
           className={preferences.navigation_style === "full" ? "bg-accent" : ""}
         >
           <LayoutGrid className="h-4 w-4 mr-2" />
-          Full Navigation
+          {t('navStyle.fullNavigation')}
           {preferences.navigation_style === "full" && <span className="ml-auto">✓</span>}
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -42,7 +44,7 @@ export const NavigationStyleToggle = () => {
           className={preferences.navigation_style === "simplified" ? "bg-accent" : ""}
         >
           <Menu className="h-4 w-4 mr-2" />
-          Simplified Navigation
+          {t('navStyle.simplifiedNavigation')}
           {preferences.navigation_style === "simplified" && <span className="ml-auto">✓</span>}
         </DropdownMenuItem>
       </DropdownMenuContent>

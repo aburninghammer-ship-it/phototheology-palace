@@ -1,80 +1,100 @@
+import { useState } from "react";
 import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { COURSES_TOUR } from "@/data/guidedTours";
 import { Button } from "@/components/ui/button";
+import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { GlassBubbles } from "@/components/ui/glass-bubbles";
 import { BookOpen, Users, Calendar, GraduationCap, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const Courses = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const [tourOpen, setTourOpen] = useState(false);
 
   const courses = [
     {
       id: "phototheology",
-      title: "50-Day Phototheology Course",
-      description: "Master the complete Palace Method in 50 days through guided daily lessons",
+      title: t('courses.phototheology.title'),
+      description: t('courses.phototheology.description'),
       path: "/phototheology-course",
-      duration: "50 days",
-      level: "Beginner to Advanced",
-      ageGroups: ["Adults", "Ages 5-8", "Ages 9-12", "Ages 13-16"],
+      duration: t('courses.phototheology.duration'),
+      level: t('courses.phototheology.level'),
+      ageGroups: [
+        t('courses.ageGroups.adults'),
+        t('courses.ageGroups.ages5to8'),
+        t('courses.ageGroups.ages9to12'),
+        t('courses.ageGroups.ages13to16')
+      ],
       features: [
-        "Daily structured lessons",
-        "Progressive skill building",
-        "All 8 floors covered",
-        "Age-appropriate versions"
+        t('courses.phototheology.features.dailyLessons'),
+        t('courses.phototheology.features.progressiveSkills'),
+        t('courses.phototheology.features.allFloors'),
+        t('courses.phototheology.features.ageAppropriate')
       ],
       icon: GraduationCap,
       color: "from-primary/20 to-accent/20"
     },
     {
       id: "blueprint",
-      title: "Blueprint Prophecy Course",
-      description: "10-part biblical prophecy study covering Daniel, Revelation, and the sanctuary",
+      title: t('courses.blueprint.title'),
+      description: t('courses.blueprint.description'),
       path: "/blueprint-course",
-      duration: "10 lessons",
-      level: "Intermediate",
-      ageGroups: ["Adults", "Kids (6-12)"],
+      duration: t('courses.blueprint.duration'),
+      level: t('courses.blueprint.level'),
+      ageGroups: [
+        t('courses.ageGroups.adults'),
+        t('courses.ageGroups.kids6to12')
+      ],
       features: [
-        "Prophecy foundations",
-        "Sanctuary symbolism",
-        "End-time events",
-        "Kid-friendly version"
+        t('courses.blueprint.features.prophecyFoundations'),
+        t('courses.blueprint.features.sanctuarySymbolism'),
+        t('courses.blueprint.features.endTimeEvents'),
+        t('courses.blueprint.features.kidFriendly')
       ],
       icon: BookOpen,
       color: "from-accent/20 to-primary/20"
     },
     {
       id: "daniel",
-      title: "Daniel Deep Dive",
-      description: "Comprehensive study of the Book of Daniel with prophecy focus",
+      title: t('courses.daniel.title'),
+      description: t('courses.daniel.description'),
       path: "/daniel-course",
-      duration: "12 chapters",
-      level: "Intermediate",
-      ageGroups: ["Adults", "Kids"],
+      duration: t('courses.daniel.duration'),
+      level: t('courses.daniel.level'),
+      ageGroups: [
+        t('courses.ageGroups.adults'),
+        t('courses.ageGroups.kids')
+      ],
       features: [
-        "Chapter-by-chapter study",
-        "Prophecy interpretation",
-        "Historical context",
-        "Visual memory aids"
+        t('courses.daniel.features.chapterByChapter'),
+        t('courses.daniel.features.prophecyInterpretation'),
+        t('courses.daniel.features.historicalContext'),
+        t('courses.daniel.features.visualMemoryAids')
       ],
       icon: BookOpen,
       color: "from-primary/10 to-accent/10"
     },
     {
       id: "revelation",
-      title: "Revelation Unlocked",
-      description: "Journey through Revelation with Phototheology principles",
+      title: t('courses.revelation.title'),
+      description: t('courses.revelation.description'),
       path: "/revelation-course",
-      duration: "22 chapters",
-      level: "Advanced",
-      ageGroups: ["Adults", "Kids"],
+      duration: t('courses.revelation.duration'),
+      level: t('courses.revelation.level'),
+      ageGroups: [
+        t('courses.ageGroups.adults'),
+        t('courses.ageGroups.kids')
+      ],
       features: [
-        "Symbol interpretation",
-        "Three Angels' Messages",
-        "Sanctuary connections",
-        "Engaging kids version"
+        t('courses.revelation.features.symbolInterpretation'),
+        t('courses.revelation.features.threeAngelsMessages'),
+        t('courses.revelation.features.sanctuaryConnections'),
+        t('courses.revelation.features.engagingKidsVersion')
       ],
       icon: BookOpen,
       color: "from-accent/10 to-primary/10"
@@ -84,28 +104,32 @@ const Courses = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
+
       <main className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
             <Badge className="mb-4 bg-primary/20 text-primary border-primary/30">
-              📚 Guided Learning
+              {t('courses.guidedLearningBadge')}
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Phototheology Courses
+              {t('courses.pageTitle')}
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Structured courses for every age and level. Choose your path to mastering Scripture through the Palace Method.
+              {t('courses.pageDescription')}
             </p>
+            <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="mt-4 gap-1">
+              <GraduationCap className="h-4 w-4" /> Guided Tour
+            </Button>
           </div>
+          {tourOpen && <GuidedTourOverlay steps={COURSES_TOUR} onClose={() => setTourOpen(false)} />}
 
           {/* Courses Grid */}
           <div className="grid md:grid-cols-2 gap-8 mb-16">
             {courses.map((course) => {
               const Icon = course.icon;
               return (
-                <Card 
+                <Card
                   key={course.id}
                   variant="glass"
                 >
@@ -131,12 +155,12 @@ const Courses = () => {
                       </Badge>
                       <Badge variant="secondary" className="gap-1">
                         <Users className="h-3 w-3" />
-                        {course.ageGroups.length} age groups
+                        {t('courses.ageGroupCount', { count: course.ageGroups.length })}
                       </Badge>
                     </div>
 
                     <div>
-                      <p className="text-sm font-semibold mb-2">Age Groups Available:</p>
+                      <p className="text-sm font-semibold mb-2">{t('courses.ageGroupsAvailable')}</p>
                       <div className="flex flex-wrap gap-2">
                         {course.ageGroups.map((age) => (
                           <Badge key={age} variant="outline" className="text-xs">
@@ -147,7 +171,7 @@ const Courses = () => {
                     </div>
 
                     <div>
-                      <p className="text-sm font-semibold mb-2">What You'll Learn:</p>
+                      <p className="text-sm font-semibold mb-2">{t('courses.whatYoullLearn')}</p>
                       <ul className="space-y-1">
                         {course.features.map((feature, idx) => (
                           <li key={idx} className="text-sm text-muted-foreground flex items-center gap-2">
@@ -158,12 +182,12 @@ const Courses = () => {
                       </ul>
                     </div>
 
-                    <Button 
+                    <Button
                       onClick={() => navigate(course.path)}
                       className="w-full gap-2"
                       size="lg"
                     >
-                      Start Course
+                      {t('courses.startCourse')}
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </CardContent>
@@ -176,36 +200,31 @@ const Courses = () => {
           <Card variant="glass">
             <GlassBubbles />
             <CardHeader className="relative z-10">
-              <CardTitle className="text-2xl">Course FAQs</CardTitle>
+              <CardTitle className="text-2xl">{t('courses.faq.title')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 relative z-10">
               <div>
-                <h3 className="font-semibold mb-2">Which course should I start with?</h3>
+                <h3 className="font-semibold mb-2">{t('courses.faq.whichCourseQuestion')}</h3>
                 <p className="text-muted-foreground">
-                  Start with the <strong>50-Day Phototheology Course</strong> if you're new to the Palace Method. 
-                  It builds your foundation step-by-step. If you already know the basics, jump into the 
-                  <strong> Blueprint</strong>, <strong>Daniel</strong>, or <strong>Revelation</strong> courses.
+                  {t('courses.faq.whichCourseAnswer')}
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">Are the kids versions different?</h3>
+                <h3 className="font-semibold mb-2">{t('courses.faq.kidsVersionQuestion')}</h3>
                 <p className="text-muted-foreground">
-                  Yes! Kids versions use simpler language, shorter activities, interactive stories, 
-                  and age-appropriate illustrations. The core principles remain the same, just adapted for younger minds.
+                  {t('courses.faq.kidsVersionAnswer')}
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">Can I switch between age groups?</h3>
+                <h3 className="font-semibold mb-2">{t('courses.faq.switchAgeGroupQuestion')}</h3>
                 <p className="text-muted-foreground">
-                  Absolutely! Each course page lets you select the age group. You can switch at any time 
-                  to preview content or teach different age groups.
+                  {t('courses.faq.switchAgeGroupAnswer')}
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">Do I need to complete courses in order?</h3>
+                <h3 className="font-semibold mb-2">{t('courses.faq.courseOrderQuestion')}</h3>
                 <p className="text-muted-foreground">
-                  No, but we recommend the 50-Day Course first if you're new. After that, take Daniel, 
-                  Revelation, or Blueprint in any order based on your interests.
+                  {t('courses.faq.courseOrderAnswer')}
                 </p>
               </div>
             </CardContent>

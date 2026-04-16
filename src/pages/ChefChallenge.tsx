@@ -1,17 +1,23 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ChefHat, ArrowLeft, Loader2, Eye, Share2, RefreshCw } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChefHat, ArrowLeft, Loader2, Eye, Share2, RefreshCw, Users } from "lucide-react";
+import { PostToPublicChallengeButton } from "@/components/challenges/PostToPublicChallengeButton";
 import { SocialShareButton } from "@/components/SocialShareButton";
 import { TextShareButton } from "@/components/TextShareButton";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
+import { ChefMultiplayerLobby } from "@/components/chef/ChefMultiplayerLobby";
+import { ChefMultiplayerGame } from "@/components/chef/ChefMultiplayerGame";
+import { useChefMultiplayer } from "@/hooks/useChefMultiplayer";
 interface Verse {
   reference: string;
   text: string;
@@ -20,33 +26,36 @@ const difficultyConfig = {
   easy: {
     min: 3,
     max: 4,
-    label: "Easy (3-4 verses)",
+    labelKey: "challenges.easyVerses",
     icon: "🌱"
   },
   intermediate: {
     min: 5,
     max: 6,
-    label: "Intermediate (5-6 verses)",
+    labelKey: "challenges.intermediateVerses",
     icon: "🔥"
   },
   pro: {
-    min: 7,
-    max: 8,
-    label: "Pro (7-8 verses)",
+    min: 10,
+    max: 10,
+    labelKey: "challenges.proVerses",
     icon: "💎"
   },
   master: {
-    min: 9,
+    min: 10,
     max: 10,
-    label: "Master (9-10 verses)",
+    labelKey: "challenges.masterVerses",
     icon: "👑"
   }
 };
 export default function ChefChallenge() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const {
     user
   } = useAuth();
+  const chefMultiplayer = useChefMultiplayer();
+  const [activeTab, setActiveTab] = useState<string>("solo");
   const [difficulty, setDifficulty] = useState<keyof typeof difficultyConfig>("intermediate");
   const [verses, setVerses] = useState<Verse[]>([]);
   const [recipe, setRecipe] = useState("");
@@ -69,11 +78,11 @@ export default function ChefChallenge() {
       }).catch(() => {
         // Fallback to copying
         navigator.clipboard.writeText(`${text}\n\n${url}`);
-        toast.success("Challenge copied to clipboard!");
+        toast.success(t('challenges.challengeCopied'));
       });
     } else {
       navigator.clipboard.writeText(`${text}\n\n${url}`);
-      toast.success("Challenge copied to clipboard!");
+      toast.success(t('challenges.challengeCopied'));
     }
   };
   const generateVerses = async () => {
@@ -122,14 +131,14 @@ export default function ChefChallenge() {
       }
       console.log("Successfully received verses:", data.verses);
       setVerses(data.verses as Verse[]);
-      toast.success(`Ingredients Ready! 🎲`, {
-        description: `${data.verses.length} random verses generated.`
+      toast.success(t('challenges.ingredientsReady'), {
+        description: t('challenges.versesGenerated', { count: data.verses.length })
       });
     } catch (error: any) {
       console.error("=== ERROR GENERATING VERSES ===");
       console.error("Error message:", error.message);
-      toast.error("Failed to Generate Ingredients", {
-        description: error.message || "Unable to generate verses. Please try again."
+      toast.error(t('challenges.failedToGenerateIngredients'), {
+        description: error.message || t('challenges.unableToGenerateVerses')
       });
       setVerses([]);
     } finally {
@@ -138,8 +147,8 @@ export default function ChefChallenge() {
   };
   const handleCheck = async () => {
     if (!recipe.trim()) {
-      toast.error("No Recipe", {
-        description: "Write your recipe first!"
+      toast.error(t('challenges.noRecipe'), {
+        description: t('challenges.writeRecipeFirst')
       });
       return;
     }
@@ -158,13 +167,13 @@ export default function ChefChallenge() {
       });
       if (error) throw error;
       setFeedback(data);
-      toast.success("Recipe Checked! ⭐", {
-        description: data.feedback || "Great work!"
+      toast.success(t('challenges.recipeChecked'), {
+        description: data.feedback || t('challenges.greatWork')
       });
     } catch (error) {
       console.error("Error checking recipe:", error);
-      toast.error("Error", {
-        description: "Failed to check recipe. Please try again."
+      toast.error(t('common.error'), {
+        description: t('challenges.failedToCheckRecipe')
       });
     } finally {
       setIsChecking(false);
@@ -192,8 +201,8 @@ export default function ChefChallenge() {
       setShowModelAnswer(true);
     } catch (error) {
       console.error("Error getting model answer:", error);
-      toast.error("Error", {
-        description: "Failed to get model answer. Please try again."
+      toast.error(t('common.error'), {
+        description: t('challenges.failedToGetModelAnswer')
       });
     } finally {
       setIsLoadingModel(false);
@@ -229,12 +238,12 @@ export default function ChefChallenge() {
       });
 
       setHasSubmitted(true);
-      toast.success("Recipe Submitted!", {
-        description: "Added to your Growth Journal. +25 points!"
+      toast.success(t('challenges.recipeSubmitted'), {
+        description: t('challenges.addedToJournal')
       });
     } catch (error) {
       console.error("Error submitting:", error);
-      toast.error("Failed to submit recipe");
+      toast.error(t('challenges.failedToSubmitRecipe'));
     } finally {
       setIsLoading(false);
     }
@@ -244,18 +253,41 @@ export default function ChefChallenge() {
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         <Button variant="ghost" onClick={() => navigate("/games")} className="mb-6">
           <ArrowLeft className="mr-2" />
-          Back to Games
+          {t('challenges.backToGames')}
         </Button>
 
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="solo" className="gap-2">
+              <ChefHat className="h-4 w-4" />
+              Solo Kitchen
+            </TabsTrigger>
+            <TabsTrigger value="multiplayer" className="gap-2">
+              <Users className="h-4 w-4" />
+              Multiplayer Kitchen
+            </TabsTrigger>
+          </TabsList>
+
+          {/* MULTIPLAYER TAB */}
+          <TabsContent value="multiplayer" className="space-y-6">
+            {chefMultiplayer.room?.status === "active" ? (
+              <ChefMultiplayerGame game={chefMultiplayer} />
+            ) : (
+              <ChefMultiplayerLobby game={chefMultiplayer} />
+            )}
+          </TabsContent>
+
+          {/* SOLO TAB */}
+          <TabsContent value="solo">
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ChefHat className="h-5 w-5 text-orange-600" />
-                <CardTitle>Chef Challenge</CardTitle>
+                <CardTitle>{t('challenges.chefChallengeTitle')}</CardTitle>
               </div>
               <div className="flex items-center gap-2">
-                <Badge>Quick • 5-10 min</Badge>
+                <Badge>{t('challenges.quickTime')}</Badge>
                 {verses.length > 0 && (
                   <>
                     <TextShareButton
@@ -279,34 +311,34 @@ export default function ChefChallenge() {
               </div>
             </div>
             <CardDescription className="mt-2">
-              📖 <strong>The Rules:</strong> Jeeves will provide completely random verses that appear unrelated. Your goal is to creatively tie them together into a cohesive Bible study that makes sense.
+              {t('challenges.chefRules')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
 
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium block mb-2">Step 1: Select Your Challenge Level</label>
+                <label className="text-sm font-medium block mb-2">{t('challenges.step1SelectLevel')}</label>
                 <div className="grid grid-cols-2 gap-2">
                   {(["easy", "intermediate", "pro", "master"] as const).map(level => <Button key={level} variant={difficulty === level ? "default" : "outline"} onClick={() => setDifficulty(level)} className="w-full" disabled={isLoading || hasSubmitted || verses.length > 0}>
                       {difficultyConfig[level].icon} {level.charAt(0).toUpperCase() + level.slice(1)}
                     </Button>)}
                 </div>
                 <p className="text-xs text-muted-foreground text-center mt-2">
-                  {difficultyConfig[difficulty].label}
+                  {t(difficultyConfig[difficulty].labelKey)}
                 </p>
               </div>
 
               <div>
-                <label className="text-sm font-medium block mb-2">Step 2: Get Your Ingredients</label>
+                <label className="text-sm font-medium block mb-2">{t('challenges.step2GetIngredients')}</label>
                 <Button onClick={generateVerses} className="w-full bg-orange-600 hover:bg-orange-700" disabled={isLoading || hasSubmitted || verses.length > 0}>
                   {isLoading ? <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Jeeves is selecting verses...
+                      {t('challenges.jeevesSelectingVerses')}
                     </> : verses.length > 0 ? <>
-                      ✓ Ingredients Generated
+                      {t('challenges.ingredientsGenerated')}
                     </> : <>
-                      🎲 Generate Challenge Ingredients
+                      {t('challenges.generateIngredients')}
                     </>}
                 </Button>
               </div>
@@ -314,17 +346,17 @@ export default function ChefChallenge() {
 
             {isLoading && verses.length === 0 ? <div className="flex flex-col items-center justify-center py-8 space-y-2">
                 <Loader2 className="h-6 w-6 animate-spin text-orange-600" />
-                <span className="text-sm">Jeeves is gathering random ingredients...</span>
+                <span className="text-sm">{t('challenges.jeevesGatheringIngredients')}</span>
               </div> : verses.length === 0 ? <div className="bg-orange-50 dark:bg-orange-900/20 p-6 rounded-lg text-center">
                 <ChefHat className="h-12 w-12 mx-auto mb-3 text-orange-600" />
-                <p className="font-medium mb-2">Ready to cook up a biblical recipe?</p>
+                <p className="font-medium mb-2">{t('challenges.readyToCook')}</p>
                 <p className="text-sm text-muted-foreground">
-                  Select a difficulty level and click "Generate Challenge Ingredients"!
+                  {t('challenges.selectDifficultyAndGenerate')}
                 </p>
               </div> : <>
                 <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 p-4 rounded-lg space-y-3 border-2 border-orange-200 dark:border-orange-800">
                   <div className="flex items-center justify-between">
-                    <p className="font-semibold text-lg">🥘 Your Ingredients ({verses.length} verses):</p>
+                    <p className="font-semibold text-lg">{t('challenges.yourIngredients', { count: verses.length })}</p>
                     <Badge variant="outline" className="bg-white dark:bg-gray-800">
                       {difficulty}
                     </Badge>
@@ -336,7 +368,7 @@ export default function ChefChallenge() {
                       </div>)}
                   </div>
                   <p className="text-xs text-muted-foreground italic">
-                    ⚡ Challenge: These verses are intentionally random and unrelated! Your goal is to creatively weave them into a coherent Bible study.
+                    {t('challenges.challengeExplanation')}
                   </p>
                   
                   <div className="flex gap-2">
@@ -354,30 +386,39 @@ export default function ChefChallenge() {
                         {isLoading ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Regenerating...
+                            {t('challenges.regenerating')}
                           </>
                         ) : (
                           <>
                             <RefreshCw className="mr-2 h-4 w-4" />
-                            Regenerate
+                            {t('challenges.regenerate')}
                           </>
                         )}
                       </Button>
                     )}
+                    <PostToPublicChallengeButton
+                      challengeType="chef"
+                      title={`Chef Challenge — ${verses.length} Random Verses`}
+                      content={verses.map(v => `📖 **${v.reference}**\n> "${v.text}"`).join("\n\n") + "\n\n⚡ Challenge: These verses are intentionally random and unrelated! Your goal is to creatively weave them into a coherent Bible study."}
+                      difficulty={difficulty}
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                    />
                   </div>
                 </div>
 
                 {!hasSubmitted ? <>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Create Your Biblical Recipe</label>
-                      
+                      <label className="text-sm font-medium">{t('challenges.createYourRecipe')}</label>
+
                       <p className="text-xs text-muted-foreground">
-                        Explain how these seemingly unrelated verses connect to make a complete theological point.
+                        {t('challenges.explainConnections')}
                       </p>
                     </div>
 
                     {feedback && <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg space-y-2">
-                        <p className="font-semibold">✨ Jeeves's Feedback:</p>
+                        <p className="font-semibold">{t('challenges.jeevesFeedback')}</p>
                         <div className="text-sm">{formatJeevesResponse(feedback.feedback || "")}</div>
                         {feedback.rating && <div className="flex items-center gap-1">
                             {"⭐".repeat(feedback.rating)}
@@ -389,35 +430,35 @@ export default function ChefChallenge() {
                       <Button onClick={handleCheck} variant="outline" className="flex-1" disabled={!recipe.trim() || isChecking}>
                         {isChecking ? <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Checking...
-                          </> : "Check My Recipe"}
+                            {t('common.checking')}
+                          </> : t('challenges.checkMyRecipe')}
                       </Button>
                       <Button onClick={handleShowModelAnswer} variant="secondary" className="flex-1" disabled={isLoadingModel}>
                         {isLoadingModel ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Loading...
+                            {t('common.loading')}
                           </>
                         ) : (
                           <>
                             <Eye className="mr-2 h-4 w-4" />
-                            {showModelAnswer ? "Hide" : "Show"} Model Answer
+                            {showModelAnswer ? t('challenges.hideModelAnswer') : t('challenges.showModelAnswer')}
                           </>
                         )}
                       </Button>
                     </div>
 
                     {showModelAnswer && modelAnswer && <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg space-y-2">
-                        <p className="font-semibold">🤖 Jeeves's Model Answer:</p>
+                        <p className="font-semibold">{t('challenges.jeevesModelAnswer')}</p>
                         <div className="text-sm">{formatJeevesResponse(modelAnswer)}</div>
                       </div>}
 
                     <Button onClick={handleSubmit} className="w-full bg-orange-600 hover:bg-orange-700" disabled={!recipe.trim() || isLoading}>
-                      Submit Recipe to Growth Journal
+                      {t('challenges.submitRecipeToJournal')}
                     </Button>
                   </> : <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg text-center space-y-4">
                     <p className="text-green-800 dark:text-green-200">
-                      ✓ Recipe Complete! Added to your Growth Journal.
+                      {t('challenges.recipeComplete')}
                     </p>
                     <Button onClick={() => {
                 setVerses([]);
@@ -427,12 +468,14 @@ export default function ChefChallenge() {
                 setModelAnswer("");
                 setHasSubmitted(false);
               }} variant="outline">
-                      Start New Challenge
+                      {t('challenges.startNewChallenge')}
                     </Button>
                   </div>}
               </>}
-          </CardContent>
+           </CardContent>
         </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>;
 }

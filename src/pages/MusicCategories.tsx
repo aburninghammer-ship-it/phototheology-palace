@@ -1,4 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { MUSIC_TOUR } from "@/data/guidedTours";
+import { useTranslation } from "react-i18next";
 import { useAudioDucking } from "@/hooks/useAudioDucking";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -96,11 +99,13 @@ const MUSIC_FLOORS = [
 ];
 
 export default function MusicCategories() {
+  const { t } = useTranslation();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
   const [volume, setVolume] = useState(0.08);
   const [isMuted, setIsMuted] = useState(false);
   const [duckMultiplier, setDuckMultiplier] = useState(1);
+  const [tourOpen, setTourOpen] = useState(false);
 
   // Listen for audio ducking events (when TTS is playing)
   useAudioDucking(useCallback((ducked: boolean, duckRatio: number) => {
@@ -149,17 +154,16 @@ export default function MusicCategories() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={MUSIC_TOUR} onClose={() => setTourOpen(false)} />}
       <div className="container max-w-6xl mx-auto px-4 py-8 space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-2">
             <Music className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold">Phototheology Music</h1>
+            <h1 className="text-3xl font-bold">{t('music.title')}</h1>
           </div>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Rich orchestral soundscapes for focused Bible study. Inspired by The Chosen, 
-            Hans Zimmer, and Bryan Tyler. Pure strings, cello, harp, and gentle brass—no synthesizers. 
-            BPM 55-70 for optimal memory and reflection.
+            {t('music.description')}
           </p>
         </div>
 
@@ -210,7 +214,7 @@ export default function MusicCategories() {
                     </div>
                     <div>
                       <CardTitle className="text-lg">
-                        Floor {floor.floor}: {floor.name}
+                        {t('music.floor', { number: floor.floor })}: {floor.name}
                       </CardTitle>
                       <p className="text-sm text-muted-foreground">{floor.subtitle}</p>
                     </div>
@@ -258,11 +262,9 @@ export default function MusicCategories() {
         {/* Guidelines Info */}
         <Card variant="glass" className="max-w-2xl mx-auto">
           <CardContent className="p-6 text-center space-y-3">
-            <h3 className="font-semibold">Music Guidelines</h3>
+            <h3 className="font-semibold">{t('music.guidelinesTitle')}</h3>
             <p className="text-sm text-muted-foreground">
-              Rich orchestral soundscapes inspired by The Chosen, Hans Zimmer, and Bryan Tyler. 
-              Pure orchestra: warm strings, cello, harp, gentle brass, woodwinds. 
-              No synthesizers. BPM 55-70 for optimal focus and memory retention.
+              {t('music.guidelinesDescription')}
             </p>
           </CardContent>
         </Card>

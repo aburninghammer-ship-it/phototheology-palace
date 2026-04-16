@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, X, Clock, Sparkles } from 'lucide-react';
 import { useChangeSpine, shouldEscalateUpgrade } from '@/hooks/useChangeSpine';
 import { useAuth } from '@/hooks/useAuth';
+import { useChurchMembership } from '@/hooks/useChurchMembership';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -13,8 +15,8 @@ interface ChangeSpineUpgradePromptProps {
 
 /**
  * Upgrade prompt that escalates based on trial days remaining.
- * - 7+ days: Minimal/hidden
- * - 4-7 days: Subtle banner
+ * - 10+ days: Minimal/hidden
+ * - 4-10 days: Subtle banner
  * - 1-3 days: Prominent banner with urgency
  * - 0 days: Full modal-like urgency
  */
@@ -24,6 +26,8 @@ export const ChangeSpineUpgradePrompt = ({ className }: ChangeSpineUpgradePrompt
   const { user, loading: authLoading } = useAuth();
   const changeSpine = useChangeSpine();
   const { trialDaysRemaining, isPaid, isLoading, isNewUser, hasAchievedFirstWin } = changeSpine;
+  const { isMember: isChurchMember, isLoading: churchLoading } = useChurchMembership();
+  const { isAdmin, loading: adminLoading } = useIsAdmin();
   
   const [dismissed, setDismissed] = useState(false);
 
@@ -41,8 +45,13 @@ export const ChangeSpineUpgradePrompt = ({ className }: ChangeSpineUpgradePrompt
     return null;
   }
 
+  // CRITICAL: Never show upgrade prompts to church members or admins
+  if (isChurchMember || isAdmin) {
+    return null;
+  }
+
   // Don't show if paid, loading, or dismissed
-  if (isLoading || isPaid || dismissed) {
+  if (isLoading || churchLoading || adminLoading || isPaid || dismissed) {
     return null;
   }
 

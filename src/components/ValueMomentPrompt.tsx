@@ -91,7 +91,7 @@ export function ValueMomentPrompt({ trigger, actionLabel, onDismiss }: ValueMome
           initial={{ opacity: 0, y: 50, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.95 }}
-          className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50"
+          className="fixed bottom-24 md:bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50"
         >
           <div className="relative bg-gradient-to-br from-primary/10 via-background to-accent/10 border border-primary/30 rounded-xl p-5 shadow-2xl backdrop-blur-sm">
             {/* Close button */}

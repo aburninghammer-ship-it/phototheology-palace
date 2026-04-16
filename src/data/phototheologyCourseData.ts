@@ -1,8 +1,14 @@
+export interface PracticeToolLink {
+  link: string;
+  label: string;
+}
+
 export interface CourseDay {
   day: number;
   week: number;
   title: string;
   floor: string;
+  floorNumber: number;
   focus: string;
   scripture: string;
   scriptureText: string;
@@ -10,6 +16,10 @@ export interface CourseDay {
   reflection: string;
   prayer: string;
   room?: string;
+  roomCode?: string;
+  practiceLink?: string;
+  practiceLinkLabel?: string;
+  practiceTools?: PracticeToolLink[];
 }
 
 export interface KidsCourseDay extends CourseDay {
@@ -18,757 +28,272 @@ export interface KidsCourseDay extends CourseDay {
   funElement: string;
 }
 
+export const FLOOR_META = [
+  { number: 1, name: "Furnishing Floor", subtitle: "Memory & Visualization for Width", icon: "📚", color: "from-amber-500/20 to-amber-600/5", weeks: "1–2", expansion: "Width" },
+  { number: 2, name: "Investigation Floor", subtitle: "Detective Work for Width", icon: "🔍", color: "from-blue-500/20 to-blue-600/5", weeks: "3–4", expansion: "Width" },
+  { number: 3, name: "Freestyle Floor", subtitle: "Connections for Time", icon: "🎤", color: "from-green-500/20 to-green-600/5", weeks: "5–6", expansion: "Time" },
+  { number: 4, name: "Next Level Floor", subtitle: "Christ-Centered Depth", icon: "✝️", color: "from-purple-500/20 to-purple-600/5", weeks: "7–8", expansion: "Depth" },
+  { number: 5, name: "Vision Floor", subtitle: "Prophecy & Sanctuary", icon: "🔭", color: "from-indigo-500/20 to-indigo-600/5", weeks: "9", expansion: "Depth" },
+  { number: 6, name: "Three Heavens Floor", subtitle: "Cycles & Cosmic Context", icon: "🌌", color: "from-cyan-500/20 to-cyan-600/5", weeks: "10", expansion: "Depth" },
+  { number: 7, name: "Spiritual Floor", subtitle: "Fire, Meditation & Speed", icon: "🔥", color: "from-red-500/20 to-red-600/5", weeks: "11", expansion: "Height" },
+  { number: 8, name: "Master Floor", subtitle: "Reflexive Phototheology", icon: "♾️", color: "from-yellow-500/20 to-yellow-600/5", weeks: "12–13", expansion: "Height" },
+];
+
 export const phototheologyCourse: CourseDay[] = [
-  // Week 1: Foundations (Days 1-7) – Floor 1: Furnishing Your Palace
-  {
-    day: 1,
-    week: 1,
-    title: "The Vision of Phototheology",
-    floor: "Floor 1: Furnishing Your Palace",
-    focus: "Phototheology as visual, Christ-centered study",
-    scripture: "Luke 24:27",
-    scriptureText: "And beginning at Moses and all the prophets, he expounded unto them in all the scriptures the things concerning himself.",
-    activity: "Read Genesis 1-3. Visualize Eden as your palace entrance: Adam (covenant), Eve (relationship), serpent (conflict). Sketch a simple palace outline (8 floors).",
-    reflection: "Where do you see Jesus in creation's fall and promise?",
-    prayer: "Lord, open my eyes to Your image in every story."
-  },
-  {
-    day: 2,
-    week: 1,
-    title: "Story Room (ST)",
-    floor: "Floor 1: Furnishing Your Palace",
-    room: "Story Room",
-    focus: "Narrative as God's visual teaching",
-    scripture: "Genesis 3:21",
-    scriptureText: "Unto Adam also and to his wife did the LORD God make coats of skins, and clothed them.",
-    activity: "Retell Genesis 3 as a movie scene. Assign images: Tree (knowledge), Blood (first sacrifice). Memorize 3 key stories from Genesis 1-11.",
-    reflection: "How does clothing symbolize Christ's covering?",
-    prayer: "Clothe me in Your righteousness, Jesus."
-  },
-  {
-    day: 3,
-    week: 1,
-    title: "Imagination Room (IR)",
-    floor: "Floor 1: Furnishing Your Palace",
-    room: "Imagination Room",
-    focus: "Mental images for retention",
-    scripture: "Hebrews 11:1",
-    scriptureText: "Now faith is the substance of things hoped for, the evidence of things not seen.",
-    activity: "Imagine Noah's ark as a floating palace room. Place animals as symbols (dove=Holy Spirit). Visualize 5 flood details.",
-    reflection: "What unseen truths does imagination reveal about faith?",
-    prayer: "Ignite my imagination to see Your faithfulness."
-  },
-  {
-    day: 4,
-    week: 1,
-    title: "24FPS Room (F24)",
-    floor: "Floor 1: Furnishing Your Palace",
-    room: "24FPS Room",
-    focus: "Frame-by-frame narrative (like a film at 24 frames per second)",
-    scripture: "Exodus 14:21-22",
-    scriptureText: "And Moses stretched out his hand over the sea... and the waters were divided.",
-    activity: "Break Exodus 14 into 24 'frames': Wave rises (F1), Israel crosses (F12), Egyptians drown (F24). Narrate aloud.",
-    reflection: "How does slowing the story reveal God's timing?",
-    prayer: "Help me see Your deliverance frame by frame."
-  },
-  {
-    day: 5,
-    week: 1,
-    title: "Bible Rendered Room (BR)",
-    floor: "Floor 1: Furnishing Your Palace",
-    room: "Bible Rendered Room",
-    focus: "Rendering text as vivid scenes",
-    scripture: "Psalm 23:1-6",
-    scriptureText: "The LORD is my shepherd; I shall not want...",
-    activity: "'Render' Psalm 23: Green pastures (Floor 1 garden), Valley shadow (deeper floor). Draw or describe one scene.",
-    reflection: "Where is Jesus the Shepherd in your life?",
-    prayer: "Lead me beside still waters, Good Shepherd."
-  },
-  {
-    day: 6,
-    week: 1,
-    title: "Gems Room (GEM)",
-    floor: "Floor 1: Furnishing Your Palace",
-    room: "Gems Room",
-    focus: "Concise, sparkling insights linking verses",
-    scripture: "Proverbs 2:4",
-    scriptureText: "If thou seekest her as silver, and searchest for her as for hid treasures.",
-    activity: "Mine a gem: Link Malachi 4:2 (Sun of Righteousness) to John 8:12 (Light of the World). Write a 3-sentence linkage.",
-    reflection: "What hidden treasure did you uncover?",
-    prayer: "Reveal Your gems, Lord."
-  },
-  {
-    day: 7,
-    week: 1,
-    title: "Week Review – Palace Ground Floor",
-    floor: "Floor 1: Furnishing Your Palace",
-    focus: "Integrate Week 1",
-    scripture: "Nehemiah 8:8",
-    scriptureText: "So they read in the book in the law of God distinctly, and gave the sense, and caused them to understand the reading.",
-    activity: "Walk your palace mentally: Enter via Story Room, furnish with images from Days 1-6. Quiz: Recall 3 stories visually.",
-    reflection: "How has visualization deepened your retention?",
-    prayer: "Build my palace on Your Word."
-  },
+  // ═══════════════════════════════════════════
+  // WEEKS 1–2: FLOOR 1 — FURNISHING (Days 1–14)
+  // ═══════════════════════════════════════════
+  { day: 1, week: 1, floorNumber: 1, title: "The Vision of Phototheology", floor: "Floor 1: Furnishing Your Palace", focus: "Phototheology as visual, Christ-centered study — the Bible is not just words, it is images, stories, and living patterns", scripture: "Luke 24:27", scriptureText: "And beginning at Moses and all the prophets, he expounded unto them in all the scriptures the things concerning himself.", activity: "Read Genesis 1–3. Visualize Eden as your palace entrance: Adam (covenant), Eve (relationship), serpent (conflict). Sketch a simple palace outline with 8 floors. Label each floor with its purpose. This palace is your mental home for the Word.", reflection: "Where do you see Jesus in creation's fall and promise? How does Genesis 3:15 set the stage for the entire Bible?", prayer: "Lord, open my eyes to Your image in every story. Build this palace in my mind by Your Spirit.", practiceTools: [{ link: "/palace", label: "Explore the Palace" }, { link: "/palace/floor/1", label: "Visit Floor 1" }] },
 
-  // Week 2: Investigation (Days 8-14) – Floor 2: Detective Skills
-  {
-    day: 8,
-    week: 2,
-    title: "Observation Room (OBS)",
-    floor: "Floor 2: Detective Skills",
-    room: "Observation Room",
-    focus: "Plain facts before interpretation",
-    scripture: "Luke 1:1-4",
-    scriptureText: "Forasmuch as many have taken in hand to set forth in order a declaration...",
-    activity: "Observe John 1:1-5: List 10 facts (who, what, where). No opinions.",
-    reflection: "What details did you miss at first glance?",
-    prayer: "Open my eyes to Your facts, Father."
-  },
-  {
-    day: 9,
-    week: 2,
-    title: "Def-Com Room (DC)",
-    floor: "Floor 2: Detective Skills",
-    room: "Def-Com Room",
-    focus: "Definitions and comparisons",
-    scripture: "Isaiah 6:3",
-    scriptureText: "Holy, holy, holy, is the LORD of hosts: the whole earth is full of his glory.",
-    activity: "Define 'holy' from 3 verses (Lev 19:2, 1 Pet 1:16, Rev 4:8). Compare usages.",
-    reflection: "How does definition clarify God's nature?",
-    prayer: "Make me holy as You are."
-  },
-  {
-    day: 10,
-    week: 2,
-    title: "Symbols/Types Room (SCYM)",
-    floor: "Floor 2: Detective Skills",
-    room: "Symbols/Types Room",
-    focus: "Metaphors pointing to Christ",
-    scripture: "John 3:14",
-    scriptureText: "And as Moses lifted up the serpent in the wilderness, even so must the Son of man be lifted up.",
-    activity: "Type: Bronze serpent (Num 21:9) → Antitype: Cross (Jn 3:14). Draw the connection.",
-    reflection: "Where else do you see shadows of Jesus?",
-    prayer: "Lift my eyes to the true Savior."
-  },
-  {
-    day: 11,
-    week: 2,
-    title: "Questions Room (Q)",
-    floor: "Floor 2: Detective Skills",
-    room: "Questions Room",
-    focus: "Probing inquiries",
-    scripture: "Habakkuk 2:1",
-    scriptureText: "I will stand upon my watch, and set me upon the tower...",
-    activity: "Ask 5 questions on Daniel 2: Nebuchadnezzar's dream. (Who interprets? What metals mean?)",
-    reflection: "What question challenges your understanding?",
-    prayer: "Teach me to seek answers in You."
-  },
-  {
-    day: 12,
-    week: 2,
-    title: "Q&A Internship Room (QA)",
-    floor: "Floor 2: Detective Skills",
-    room: "Q&A Internship Room",
-    focus: "Chain questions to insights",
-    scripture: "Proverbs 25:2",
-    scriptureText: "It is the glory of God to conceal a thing: but the honour of kings is to search out a matter.",
-    activity: "Chain: Q1 on Matt 24:3 (signs?) → A1 (wars) → Q2 (end times?). Build 3 links.",
-    reflection: "How do questions lead to revelation?",
-    prayer: "Unconceal Your truths."
-  },
-  {
-    day: 13,
-    week: 2,
-    title: "Listening Room (LR)",
-    floor: "Floor 2: Detective Skills",
-    room: "Listening Room",
-    focus: "Spirit-prompted insights",
-    scripture: "1 Samuel 3:10",
-    scriptureText: "Speak; for thy servant heareth.",
-    activity: "Read Psalm 119:1-16 silently. Note 3 Spirit-whispers (e.g., 'Keep my ways').",
-    reflection: "What did quiet listening reveal?",
-    prayer: "Tune my ear to Your voice."
-  },
-  {
-    day: 14,
-    week: 2,
-    title: "Week Review – Floor 2 Integration",
-    floor: "Floor 2: Detective Skills",
-    focus: "Detective toolkit",
-    scripture: "Acts 17:11",
-    scriptureText: "These were more noble... in that they received the word... and searched the scriptures daily.",
-    activity: "Investigate Ruth 1: Observe facts, define 'kinsman,' symbolize Boaz, question loyalty.",
-    reflection: "How has investigation uncovered Christ?",
-    prayer: "Search me and know me, O God."
-  },
+  { day: 2, week: 1, floorNumber: 1, title: "Story Room: Narrative as Foundation", floor: "Floor 1: Furnishing Your Palace", room: "Story Room", roomCode: "SR", focus: "The Bible is primarily narrative — before doctrines or prophecies, it is a book of stories", scripture: "Genesis 3:21", scriptureText: "Unto Adam also and to his wife did the LORD God make coats of skins, and clothed them.", activity: "Retell Genesis 3 as a vivid movie scene. Assign images: Tree (knowledge vs. life), Blood (first sacrifice), Covering (Christ's righteousness). Memorize 3 key stories from Genesis 1–11 in sequence: Creation → Fall → Flood. Tell each in under 60 seconds.", reflection: "How does God clothing Adam and Eve foreshadow Christ's covering? What does the first death in Scripture tell us about the cost of sin?", prayer: "Clothe me in Your righteousness, Jesus. Help me carry these stories in my heart.", practiceLink: "/palace/room/story", practiceLinkLabel: "Open Story Room" },
 
-  // Week 3: Freestyle Connections (Days 15-21) – Floor 3: Daily Links
-  {
-    day: 15,
-    week: 3,
-    title: "Nature Freestyle (NF)",
-    floor: "Floor 3: Daily Links",
-    room: "Nature Freestyle",
-    focus: "Creation analogies",
-    scripture: "Romans 1:20",
-    scriptureText: "For the invisible things of him... are clearly seen, being understood by the things that are made.",
-    activity: "Walk outside. Link a tree (roots=faith, Ps 1:3) to Jeremiah 17:7-8. Journal.",
-    reflection: "How does nature echo Scripture?",
-    prayer: "Speak through Your creation."
-  },
-  {
-    day: 16,
-    week: 3,
-    title: "Personal Freestyle (PF)",
-    floor: "Floor 3: Daily Links",
-    room: "Personal Freestyle",
-    focus: "Life application",
-    scripture: "James 1:22",
-    scriptureText: "But be ye doers of the word, and not hearers only, deceiving your own selves.",
-    activity: "Apply Ephesians 4:32 to a recent conflict: Forgive as Christ forgave. Act on it.",
-    reflection: "Where does the Word meet your day?",
-    prayer: "Make my life Your mirror."
-  },
-  {
-    day: 17,
-    week: 3,
-    title: "Bible Freestyle / Verse Genetics (BF)",
-    floor: "Floor 3: Daily Links",
-    room: "Bible Freestyle",
-    focus: "Verse family trees",
-    scripture: "Psalm 119:105",
-    scriptureText: "Thy word is a lamp unto my feet, and a light unto my path.",
-    activity: "Trace 'light' genetics: Ps 119:105 → John 8:12 → Rev 21:23. Map connections.",
-    reflection: "How do verses 'breed' deeper truth?",
-    prayer: "Illuminate my path with Your Word."
-  },
-  {
-    day: 18,
-    week: 3,
-    title: "History/Social Freestyle (HF)",
-    floor: "Floor 3: Daily Links",
-    room: "History/Social Freestyle",
-    focus: "Historical amplification (historicist lens)",
-    scripture: "Daniel 2:21",
-    scriptureText: "And he changeth the times and the seasons: he removeth kings, and setteth up kings.",
-    activity: "Link Dan 2 empires to history: Babylon (ancient) → Rome (pagan/papal). Note 1798 wound.",
-    reflection: "How does history confirm prophecy?",
-    prayer: "Show me Your sovereignty in time."
-  },
-  {
-    day: 19,
-    week: 3,
-    title: "Recipe Room (RCP)",
-    floor: "Floor 3: Daily Links",
-    room: "Recipe Room",
-    focus: "Verses as ingredients for studies",
-    scripture: "Proverbs 15:17",
-    scriptureText: "Better is a dinner of herbs where love is, than a stalled ox and hatred therewith.",
-    activity: "'Cook' with 3 verses: Prov 15:17 + Jn 13:34 + 1 Cor 13:13. Create a 'love meal' outline.",
-    reflection: "What recipe nourishes your soul?",
-    prayer: "Feed me with Your bread of life."
-  },
-  {
-    day: 20,
-    week: 3,
-    title: "Concentration Room (CON)",
-    floor: "Floor 3: Daily Links",
-    room: "Concentration Room",
-    focus: "Find Jesus in texts",
-    scripture: "Luke 24:44",
-    scriptureText: "All things must be fulfilled, which were written in the law of Moses... and in the psalms, concerning me.",
-    activity: "Concentrate on Gen 22: Abraham's sacrifice → Christ's (Heb 11:17-19). Spot 3 links.",
-    reflection: "Where was Jesus hiding?",
-    prayer: "Draw me to Yourself."
-  },
-  {
-    day: 21,
-    week: 3,
-    title: "Week Review – Freestyle Flow",
-    floor: "Floor 3: Daily Links",
-    focus: "Spontaneous connections",
-    scripture: "Colossians 3:16",
-    scriptureText: "Let the word of Christ dwell in you richly in all wisdom.",
-    activity: "Freestyle Isaiah 53: Link to nature (suffering servant as vine), personal trial, history (crucifixion).",
-    reflection: "How do freestyles make study alive?",
-    prayer: "Let Your Word dwell in me."
-  },
+  { day: 3, week: 1, floorNumber: 1, title: "Imagination Room: Stepping Inside the Text", floor: "Floor 1: Furnishing Your Palace", room: "Imagination Room", roomCode: "IR", focus: "Memory deepens when you move from recall to immersion — step inside the story as if you were there", scripture: "Hebrews 11:1", scriptureText: "Now faith is the substance of things hoped for, the evidence of things not seen.", activity: "Close your eyes and imagine Noah's ark. Feel the rain begin. Hear the animals. See the door shut by an unseen hand. Spend 5 full minutes immersed in Genesis 7. Then journal 5 sensory details you 'experienced.' This sanctified imagination anchors stories in emotional memory.", reflection: "What unseen truths does imagination reveal about faith? How does standing inside the story change your understanding?", prayer: "Ignite my imagination to see Your faithfulness. Let me feel the weight of Your Word.", practiceLink: "/palace/room/imagination", practiceLinkLabel: "Open Imagination Room" },
 
-  // Week 4: Structure & Patterns (Days 22-28) – Floor 4: Christ-Centered Depth
-  {
-    day: 22,
-    week: 4,
-    title: "Dimensions Room (DIM)",
-    floor: "Floor 4: Christ-Centered Depth",
-    room: "Dimensions Room",
-    focus: "1D Literal → 5D Eschatological",
-    scripture: "Exodus 25:8",
-    scriptureText: "And let them make me a sanctuary; that I may dwell among them.",
-    activity: "Apply dimensions to Ex 25:8: 1D (building), 2D (type of heaven), 3D (dwell in me), 4D (church temple), 5D (new Jerusalem).",
-    reflection: "How do layers reveal Christ?",
-    prayer: "Dwell among us eternally."
-  },
-  {
-    day: 23,
-    week: 4,
-    title: "Connect-6 (C6)",
-    floor: "Floor 4: Christ-Centered Depth",
-    room: "Connect-6",
-    focus: "Genres linkage (Prophecy, Parables, etc.)",
-    scripture: "Matthew 13:3",
-    scriptureText: "Behold, a sower went forth to sow.",
-    activity: "Connect sower across 6 genres: Parable (Matt 13), Prophecy (Isa 55:10-11), History (farmers in Ruth), etc.",
-    reflection: "What unified truth emerges?",
-    prayer: "Sow Your seed in my heart."
-  },
-  {
-    day: 24,
-    week: 4,
-    title: "Theme Room (THM)",
-    floor: "Floor 4: Christ-Centered Depth",
-    room: "Theme Room",
-    focus: "Walls (Sanctuary, Life of Christ) and floors/ceiling",
-    scripture: "Hebrews 9:1",
-    scriptureText: "Then verily the first covenant had also ordinances of divine service, and a worldly sanctuary.",
-    activity: "Trace 'blood' on Sanctuary Wall: Ex 12 (Passover) → Heb 9 (new covenant).",
-    reflection: "How does theme build the palace?",
-    prayer: "Wash me in Your blood."
-  },
-  {
-    day: 25,
-    week: 4,
-    title: "Time Zone Room (TZ)",
-    floor: "Floor 4: Christ-Centered Depth",
-    room: "Time Zone Room",
-    focus: "Hpa (Heaven Past) to Ef (Earth Future)",
-    scripture: "Revelation 12:7",
-    scriptureText: "And there was war in heaven: Michael and his angels fought against the dragon.",
-    activity: "Map Rev 12: TZ-Hpa (fall of Lucifer) → TZ-Ef (final defeat).",
-    reflection: "How does time zone prophecy comfort?",
-    prayer: "Prepare me for Your times."
-  },
-  {
-    day: 26,
-    week: 4,
-    title: "Patterns Room (PRM)",
-    floor: "Floor 4: Christ-Centered Depth",
-    room: "Patterns Room",
-    focus: "Chiasm, inclusio, repeats",
-    scripture: "Genesis 1:1",
-    scriptureText: "In the beginning God created the heaven and the earth.",
-    activity: "Spot pattern in Jonah: Chiasm (Jon 2 prayer center).",
-    reflection: "What patterns point to design?",
-    prayer: "Order my chaotic thoughts."
-  },
-  {
-    day: 27,
-    week: 4,
-    title: "Parallels Room (PAR)",
-    floor: "Floor 4: Christ-Centered Depth",
-    room: "Parallels Room",
-    focus: "Canonical echoes",
-    scripture: "Psalm 22:1",
-    scriptureText: "My God, my God, why hast thou forsaken me?",
-    activity: "Parallel Ps 22 to Matt 27:46 (crucifixion). Source: Both.",
-    reflection: "How do echoes amplify Christ?",
-    prayer: "Echo Your cry in my trials."
-  },
-  {
-    day: 28,
-    week: 4,
-    title: "Week Review – Pattern Mastery",
-    floor: "Floor 4: Christ-Centered Depth",
-    focus: "Structural synthesis",
-    scripture: "Romans 11:33",
-    scriptureText: "O the depth of the riches both of the wisdom and knowledge of God!",
-    activity: "Pattern Daniel 7: Beasts (1D) → Christ kingdom (5D). Connect genres.",
-    reflection: "How do patterns unveil wisdom?",
-    prayer: "Reveal Your patterns."
-  },
+  { day: 4, week: 1, floorNumber: 1, title: "24FPS Room: Scripture as Film", floor: "Floor 1: Furnishing Your Palace", room: "24FPS Room", roomCode: "24F", focus: "Like a movie at 24 frames per second, break each chapter into one memorable symbolic image", scripture: "Exodus 14:21-22", scriptureText: "And Moses stretched out his hand over the sea; and the LORD caused the sea to go back… and the waters were divided.", activity: "Create symbolic frames for Genesis 1–10: Gen 1 = birthday cake earth (creation), Gen 3 = snake biting an apple-clock (fall into time), Gen 6 = floating house (ark), Gen 9 = rainbow crown. The stranger the image, the more memorable. Practice flipping through your frames mentally.", reflection: "How does 'filming' Scripture change the way you remember? What frame surprised you most?", prayer: "Help me see Your Word frame by frame, Lord.", practiceLink: "/image-bible", practiceLinkLabel: "Open Image Bible" },
 
-  // Week 5: Sanctuary & Prophecy (Days 29-35) – Floors 5-6: Vision & Cycles
-  {
-    day: 29,
-    week: 5,
-    title: "Blue/Sanctuary Room (SAN)",
-    floor: "Floors 5-6: Vision & Cycles",
-    room: "Blue/Sanctuary Room",
-    focus: "Furniture path: Altar → Ark",
-    scripture: "Exodus 40:6",
-    scriptureText: "And thou shalt set the altar of the burnt offering before the door of the tabernacle.",
-    activity: "Walk SAN path for Lev 16: Altar (sacrifice) → Mercy Seat (atonement). Christ link.",
-    reflection: "How does sanctuary map salvation?",
-    prayer: "Enter Your courts."
-  },
-  {
-    day: 30,
-    week: 5,
-    title: "Prophecy Room (PRO)",
-    floor: "Floors 5-6: Vision & Cycles",
-    room: "Prophecy Room",
-    focus: "Historicist symbols (beast=power)",
-    scripture: "Daniel 7:17",
-    scriptureText: "These great beasts, which are four, are four kings, which shall arise out of the earth.",
-    activity: "PRO Dan 7: Little Horn (papal) → 1260 years (538-1798).",
-    reflection: "What prophecy anchors hope?",
-    prayer: "Fulfill Your words."
-  },
-  {
-    day: 31,
-    week: 5,
-    title: "Three Angels' Room (AM3)",
-    floor: "Floors 5-6: Vision & Cycles",
-    room: "Three Angels' Room",
-    focus: "Rev 14:6-12 messages",
-    scripture: "Revelation 14:7",
-    scriptureText: "Fear God, and give glory to him; for the hour of his judgment is come.",
-    activity: "Break down: 1st (gospel), 2nd (Babylon fall), 3rd (mark warning). Personal tie.",
-    reflection: "How do angels call today?",
-    prayer: "Seal me with Your truth."
-  },
-  {
-    day: 32,
-    week: 5,
-    title: "Feasts Room (FST)",
-    floor: "Floors 5-6: Vision & Cycles",
-    room: "Feasts Room",
-    focus: "Typology to Christ (Passover= cross)",
-    scripture: "Leviticus 23:5",
-    scriptureText: "In the fourteenth day of the first month at even is the LORD'S passover.",
-    activity: "FST chain: Passover (Ex 12) → Pentecost (Acts 2) → Atonement (Heb 9).",
-    reflection: "What feast fulfills in you?",
-    prayer: "Celebrate Your feasts eternally."
-  },
-  {
-    day: 33,
-    week: 5,
-    title: "Juice Room (JUI)",
-    floor: "Floors 5-6: Vision & Cycles",
-    room: "Juice Room",
-    focus: "Whole-book synthesis",
-    scripture: "Hebrews 1:1-2",
-    scriptureText: "God, who at sundry times and in divers manners spake... hath in these last days spoken unto us by his Son.",
-    activity: "Juice Romans: Theme (justification) in one page.",
-    reflection: "How does synthesis refresh?",
-    prayer: "Squeeze truth from Your book."
-  },
-  {
-    day: 34,
-    week: 5,
-    title: "Christ in Every Chapter (CEC)",
-    floor: "Floors 5-6: Vision & Cycles",
-    room: "Christ in Every Chapter",
-    focus: "Jesus per chapter",
-    scripture: "Genesis 3:15",
-    scriptureText: "And I will put enmity between thee and the woman, and between thy seed and her seed.",
-    activity: "CEC Exodus: Ch. 12 (Passover Lamb). Find in 3 chapters.",
-    reflection: "Where is Christ chapter by chapter?",
-    prayer: "Expound Yourself in all Scripture."
-  },
-  {
-    day: 35,
-    week: 5,
-    title: "Eight Cycles (@Ad to @Re)",
-    floor: "Floors 5-6: Vision & Cycles",
-    room: "Eight Cycles",
-    focus: "Covenantal patterns (Adamic to Remnant)",
-    scripture: "Genesis 6:18",
-    scriptureText: "But with thee will I establish my covenant.",
-    activity: "Map one cycle: Abrahamic (Gen 12-50: Promise → Egypt). Link to Christ.",
-    reflection: "How do cycles show redemption?",
-    prayer: "Restore me in Your cycle."
-  },
+  { day: 5, week: 1, floorNumber: 1, title: "Bible Rendered Room: The 51-Symbol Panorama", floor: "Floor 1: Furnishing Your Palace", room: "Bible Rendered Room", roomCode: "BR", focus: "One master image per 24-chapter block — map the entire Bible with just 51 symbols", scripture: "Psalm 119:130", scriptureText: "The entrance of thy words giveth light; it giveth understanding unto the simple.", activity: "Learn the first 3 rendered symbols: Genesis 1–24 = '/' (division: Eden/exile, Cain/Abel, Ishmael/Isaac). Genesis 25–50 = '×' (multiplication: 12 tribes, Joseph's provision). Exodus 1–24 = '⛓️→🔓' (bondage to freedom). Sketch all three and memorize them.", reflection: "How does rendering give you a 'trailer' of Scripture? What patterns emerge when you zoom out?", prayer: "Let me carry Your whole story in my mind, Lord.", practiceLink: "/image-bible", practiceLinkLabel: "View 51 Symbols" },
 
-  // Week 6: Transformation & Mastery (Days 36-42) – Floors 7-8: Synthesis & Ascension
-  {
-    day: 36,
-    week: 6,
-    title: "Fire Room (FRM)",
-    floor: "Floors 7-8: Synthesis & Ascension",
-    room: "Fire Room",
-    focus: "Emotional engagement",
-    scripture: "Jeremiah 20:9",
-    scriptureText: "His word was in mine heart as a burning fire shut up in my bones.",
-    activity: "Feel Psalm 51: David's repentance. Journal emotion.",
-    reflection: "What fire burns in the text?",
-    prayer: "Set my heart aflame."
-  },
-  {
-    day: 37,
-    week: 6,
-    title: "Meditation Room (MED)",
-    floor: "Floors 7-8: Synthesis & Ascension",
-    room: "Meditation Room",
-    focus: "Rumination on study",
-    scripture: "Psalm 1:2",
-    scriptureText: "But his delight is in the law of the LORD; and in his law doth he meditate day and night.",
-    activity: "Meditate Joshua 1:8 for 10 min. Repeat, visualize.",
-    reflection: "What deepens in stillness?",
-    prayer: "Meditate on You day and night."
-  },
-  {
-    day: 38,
-    week: 6,
-    title: "Speed Room (SPD)",
-    floor: "Floors 7-8: Synthesis & Ascension",
-    room: "Speed Room",
-    focus: "Rapid room application",
-    scripture: "Ecclesiastes 3:1",
-    scriptureText: "To every thing there is a season, and a time to every purpose under the heaven.",
-    activity: "Speed-run Prov 3:5-6 through 3 rooms (1 min each). Time yourself.",
-    reflection: "How does speed sharpen focus?",
-    prayer: "Teach me Your timing."
-  },
-  {
-    day: 39,
-    week: 6,
-    title: "Mathematics Room (MATH)",
-    floor: "Floors 7-8: Synthesis & Ascension",
-    room: "Mathematics Room",
-    focus: "Prophetic numbers (DY principle)",
-    scripture: "Daniel 8:14",
-    scriptureText: "Unto two thousand and three hundred days; then shall the sanctuary be cleansed.",
-    activity: "MATH @2300: 457 BC → 1844 AD (IJ start). Link to sanctuary.",
-    reflection: "What math measures mercy?",
-    prayer: "Count Your blessings."
-  },
-  {
-    day: 40,
-    week: 6,
-    title: "Reflexive Mastery (Floor 8)",
-    floor: "Floors 7-8: Synthesis & Ascension",
-    room: "Reflexive Mastery",
-    focus: "Internalized palace; ascension to Christ",
-    scripture: "Ephesians 3:17-19",
-    scriptureText: "That Christ may dwell in your hearts... that ye might be filled with all the fulness of God.",
-    activity: "Full palace tour: Pick Rev 14:12. Apply 5 rooms/dimensions. Synthesize.",
-    reflection: "How has the palace formed Christ in you?",
-    prayer: "Fill me with Your fullness; ascend in You."
-  },
-  {
-    day: 41,
-    week: 6,
-    title: "Integration Practice",
-    floor: "Floors 7-8: Synthesis & Ascension",
-    focus: "Combining multiple rooms",
-    scripture: "Colossians 1:18",
-    scriptureText: "That in all things he might have the preeminence.",
-    activity: "Choose Philippians 2:5-11. Apply Story (kenosis narrative), Symbols (name above all names), Dimensions (cosmic scope).",
-    reflection: "How do multiple lenses magnify Christ?",
-    prayer: "Have preeminence in all my studies."
-  },
-  {
-    day: 42,
-    week: 6,
-    title: "Palace Walkthrough Mastery",
-    floor: "Floors 7-8: Synthesis & Ascension",
-    focus: "Complete mental tour of all 8 floors",
-    scripture: "Psalm 119:130",
-    scriptureText: "The entrance of thy words giveth light; it giveth understanding unto the simple.",
-    activity: "Mental walkthrough from Floor 1 to Floor 8. Recall one room from each floor with its key lesson.",
-    reflection: "What floor needs more practice?",
-    prayer: "Guide me through Your palace daily."
-  },
+  { day: 6, week: 1, floorNumber: 1, title: "Translation Room: Words into Pictures", floor: "Floor 1: Furnishing Your Palace", room: "Translation Room", roomCode: "TR", focus: "Abstract texts become concrete images — turning verses into visual anchors", scripture: "Psalm 119:105", scriptureText: "Thy word is a lamp unto my feet, and a light unto my path.", activity: "Translate 3 verses into images: Ps 119:105 = glowing scroll lighting a dark path. Matt 5:14 = city glowing on a hilltop at night. John 15:5 = branches plugged into a central vine, pulsing with life. Draw or describe each scene in detail.", reflection: "Which translation felt most alive? How does visual translation deepen understanding?", prayer: "Transform Your abstract truths into vivid realities in my mind.", practiceTools: [{ link: "/palace/room/translation", label: "Translation Room" }, { link: "/bible/thematic-search", label: "Thematic Search" }] },
 
-  // Week 7: Advanced Application (Days 43-49)
-  {
-    day: 43,
-    week: 7,
-    title: "Multi-Room Synthesis I",
-    floor: "Advanced Application",
-    focus: "Combining 3-4 rooms per passage",
-    scripture: "John 15:1-8",
-    scriptureText: "I am the true vine, and my Father is the husbandman.",
-    activity: "Study John 15:1-8 through Nature Freestyle (vine metaphor), Symbols (branches=believers), Dimensions (1D-5D fruitbearing), Meditation (abide).",
-    reflection: "How does multi-room study create depth?",
-    prayer: "Make me fruitful in Your vine."
-  },
-  {
-    day: 44,
-    week: 7,
-    title: "Multi-Room Synthesis II",
-    floor: "Advanced Application",
-    focus: "Full palace application to one chapter",
-    scripture: "Revelation 3:14-22",
-    scriptureText: "These things saith the Amen, the faithful and true witness.",
-    activity: "Apply 6 rooms to Laodicea message: Story (church history), Prophecy (end-time), Personal (lukewarm), Fire (urgency), Symbols (gold, white raiment), CEC (Christ outside).",
-    reflection: "What does comprehensive study reveal?",
-    prayer: "Open the door to You, Jesus."
-  },
-  {
-    day: 45,
-    week: 7,
-    title: "Teaching Preparation",
-    floor: "Advanced Application",
-    focus: "Using palace to teach others",
-    scripture: "2 Timothy 2:2",
-    scriptureText: "The same commit thou to faithful men, who shall be able to teach others also.",
-    activity: "Prepare a 10-minute teaching on Psalm 23 using 3 rooms. Outline: Intro, Room 1 (Story), Room 2 (Personal), Room 3 (Dimensions). Practice delivery.",
-    reflection: "How does teaching solidify learning?",
-    prayer: "Make me a faithful teacher."
-  },
-  {
-    day: 46,
-    week: 7,
-    title: "Difficult Passages Practice",
-    floor: "Advanced Application",
-    focus: "Applying palace to hard texts",
-    scripture: "2 Peter 3:16",
-    scriptureText: "In which are some things hard to be understood.",
-    activity: "Tackle Ezekiel 1 (throne vision). Use: Observation (facts), Symbols (living creatures), Dimensions (heavenly reality), Prophecy (God's glory). Journal insights.",
-    reflection: "How does the palace unlock difficult passages?",
-    prayer: "Give me wisdom for hard truths."
-  },
-  {
-    day: 47,
-    week: 7,
-    title: "Speed & Depth Balance",
-    floor: "Advanced Application",
-    focus: "Quick daily study vs. deep weekly dive",
-    scripture: "Proverbs 4:18",
-    scriptureText: "But the path of the just is as the shining light, that shineth more and more unto the perfect day.",
-    activity: "Speed study (5 min): Proverbs 3:5-6 in 2 rooms. Deep study (20 min): Same passage in 5 rooms. Compare results.",
-    reflection: "When do you need speed vs. depth?",
-    prayer: "Balance my study time wisely."
-  },
-  {
-    day: 48,
-    week: 7,
-    title: "Cross-Testament Connections",
-    floor: "Advanced Application",
-    focus: "Linking OT and NT through palace",
-    scripture: "Matthew 5:17",
-    scriptureText: "Think not that I am come to destroy the law, or the prophets: I am not come to destroy, but to fulfil.",
-    activity: "Connect Isaiah 53 to Gospel passion accounts using: Prophecy (fulfillment), Parallels (verse echoes), CEC (Christ in Isaiah). Create visual map.",
-    reflection: "How does the palace bridge testaments?",
-    prayer: "Show me Your Word's unity."
-  },
-  {
-    day: 49,
-    week: 7,
-    title: "Personal Palace Customization",
-    floor: "Advanced Application",
-    focus: "Adapting palace to your learning style",
-    scripture: "1 Corinthians 12:4",
-    scriptureText: "Now there are diversities of gifts, but the same Spirit.",
-    activity: "Review all 38 rooms. Identify your 5 strongest and 5 weakest. Create a personalized study plan emphasizing growth areas.",
-    reflection: "What's your unique palace signature?",
-    prayer: "Use my gifts for Your glory."
-  },
+  { day: 7, week: 1, floorNumber: 1, title: "Gems Room: The Treasure Chest", floor: "Floor 1: Furnishing Your Palace", room: "Gems Room", roomCode: "GR", focus: "Collect striking insights that shine with clarity — building blocks for later study", scripture: "Proverbs 2:4", scriptureText: "If thou seekest her as silver, and searchest for her as for hid treasures.", activity: "Mine 3 gems today: (1) David's 5 stones — not doubt, but Goliath had 4 brothers (2 Sam 21:22). (2) Jesus fed 5,000 with 12 baskets left (one per tribe) and 4,000 with 7 baskets (fullness for nations). (3) The Passover lamb in Exodus 12 foreshadows Christ's crucifixion at Passover. Write each as a 3-sentence insight.", reflection: "What hidden treasure did you uncover? Which gem excites you most?", prayer: "Reveal Your gems, Lord. Make me a diligent miner of truth.", practiceLink: "/give-me-a-gem", practiceLinkLabel: "Give Me A Gem" },
 
-  // Week 8: Mastery & Legacy (Day 50)
-  {
-    day: 50,
-    week: 8,
-    title: "Palace Completion & Commissioning",
-    floor: "Complete Palace Mastery",
-    focus: "Final integration and lifelong commitment",
-    scripture: "Revelation 22:17",
-    scriptureText: "And the Spirit and the bride say, Come. And let him that heareth say, Come.",
-    activity: "Complete palace review: Choose one favorite verse (any book). Apply all 8 floors systematically, spending 5 min per floor. Create a final gem synthesis. Share your palace journey with someone—invite them to begin.",
-    reflection: "How has this 50-day journey transformed your Bible study? What legacy will your palace create?",
-    prayer: "Thank You for building this palace in me. May I dwell in Your Word daily and invite others to discover Christ in every passage. Let my palace be a living testimony of Your truth. Amen."
-  }
+  { day: 8, week: 2, floorNumber: 1, title: "Story Room Deep Dive: Patriarchs", floor: "Floor 1: Furnishing Your Palace", room: "Story Room", roomCode: "SR", focus: "Expanding your story library — the patriarchal narratives as mental movies", scripture: "Genesis 22:8", scriptureText: "And Abraham said, My son, God will provide himself a lamb for a burnt offering.", activity: "Create mental movies for 4 patriarchal stories: Abraham's call (Gen 12), Binding of Isaac (Gen 22), Jacob's ladder (Gen 28), Joseph's coat to throne (Gen 37–50). For each, identify: key visual, emotional peak, Christ-connection. Practice retelling one in under 2 minutes.", reflection: "How does Joseph's story preview Christ's journey from rejection to exaltation?", prayer: "God, provide Yourself the Lamb — let me see Him in every patriarch's story.", practiceTools: [{ link: "/palace/room/story", label: "Story Room" }, { link: "/character-profiles", label: "Character Profiles" }] },
+
+  { day: 9, week: 2, floorNumber: 1, title: "Imagination Room: Walking Through Exodus", floor: "Floor 1: Furnishing Your Palace", room: "Imagination Room", roomCode: "IR", focus: "Immersive walk through the Exodus — from bondage to the Red Sea", scripture: "Exodus 14:13", scriptureText: "Fear ye not, stand still, and see the salvation of the LORD.", activity: "Spend 10 minutes in immersive imagination: You are an Israelite slave. Feel the bricks. Hear the taskmaster. Then the plagues begin — frogs, darkness, death passes over your blood-marked door. You march out. The sea opens. Walk through on dry ground. Fish swim in the walls of water. Journal every sensory detail.", reflection: "What did you feel standing at the Red Sea? How does this experience connect to your own deliverance?", prayer: "Let me stand still and see Your salvation, Lord.", practiceTools: [{ link: "/palace/room/imagination", label: "Imagination Room" }, { link: "/bible/Exodus/14", label: "Read Exodus 14" }] },
+
+  { day: 10, week: 2, floorNumber: 1, title: "24FPS: Filming the Gospels", floor: "Floor 1: Furnishing Your Palace", room: "24FPS Room", roomCode: "24F", focus: "Creating symbolic frames for the life of Christ across all four Gospels", scripture: "John 20:31", scriptureText: "But these are written, that ye might believe that Jesus is the Christ, the Son of God.", activity: "Create frames for key Gospel chapters: Matt 1 = star over manger, Matt 5 = mountain sermon, Matt 27 = three crosses on hill, Matt 28 = empty tomb. Do 10 frames total across Matthew. Practice scanning them mentally in 30 seconds.", reflection: "Which Gospel frame most moves you? Why?", prayer: "Let me see Your life, death, and resurrection as vivid realities.", practiceTools: [{ link: "/image-bible", label: "Image Bible" }, { link: "/bible/Matthew/1", label: "Read Matthew 1" }] },
+
+  { day: 11, week: 2, floorNumber: 1, title: "Translation Room: Prophetic Imagery", floor: "Floor 1: Furnishing Your Palace", room: "Translation Room", roomCode: "TR", focus: "Translating prophetic language into concrete scenes", scripture: "Isaiah 53:5", scriptureText: "But he was wounded for our transgressions, he was bruised for our iniquities.", activity: "Translate Isaiah 53 verse by verse into a visual sequence: v1 = tender plant in desert, v3 = man of sorrows with downcast face, v5 = wounds glowing with healing light, v7 = silent lamb before shearers, v10 = crushed grain becoming bread. Create a 'graphic novel' version of the chapter.", reflection: "How does visual translation make Isaiah 53 more personal and powerful?", prayer: "Show me the Suffering Servant in vivid clarity.", practiceTools: [{ link: "/palace/room/translation", label: "Translation Room" }, { link: "/bible/Isaiah/53", label: "Read Isaiah 53" }] },
+
+  { day: 12, week: 2, floorNumber: 1, title: "Gems Room: Mining the Psalms", floor: "Floor 1: Furnishing Your Palace", room: "Gems Room", roomCode: "GR", focus: "Finding sparkling insights in poetic Scripture", scripture: "Psalm 23:4", scriptureText: "Yea, though I walk through the valley of the shadow of death, I will fear no evil: for thou art with me.", activity: "Mine gems from Psalm 23: (1) 'Shadow of death' — a shadow cannot hurt you; only the object can, and Christ defeated death itself. (2) 'Thy rod and thy staff' — rod for enemies, staff for sheep; God both protects and guides. (3) 'Thou preparest a table before me in the presence of mine enemies' — feast during battle, not after. Write each as a polished insight.", reflection: "Which Psalm 23 gem changes your perspective most?", prayer: "Prepare Your table before me today, Shepherd.", practiceTools: [{ link: "/give-me-a-gem", label: "Give Me A Gem" }, { link: "/bible/Psalms/23", label: "Read Psalm 23" }] },
+
+  { day: 13, week: 2, floorNumber: 1, title: "Bible Rendered: Prophets & Epistles", floor: "Floor 1: Furnishing Your Palace", room: "Bible Rendered Room", roomCode: "BR", focus: "Expanding your rendered panorama to the prophets and New Testament", scripture: "Romans 1:16", scriptureText: "For I am not ashamed of the gospel of Christ: for it is the power of God unto salvation.", activity: "Learn 4 more rendered symbols: Isaiah 1–24 = ⚖️ (judgment and hope). Daniel 1–24 = 🦁👑 (lions and kingdoms). Romans 1–16 = ⚡ (power of the gospel). Revelation 1–22 = 🔑🚪 (keys, doors, and final opening). Sketch and memorize. Can you now scan 7 blocks of Scripture in under 30 seconds?", reflection: "How does the rendered panorama give you confidence in Scripture's unity?", prayer: "Let me carry Your entire story, from Genesis to Revelation, in my heart.", practiceTools: [{ link: "/image-bible", label: "View 51 Symbols" }, { link: "/bible/Romans/1", label: "Read Romans 1" }] },
+
+  { day: 14, week: 2, floorNumber: 1, title: "Floor 1 Integration: Palace Walkthrough", floor: "Floor 1: Furnishing Your Palace", focus: "Integrate all 6 rooms of Floor 1 into a unified practice", scripture: "Nehemiah 8:8", scriptureText: "So they read in the book in the law of God distinctly, and gave the sense, and caused them to understand the reading.", activity: "Full Floor 1 walkthrough on Genesis 22: (1) Story Room — retell Abraham's sacrifice as a movie. (2) Imagination Room — stand on Moriah, feel the knife, hear 'God will provide.' (3) 24FPS — create 3 frames for the chapter. (4) Bible Rendered — place it in the Genesis 1–24 '/' symbol. (5) Translation — turn 'God will provide Himself a lamb' into one vivid image. (6) Gems — write one sparkling insight linking Gen 22 to Calvary.", reflection: "How has visualization deepened your retention over these 14 days? Which room is your strongest?", prayer: "Build my palace on Your Word. May Floor 1 be firmly furnished in my mind.", practiceTools: [{ link: "/palace/floor/1", label: "Floor 1 Overview" }, { link: "/bible/Genesis/22", label: "Read Genesis 22" }] },
+
+  // ═══════════════════════════════════════════
+  // WEEKS 3–4: FLOOR 2 — INVESTIGATION (Days 15–28)
+  // ═══════════════════════════════════════════
+  { day: 15, week: 3, floorNumber: 2, title: "Observation Room: The Detective's Notebook", floor: "Floor 2: Investigation Floor", room: "Observation Room", roomCode: "OR", focus: "Log details without rushing to meaning — fingerprints, footprints, witness statements", scripture: "Luke 1:1-4", scriptureText: "Forasmuch as many have taken in hand to set forth in order a declaration of those things which are most surely believed among us.", activity: "Read John 1:1-14. Write 20 plain observations — no interpretation, just facts. Who? What? When? Where? How? Notice: 'In the beginning' echoes Genesis 1. 'The Word was God.' 'Made flesh' — incarnation. 'Dwelt among us' — literally 'tabernacled.' Train your detective eye.", reflection: "What details did you miss at first glance? How does careful observation change the text?", prayer: "Open my eyes to Your facts, Father. Make me a careful reader.", practiceLink: "/palace/room/observation", practiceLinkLabel: "Open Observation Room" },
+
+  { day: 16, week: 3, floorNumber: 2, title: "Observation Room: 50 Details Challenge", floor: "Floor 2: Investigation Floor", room: "Observation Room", roomCode: "OR", focus: "Sharpening the eye — pushing past surface reading to forensic detail", scripture: "Acts 17:11", scriptureText: "These were more noble… in that they received the word with all readiness of mind, and searched the scriptures daily.", activity: "Take Luke 15:11-32 (Prodigal Son). Write 50 observations. Notice: 'When he was yet a great way off' — the father was watching. 'Ran' — culturally undignified for a patriarch. 'Fell on his neck' — embrace before confession. 'Best robe' — not any robe, the best. Push past 30 — the last 20 observations are where the gold hides.", reflection: "What surprised you in observation #30-50? How does volume change quality?", prayer: "Give me eyes that see what casual readers miss.", practiceTools: [{ link: "/palace/room/observation", label: "Observation Room" }, { link: "/daily-challenges", label: "Daily Challenge" }] },
+
+  { day: 17, week: 3, floorNumber: 2, title: "Def-Com Room: The Forensic Lab", floor: "Floor 2: Investigation Floor", room: "Def-Com Room", roomCode: "DC", focus: "Definitions and commentary — testing words under the microscope", scripture: "Isaiah 6:3", scriptureText: "Holy, holy, holy, is the LORD of hosts: the whole earth is full of his glory.", activity: "Forensic analysis of John 21:15-17: Jesus asks Peter 'Lovest thou me?' twice with agapao (divine love), but Peter responds with phileo (friendship love). The third time, Jesus drops to phileo. Look up both Greek words. Read 2 commentaries on this exchange. How does definition shift the conversation's emotional weight?", reflection: "How does word-level study prevent misunderstanding? What nuance would you have missed?", prayer: "Make me a student of Your words — every syllable matters.", practiceLink: "/bible-lexicon", practiceLinkLabel: "Open Lexicon" },
+
+  { day: 18, week: 3, floorNumber: 2, title: "Def-Com Room: Cultural Context", floor: "Floor 2: Investigation Floor", room: "Def-Com Room", roomCode: "DC", focus: "Historical and cultural backgrounds that illuminate meaning", scripture: "Revelation 3:17-18", scriptureText: "Because thou sayest, I am rich, and increased with goods, and have need of nothing.", activity: "Research Laodicea: a wealthy city known for banking, black wool clothing, and eye-salve production. Now re-read Rev 3:17-18 — Christ's counsel to 'buy gold,' 'white raiment,' and 'eye-salve' cuts directly against their civic pride. Look up one historical source on Laodicea. Write how context transforms the passage.", reflection: "How does cultural background sharpen prophetic urgency? What modern parallels exist?", prayer: "Anoint my eyes with Your eyesalve, Lord.", practiceTools: [{ link: "/bible-lexicon", label: "Bible Lexicon" }, { link: "/research-mode", label: "Research Mode" }] },
+
+  { day: 19, week: 3, floorNumber: 2, title: "Symbols/Types Room: God's Fingerprints", floor: "Floor 2: Investigation Floor", room: "Symbols/Types Room", roomCode: "ST", focus: "Symbols are God's universal language; Types are shadows pointing forward to Christ", scripture: "John 3:14", scriptureText: "And as Moses lifted up the serpent in the wilderness, even so must the Son of man be lifted up.", activity: "Build a symbol profile: Lamb = Christ (John 1:29), Rock = Christ (1 Cor 10:4), Light = truth/Christ (John 8:12), Water = Spirit/Word (John 7:38; Eph 5:26). Then build a type chain: Passover lamb → Calvary. Manna → Bread of Life. Ark → salvation in Christ. Bronze serpent → Cross. Write each connection with Scripture references.", reflection: "Where else do you see God's symbolic fingerprints? How do types prove Scripture's unity?", prayer: "Show me Your fingerprints across every page of Scripture.", practiceLink: "/palace/room/symbols-types", practiceLinkLabel: "Open Symbols Room" },
+
+  { day: 20, week: 3, floorNumber: 2, title: "Symbols/Types Room: Advanced Typology", floor: "Floor 2: Investigation Floor", room: "Symbols/Types Room", roomCode: "ST", focus: "Extended typology — entire narratives as prophetic shadows", scripture: "1 Corinthians 10:11", scriptureText: "Now all these things happened unto them for ensamples: and they are written for our admonition.", activity: "Study Joseph as a comprehensive type of Christ: Beloved son → rejected by brothers → sold for silver → falsely accused → imprisoned → exalted to throne → saves those who rejected him → weeps with compassion → provides bread for the world. List at least 10 parallels with Scripture references for each.", reflection: "At what point does the Joseph-Christ parallel most move you? Why?", prayer: "Let me see Christ in every narrative shadow You've planted.", practiceTools: [{ link: "/palace/room/symbols-types", label: "Symbols Room" }, { link: "/character-profiles", label: "Character Profiles" }] },
+
+  { day: 21, week: 3, floorNumber: 2, title: "Questions Room: The Interrogation", floor: "Floor 2: Investigation Floor", room: "Questions Room", roomCode: "QR", focus: "Relentless questioning until the story emerges — three types of questions", scripture: "Habakkuk 2:1", scriptureText: "I will stand upon my watch, and set me upon the tower, and will watch to see what he will say unto me.", activity: "Take John 11:35 ('Jesus wept'). Generate questions in three categories: Intratextual (10): Why 'wept' not 'cried'? Why shortest verse? Why weep if resurrection is minutes away? Intertextual (10): Where else does God weep? Jeremiah 9:1? Isaiah 53? Phototheological (10): Which rooms activate? Fire Room? Fruit Room? Great Controversy? Push toward 30 total.", reflection: "Which question cracked open the most meaning? How does questioning change passive reading?", prayer: "Teach me to ask until truth shines, Lord.", practiceLink: "/palace/room/questions", practiceLinkLabel: "Open Questions Room" },
+
+  { day: 22, week: 4, floorNumber: 2, title: "Questions Room: The Five Ascensions", floor: "Floor 2: Investigation Floor", room: "Questions Room", roomCode: "QR", focus: "Questions that ascend from text to chapter to book to cycle to heaven", scripture: "Proverbs 25:2", scriptureText: "It is the glory of God to conceal a thing: but the honour of kings is to search out a matter.", activity: "Take Exodus 12:13 ('When I see the blood, I will pass over you'). Ascend: Asc-1 (Text): What does 'pass over' literally mean? Asc-2 (Chapter): How does Ex 12 build to Israel's departure? Asc-3 (Book): Where does blood appear elsewhere in Exodus? Asc-4 (Cycle): Which @cycle does this belong to? (@Mo) Asc-5 (Heaven): Which heaven? (1H → foreshadowing 2H). Write 5 questions per ascension level.", reflection: "How does ascending change the depth of your questions?", prayer: "Lift my questions from surface to heaven, Lord.", practiceTools: [{ link: "/palace/room/questions", label: "Questions Room" }, { link: "/ascensions-expansions", label: "Ascensions & Expansions" }] },
+
+  { day: 23, week: 4, floorNumber: 2, title: "Q&A Internship Room: Scripture Answers Scripture", floor: "Floor 2: Investigation Floor", room: "Q&A Internship Room", roomCode: "QA", focus: "The courtroom where witnesses corroborate — Scripture is its own best interpreter", scripture: "Isaiah 28:10", scriptureText: "For precept must be upon precept, precept upon precept; line upon line, line upon line.", activity: "Build Q&A chains: Q1: Why did the father in Luke 15 run? → A1: Psalm 103:13 ('as a father pitieth his children'). Q2: Why a robe, ring, and shoes? → A2: Zechariah 3:3-5 (Joshua reclothed), Isaiah 61:10 (garments of salvation). Q3: Why kill the fatted calf? → A3: Hebrews 9:22 ('without shedding of blood'). Build 5 full chains.", reflection: "How does Scripture answering Scripture protect against private interpretation?", prayer: "Let Your Word be its own witness in my study.", practiceTools: [{ link: "/palace/room/questions", label: "Q&A Room" }, { link: "/bible/thematic-search", label: "Thematic Search" }] },
+
+  { day: 24, week: 4, floorNumber: 2, title: "Q&A Internship: Cross-Examining Daniel 2", floor: "Floor 2: Investigation Floor", room: "Q&A Internship Room", roomCode: "QA", focus: "Comprehensive cross-examination of a prophetic passage", scripture: "Daniel 2:44", scriptureText: "And in the days of these kings shall the God of heaven set up a kingdom, which shall never be destroyed.", activity: "Cross-examine Daniel 2 with 15 questions, each answered by another Scripture: Q: What is the stone? A: 1 Pet 2:6-8. Q: Why a statue of metals? A: Jer 10:14 (molten images). Q: What kingdom never destroyed? A: Rev 11:15. Q: When 'in the days of these kings'? A: Gal 4:4 ('fulness of time'). Build the full investigation file.", reflection: "How does cross-examination strengthen your confidence in prophecy?", prayer: "Set up Your unshakable kingdom in my heart.", practiceTools: [{ link: "/palace/room/questions", label: "Q&A Room" }, { link: "/prophecy-watch", label: "Prophecy Watch" }] },
+
+  { day: 25, week: 4, floorNumber: 2, title: "Observation + Def-Com Integration", floor: "Floor 2: Investigation Floor", focus: "Combining observation with forensic word study", scripture: "Hebrews 4:12", scriptureText: "For the word of God is quick, and powerful, and sharper than any twoedged sword.", activity: "Take Hebrews 4:12. First, observe 15 facts. Then forensically define: 'quick' (zao = living), 'powerful' (energes = active/effectual), 'twoedged sword' (machaira distomos = double-mouthed blade), 'discerner' (kritikos = judge/critic). How does word study transform this verse from familiar to explosive?", reflection: "What word surprised you most? How does it change your reading?", prayer: "Let Your living Word judge and heal my innermost thoughts.", practiceTools: [{ link: "/bible-lexicon", label: "Bible Lexicon" }, { link: "/interlinear", label: "Interlinear Bible" }] },
+
+  { day: 26, week: 4, floorNumber: 2, title: "Symbols + Questions Integration", floor: "Floor 2: Investigation Floor", focus: "Using symbols as springboards for deeper questioning", scripture: "Revelation 5:5-6", scriptureText: "Behold, the Lion of the tribe of Juda… And I beheld, and, lo, in the midst of the throne… stood a Lamb as it had been slain.", activity: "Study Rev 5:5-6: John hears 'Lion' but sees 'Lamb.' Build: (1) Symbol profile for Lion (power, kingship), (2) Symbol profile for Lamb (sacrifice, meekness), (3) 10 questions about why John heard one and saw another, (4) Q&A chain linking to Isaiah 53, Genesis 49:9, John 1:29. What does this juxtaposition teach about Christ's nature?", reflection: "How does the Lion-Lamb paradox reshape your understanding of power?", prayer: "You are both Lion and Lamb — conquer my heart with sacrificial love.", practiceTools: [{ link: "/palace/room/symbols-types", label: "Symbols Room" }, { link: "/palace/room/questions", label: "Questions Room" }] },
+
+  { day: 27, week: 4, floorNumber: 2, title: "Full Investigation: Ruth", floor: "Floor 2: Investigation Floor", focus: "Complete Floor 2 investigation of an entire book", scripture: "Ruth 4:14", scriptureText: "Blessed be the LORD, which hath not left thee this day without a kinsman.", activity: "Full detective work on Ruth: (1) Observe 30 facts across 4 chapters. (2) Define 'kinsman-redeemer' (goel) with 3 cross-references. (3) Build symbol/type profile: Boaz = Christ the Redeemer. (4) Ask 15 questions (5 per type). (5) Build Q&A chains linking Ruth to Christ's genealogy (Matt 1:5). Write a one-page investigation summary.", reflection: "How has investigation uncovered Christ in a story that never mentions His name?", prayer: "Be my Kinsman-Redeemer, Lord. Search me and know me.", practiceTools: [{ link: "/palace/floor/2", label: "Floor 2 Overview" }, { link: "/character-profiles", label: "Character Profiles" }] },
+
+  { day: 28, week: 4, floorNumber: 2, title: "Floor 2 Integration: Case File Complete", floor: "Floor 2: Investigation Floor", focus: "Compile your detective toolkit and review all 5 rooms", scripture: "John 5:39", scriptureText: "Search the scriptures; for in them ye think ye have eternal life: and they are they which testify of me.", activity: "Create your 'Detective Toolkit Summary': List each room (Observation, Def-Com, Symbols/Types, Questions, Q&A) with its purpose, your favorite example, and one key lesson. Then apply the full toolkit to ONE verse — John 3:16. How many layers emerge? Aim for at least 2 pages of investigation on this single verse.", reflection: "How has investigation transformed you from a passive reader to an active detective?", prayer: "I will search Your scriptures daily. They testify of You, Jesus.", practiceTools: [{ link: "/palace/floor/2", label: "Floor 2 Overview" }, { link: "/test-me", label: "Test Your Knowledge" }] },
+
+  // ═══════════════════════════════════════════
+  // WEEKS 5–6: FLOOR 3 — FREESTYLE (Days 29–42)
+  // ═══════════════════════════════════════════
+  { day: 29, week: 5, floorNumber: 3, title: "Nature Freestyle: God's Second Book", floor: "Floor 3: Freestyle Floor", room: "Nature Freestyle", roomCode: "NF", focus: "Creation is God's second book — every element can become a sermon illustration", scripture: "Romans 1:20", scriptureText: "For the invisible things of him from the creation of the world are clearly seen, being understood by the things that are made.", activity: "Go outside (or look out a window). Find 5 natural objects and freestyle a Scripture connection for each: Tree → Psalm 1:3, Rain → Isaiah 55:10-11, Bird → Matthew 6:26, Sunset → Malachi 4:2, Rock → 1 Corinthians 10:4. Write each as a 3-sentence mini-lesson. The more you practice, the more automatic these connections become.", reflection: "How does nature echo Scripture? Which connection felt most alive?", prayer: "Speak through Your creation, Lord. Let me see sermons in every leaf and stone.", practiceLink: "/palace/room/nature-freestyle", practiceLinkLabel: "Open Nature Room" },
+
+  { day: 30, week: 5, floorNumber: 3, title: "Nature Freestyle: Deep Dive", floor: "Floor 3: Freestyle Floor", room: "Nature Freestyle", roomCode: "NF", focus: "Extended nature meditation — one object, multiple layers", scripture: "Jeremiah 17:7-8", scriptureText: "Blessed is the man that trusteth in the LORD, and whose hope the LORD is. For he shall be as a tree planted by the waters.", activity: "Choose one natural object (a tree is ideal). Build 5 layers: (1) Physical observation — describe it in detail. (2) Psalm 1 parallel — roots, fruit, seasons. (3) Christ connection — John 15 vine. (4) Personal application — where are your roots? (5) Prophetic echo — tree of life in Rev 22. Write a full one-page meditation from nature alone.", reflection: "How many layers can one object yield? What does this teach about God's design?", prayer: "Root me deep in Your water. Let me bear fruit in every season.", practiceTools: [{ link: "/palace/room/nature-freestyle", label: "Nature Room" }, { link: "/devotionals", label: "Devotional Mode" }] },
+
+  { day: 31, week: 5, floorNumber: 3, title: "Personal Freestyle: Your Life as Scripture", floor: "Floor 3: Freestyle Floor", room: "Personal Freestyle", roomCode: "PF", focus: "Your own experiences become object lessons — authenticity in application", scripture: "James 1:22", scriptureText: "But be ye doers of the word, and not hearers only, deceiving your own selves.", activity: "Identify 5 recent life experiences and freestyle Scripture connections: Traffic jam → Israel at the Red Sea (patience). Lost keys → Luke 15 lost coin. Forgiveness from a friend → Joseph forgiving brothers. Finishing a tough project → 'I have finished my course' (2 Tim 4:7). A good meal → Psalm 23 'prepared a table.' Journal each.", reflection: "Where does the Word meet your day today? How does personal application build authenticity?", prayer: "Make my life Your mirror, Lord. Let every experience teach me.", practiceTools: [{ link: "/palace/room/personal-freestyle", label: "Personal Freestyle" }, { link: "/my-studies", label: "My Studies" }] },
+
+  { day: 32, week: 5, floorNumber: 3, title: "Personal Freestyle: Trials & Testimony", floor: "Floor 3: Freestyle Floor", room: "Personal Freestyle", roomCode: "PF", focus: "Turning struggles into spiritual teaching material", scripture: "Romans 8:28", scriptureText: "And we know that all things work together for good to them that love God.", activity: "Think of your hardest trial this year. Now freestyle 3 Scripture connections: (1) A verse that describes the experience. (2) A verse that provides comfort. (3) A verse that shows God's purpose. Then write a 5-sentence testimony connecting your trial to a biblical character who faced something similar. This is your Personal Freestyle testimony.", reflection: "How does connecting your story to Scripture transform pain into purpose?", prayer: "Work all things together for good in my life, Lord.", practiceTools: [{ link: "/palace/room/personal-freestyle", label: "Personal Freestyle" }, { link: "/analyze-thoughts", label: "Analyze Thoughts" }] },
+
+  { day: 33, week: 5, floorNumber: 3, title: "Bible Freestyle: Verse Genetics", floor: "Floor 3: Freestyle Floor", room: "Bible Freestyle", roomCode: "BF", focus: "Every verse has relatives — siblings, cousins, and distant family across Scripture", scripture: "Psalm 119:105", scriptureText: "Thy word is a lamp unto my feet, and a light unto my path.", activity: "Build a family tree for 'light': Ps 119:105 (lamp to feet) → Gen 1:3 (Let there be light — grandfather) → John 1:4-5 (life was the light — parent) → John 8:12 (I am the light — central figure) → Matt 5:14 (You are light — child) → Rev 21:23 (Lamb is the light — heir). Map at least 8 'relatives' and draw connecting lines.", reflection: "How do verses 'breed' deeper truth? What family tree surprised you most?", prayer: "Illuminate my path with Your connected Word.", practiceLink: "/palace/room/bible-freestyle", practiceLinkLabel: "Open Verse Genetics" },
+
+  { day: 34, week: 6, floorNumber: 3, title: "Bible Freestyle: Extended Genetics", floor: "Floor 3: Freestyle Floor", room: "Bible Freestyle", roomCode: "BF", focus: "Tracing themes across entire biblical families of verses", scripture: "John 10:11", scriptureText: "I am the good shepherd: the good shepherd giveth his life for the sheep.", activity: "Build verse genetics for 'shepherd': Gen 48:15 → Ps 23:1 → Ps 80:1 → Isa 40:11 → Ezek 34:23 → Mic 5:4 → Zech 13:7 → Matt 2:6 → John 10:11 → Heb 13:20 → 1 Pet 2:25 → Rev 7:17. For each, write one sentence showing the shepherd's role. Notice how the theme develops from Genesis to Revelation.", reflection: "How does the shepherd motif grow across Scripture? What does the progression reveal about Christ?", prayer: "Good Shepherd, lead me from Genesis to Revelation.", practiceTools: [{ link: "/palace/room/bible-freestyle", label: "Verse Genetics" }, { link: "/bible/thematic-search", label: "Thematic Search" }] },
+
+  { day: 35, week: 6, floorNumber: 3, title: "History/Social Freestyle: God in History", floor: "Floor 3: Freestyle Floor", room: "History/Social Freestyle", roomCode: "HF", focus: "Seeing biblical patterns in secular history and current events", scripture: "Daniel 2:21", scriptureText: "And he changeth the times and the seasons: he removeth kings, and setteth up kings.", activity: "Choose 3 historical events and freestyle Scripture connections: (1) The printing press (1440) → God's providence for spreading truth globally (Rev 14:6). (2) The fall of the Berlin Wall → Babylon's walls falling (Jer 51). (3) The rise of social media → spirit of Babel: one voice, one language, global ambition (Gen 11). Write each as a paragraph showing God's hand in history.", reflection: "How does history confirm prophecy? What modern event echoes Scripture to you?", prayer: "Show me Your sovereignty in time. You change the times and seasons.", practiceTools: [{ link: "/culture-controversy", label: "Christ & Culture" }, { link: "/bible-timeline", label: "Bible Timeline" }] },
+
+  { day: 36, week: 6, floorNumber: 3, title: "History/Social Freestyle: Current Events", floor: "Floor 3: Freestyle Floor", room: "History/Social Freestyle", roomCode: "HF", focus: "Training the prophetic eye for current events without speculation", scripture: "Matthew 16:3", scriptureText: "O ye hypocrites, ye can discern the face of the sky; but can ye not discern the signs of the times?", activity: "Find 3 current news stories. For each: (1) Summarize in one sentence. (2) Connect to a biblical principle or prophecy. (3) Identify the Great Controversy angle — where is the conflict between Christ and Satan visible? Remember: this is discernment, not date-setting. Focus on principles, not predictions.", reflection: "How does Scripture help you interpret the news without fear?", prayer: "Give me eyes to discern the signs of the times with wisdom and peace.", practiceLink: "/culture-controversy", practiceLinkLabel: "Christ & Culture" },
+
+  { day: 37, week: 6, floorNumber: 3, title: "Listening Room: Hearing with Scripture Ears", floor: "Floor 3: Freestyle Floor", room: "Listening Room", roomCode: "LR", focus: "Freestyle is not only speaking — it's hearing and responding instantly", scripture: "1 Samuel 3:10", scriptureText: "Speak; for thy servant heareth.", activity: "Today, practice listening throughout the day. When someone shares: A healing story → connect to James 5:16. Anxiety → Philippians 4:6-7. A child's question about God → Mark 10:14. A complaint about injustice → Micah 6:8. Journal 5 real conversations and the verses they sparked. This is the MC's response skill — hearing a 'bar' and instantly replying.", reflection: "What did careful listening reveal that talking would have missed?", prayer: "Tune my ear to Your voice in every conversation.", practiceTools: [{ link: "/palace/room/listening", label: "Listening Room" }, { link: "/audio-library", label: "Audio Library" }] },
+
+  { day: 38, week: 6, floorNumber: 3, title: "Listening Room: Sermon Response", floor: "Floor 3: Freestyle Floor", room: "Listening Room", roomCode: "LR", focus: "Active listening during sermons and teachings", scripture: "Luke 8:18", scriptureText: "Take heed therefore how ye hear.", activity: "Listen to a sermon (live, recorded, or from the Audio Library). As you listen: (1) Note 3 key Scripture references the speaker uses. (2) For each, think of 2 additional verses that support or expand the point. (3) Identify which Palace room(s) the speaker is naturally using (even if they don't know PT). (4) Write a 'Response Gem' — a one-paragraph freestyle connecting the sermon to something personal.", reflection: "How does active listening multiply the value of a sermon?", prayer: "Let me hear Your voice through every faithful teacher.", practiceLink: "/audio-library", practiceLinkLabel: "Open Audio Library" },
+
+  { day: 39, week: 6, floorNumber: 3, title: "Multi-Freestyle: Nature + Personal + Bible", floor: "Floor 3: Freestyle Floor", focus: "Combining all freestyle modes into one flowing session", scripture: "Colossians 3:16", scriptureText: "Let the word of Christ dwell in you richly in all wisdom.", activity: "Choose one verse: Isaiah 40:31 ('they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles'). Freestyle in 3 modes: (1) Nature — watch a bird in flight or find an image of an eagle. What does soaring teach? (2) Personal — when have you waited on God and been renewed? (3) Bible — trace 'eagle' through Scripture: Exodus 19:4, Deut 32:11, Ps 103:5, Rev 4:7. Combine into one flowing meditation.", reflection: "How does multi-mode freestyle create richer understanding than any single mode?", prayer: "Let Your Word dwell in me richly in all wisdom.", practiceTools: [{ link: "/palace/freestyle", label: "Palace Freestyle" }, { link: "/devotionals", label: "Devotional Mode" }] },
+
+  { day: 40, week: 6, floorNumber: 3, title: "Freestyle Mastery: Teach Someone", floor: "Floor 3: Freestyle Floor", focus: "Using freestyle skills to teach spontaneously", scripture: "1 Peter 3:15", scriptureText: "Be ready always to give an answer to every man that asketh you a reason of the hope that is in you.", activity: "Find someone (friend, family member, or study partner) and do a live freestyle lesson. Pick any chapter (suggestion: Psalm 23). Use Nature (green pastures), Personal (your own valley experience), Bible (shepherd genealogy), and History (shepherding in ancient Israel). Keep it under 10 minutes. The goal is spontaneous, Spirit-led flow — not a prepared lecture.", reflection: "How did teaching through freestyle feel different from a prepared study?", prayer: "Make me ready always to share the reason for my hope.", practiceTools: [{ link: "/palace/freestyle", label: "Palace Freestyle" }, { link: "/sermon-builder", label: "Sermon Builder" }] },
+
+  { day: 41, week: 6, floorNumber: 3, title: "Floor 3 Review: The Freestyle Flow", floor: "Floor 3: Freestyle Floor", focus: "Reviewing and strengthening all 5 freestyle modes", scripture: "Deuteronomy 6:7", scriptureText: "And thou shalt teach them diligently unto thy children, and shalt talk of them when thou sittest in thine house, and when thou walkest by the way.", activity: "Review your Freestyle Toolkit: (1) Nature — your best nature connection so far. (2) Personal — your strongest testimony freestyle. (3) Bible — your most powerful verse genetics tree. (4) History — your most compelling historical connection. (5) Listening — your best real-time response. Polish each and write a 'Greatest Hits' summary.", reflection: "Which freestyle mode feels most natural? Which needs more practice?", prayer: "Let me talk of Your Word when I sit, walk, lie down, and rise up.", practiceTools: [{ link: "/palace/floor/3", label: "Floor 3 Overview" }, { link: "/training-drills", label: "Training Drills" }] },
+
+  { day: 42, week: 6, floorNumber: 3, title: "Floors 1-3 Integration: Width + Time", floor: "Floor 3: Freestyle Floor", focus: "Full integration of Furnishing, Investigation, and Freestyle", scripture: "Psalm 1:2-3", scriptureText: "But his delight is in the law of the LORD; and in his law doth he meditate day and night.", activity: "Take Revelation 3:20 ('Behold, I stand at the door and knock'). Apply all 3 floors: Floor 1 — Create a story image, an imagination scene, a 24FPS frame, a translation image, and a gem. Floor 2 — Observe 10 facts, define 'knock' and 'sup,' build a type profile (Christ as guest), ask 10 questions. Floor 3 — Nature (a door in a garden), Personal (when Christ knocked on your heart), Bible (trace 'door' through Scripture), History (Laodicean context). Write a comprehensive 2-page study.", reflection: "How do the first 3 floors work together to build Width and Time?", prayer: "Delight me in Your law day and night. Let me meditate without ceasing.", practiceTools: [{ link: "/palace/floor/3", label: "Floors 1-3" }, { link: "/my-studies", label: "My Studies" }] },
+
+  // ═══════════════════════════════════════════
+  // WEEKS 7–8: FLOOR 4 — NEXT LEVEL (Days 43–56)
+  // ═══════════════════════════════════════════
+  { day: 43, week: 7, floorNumber: 4, title: "Concentration Room: Every Text Reveals Christ", floor: "Floor 4: Next Level Floor", room: "Concentration Room", roomCode: "CR", focus: "The one non-negotiable rule — every text must reveal Christ", scripture: "John 5:39", scriptureText: "Search the scriptures; for in them ye think ye have eternal life: and they are they which testify of me.", activity: "Take 5 'unlikely' texts and find Christ: (1) Leviticus 13 (leprosy laws) → Christ touches the leper. (2) Numbers 19 (red heifer) → Christ's sacrifice outside the camp. (3) Judges 14 (Samson's riddle) → Out of the strong came forth sweetness. (4) 2 Kings 4 (Elisha's axe head) → Christ raises what sinks. (5) Ecclesiastes 1 (vanity) → Christ gives meaning to meaninglessness. No text is exempt from this lens.", reflection: "Which 'unlikely' text yielded the richest Christ-connection?", prayer: "Let me never read without finding You, Jesus.", practiceLink: "/palace/room/concentration", practiceLinkLabel: "Open Concentration Room" },
+
+  { day: 44, week: 7, floorNumber: 4, title: "Dimensions Room: Five Layers of Meaning", floor: "Floor 4: Next Level Floor", room: "Dimensions Room", roomCode: "DR", focus: "Every passage stretches across five dimensions: Literal, Christ, Me, Church, Heaven", scripture: "Exodus 25:8", scriptureText: "And let them make me a sanctuary; that I may dwell among them.", activity: "Apply 5 dimensions to Exodus 25:8: (1) Literal — God commands a physical sanctuary. (2) Christ — Christ is the true sanctuary (John 2:19). (3) Me — My body is God's temple (1 Cor 6:19). (4) Church — The church is being built as a dwelling place (Eph 2:21). (5) Heaven — New Jerusalem needs no temple because God Himself is the temple (Rev 21:22). Write a paragraph for each dimension.", reflection: "How does the 5D lens turn one verse into a panoramic view?", prayer: "Dwell among us eternally. Make me Your sanctuary.", practiceLink: "/palace/room/dimensions", practiceLinkLabel: "Open Dimensions Room" },
+
+  { day: 45, week: 7, floorNumber: 4, title: "Dimensions Room: Practice on the Cross", floor: "Floor 4: Next Level Floor", room: "Dimensions Room", roomCode: "DR", focus: "Applying five dimensions to the central event of Scripture", scripture: "John 19:30", scriptureText: "When Jesus therefore had received the vinegar, he said, It is finished: and he bowed his head, and gave up the ghost.", activity: "5D on 'It is finished' (tetelestai): (1) Literal — Jesus died on a Roman cross. (2) Christ — The debt of sin is 'paid in full' (tetelestai = receipt stamp). (3) Me — My penalty is cancelled. (4) Church — The veil tears; access to God opens for all. (5) Heaven — The heavenly sanctuary ministry begins; the Lamb takes the throne (Rev 5). Write each dimension with supporting verses.", reflection: "Which dimension of 'It is finished' most transforms your daily life?", prayer: "Thank You that it is finished. Let me live in that freedom.", practiceTools: [{ link: "/palace/room/dimensions", label: "Dimensions Room" }, { link: "/bible/John/19", label: "Read John 19" }] },
+
+  { day: 46, week: 7, floorNumber: 4, title: "Connect 6: Genre-Aware Study", floor: "Floor 4: Next Level Floor", room: "Connect 6 Room", roomCode: "C6", focus: "Six genres, six 'rules of language' — you don't critique a rap lyric like a symphony", scripture: "Matthew 13:3", scriptureText: "And he spake many things unto them in parables.", activity: "Take the theme of 'sowing' and connect it across all 6 genres: (1) Prophecy — Hosea 10:12. (2) Poetry — Psalm 126:5-6. (3) History — Genesis 26:12 (Isaac sowed, reaped hundredfold). (4) Gospels — Matthew 13:3-9 (parable of the sower). (5) Epistles — Galatians 6:7-9. (6) Parables — Luke 8:5-15 (expanded sower). Note how each genre treats the same theme differently.", reflection: "How does genre shape meaning? What unified truth emerges from all 6?", prayer: "Sow Your seed in my heart. Let me bear fruit in every genre of life.", practiceTools: [{ link: "/palace/room/connect6", label: "Connect 6 Room" }, { link: "/bible/thematic-search", label: "Thematic Search" }] },
+
+  { day: 47, week: 7, floorNumber: 4, title: "Theme Room: The Sanctuary Wall", floor: "Floor 4: Next Level Floor", room: "Theme Room", roomCode: "TRm", focus: "Placing texts on the great walls and floors of biblical architecture", scripture: "Hebrews 9:1-5", scriptureText: "Then verily the first covenant had also ordinances of divine service, and a worldly sanctuary.", activity: "Build the Sanctuary Wall: Place 6 verses on it: (1) Altar of Burnt Offering — Heb 13:10 (we have an altar). (2) Laver — Eph 5:26 (washing of water by the Word). (3) Lampstand — Rev 1:20 (seven churches). (4) Showbread — John 6:35 (Bread of Life). (5) Altar of Incense — Rev 8:3-4 (prayers of saints). (6) Ark/Mercy Seat — Rom 3:25 (propitiation). Each verse belongs on this wall.", reflection: "How does the Sanctuary Wall organize your theology?", prayer: "Let every doctrine point back to Your sanctuary plan.", practiceTools: [{ link: "/palace/room/theme", label: "Theme Room" }, { link: "/games/sanctuary-run", label: "Sanctuary Run Game" }] },
+
+  { day: 48, week: 8, floorNumber: 4, title: "Theme Room: Great Controversy Wall", floor: "Floor 4: Next Level Floor", room: "Theme Room", roomCode: "TRm", focus: "The cosmic battle between Christ and Satan — the Great Controversy Wall", scripture: "Revelation 12:7-9", scriptureText: "And there was war in heaven: Michael and his angels fought against the dragon.", activity: "Build the Great Controversy Wall: (1) Origin of evil — Isaiah 14:12-14, Ezekiel 28:15. (2) Garden conflict — Genesis 3:15. (3) Cosmic wager — Job 1-2. (4) Wilderness temptation — Matthew 4:1-11. (5) Cross victory — Colossians 2:15. (6) Ongoing battle — Ephesians 6:12. (7) Final defeat — Revelation 20:10. Place each verse on the wall in sequence. This is the spine of Scripture's story.", reflection: "How does the Great Controversy framework help you understand suffering and evil?", prayer: "Fight for me, Lord. Let me stand in Your victory.", practiceTools: [{ link: "/palace/room/theme", label: "Theme Room" }, { link: "/games/controversy-raid", label: "Controversy Raid Game" }] },
+
+  { day: 49, week: 8, floorNumber: 4, title: "Time Zone Room: The 6-Zone Grid", floor: "Floor 4: Next Level Floor", room: "Time Zone Room", roomCode: "TZ", focus: "Locating passages across Earth/Heaven × Past/Present/Future", scripture: "Revelation 12:7", scriptureText: "And there was war in heaven: Michael and his angels fought against the dragon.", activity: "Use the 6-zone grid on Revelation 12: Heaven-Past (v7-9: war in heaven). Earth-Past (v13: dragon persecutes woman). Heaven-Present (v10: now is come salvation). Earth-Present (v17: dragon wars with remnant). Heaven-Future (v10-12: Satan cast down forever). Earth-Future (implied: remnant vindicated). Place each section in its correct zone.", reflection: "How does the Time Zone grid prevent misplacing events?", prayer: "Help me locate every truth in its proper time and place.", practiceTools: [{ link: "/palace/room/timezone", label: "Time Zone Room" }, { link: "/games/time-zone-invasion", label: "Time Zone Invasion Game" }] },
+
+  { day: 50, week: 8, floorNumber: 4, title: "Patterns Room: God's Recurring Motifs", floor: "Floor 4: Next Level Floor", room: "Patterns Room", roomCode: "PRm", focus: "Patterns are God's fingerprints — they repeat with variation like riffs in a symphony", scripture: "Ecclesiastes 1:9", scriptureText: "The thing that hath been, it is that which shall be.", activity: "Trace 3 master patterns: (1) '40' pattern: 40 days rain (Gen 7), 40 days on Sinai (Ex 24), 40 years wandering (Num 14), 40 days Goliath's challenge (1 Sam 17), 40 days Elijah fasted (1 Ki 19), 40 days Jesus in wilderness (Matt 4). (2) '3 days' pattern: Joseph in prison, Jonah in fish, Christ in tomb. (3) Deliverer pattern: Moses, Gideon, Samson, David → Christ. List at least 5 examples per pattern.", reflection: "What pattern speaks loudest to your current season?", prayer: "You are the God of patterns. Help me recognize Your recurring faithfulness.", practiceTools: [{ link: "/palace/room/patterns", label: "Patterns Room" }, { link: "/bible/thematic-search", label: "Thematic Search" }] },
+
+  { day: 51, week: 8, floorNumber: 4, title: "Parallels Room: Mirrored Actions Across Time", floor: "Floor 4: Next Level Floor", room: "Parallels Room", roomCode: "P‖", focus: "Unlike types (objects), parallels show mirrored actions echoing across history", scripture: "Acts 2:1-4", scriptureText: "And when the day of Pentecost was fully come, they were all with one accord in one place.", activity: "Study 4 major parallels: (1) Babel (languages divided, Gen 11) ↔ Pentecost (languages united, Acts 2). (2) Israel leaving Egypt (Ex 14) ↔ Israel returning from Babylon (Ezra 1). (3) Jesus fasting 40 days (Matt 4) ↔ Israel wandering 40 years (Num 14). (4) First Adam falls in a garden (Gen 3) ↔ Last Adam agonizes in a garden (Luke 22). For each, identify the mirror point and what reverses.", reflection: "How do parallels show God's redemptive pattern of reversal?", prayer: "Reverse the curse in my life, as You reversed it at Pentecost.", practiceTools: [{ link: "/palace/room/parallels", label: "Parallels Room" }, { link: "/bible-timeline", label: "Bible Timeline" }] },
+
+  { day: 52, week: 8, floorNumber: 4, title: "Fruit Room: The Character Test", floor: "Floor 4: Next Level Floor", room: "Fruit Room", roomCode: "FRt", focus: "Every interpretation must pass the fruit test — does it produce Christlike character?", scripture: "Galatians 5:22-23", scriptureText: "But the fruit of the Spirit is love, joy, peace, longsuffering, gentleness, goodness, faith, meekness, temperance.", activity: "Test 3 common interpretations through the Fruit Room: (1) 'God helps those who help themselves' — does it produce humility or self-reliance? (2) 'Prosperity is a sign of God's blessing' — does it produce compassion or judgmentalism? (3) 'The remnant is a small elite' — does it produce service or arrogance? For each, apply all 9 fruits as a checklist. True study nourishes Christlike character.", reflection: "Which interpretation failed the fruit test? What does that reveal?", prayer: "Let every study produce Your fruit in me — love, joy, peace, and all the rest.", practiceTools: [{ link: "/palace/room/fruit", label: "Fruit Room" }, { link: "/analyze-thoughts", label: "Analyze Thoughts" }] },
+
+  { day: 53, week: 8, floorNumber: 4, title: "Christ in Every Chapter & Room 66", floor: "Floor 4: Next Level Floor", room: "Christ in Every Chapter", roomCode: "CEC", focus: "Every chapter must name Christ — and one theme must be traced through all 66 books", scripture: "Genesis 3:15", scriptureText: "And I will put enmity between thee and the woman, and between thy seed and her seed.", activity: "CEC Practice: Find Christ in 10 random chapters — Gen 1 (Creator), Ex 12 (Passover Lamb), Lev 16 (High Priest), Josh 5 (Captain of the Host), Ps 22 (Crucified One), Isa 53 (Suffering Servant), Dan 7 (Son of Man), Matt 1 (Immanuel), Rom 3 (Justifier), Rev 5 (Worthy Lamb). Then for Room 66, trace 'salvation' from Genesis to Revelation with one verse per book (choose 10 books to start).", reflection: "Which chapter surprised you with its Christ-connection?", prayer: "Expound Yourself in all 66 books, Lord.", practiceTools: [{ link: "/palace/room/concentration", label: "Concentration Room" }, { link: "/games/christ-lock", label: "Christ Lock Game" }] },
+
+  { day: 54, week: 8, floorNumber: 4, title: "Floor 4 Full Integration: Philippians 2", floor: "Floor 4: Next Level Floor", focus: "Complete Floor 4 application to one magnificent passage", scripture: "Philippians 2:5-11", scriptureText: "Let this mind be in you, which was also in Christ Jesus.", activity: "Full Floor 4 walkthrough on Philippians 2:5-11: (1) Concentration — Christ is the center of cosmic humility. (2) Dimensions — 5D on 'emptied himself.' (3) Connect 6 — locate this passage's genre and cross-genre echoes. (4) Theme Room — place on Life of Christ Wall and Gospel Floor. (5) Time Zone — 6 zones. (6) Patterns — kenosis pattern elsewhere. (7) Parallels — first Adam exalted self / last Adam emptied self. (8) Fruit — produces humility, not self-abasement.", reflection: "How do 8 rooms working together create theology with walls, beams, and balance?", prayer: "Let this mind be in me, which was also in You, Christ Jesus.", practiceTools: [{ link: "/palace/floor/4", label: "Floor 4 Overview" }, { link: "/remix", label: "Study Remix" }] },
+
+  { day: 55, week: 8, floorNumber: 4, title: "Floors 1-4 Checkpoint: The Four Expansions", floor: "Floor 4: Next Level Floor", focus: "Review Width (Floors 1-2), Time (Floor 3), and the beginning of Depth (Floor 4)", scripture: "Ephesians 3:18", scriptureText: "May be able to comprehend with all saints what is the breadth, and length, and depth, and height.", activity: "Self-assessment across all 4 floors: Width — Can you recall 20 Bible stories as vivid mental movies? Can you observe 30+ details in any passage? Time — Do you spontaneously connect daily life to Scripture? Depth — Can you apply 5 dimensions to any verse? Find Christ in any chapter? Rate yourself 1-10 on each floor. Identify your weakest area and create a 5-day strengthening plan.", reflection: "Where are you strongest? Where do you need the most growth?", prayer: "Expand my breadth, length, depth, and height in Your Word.", practiceTools: [{ link: "/ascensions-expansions", label: "Ascensions & Expansions" }, { link: "/training-drills", label: "Training Drills" }] },
+
+  { day: 56, week: 8, floorNumber: 4, title: "Mid-Course Milestone: Comprehensive Study", floor: "Floor 4: Next Level Floor", focus: "Full Floors 1-4 comprehensive study of one text — your mid-course masterpiece", scripture: "Isaiah 55:1-3", scriptureText: "Ho, every one that thirsteth, come ye to the waters.", activity: "Comprehensive study of Isaiah 55:1-3 using all 4 floors: Floor 1 — Story (imagine the marketplace), Translation (water/wine/milk as images), Gem (free salvation). Floor 2 — Observe 20 facts, define key Hebrew words, build type profile (water = Spirit), 15 questions. Floor 3 — Nature (water sources), Personal (your spiritual thirst), Bible (trace 'water' genetics), History (ancient water commerce). Floor 4 — Concentration (Christ the Living Water), Dimensions, Theme Wall (Gospel Floor), Patterns. Write a 3-page study.", reflection: "How does a 4-floor study compare to your pre-course reading? What has changed?", prayer: "I come to Your waters. Satisfy my thirst with study that transforms.", practiceTools: [{ link: "/my-studies", label: "My Studies" }, { link: "/amplify", label: "Study Amplify" }] },
+
+  // ═══════════════════════════════════════════
+  // WEEK 9: FLOOR 5 — VISION (Days 57–63)
+  // ═══════════════════════════════════════════
+  { day: 57, week: 9, floorNumber: 5, title: "Blue/Sanctuary Room: The Blueprint of Salvation", floor: "Floor 5: Vision Floor", room: "Blue/Sanctuary Room", roomCode: "BL", focus: "The sanctuary is not just furniture — it is the map of salvation history", scripture: "Hebrews 8:5", scriptureText: "See, saith he, that thou make all things according to the pattern shewed to thee in the mount.", activity: "Walk the sanctuary path: (1) Gate — Christ the Way (John 14:6). (2) Altar of Burnt Offering — the Cross (Heb 13:10). (3) Laver — Baptism/cleansing (Eph 5:26). (4) Lampstand — Light of the Spirit (Rev 4:5). (5) Table of Showbread — Word/Bread of Life (John 6:35). (6) Altar of Incense — Intercession (Rev 8:3-4). (7) Veil — Christ's flesh (Heb 10:20). (8) Ark of the Covenant — Law, mercy seat, God's throne (Ex 25:21-22). Draw the full layout and label each piece with its Christ-fulfillment.", reflection: "How does the sanctuary map your personal journey of salvation?", prayer: "Walk me through Your sanctuary, Lord. From gate to throne.", practiceLink: "/palace/room/sanctuary", practiceLinkLabel: "Sanctuary Explorer" },
+
+  { day: 58, week: 9, floorNumber: 5, title: "Sanctuary Room: Christ's Two-Phase Ministry", floor: "Floor 5: Vision Floor", room: "Blue/Sanctuary Room", roomCode: "BL", focus: "Holy Place ministry (Rev 5) vs. Most Holy Place ministry (Rev 11:17-19)", scripture: "Hebrews 9:24", scriptureText: "For Christ is not entered into the holy places made with hands… but into heaven itself, now to appear in the presence of God for us.", activity: "Map Christ's two-phase heavenly ministry: Phase 1 — Holy Place (Rev 1-5): Christ among the lampstands, interceding, mediating. Daily sacrifice fulfilled. Phase 2 — Most Holy Place (Dan 8:14, Rev 11:19): Pre-advent judgment begins 1844. Ark of the covenant seen. Key distinction: Christ's death fulfilled Passover (not Day of Atonement). Day of Atonement is the investigative judgment. Write the timeline with Scripture references.", reflection: "Why is the Passover/Day of Atonement distinction important for understanding the cross and judgment?", prayer: "Minister for me in heaven, my High Priest.", practiceTools: [{ link: "/palace/room/sanctuary", label: "Sanctuary Explorer" }, { link: "/bible/Hebrews/9", label: "Read Hebrews 9" }] },
+
+  { day: 59, week: 9, floorNumber: 5, title: "Prophecy Room: The Telescope of Daniel", floor: "Floor 5: Vision Floor", room: "Prophecy Room", roomCode: "PR", focus: "Lining up the prophetic constellations — Daniel's repeat-and-enlarge pattern", scripture: "Daniel 2:44", scriptureText: "And in the days of these kings shall the God of heaven set up a kingdom.", activity: "Map the prophetic telescope: Daniel 2 (statue) → Daniel 7 (beasts) → Daniel 8-9 (sanctuary timeline). Show how each 'enlarges' the previous: Dan 2 gives the outline, Dan 7 adds the little horn and judgment scene, Dan 8-9 adds the 2300-day/70-week timeline. Create a side-by-side comparison chart. Key dates: 605 BC, 538 AD, 1798 AD, 1844 AD.", reflection: "How does the repeat-and-enlarge pattern build confidence in prophecy?", prayer: "Open the prophetic telescope to my understanding, Lord.", practiceLink: "/prophecy-watch", practiceLinkLabel: "Prophecy Watch" },
+
+  { day: 60, week: 9, floorNumber: 5, title: "Prophecy Room: Revelation's Grand Sweep", floor: "Floor 5: Vision Floor", room: "Prophecy Room", roomCode: "PR", focus: "Revelation's key sequences through the historicist lens", scripture: "Revelation 1:1", scriptureText: "The Revelation of Jesus Christ, which God gave unto him, to shew unto his servants things which must shortly come to pass.", activity: "Map 3 Revelation sequences: (1) Seven Churches (Rev 2-3) = church history from Ephesus to Laodicea. (2) Seven Seals (Rev 6-8) = progressive unveiling. (3) Three Angels (Rev 14:6-12) = final gospel appeal. For each sequence, identify: starting point, progression, climax. Focus especially on the Three Angels as the capstone of Phototheology's prophetic message.", reflection: "How does historicism give Revelation a clear, progressive storyline?", prayer: "Reveal Yourself to me through Your Revelation, Jesus.", practiceTools: [{ link: "/prophecy-watch", label: "Prophecy Watch" }, { link: "/daniel-revelation-gpt", label: "Daniel-Revelation AI" }] },
+
+  { day: 61, week: 9, floorNumber: 5, title: "Three Angels' Room: The Final Gospel Syllabus", floor: "Floor 5: Vision Floor", room: "Three Angels' Room", roomCode: "3A", focus: "Revelation 14:6-12 — where all doctrine and mission converge", scripture: "Revelation 14:7", scriptureText: "Fear God, and give glory to him; for the hour of his judgment is come: and worship him that made heaven, and earth.", activity: "Deep study of the Three Angels: Angel 1 (v6-7): Everlasting gospel → worship Creator → judgment hour. Break down each phrase. Connect 'worship him that made' to Sabbath (Ex 20:8-11). Angel 2 (v8): Babylon is fallen → identify false systems. Connect to Daniel 2-7. Angel 3 (v9-12): Beast/image/mark warning → patient endurance of saints. Connect to Rev 13. Write a one-page synthesis showing how all Adventist doctrine converges here.", reflection: "How do the Three Angels unify gospel, prophecy, sanctuary, and Sabbath?", prayer: "Seal me with Your truth, Lord. Prepare me for Your return.", practiceTools: [{ link: "/prophecy-watch", label: "Prophecy Watch" }, { link: "/bible/Revelation/14", label: "Read Revelation 14" }] },
+
+  { day: 62, week: 9, floorNumber: 5, title: "Feasts Room: Israel's Calendar Points to Christ", floor: "Floor 5: Vision Floor", room: "Feasts Room", roomCode: "FST", focus: "The seven feasts as a prophetic calendar of redemption", scripture: "Leviticus 23:2", scriptureText: "Speak unto the children of Israel, and say unto them, Concerning the feasts of the LORD.", activity: "Map the feast calendar to Christ: (1) Passover → Christ's death (1 Cor 5:7). (2) Unleavened Bread → sinless life, buried (1 Cor 5:8). (3) Firstfruits → resurrection (1 Cor 15:20). (4) Pentecost → Holy Spirit outpouring (Acts 2). (5) Trumpets → warning/awakening (Rev 8-9). (6) Day of Atonement → investigative judgment (Dan 8:14). (7) Tabernacles → Second Coming / dwelling with God (Rev 21:3). Note: spring feasts fulfilled at first coming; fall feasts relate to second coming.", reflection: "Which feast most illuminates your understanding of salvation's timeline?", prayer: "Let me celebrate Your feasts with understanding and anticipation.", practiceTools: [{ link: "/palace/room/sanctuary", label: "Sanctuary Explorer" }, { link: "/bible-timeline", label: "Bible Timeline" }] },
+
+  { day: 63, week: 9, floorNumber: 5, title: "Floor 5 Integration: Sanctuary + Prophecy + Angels", floor: "Floor 5: Vision Floor", focus: "Unifying the Vision Floor into one panoramic view", scripture: "Daniel 8:14", scriptureText: "Unto two thousand and three hundred days; then shall the sanctuary be cleansed.", activity: "Connect all 3 rooms on Daniel 8:14: (1) Blue Room — which sanctuary article is in view? The Most Holy Place, the Ark, the Day of Atonement. (2) Prophecy Room — map the 2300-day timeline (457 BC → 1844 AD). Show the 70-week subset (Dan 9:24-27). (3) Three Angels — how does the first angel's 'hour of his judgment is come' connect to 1844? (4) Feasts — Day of Atonement typology. Write a synthesis showing how sanctuary, prophecy, and mission are one unified system.", reflection: "How does the Vision Floor expand your sight from local texts to God's master plan?", prayer: "Cleanse Your sanctuary in me, Lord. Prepare me for judgment with confidence.", practiceTools: [{ link: "/palace/floor/5", label: "Floor 5 Overview" }, { link: "/prophecy-watch", label: "Prophecy Watch" }] },
+
+  // ═══════════════════════════════════════════
+  // WEEK 10: FLOOR 6 — THREE HEAVENS (Days 64–70)
+  // ═══════════════════════════════════════════
+  { day: 64, week: 10, floorNumber: 6, title: "Three Heavens Framework: The Three-Act Play", floor: "Floor 6: Three Heavens Floor", focus: "Three Day-of-the-LORD cycles, each with its own 'new heavens and earth'", scripture: "2 Peter 3:13", scriptureText: "Nevertheless we, according to his promise, look for new heavens and a new earth, wherein dwelleth righteousness.", activity: "Map the Three Heavens: 1H (DoL¹/NE¹) — Babylon destroys Jerusalem (586 BC) → Cyrusic restoration. Isaiah 65-66 as typological 'new heavens and earth.' 2H (DoL²/NE²) — Rome destroys Jerusalem (70 AD) → New Covenant order. Church as temple, Christ in heavenly sanctuary (Heb 8-12). 3H (DoL³/NE³) — Final cosmic judgment → literal New Creation (Rev 21-22). Create a chart placing key texts in their correct heaven.", reflection: "Why is it important NOT to flatten all 'new heavens and earth' into one event?", prayer: "Help me rightly divide the horizons of Your Word.", practiceTools: [{ link: "/ascensions-expansions", label: "Three Heavens Framework" }, { link: "/bible-timeline", label: "Bible Timeline" }] },
+
+  { day: 65, week: 10, floorNumber: 6, title: "The Eight Cycles: Redemption's Recurring Arc", floor: "Floor 6: Three Heavens Floor", focus: "Eight cycles from Adam to Remnant — each following Fall → Covenant → Sanctuary → Enemy → Restoration", scripture: "Genesis 6:18", scriptureText: "But with thee will I establish my covenant.", activity: "Map all 8 cycles with their 5-part structure: @Ad (Adamic): Fall in Eden → Seed promise → Animal skins → Serpent → Seth's line. @No (Noahic): Violence → Ark covenant → Floating temple → Mockery → Rainbow. @Ab (Abrahamic): Babel → Promise to Abram → Altars → Pharaoh/famine → Isaac. @Mo (Mosaic): Egypt bondage → Sinai covenant → Tabernacle → Pharaoh → Canaan. @Cy (Cyrusic): Exile → Prophetic promises → Temple rebuilt → Opposition → Ezra/Nehemiah. @CyC (Cyrus-Christ): Roman occupation → Christ embodied → Christ IS the temple → Cross enemies → Resurrection. @Sp (Spirit): Disciples doubt → Spirit promise → Pentecost → Persecution → Reformation. @Re (Remnant): Apostasy → Rev 12:17 → Heavenly judgment → Beast/mark → Second Coming.", reflection: "Which cycle resonates most with your current spiritual journey?", prayer: "Restore me in Your cycle of grace, Lord.", practiceTools: [{ link: "/ascensions-expansions", label: "Cycles Framework" }, { link: "/bible/Genesis/6", label: "Read Genesis 6" }] },
+
+  { day: 66, week: 10, floorNumber: 6, title: "Placing Texts in Cycles & Heavens", floor: "Floor 6: Three Heavens Floor", focus: "Practice assigning passages to their correct cycle and heaven", scripture: "Jeremiah 31:31-33", scriptureText: "Behold, the days come, saith the LORD, that I will make a new covenant.", activity: "Place 8 texts in their correct cycle and heaven: (1) Gen 3:15 → @Ad, 1H. (2) Gen 9:13 → @No, 1H. (3) Ex 12:13 → @Mo, 1H. (4) Isa 44:28 → @Cy, 1H. (5) John 2:19 → @CyC, 2H. (6) Acts 2:1-4 → @Sp, 2H. (7) Rev 12:17 → @Re, 3H horizon. (8) Jer 31:31-33 → @Cy/foreshadowing @CyC, bridges 1H→2H. For each, explain why you placed it there.", reflection: "How does cycle/heaven placement prevent misinterpretation?", prayer: "Anchor every text in its proper place in Your redemptive plan.", practiceTools: [{ link: "/ascensions-expansions", label: "Cycles & Heavens" }, { link: "/bible/thematic-search", label: "Thematic Search" }] },
+
+  { day: 67, week: 10, floorNumber: 6, title: "Juice Room: Squeezing an Entire Book", floor: "Floor 6: Three Heavens Floor", room: "Juice Room", roomCode: "JR", focus: "Apply all Phototheology principles to one entire book — squeeze until every drop comes out", scripture: "Hebrews 1:1-2", scriptureText: "God, who at sundry times and in divers manners spake in time past unto the fathers by the prophets, hath in these last days spoken unto us by his Son.", activity: "Juice the book of Jonah (4 chapters): (1) Floor 1 — Story (movie), 24FPS (4 frames), Translation (whale as death/resurrection image), Gem. (2) Floor 2 — Observe 20 facts, define 'great fish' (Hebrew: dag gadol), symbols (sea = chaos, Nineveh = Gentile world), 10 questions. (3) Floor 3 — Nature (storm), Personal (running from God), Bible ('3 days' genetics), History (Assyrian empire). (4) Floor 4 — Christ (Matt 12:40), 5 Dimensions, Great Controversy Wall, Patterns ('3 days'). (5) Floor 5 — Sanctuary (Jonah's prayer as incense), Prophecy (Gentile mission). (6) Floor 6 — Cycle (@Mo/@Cy), Heaven (1H). Write a 2-page 'juice summary.'", reflection: "How does the Juice Room produce something no single-room study could?", prayer: "Squeeze every drop of truth from Your Word into my life.", practiceLink: "/palace/room/juice", practiceLinkLabel: "Open Juice Room" },
+
+  { day: 68, week: 10, floorNumber: 6, title: "Juice Room: A Longer Book", floor: "Floor 6: Three Heavens Floor", room: "Juice Room", roomCode: "JR", focus: "Applying the Juice Room to a larger, more complex book", scripture: "Romans 1:16-17", scriptureText: "For I am not ashamed of the gospel of Christ: for it is the power of God unto salvation.", activity: "Juice Romans (16 chapters) — this is a challenge! Create a condensed juice summary: (1) Theme in one sentence: Justification by faith for all. (2) Floor 1 summary: Key stories (Abraham, Adam), images (potter/clay), gems. (3) Floor 2 summary: Key definitions (dikaiosune = righteousness), key questions. (4) Floor 3 connections: Personal application of Romans 8:28, nature echoes of Rom 1:20. (5) Floor 4 structure: Christ (Rom 3:21-26), Dimensions on Rom 8:1, Patterns (Adam/Christ parallel in Rom 5). (6) Floors 5-6: Place on Gospel Floor, identify cycle (@CyC→@Sp), heaven (2H). One-page juice extract.", reflection: "How does juicing a longer book force you to identify what truly matters?", prayer: "Power of God unto salvation — let Romans live in me.", practiceTools: [{ link: "/palace/room/juice", label: "Juice Room" }, { link: "/amplify", label: "Study Amplify" }] },
+
+  { day: 69, week: 10, floorNumber: 6, title: "The Five Ascensions: Static & Dynamic", floor: "Floor 6: Three Heavens Floor", focus: "The staircase of Phototheology — anchored and creative climbing", scripture: "Psalm 24:3", scriptureText: "Who shall ascend into the hill of the LORD?", activity: "Practice both ascension modes on Psalm 23:1 ('The LORD is my shepherd'): STATIC (anchored): Asc-1 Text (define 'shepherd' in Hebrew: ro'eh), Asc-2 Chapter (Psalm 23's arc), Asc-3 Book (Psalms' shepherd theme), Asc-4 Cycle (@Mo — shepherd-king motif), Asc-5 Heaven (2H — Christ the Good Shepherd). DYNAMIC (creative): Asc-1 (any verse with 'shepherd'), Asc-2 (drop into John 10), Asc-3 (shepherd theme in Ezekiel), Asc-4 (move to @CyC), Asc-5 (3H — Lamb/Shepherd in Rev 7:17).", reflection: "How do static and dynamic ascensions complement each other?", prayer: "Let me ascend Your hill with both discipline and creativity.", practiceTools: [{ link: "/ascensions-expansions", label: "Ascensions & Expansions" }, { link: "/palace/freestyle", label: "Palace Freestyle" }] },
+
+  { day: 70, week: 10, floorNumber: 6, title: "Floor 6 Integration: Cosmic Placement", floor: "Floor 6: Three Heavens Floor", focus: "Full Three Heavens + Cycles + Juice Room synthesis", scripture: "Revelation 21:1", scriptureText: "And I saw a new heaven and a new earth: for the first heaven and the first earth were passed away.", activity: "Comprehensive Floor 6 exercise: Take Daniel 7:13-14 (Son of Man receiving the kingdom). (1) Place in cycle: @CyC. (2) Place in heaven: 2H (DoL²/NE²) — Christ ascends and receives dominion. (3) Trace through all 3 heavens: 1H (foreshadowed in Cyrus's decree), 2H (fulfilled in Christ's ascension), 3H (consummated at Second Coming). (4) Juice Daniel 7 through all floors. (5) Map the Five Ascensions (static). Write a comprehensive 2-page placement study.", reflection: "How does cosmic placement prevent you from misreading Daniel's vision?", prayer: "Your kingdom comes. Your dominion is everlasting.", practiceTools: [{ link: "/palace/floor/6", label: "Floor 6 Overview" }, { link: "/prophecy-watch", label: "Prophecy Watch" }] },
+
+  // ═══════════════════════════════════════════
+  // WEEK 11: FLOOR 7 — SPIRITUAL & EMOTIONAL (Days 71–77)
+  // ═══════════════════════════════════════════
+  { day: 71, week: 11, floorNumber: 7, title: "Fire Room: The Word That Burns", floor: "Floor 7: Spiritual Floor", room: "Fire Room", roomCode: "FRm", focus: "Plunging into the emotional weight of Scripture — feeling what you study", scripture: "Jeremiah 20:9", scriptureText: "But his word was in mine heart as a burning fire shut up in my bones.", activity: "Read Isaiah 53 slowly. Stop after each verse. Don't analyze — feel. Verse 3: 'despised and rejected' — let rejection's weight settle. Verse 5: 'wounded for our transgressions' — your transgressions. Verse 7: 'as a lamb' — silent, willing. Journal one emotion per verse. This is not head study — it is heart study. The Fire Room burns away apathy.", reflection: "Which verse made you pause longest? What did you feel?", prayer: "Set my heart aflame with Your Word. Burn away every cold place.", practiceLink: "/devotionals", practiceLinkLabel: "Devotional Mode" },
+
+  { day: 72, week: 11, floorNumber: 7, title: "Fire Room: Gethsemane Immersion", floor: "Floor 7: Spiritual Floor", room: "Fire Room", roomCode: "FRm", focus: "Entering the darkest hour with Christ — emotional depth that transforms", scripture: "Luke 22:44", scriptureText: "And being in an agony he prayed more earnestly: and his sweat was as it were great drops of blood falling down to the ground.", activity: "Immersive Fire Room experience: Read Luke 22:39-46 three times. First — for facts. Second — for emotion. Third — as if you were there. Imagine the garden at night. The disciples sleeping. Jesus alone. His sweat like blood. 'Not my will, but thine.' Stay in this scene for 15 minutes. Don't rush. Journal what happens in your spirit.", reflection: "How does spending time in Gethsemane change your understanding of Christ's sacrifice?", prayer: "I will watch with You, Lord. Not my will, but Yours be done.", practiceTools: [{ link: "/devotionals", label: "Devotional Mode" }, { link: "/bible/Luke/22", label: "Read Luke 22" }] },
+
+  { day: 73, week: 11, floorNumber: 7, title: "Meditation Room: Slow Cooking the Word", floor: "Floor 7: Spiritual Floor", room: "Meditation Room", roomCode: "MR", focus: "Meditation is not emptying the mind but marinating in truth — slow cooking produces rich flavor", scripture: "Psalm 1:2", scriptureText: "But his delight is in the law of the LORD; and in his law doth he meditate day and night.", activity: "Take Psalm 23. Read it once slowly. Now take ONLY verse 1: 'The LORD is my shepherd; I shall not want.' Set a timer for 10 minutes. Repeat it slowly. Emphasize a different word each time: 'THE Lord,' 'the LORD,' 'the Lord IS,' 'MY shepherd,' etc. Each emphasis reveals new meaning. Don't move to verse 2. Marinate. Journal what the Spirit reveals.", reflection: "What deepens in stillness? How does meditation differ from study?", prayer: "I will meditate on Your Word day and night. Slow me down, Lord.", practiceTools: [{ link: "/devotionals", label: "Devotional Mode" }, { link: "/bible/Psalms/23", label: "Read Psalm 23" }] },
+
+  { day: 74, week: 11, floorNumber: 7, title: "Meditation Room: Extended Practice", floor: "Floor 7: Spiritual Floor", room: "Meditation Room", roomCode: "MR", focus: "Longer meditation sessions — building spiritual stamina", scripture: "Joshua 1:8", scriptureText: "This book of the law shall not depart out of thy mouth; but thou shalt meditate therein day and night.", activity: "Extended meditation on John 15:4-5: 'Abide in me, and I in you. As the branch cannot bear fruit of itself, except it abide in the vine; no more can ye, except ye abide in me.' Spend 20 minutes. First 5 minutes: repeat the words. Next 5: visualize the vine and branches. Next 5: ask 'What does abiding look like today?' Final 5: rest silently in the truth. This is Meditation Room at full depth.", reflection: "What did 20 minutes of one passage produce that 5 minutes could not?", prayer: "I abide in You. Let me bear fruit through abiding, not striving.", practiceTools: [{ link: "/devotionals", label: "Devotional Mode" }, { link: "/bible/John/15", label: "Read John 15" }] },
+
+  { day: 75, week: 11, floorNumber: 7, title: "Speed Room: Sprint Training for the Mind", floor: "Floor 7: Spiritual Floor", room: "Speed Room", roomCode: "SRm", focus: "Rapid application of Phototheology principles — building reflexes", scripture: "Ecclesiastes 3:1", scriptureText: "To every thing there is a season, and a time to every purpose under the heaven.", activity: "Speed drills: (1) 60-second scan: Flip through Genesis 1-11 mentally. Recall 10 scenes in order. (2) 2-minute room sprint: Take John 3:16. Apply 4 rooms in 2 minutes (Story, Concentration, Dimensions, Gems). (3) 3-minute connection race: Start with 'blood.' Connect as many verses as possible in 3 minutes. Write them down. Score: 5+ = good, 10+ = excellent, 15+ = master level. Repeat all 3 drills twice.", reflection: "How does speed training build ministry readiness?", prayer: "Train my mind for quick recall in Your service.", practiceLink: "/test-me", practiceLinkLabel: "Speed Drill" },
+
+  { day: 76, week: 11, floorNumber: 7, title: "Speed + Fire Integration: Rapid Devotion", floor: "Floor 7: Spiritual Floor", focus: "Combining speed with emotional depth — the warrior-poet balance", scripture: "Psalm 119:32", scriptureText: "I will run the way of thy commandments, when thou shalt enlarge my heart.", activity: "Rapid-fire devotional exercise: Take 5 verses (Matt 28:18, Phil 4:13, Isa 41:10, Rom 8:28, Ps 46:10). For each: (1) Speed Room — connect to 2 other verses in 30 seconds. (2) Fire Room — identify the emotional core in 30 seconds. Total: 5 minutes for all 5 verses. Then choose the one that burned hottest and spend 5 minutes in Meditation Room depth on it alone. This is the warrior-poet: quick and deep.", reflection: "How does the Speed-Fire-Meditation cycle create a complete devotional experience?", prayer: "Enlarge my heart to run Your way, Lord.", practiceTools: [{ link: "/test-me", label: "Speed Drill" }, { link: "/devotionals", label: "Devotional Mode" }] },
+
+  { day: 77, week: 11, floorNumber: 7, title: "Floor 7 Integration: Heart & Speed Together", floor: "Floor 7: Spiritual Floor", focus: "Full Floor 7 synthesis — the devotional warrior", scripture: "2 Timothy 2:15", scriptureText: "Study to shew thyself approved unto God, a workman that needeth not to be ashamed, rightly dividing the word of truth.", activity: "Complete Floor 7 walkthrough on Psalm 51 (David's repentance): (1) Fire Room — read slowly, feeling David's brokenness. Which verse burns? (2) Meditation Room — take v10 ('Create in me a clean heart') and marinate for 10 minutes. (3) Speed Room — in 3 minutes, connect Psalm 51 to 5 other repentance passages. Then write a one-page devotional journal entry combining all three experiences: emotion, depth, and readiness.", reflection: "How has Floor 7 transformed your study from intellectual to experiential?", prayer: "Create in me a clean heart, O God. Renew a right spirit within me.", practiceTools: [{ link: "/palace/floor/7", label: "Floor 7 Overview" }, { link: "/devotionals", label: "Devotional Mode" }] },
+
+  // ═══════════════════════════════════════════
+  // WEEKS 12–13: FLOOR 8 — MASTER FLOOR (Days 78–90)
+  // ═══════════════════════════════════════════
+  { day: 78, week: 12, floorNumber: 8, title: "Reflexive Mastery: The Palace Disappears", floor: "Floor 8: Master Floor", focus: "The palace becomes invisible — you no longer 'use rooms,' you think Phototheologically by instinct", scripture: "Ephesians 3:17-19", scriptureText: "That Christ may dwell in your hearts by faith… that ye might be filled with all the fulness of God.", activity: "Test your reflexive mastery: Open your Bible randomly. Read whatever passage appears. WITHOUT consciously thinking about room names, begin studying. After 10 minutes, stop and identify which rooms you naturally used. If you used 5+ rooms without thinking about them, you're approaching mastery. Record your results.", reflection: "Did the rooms flow naturally, or did you still need to think about them?", prayer: "Dwell in my heart by faith, Christ. Fill me with Your fullness.", practiceTools: [{ link: "/palace", label: "Full Palace" }, { link: "/test-me", label: "Test Mastery" }] },
+
+  { day: 79, week: 12, floorNumber: 8, title: "Teaching Without Scaffolding", floor: "Floor 8: Master Floor", focus: "Teaching others without naming rooms — the palace is inside you, not on display", scripture: "2 Timothy 2:2", scriptureText: "The same commit thou to faithful men, who shall be able to teach others also.", activity: "Prepare a 15-minute teaching on any passage (suggestion: Genesis 22). Use at least 6 Palace principles — but NEVER name the rooms. Let the flow be natural: start with the story (SR), bring out details (OR), show Christ (CR), apply dimensions (DR), connect to prophecy (PR), and let it burn with conviction (FRm). Practice delivering it aloud. If it flows like conversation rather than a lecture, you're on the 8th Floor.", reflection: "How does teaching without scaffolding prove internalization?", prayer: "Make me a faithful teacher who commits truth to the next generation.", practiceTools: [{ link: "/sermon-builder", label: "Sermon Builder" }, { link: "/palace/tour", label: "Palace Tour" }] },
+
+  { day: 80, week: 12, floorNumber: 8, title: "Full Palace Sprint: 8 Floors in 30 Minutes", floor: "Floor 8: Master Floor", focus: "Rapid full-palace application — testing fluency across all floors", scripture: "Psalm 119:130", scriptureText: "The entrance of thy words giveth light; it giveth understanding unto the simple.", activity: "Take Revelation 14:12 ('Here is the patience of the saints: here are they that keep the commandments of God, and the faith of Jesus'). Sprint through all 8 floors in 30 minutes (3-4 min per floor): Floor 1 (story, image, gem), Floor 2 (observe, define, question), Floor 3 (freestyle connections), Floor 4 (Christ, dimensions, theme), Floor 5 (sanctuary, prophecy, Three Angels), Floor 6 (cycle, heaven, juice), Floor 7 (fire, meditate, speed), Floor 8 (let it flow). Write a 1-page sprint summary.", reflection: "How fast can you now move through the palace? Where did you slow down?", prayer: "Let patience and faith define me as one of Your saints.", practiceTools: [{ link: "/test-me", label: "Speed Test" }, { link: "/training-drills", label: "Training Drills" }] },
+
+  { day: 81, week: 12, floorNumber: 8, title: "Difficult Passage Mastery: Ezekiel 1", floor: "Floor 8: Master Floor", focus: "Applying mastery to the most challenging texts in Scripture", scripture: "Ezekiel 1:1", scriptureText: "The heavens were opened, and I saw visions of God.", activity: "Full palace study of Ezekiel 1 (the throne vision): This is one of the hardest chapters in the Bible. Apply your training: Observe the living creatures, wheels within wheels, firmament, and throne. Define key Hebrew terms. Build symbol profiles. Ask 15 questions. Find Christ (the man on the throne). Apply 5 dimensions. Place in @Mo/@Cy cycle and 1H/2H. Let the Fire Room feel the overwhelming glory. If you can study Ezekiel 1 with confidence, the palace is working.", reflection: "How does the palace unlock passages that once seemed impenetrable?", prayer: "Open the heavens to me, Lord. Let me see Your glory.", practiceTools: [{ link: "/palace", label: "Full Palace" }, { link: "/research-mode", label: "Research Mode" }] },
+
+  { day: 82, week: 12, floorNumber: 8, title: "Cross-Testament Mastery", floor: "Floor 8: Master Floor", focus: "Seamlessly connecting Old and New Testaments through the palace", scripture: "Matthew 5:17", scriptureText: "Think not that I am come to destroy the law, or the prophets: I am not come to destroy, but to fulfil.", activity: "Create a 'cross-testament bridge study' connecting 5 OT/NT pairs: (1) Gen 22 → Heb 11:17-19. (2) Ex 12 → 1 Cor 5:7. (3) Isa 53 → Matt 26-27. (4) Dan 7:13-14 → Rev 5:6-14. (5) Ps 22 → Mark 15:34. For each pair: use Parallels Room (mirrored actions), Concentration (Christ), Prophecy (fulfillment), and Fruit (what character does the connection produce?). Write a synthesis showing the Bible's unity.", reflection: "How does cross-testament study prove the Bible is one unified story?", prayer: "Show me Your Word's unity across every testament.", practiceTools: [{ link: "/bible/thematic-search", label: "Thematic Search" }, { link: "/remix", label: "Study Remix" }] },
+
+  { day: 83, week: 13, floorNumber: 8, title: "Personal Palace Audit", floor: "Floor 8: Master Floor", focus: "Honest self-assessment — strengths, weaknesses, and growth plan", scripture: "1 Corinthians 12:4", scriptureText: "Now there are diversities of gifts, but the same Spirit.", activity: "Rate yourself 1-10 on every floor: Floor 1 (memory/visualization), Floor 2 (investigation), Floor 3 (freestyle), Floor 4 (Christ-centered depth), Floor 5 (prophecy/sanctuary), Floor 6 (cycles/heavens), Floor 7 (spiritual fire), Floor 8 (reflexive mastery). For your 3 weakest areas, design a 2-week strengthening plan with specific exercises. For your 3 strongest, identify how to use them in ministry.", reflection: "What's your unique palace signature? How do your strengths serve God's kingdom?", prayer: "Use my gifts for Your glory, Lord. Strengthen my weaknesses by Your Spirit.", practiceTools: [{ link: "/palace", label: "Palace Self-Audit" }, { link: "/training-drills", label: "Training Drills" }] },
+
+  { day: 84, week: 13, floorNumber: 8, title: "The Four Expansions Review", floor: "Floor 8: Master Floor", focus: "Width, Time, Depth, Height — checking all four directions of growth", scripture: "Ephesians 3:18", scriptureText: "May be able to comprehend with all saints what is the breadth, and length, and depth, and height.", activity: "Self-assessment by expansion: WIDTH (Floors 1-2) — How many stories can you recall? How many observations per passage? TIME (Floor 3) — Do you freestyle Scripture daily without prompting? DEPTH (Floors 4-6) — Can you place any text in its cycle and heaven? Apply 5 dimensions instantly? HEIGHT (Floors 7-8) — Does study regularly produce conviction and transformation? Are you approaching reflexive mastery? Score each expansion 1-10 and create a visual 'radar chart' of your growth.", reflection: "Which expansion has grown most? Which needs the most attention going forward?", prayer: "Expand me in every direction — width, time, depth, and height.", practiceTools: [{ link: "/ascensions-expansions", label: "Expansions Review" }, { link: "/mind-map", label: "Mind Map Palace" }] },
+
+  { day: 85, week: 13, floorNumber: 8, title: "Guardrails Review: The Safety Rails", floor: "Floor 8: Master Floor", focus: "Reviewing the 10 non-negotiable guardrails that keep the palace safe", scripture: "Proverbs 4:26-27", scriptureText: "Ponder the path of thy feet, and let all thy ways be established. Turn not to the right hand nor to the left.", activity: "Review all 10 guardrails and check yourself: (1) Christ-Centered — do you find Him in every text? (2) No Mutation — have you invented any rooms or codes? (3) Cycle Placement — can you place texts correctly? (4) Heaven Horizon — do you distinguish 1H/2H/3H? (5) Fruit Rule — do your studies produce Christlike character? (6) Static/Dynamic Balance — do you use both? (7) Type vs. Parallel — do you distinguish them? (8) Don't Skip Floors — have you built sequentially? (9) No Idolizing the Method — is Christ the goal, not the palace? (10) Word + Spirit — is prayer accompanying study?", reflection: "Which guardrail have you most needed? Which most protects your study?", prayer: "Keep me on the path. Let me turn neither right nor left.", practiceTools: [{ link: "/palace/tour", label: "Palace Tour" }, { link: "/test-me", label: "Guardrails Quiz" }] },
+
+  { day: 86, week: 13, floorNumber: 8, title: "Masterpiece Study: Your Chosen Text", floor: "Floor 8: Master Floor", focus: "Your 90-day masterpiece — choose any passage and apply the full palace", scripture: "Psalm 19:7-10", scriptureText: "The law of the LORD is perfect, converting the soul.", activity: "Choose your favorite passage in all of Scripture. This is your masterpiece study. Apply EVERY floor, EVERY room that applies, EVERY expansion. Let it flow naturally (8th Floor reflexive). Spend at least 45 minutes. Write a 3-5 page study that integrates: stories, observations, definitions, symbols, questions, freestyle connections, Christ-focus, dimensions, themes, patterns, sanctuary, prophecy, cycles, heavens, fire, meditation, and speed. This is the culmination of 86 days of training.", reflection: "How does this masterpiece compare to your Day 1 study of Genesis 1-3?", prayer: "Your law is perfect, converting my soul. Your Word is sweeter than honey.", practiceTools: [{ link: "/my-studies", label: "My Studies" }, { link: "/amplify", label: "Study Amplify" }] },
+
+  { day: 87, week: 13, floorNumber: 8, title: "Teaching Practicum: Share Your Masterpiece", floor: "Floor 8: Master Floor", focus: "Teaching what you've learned — the ultimate test of mastery", scripture: "Hebrews 5:12", scriptureText: "For when for the time ye ought to be teachers.", activity: "Take your Day 86 masterpiece study and prepare a 20-minute teaching from it. Don't use Palace terminology — let the method be invisible. Include: a compelling opening (Story Room), investigative depth (Floor 2), personal connection (Floor 3), Christ-centered theology (Floor 4), prophetic context (Floor 5), and devotional fire (Floor 7). Deliver it to someone — a friend, family member, small group, or even record it. The palace is proven when others are blessed by it.", reflection: "How does teaching complete the learning cycle? What surprised your audience?", prayer: "Commit this truth to faithful people who will teach others also.", practiceTools: [{ link: "/sermon-builder", label: "Sermon Builder" }, { link: "/sermon-simmer", label: "Sermon Simmer" }] },
+
+  { day: 88, week: 13, floorNumber: 8, title: "Legacy Planning: Your Ongoing Journey", floor: "Floor 8: Master Floor", focus: "Designing your post-course study rhythm — the palace is permanent, not a 90-day experiment", scripture: "Psalm 1:1-3", scriptureText: "Blessed is the man… his delight is in the law of the LORD; and in his law doth he meditate day and night.", activity: "Create your personalized ongoing study plan: (1) Daily rhythm — how will you use Floors 1-3 daily? (2) Weekly deep dive — which floor will you 'visit' each week? (3) Monthly juice — which book will you 'juice' each month? (4) Quarterly assessment — how will you check your growth? (5) Ministry application — where will you teach? Write a one-page 'Palace Lifestyle Covenant' committing to ongoing study.", reflection: "How will you ensure this palace becomes permanent, not temporary?", prayer: "Make me a tree planted by rivers of water. Let me delight in Your law forever.", practiceTools: [{ link: "/devotionals", label: "Devotional Mode" }, { link: "/reading-plans", label: "Reading Plans" }] },
+
+  { day: 89, week: 13, floorNumber: 8, title: "The 10 Guardrails Covenant", floor: "Floor 8: Master Floor", focus: "Formally committing to the guardrails that protect your study", scripture: "Deuteronomy 4:2", scriptureText: "Ye shall not add unto the word which I command you, neither shall ye diminish ought from it.", activity: "Write and sign your personal '10 Guardrails Covenant': I commit to (1) always finding Christ, (2) never mutating the palace, (3) placing texts in correct cycles, (4) distinguishing heavens, (5) testing by fruit, (6) balancing static and dynamic, (7) distinguishing types from parallels, (8) never skipping floors, (9) worshiping Christ not the method, (10) depending on Word and Spirit together. Share this covenant with an accountability partner.", reflection: "Which guardrail will be most important for your long-term faithfulness?", prayer: "Seal these guardrails on my heart. Let me study with integrity forever.", practiceTools: [{ link: "/palace", label: "Review Palace" }, { link: "/notes", label: "My Notes" }] },
+
+  { day: 90, week: 13, floorNumber: 8, title: "Palace Completion & Commissioning", floor: "Floor 8: Master Floor", focus: "Final integration, celebration, and commissioning for lifelong Phototheology", scripture: "Revelation 22:17", scriptureText: "And the Spirit and the bride say, Come. And let him that heareth say, Come.", activity: "The final day. (1) Walk through your palace one last time — mentally visit every floor and your favorite room on each. (2) Choose your single most transformative verse from these 90 days. Apply all 8 floors to it for a final time. (3) Write a one-paragraph testimony: 'How Phototheology changed my Bible study.' (4) Share your testimony with someone who hasn't started yet. Invite them to begin their own 90-day journey. The Spirit and the bride say, Come — and now you say it too.", reflection: "How has this 90-day journey transformed you? What legacy will your palace create? Who will you invite?", prayer: "Thank You for building this palace in me. I will dwell in Your Word daily and invite others to discover Christ in every passage. Let my palace be a living testimony of Your truth. The scaffolding fades, but Christ remains. Amen.", practiceTools: [{ link: "/palace", label: "Your Palace" }, { link: "/achievements", label: "Achievements" }] }
 ];
 
 // Kids versions for different age groups
 export const kidsPhototheologyCourse: KidsCourseDay[] = [
-  // Ages 5-8 simplified versions (sample days)
-  {
-    day: 1,
-    week: 1,
-    title: "Building Your Bible Castle",
-    floor: "Floor 1: Starting Your Adventure",
-    ageGroup: 'ages-6-8',
-    focus: "The Bible tells us about Jesus in every story",
-    scripture: "Luke 24:27",
-    scriptureText: "Jesus showed them all the stories in the Bible about Himself.",
-    activity: "Draw a big castle with 8 floors. Color the first floor. Think about the story of Adam and Eve in the garden.",
-    simplifiedActivity: "Draw and color your Bible castle! Make it BIG with 8 floors.",
-    funElement: "Use your favorite colors and add Jesus at the top!",
-    reflection: "Can you see Jesus in the story of the garden?",
-    prayer: "Jesus, help me see You in every Bible story."
-  },
-  {
-    day: 2,
-    week: 1,
-    title: "Story Time Room",
-    floor: "Floor 1: Starting Your Adventure",
-    room: "Story Time Room",
-    ageGroup: 'ages-6-8',
-    focus: "God teaches us through stories",
-    scripture: "Genesis 3:21",
-    scriptureText: "God made clothes for Adam and Eve.",
-    activity: "Listen to Genesis 3. Draw your favorite part. Remember that God took care of Adam and Eve even when they made mistakes.",
-    simplifiedActivity: "Draw Adam and Eve in the garden. What happened?",
-    funElement: "Make it a comic strip with 3 pictures!",
-    reflection: "How did God show love to Adam and Eve?",
-    prayer: "Thank You, God, for loving me even when I mess up."
-  },
+  // Ages 6-8 (sample days for each floor)
+  ...[1,2,3,7,15,21,29,35,43,50,57,63,71,77,85,90].map((day): KidsCourseDay => {
+    const adult = phototheologyCourse.find(d => d.day === day)!;
+    const simplified: Record<number, { title: string; activity: string; simplified: string; fun: string; reflection: string; prayer: string }> = {
+      1: { title: "Building Your Bible Castle!", activity: "Draw a big castle with 8 floors and color the first floor. The Bible tells us about Jesus in EVERY story!", simplified: "Draw and color your Bible castle! Make it BIG!", fun: "Use glitter or stickers to make Jesus shine at the top!", reflection: "Can you find Jesus in the story of Adam and Eve?", prayer: "Jesus, help me see You in every Bible story!" },
+      2: { title: "Story Time Room", activity: "Listen to Genesis 3. God made clothes for Adam and Eve even when they disobeyed. Draw your favorite part!", simplified: "Draw Adam and Eve. What did God do for them?", fun: "Make a 3-picture comic strip of the story!", reflection: "How did God show love even when they made mistakes?", prayer: "Thank You, God, for loving me even when I mess up." },
+      3: { title: "Imagine You Were There!", activity: "Close your eyes and imagine you're on Noah's ark. What do you hear? What do you see? What animals are there?", simplified: "Pretend you're ON the ark! Draw what you see!", fun: "Make animal sounds for your favorite ark animals!", reflection: "How did God keep Noah safe?", prayer: "Thank You for keeping me safe, God!" },
+      7: { title: "My Castle So Far!", activity: "Review your Bible castle drawing. Can you remember the stories from this week? Tell them to someone!", simplified: "Show your castle to a friend or family member!", fun: "Get a gold star sticker for each story you remember!", reflection: "What was your favorite story this week?", prayer: "Thank You for these amazing stories, Jesus!" },
+      15: { title: "Bible Detective!", activity: "Be a detective! Read John 1:1 and find 5 facts. Who? What? When? Write them on detective cards!", simplified: "Make detective cards with Bible clues!", fun: "Wear a pretend detective hat while you study!", reflection: "What clue did you find about Jesus?", prayer: "Help me be a great Bible detective!" },
+      21: { title: "Bible Detective Review", activity: "Use your detective toolkit on your favorite story. What facts can you find?", simplified: "Detective quiz time! Find 5 clues in any story!", fun: "Make a magnifying glass from paper to look at verses!", reflection: "What's the best clue you found this week?", prayer: "Thank You for teaching me to look closely!" },
+      29: { title: "God's Nature Show!", activity: "Go outside and find something God made. How does it teach about God? A flower grows = God helps us grow!", simplified: "Find 3 things outside that remind you of God!", fun: "Take photos or draw what you find!", reflection: "What did nature teach you about God today?", prayer: "Thank You for Your beautiful creation, God!" },
+      35: { title: "Bible Family Trees!", activity: "Pick a Bible word like 'light.' Find it in 3 different verses. They're all related — like a family!", simplified: "Find the word 'light' in 3 Bible verses!", fun: "Draw a family tree with your verses as family members!", reflection: "How are these verses connected?", prayer: "Connect Your Word in my heart, Jesus!" },
+      43: { title: "Finding Jesus Everywhere!", activity: "Jesus is hidden in every Bible story — like the best hide-and-seek ever! Find Him in 3 surprising places!", simplified: "Play hide-and-seek with Jesus in the Bible!", fun: "Put a Jesus sticker every time you find Him!", reflection: "Where was Jesus hiding today?", prayer: "I found You, Jesus! Help me always find You!" },
+      50: { title: "Pattern Spotter!", activity: "God uses patterns! The number 3 shows up everywhere: 3 days Jonah in fish, 3 days Jesus in tomb. Find more!", simplified: "Count how many times '3' appears in Bible stories!", fun: "Make a pattern poster with all your discoveries!", reflection: "Why does God use patterns?", prayer: "You're so creative, God! I love Your patterns!" },
+      57: { title: "The Special Tent!", activity: "God told Moses to build a special tent (tabernacle). Each part teaches about Jesus! The door = Jesus is the Way!", simplified: "Draw the special tent and label the parts!", fun: "Build a mini tabernacle from a shoebox!", reflection: "How does the tent teach about Jesus?", prayer: "Jesus, You are the door to God!" },
+      63: { title: "Prophecy Pictures!", activity: "God told the future through Daniel! A big statue with gold head, silver chest, bronze belly, iron legs. Each part = a kingdom!", simplified: "Color the statue from Daniel 2!", fun: "Build the statue from Play-Doh — different colors for each part!", reflection: "How does God know the future?", prayer: "You know everything, God! I trust You!" },
+      71: { title: "Heart on Fire!", activity: "Read about David saying sorry to God (Psalm 51). Sometimes the Bible makes our hearts feel things. That's good!", simplified: "Draw a heart and write what makes you feel close to God!", fun: "Use red and orange crayons to make 'fire' around your heart!", reflection: "What makes your heart burn for God?", prayer: "Set my heart on fire for You, Jesus!" },
+      77: { title: "Fast and Deep!", activity: "Quick challenge: name 5 Bible stories in 30 seconds! Then pick one and think about it quietly for 5 minutes.", simplified: "Speed round + quiet time = the best combo!", fun: "Use a timer and try to beat your record!", reflection: "Which is easier for you — fast or slow? Both matter!", prayer: "Help me be both quick and deep in Your Word!" },
+      85: { title: "My Bible Rules!", activity: "Review the safety rules: Always find Jesus! Never change the palace! Check your heart! These rules keep us safe!", simplified: "Make a poster of your Bible study rules!", fun: "Decorate your poster with stickers and hang it up!", reflection: "Which rule helps you most?", prayer: "Keep me safe in Your truth, Lord!" },
+      90: { title: "Palace Party!", activity: "You finished! Walk through your castle one more time. Pick your favorite Bible moment. Tell someone about it. Invite a friend to start their own castle!", simplified: "Celebrate and share what you learned!", fun: "Have a Bible castle party with friends or family!", reflection: "What's your favorite thing you learned in 90 days?", prayer: "Thank You, Jesus, for this amazing journey! I'll keep studying forever!" },
+    };
+    const s = simplified[day] || { title: adult.title, activity: adult.activity, simplified: adult.activity, fun: "Draw or act out what you learned!", reflection: adult.reflection, prayer: adult.prayer };
+    return {
+      day, week: adult.week, floorNumber: adult.floorNumber, title: s.title, floor: adult.floor.replace(/Floor \d:/, 'Floor ' + adult.floorNumber + ':'),
+      ageGroup: 'ages-6-8', focus: adult.focus, scripture: adult.scripture, scriptureText: adult.scriptureText,
+      activity: s.activity, simplifiedActivity: s.simplified, funElement: s.fun, reflection: s.reflection, prayer: s.prayer,
+      room: adult.room, roomCode: adult.roomCode, practiceLink: adult.practiceLink, practiceLinkLabel: adult.practiceLinkLabel,
+    };
+  }),
 
-  // Ages 9-12 versions (sample days)
-  {
-    day: 1,
-    week: 1,
-    title: "The Phototheology Vision",
-    floor: "Floor 1: Building Your Palace",
-    ageGroup: 'ages-9-12',
-    focus: "Learning to see Jesus throughout the whole Bible",
-    scripture: "Luke 24:27",
-    scriptureText: "And beginning at Moses and all the prophets, he expounded unto them in all the scriptures the things concerning himself.",
-    activity: "Read Genesis 1-3. Create a simple map of your memory palace with 8 floors. On Floor 1, draw the Garden of Eden as your entrance. Label three things: Adam (God's promise), Eve (relationship), serpent (the problem sin causes).",
-    simplifiedActivity: "Design your 8-floor memory palace. Make it colorful and creative!",
-    funElement: "Give your palace a cool name like 'Truth Tower' or 'Jesus Castle'!",
-    reflection: "Where can you see Jesus promised in Genesis 3:15?",
-    prayer: "Lord, open my eyes to see Jesus in every Bible story I read."
-  },
-  {
-    day: 2,
-    week: 1,
-    title: "Story Room Adventure",
-    floor: "Floor 1: Building Your Palace",
-    room: "Story Room",
-    ageGroup: 'ages-9-12',
-    focus: "Bible stories teach us about God visually",
-    scripture: "Genesis 3:21",
-    scriptureText: "Unto Adam also and to his wife did the LORD God make coats of skins, and clothed them.",
-    activity: "Retell Genesis 3 like a movie scene. Create images in your mind: The tree of knowledge, the first animal sacrifice, God making clothes. Memorize 3 key stories from Genesis 1-11 (Creation, Fall, Flood).",
-    simplifiedActivity: "Storyboard Genesis 3 with 6 key scenes. Add captions!",
-    funElement: "Act it out with family members or stuffed animals!",
-    reflection: "How does God's clothing for Adam and Eve show us Jesus's sacrifice?",
-    prayer: "Jesus, cover me with Your righteousness like You covered Adam and Eve."
-  },
+  // Ages 9-12 (sample days for each floor)
+  ...[1,2,3,7,14,15,21,28,29,35,42,43,56,57,63,71,77,85,90].map((day): KidsCourseDay => {
+    const adult = phototheologyCourse.find(d => d.day === day)!;
+    return {
+      ...adult, ageGroup: 'ages-9-12' as const,
+      simplifiedActivity: `Youth version: ${adult.activity.split('.').slice(0, 2).join('.')}. Make it your own!`,
+      funElement: "Challenge a friend to do this exercise together and compare discoveries!",
+    };
+  }),
 
-  // Ages 13-16 versions (sample days)
-  {
-    day: 1,
-    week: 1,
-    title: "Introduction to Phototheology",
-    floor: "Floor 1: Foundations",
-    ageGroup: 'ages-13-15',
-    focus: "Phototheology as a visual, Christ-centered approach to Scripture",
-    scripture: "Luke 24:27",
-    scriptureText: "And beginning at Moses and all the prophets, he expounded unto them in all the scriptures the things concerning himself.",
-    activity: "Read Genesis 1-3 carefully. Design your memory palace structure (8 floors, 38 rooms). Visualize Eden as your palace entrance, noting key elements: Adam (covenant relationship), Eve (community), serpent (cosmic conflict). Create a detailed sketch or digital design of your palace outline.",
-    simplifiedActivity: "Design and diagram your complete 8-floor palace with labels for each floor's purpose.",
-    funElement: "Use an app like Canva or Procreate to create a digital palace design, or build a 3D model!",
-    reflection: "Where do you see Christ foreshadowed in Genesis 3:15? How does this proto-evangelium (first gospel) set the stage for redemption?",
-    prayer: "Lord, give me eyes to see Your Son in every passage. Open my heart to the depth of Scripture."
-  },
-  {
-    day: 2,
-    week: 1,
-    title: "Story Room (ST) Deep Dive",
-    floor: "Floor 1: Foundations",
-    room: "Story Room",
-    ageGroup: 'ages-13-15',
-    focus: "Narrative as God's primary visual teaching method",
-    scripture: "Genesis 3:21",
-    scriptureText: "Unto Adam also and to his wife did the LORD God make coats of skins, and clothed them.",
-    activity: "Analyze Genesis 3 as narrative theology. Map the story structure: Exposition (garden setting), Rising Action (serpent's temptation), Climax (eating fruit), Falling Action (hiding), Resolution (judgment and promise). Assign symbolic images: Tree (knowledge vs. life), Blood (first sacrifice), Covering (Christ's righteousness). Memorize the narrative arc of 3 Genesis stories (1-11).",
-    simplifiedActivity: "Create a detailed story map with theological annotations showing Christ-types and symbols.",
-    funElement: "Film a 2-minute video retelling Genesis 3 with modern parallels!",
-    reflection: "How does the animal skin covering point to substitutionary atonement? What does this reveal about the cost of covering sin?",
-    prayer: "Clothe me fully in Your righteousness, Jesus. Let me never trust in my own covering."
-  }
+  // Ages 13-15 (essentially the full adult course with youth-relevant framing)
+  ...[1,2,3,7,14,15,21,28,29,35,42,43,56,57,63,67,71,77,85,90].map((day): KidsCourseDay => {
+    const adult = phototheologyCourse.find(d => d.day === day)!;
+    return {
+      ...adult, ageGroup: 'ages-13-15' as const,
+      simplifiedActivity: `Deep dive: ${adult.activity}`,
+      funElement: "Use digital tools (Canva, notes app, or the Palace OS) to create your study materials!",
+    };
+  }),
 ];

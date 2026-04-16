@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { GameLeaderboard } from "@/components/GameLeaderboard";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -42,6 +44,7 @@ const passages = [
 
 export default function ConcentrationRoom() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
   const [currentPassage, setCurrentPassage] = useState(0);
@@ -56,8 +59,8 @@ export default function ConcentrationRoom() {
   const handleSubmit = () => {
     if (userAnswer.trim().length < 20) {
       toast({
-        title: "Add More Detail",
-        description: "Try to explain how this points to Christ more fully!",
+        title: t('games.concentrationRoom.addMoreDetail'),
+        description: t('games.concentrationRoom.explainMoreFully'),
         variant: "destructive",
       });
       return;
@@ -67,8 +70,8 @@ export default function ConcentrationRoom() {
     setRevealed(true);
     
     toast({
-      title: "Well Done!",
-      description: "See how the whole Bible points to Jesus!",
+      title: t('games.concentrationRoom.wellDone'),
+      description: t('games.concentrationRoom.biblePointsToJesus'),
     });
   };
 
@@ -116,9 +119,9 @@ export default function ConcentrationRoom() {
             <Card className="text-center">
               <CardHeader>
                 <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
-                <CardTitle className="text-3xl">Concentration Room Mastered!</CardTitle>
+                <CardTitle className="text-3xl">{t('games.concentrationRoom.mastered')}</CardTitle>
                 <CardDescription>
-                  You're seeing Christ in all Scripture!
+                  {t('games.concentrationRoom.masteredDescription')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -126,15 +129,15 @@ export default function ConcentrationRoom() {
                   {score} / {passages.length}
                 </div>
                 <p className="text-muted-foreground">
-                  "These are they which testify of me" - John 5:39
+                  {t('games.concentrationRoom.quoteJohn539')}
                 </p>
                 <div className="flex gap-4 justify-center">
                   <Button onClick={() => navigate("/games")}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Games
+                    {t('games.common.backToGames')}
                   </Button>
                   <Button onClick={() => window.location.reload()} variant="outline">
-                    Play Again
+                    {t('games.common.playAgain')}
                   </Button>
                 </div>
               </CardContent>
@@ -157,20 +160,20 @@ export default function ConcentrationRoom() {
           className="mb-4"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Games
+          {t('games.common.backToGames')}
         </Button>
 
         <Card className="mb-6">
           <CardHeader>
             <div className="flex items-center justify-between mb-2">
-              <Badge variant="secondary">Floor 4 • Concentration Room (CR)</Badge>
+              <Badge variant="secondary">{t('games.concentrationRoom.floorBadge')}</Badge>
               <Badge variant="outline">
                 {currentPassage + 1} / {passages.length}
               </Badge>
             </div>
-            <CardTitle className="text-3xl">✝️ Concentration Room</CardTitle>
+            <CardTitle className="text-3xl">{t('games.concentrationRoom.title')}</CardTitle>
             <CardDescription>
-              Every text must reveal Christ. Use the magnifying glass on every verse until Jesus comes into focus!
+              {t('games.concentrationRoom.description')}
             </CardDescription>
             <Progress value={progress} className="mt-4" />
           </CardHeader>
@@ -192,16 +195,16 @@ export default function ConcentrationRoom() {
                 <div>
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
                     <Focus className="h-5 w-5" />
-                    How does this passage reveal Christ?
+                    {t('games.concentrationRoom.howRevealChrist')}
                   </h3>
                   <Textarea
                     value={userAnswer}
                     onChange={(e) => setUserAnswer(e.target.value)}
-                    placeholder="Explain how this passage points to Jesus Christ...&#10;&#10;Consider: Is He a type? A prophecy? A principle? A promise?"
+                    placeholder={t('games.concentrationRoom.answerPlaceholder')}
                     className="min-h-[150px]"
                   />
                   <p className="text-xs text-muted-foreground mt-2">
-                    Remember: "These are they which testify of me" (John 5:39). No text is random - all Scripture reveals Christ!
+                    {t('games.concentrationRoom.rememberQuote')}
                   </p>
                 </div>
 
@@ -211,7 +214,7 @@ export default function ConcentrationRoom() {
                   className="w-full"
                   size="lg"
                 >
-                  Submit Answer
+                  {t('games.common.submitAnswer')}
                 </Button>
               </>
             )}
@@ -222,21 +225,21 @@ export default function ConcentrationRoom() {
                 <div className="space-y-4">
                   <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg">
                     <h3 className="font-semibold mb-3 text-blue-800 dark:text-blue-400">
-                      Your Answer:
+                      {t('games.concentrationRoom.yourAnswer')}
                     </h3>
                     <p className="text-sm whitespace-pre-wrap">{userAnswer}</p>
                   </div>
 
                   <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg">
                     <h3 className="font-semibold mb-3 text-green-800 dark:text-green-400">
-                      ✓ Christ Connection:
+                      {t('games.concentrationRoom.christConnection')}
                     </h3>
                     <p className="text-sm leading-relaxed">{passage.christConnection}</p>
                   </div>
                 </div>
 
                 <Button onClick={handleNext} className="w-full" size="lg">
-                  {currentPassage < passages.length - 1 ? "Next Passage" : "Finish"}
+                  {currentPassage < passages.length - 1 ? t('games.concentrationRoom.nextPassage') : t('games.common.finish')}
                 </Button>
               </>
             )}
@@ -245,16 +248,17 @@ export default function ConcentrationRoom() {
 
         <Card className="bg-amber-50 dark:bg-amber-900/20">
           <CardContent className="pt-6">
-            <h4 className="font-semibold mb-2">💡 Concentration Room Rule:</h4>
+            <h4 className="font-semibold mb-2">{t('games.concentrationRoom.ruleTitle')}</h4>
             <p className="text-sm text-muted-foreground mb-2">
-              Every text must pass through this room. Use the magnifying glass until Christ comes into focus. Without this lens, Bible study collapses into moral lessons or disconnected trivia.
+              {t('games.concentrationRoom.ruleDescription')}
             </p>
             <p className="text-xs text-muted-foreground italic">
-              "And beginning with Moses and all the Prophets, he explained to them what was said in all the Scriptures concerning himself." - Luke 24:27
+              {t('games.concentrationRoom.quoteLuke2427')}
             </p>
           </CardContent>
         </Card>
       </main>
+      <FloatingGameChat gameType="concentration-room" />
     </div>
   );
 }

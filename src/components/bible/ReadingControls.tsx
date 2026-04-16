@@ -14,24 +14,33 @@ import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { BIBLE_TRANSLATIONS, Translation } from "@/services/bibleApi";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 export const ReadingControls = () => {
+  const { t } = useTranslation();
   const { preferences, updatePreference } = useUserPreferences();
   const { book = "John", chapter: chapterParam = "3" } = useParams();
   const navigate = useNavigate();
   const [translation, setTranslation] = useState<Translation>(preferences.bible_translation as Translation);
 
   useEffect(() => {
-    // Sync with preferences
     setTranslation(preferences.bible_translation as Translation);
   }, [preferences.bible_translation]);
 
   const handleTranslationChange = async (value: Translation) => {
+    console.log('[ReadingControls] Translation changing to:', value);
     setTranslation(value);
-    // Save to preferences
-    await updatePreference("bible_translation", value);
-    // Navigate with translation parameter
-    navigate(`/bible/${book}/${chapterParam}?t=${value}`);
+
+    try {
+      await updatePreference("bible_translation", value);
+      console.log('[ReadingControls] Preference updated, navigating...');
+
+      // Force page reload with new translation to ensure it applies
+      const newUrl = `/bible/${book}/${chapterParam}?t=${value}`;
+      window.location.href = newUrl;
+    } catch (error) {
+      console.error('[ReadingControls] Error updating translation:', error);
+    }
   };
 
   return (
@@ -39,21 +48,21 @@ export const ReadingControls = () => {
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm">
           <Settings className="h-4 w-4 mr-2" />
-          Reading Settings
+          {t('bible.readingSettings')}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+      <PopoverContent className="w-80 sm:w-80">
         <div className="space-y-4">
           <div>
             <h4 className="font-medium mb-3 flex items-center gap-2">
               <Languages className="h-4 w-4" />
-              Translation
+              {t('bible.translationLabel')}
             </h4>
             <Select value={translation} onValueChange={handleTranslationChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select translation" />
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={t('bible.selectTranslation')} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-[300px] z-[100]" position="popper">
                 {BIBLE_TRANSLATIONS.map((trans) => (
                   <SelectItem key={trans.value} value={trans.value}>
                     {trans.label}
@@ -66,7 +75,7 @@ export const ReadingControls = () => {
           <div>
             <h4 className="font-medium mb-3 flex items-center gap-2">
               <Type className="h-4 w-4" />
-              Font Size
+              {t('bible.fontSize')}
             </h4>
             <RadioGroup
               value={preferences.bible_font_size}
@@ -76,15 +85,15 @@ export const ReadingControls = () => {
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="small" id="small" />
-                <Label htmlFor="small">Small</Label>
+                <Label htmlFor="small">{t('bible.small')}</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="medium" id="medium" />
-                <Label htmlFor="medium">Medium</Label>
+                <Label htmlFor="medium">{t('bible.medium')}</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="large" id="large" />
-                <Label htmlFor="large">Large</Label>
+                <Label htmlFor="large">{t('bible.large')}</Label>
               </div>
             </RadioGroup>
           </div>
@@ -92,7 +101,7 @@ export const ReadingControls = () => {
           <div>
             <h4 className="font-medium mb-3 flex items-center gap-2">
               <BookOpen className="h-4 w-4" />
-              Reading Mode
+              {t('bible.readingModeLabel')}
             </h4>
             <RadioGroup
               value={preferences.reading_mode}
@@ -102,15 +111,15 @@ export const ReadingControls = () => {
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="default" id="default" />
-                <Label htmlFor="default">Default</Label>
+                <Label htmlFor="default">{t('bible.default')}</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="focus" id="focus" />
-                <Label htmlFor="focus">Focus (minimal distractions)</Label>
+                <Label htmlFor="focus">{t('bible.focus')}</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="study" id="study" />
-                <Label htmlFor="study">Study (with notes)</Label>
+                <Label htmlFor="study">{t('bible.studyWithNotes')}</Label>
               </div>
             </RadioGroup>
           </div>

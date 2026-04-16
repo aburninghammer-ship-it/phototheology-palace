@@ -8,13 +8,19 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 export default function PatreonCallback() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [processing, setProcessing] = useState(true);
   const processedRef = useRef(false);
 
   useEffect(() => {
+    // Wait for auth to finish loading before processing
+    if (loading) {
+      console.log("Patreon callback: waiting for auth to load...");
+      return;
+    }
+
     const handleCallback = async () => {
-      // Prevent double-processing (React StrictMode / double-render protection)
+      // Prevent double-processing
       if (processedRef.current) {
         console.log("Patreon callback already processed, skipping");
         return;
@@ -35,22 +41,23 @@ export default function PatreonCallback() {
         return;
       }
 
-      // Mark as processed BEFORE the async call
-      processedRef.current = true;
-      
-      // Also check sessionStorage to prevent page refresh re-submission
+      // Check sessionStorage to prevent page refresh re-submission
       const processedCode = sessionStorage.getItem("patreon_processed_code");
       if (processedCode === code) {
         console.log("This Patreon code was already processed");
         navigate("/dashboard");
         return;
       }
-      
-      // Store the code we're processing
+
+      // Mark as processed AFTER all guards pass
+      processedRef.current = true;
       sessionStorage.setItem("patreon_processed_code", code);
 
       try {
-        const redirectUri = `${window.location.origin}/patreon-callback`;
+        // Use canonical domain for Patreon OAuth (must match what was sent in patreon-auth)
+        const redirectUri = "https://phototheology.app/patreon-callback";
+        
+        console.log("Processing Patreon callback with userId:", user?.id || "none (will fallback to email matching)");
         
         const { data, error: fnError } = await supabase.functions.invoke("patreon-callback", {
           body: {
@@ -62,17 +69,26 @@ export default function PatreonCallback() {
 
         if (fnError) throw fnError;
 
-        if (data.isActivePatron) {
+        if (data.hasAccess && data.userLinked) {
           toast.success(`Welcome, ${data.patreonName}! Your Patron benefits are now active.`);
           navigate("/dashboard");
+        } else if (data.hasAccess && !data.userLinked) {
+          toast.info(`Great news, ${data.patreonName}! You're an active patron. Please sign up or log in with the email ${data.patreonEmail} to activate your benefits.`, { duration: 8000 });
+          navigate("/auth");
+        } else if (data.isActivePatron && !data.meetsMinimumPledge) {
+          const currentPledge = (data.entitledCents / 100).toFixed(2);
+          const minimumPledge = (data.minimumPledgeCents / 100).toFixed(2);
+          toast.info(`Thanks for your support, ${data.patreonName}! Your current pledge is $${currentPledge}/month. Upgrade to $${minimumPledge}/month on Patreon to unlock full app access.`);
+          navigate("/pricing");
         } else {
-          toast.info("Connected to Patreon, but no active patronage found. Consider becoming a Patron for full access!");
-          navigate("/auth?patreon=true");
+          toast.info("Connected to Patreon, but no active patronage found. Become a Patron at $15/month for full access!");
+          navigate("/pricing");
         }
       } catch (err) {
         console.error("Patreon callback error:", err);
-        // Clear the processed code on error so user can retry
+        // Clear guards on error so user can retry
         sessionStorage.removeItem("patreon_processed_code");
+        processedRef.current = false;
         toast.error("Failed to connect Patreon account. Please try again.");
         navigate("/auth?patreon=true");
       } finally {
@@ -81,7 +97,7 @@ export default function PatreonCallback() {
     };
 
     handleCallback();
-  }, [searchParams, user, navigate]);
+  }, [searchParams, user, loading, navigate]);
 
   return <LoadingScreen message="Connecting your Patreon account..." />;
 }

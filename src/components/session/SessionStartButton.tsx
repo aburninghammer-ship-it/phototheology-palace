@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSessionMode } from '@/contexts/SessionModeContext';
 import { Button } from '@/components/ui/button';
 import { BookOpen, Loader2 } from 'lucide-react';
@@ -21,6 +22,7 @@ import {
 } from '@/components/ui/tooltip';
 
 export function SessionStartButton() {
+  const { t } = useTranslation();
   const { isSessionActive, startSession, isLoading } = useSessionMode();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
@@ -39,18 +41,18 @@ export function SessionStartButton() {
         <Tooltip>
           <TooltipTrigger asChild>
             <DialogTrigger asChild>
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 className="gap-2"
               >
                 <BookOpen className="h-4 w-4" />
-                <span className="hidden sm:inline">Start Session</span>
+                <span className="hidden sm:inline">{t('session.startSession')}</span>
               </Button>
             </DialogTrigger>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Start a study session to track your entire journey</p>
+            <p>{t('session.tooltip')}</p>
           </TooltipContent>
         </Tooltip>
 
@@ -58,20 +60,19 @@ export function SessionStartButton() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-primary" />
-              Start New Session
+              {t('session.startNew')}
             </DialogTitle>
             <DialogDescription>
-              Session Mode captures your entire study journey — every verse, PT room, 
-              Jeeves analysis, and note. You can save, resume, export, or share it later.
+              {t('session.description')}
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="new-session-title">Session Title</Label>
+              <Label htmlFor="new-session-title">{t('session.titleLabel')}</Label>
               <Input
                 id="new-session-title"
-                placeholder="e.g., Daniel 2 Prophecy Study"
+                placeholder={t('session.titlePlaceholder')}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleStart()}
@@ -81,16 +82,16 @@ export function SessionStartButton() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>
-              Cancel
+              {t('session.cancel')}
             </Button>
             <Button onClick={handleStart} disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Starting...
+                  {t('session.starting')}
                 </>
               ) : (
-                'Start Session'
+                t('session.startSession')
               )}
             </Button>
           </DialogFooter>

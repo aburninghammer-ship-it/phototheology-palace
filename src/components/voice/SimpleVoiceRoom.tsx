@@ -33,11 +33,30 @@ export function SimpleVoiceRoom({ roomId, userId, userName, roomName, className 
   const audioElementsRef = useRef<Map<string, HTMLAudioElement>>(new Map());
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
+  const pendingIceCandidatesRef = useRef<Map<string, RTCIceCandidateInit[]>>(new Map());
+
   const iceConfig: RTCConfiguration = {
     iceServers: [
       { urls: "stun:stun.l.google.com:19302" },
       { urls: "stun:stun1.l.google.com:19302" },
+      // Free TURN servers for NAT traversal
+      {
+        urls: "turn:openrelay.metered.ca:80",
+        username: "openrelayproject",
+        credential: "openrelayproject",
+      },
+      {
+        urls: "turn:openrelay.metered.ca:443",
+        username: "openrelayproject",
+        credential: "openrelayproject",
+      },
+      {
+        urls: "turn:openrelay.metered.ca:443?transport=tcp",
+        username: "openrelayproject",
+        credential: "openrelayproject",
+      },
     ],
+    iceTransportPolicy: "all",
   };
 
   const cleanup = useCallback(() => {
@@ -177,6 +196,14 @@ export function SimpleVoiceRoom({ roomId, userId, userName, roomName, className 
     peerConnectionsRef.current.set(payload.from, pc);
 
     await pc.setRemoteDescription({ type: payload.type, sdp: payload.sdp });
+    
+    // Flush any pending ICE candidates
+    const pending = pendingIceCandidatesRef.current.get(payload.from) || [];
+    for (const candidate of pending) {
+      await pc.addIceCandidate(new RTCIceCandidate(candidate));
+    }
+    pendingIceCandidatesRef.current.delete(payload.from);
+    
     const answer = await pc.createAnswer();
     await pc.setLocalDescription(answer);
 
@@ -199,6 +226,13 @@ export function SimpleVoiceRoom({ roomId, userId, userName, roomName, className 
     const pc = peerConnectionsRef.current.get(payload.from);
     if (pc && !pc.currentRemoteDescription) {
       await pc.setRemoteDescription({ type: payload.type, sdp: payload.sdp });
+      
+      // Flush any pending ICE candidates
+      const pending = pendingIceCandidatesRef.current.get(payload.from) || [];
+      for (const candidate of pending) {
+        await pc.addIceCandidate(new RTCIceCandidate(candidate));
+      }
+      pendingIceCandidatesRef.current.delete(payload.from);
     }
   }, [userId]);
 
@@ -208,6 +242,11 @@ export function SimpleVoiceRoom({ roomId, userId, userName, roomName, className 
     const pc = peerConnectionsRef.current.get(payload.from);
     if (pc && pc.remoteDescription) {
       await pc.addIceCandidate(new RTCIceCandidate(payload.candidate));
+    } else {
+      // Queue ICE candidates until remote description is set
+      const pending = pendingIceCandidatesRef.current.get(payload.from) || [];
+      pending.push(payload.candidate);
+      pendingIceCandidatesRef.current.set(payload.from, pending);
     }
   }, [userId]);
 

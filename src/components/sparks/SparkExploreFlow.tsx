@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowRight, BookOpen, PenLine, Layers, Bookmark, Check, Loader2 } from 'lucide-react';
+import { X, ArrowRight, BookOpen, PenLine, Layers, Bookmark, Check, Loader2, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Spark } from '@/hooks/useSparks';
+import { DraggableSparkOverlay } from './DraggableSparkOverlay';
 
 interface SparkExploreFlowProps {
   spark: Spark;
@@ -134,15 +135,16 @@ export function SparkExploreFlow({ spark, isOpen, onClose, onSave }: SparkExplor
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-background/60 backdrop-blur-md z-50 flex items-end md:items-center justify-center"
+        className="fixed inset-0 bg-background/60 backdrop-blur-md z-50"
         onClick={onClose}
-      >
+      />
+      <DraggableSparkOverlay>
         <motion.div
           initial={{ scale: 0.95, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0, y: 20 }}
           onClick={e => e.stopPropagation()}
-          className="w-full md:w-auto relative"
+          className="w-full relative"
         >
           {/* Outer glow */}
           <div className="absolute -inset-2 rounded-3xl blur-2xl opacity-40 bg-gradient-to-br from-primary/40 via-purple-500/30 to-orange-500/20 pointer-events-none" />
@@ -303,7 +305,7 @@ export function SparkExploreFlow({ spark, isOpen, onClose, onSave }: SparkExplor
             </CardContent>
           </Card>
         </motion.div>
-      </motion.div>
+      </DraggableSparkOverlay>
     </AnimatePresence>
   );
 }

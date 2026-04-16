@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { LEADERBOARD_TOUR } from "@/data/guidedTours";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -7,9 +9,11 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Trophy, Medal, Award, Target, Building2, Flame, Calendar, Crown, Star } from "lucide-react";
+import { Trophy, Medal, Award, Target, Building2, Flame, Calendar, Crown, Star, GraduationCap } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const Leaderboard = () => {
+  const { t } = useTranslation();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [leaders, setLeaders] = useState<any[]>([]);
@@ -21,6 +25,7 @@ const Leaderboard = () => {
   const [viewMode, setViewMode] = useState<'general' | 'categories'>('general');
   const [categoryLeaders, setCategoryLeaders] = useState<Record<string, any[]>>({});
   const [isInTop100, setIsInTop100] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -34,12 +39,19 @@ const Leaderboard = () => {
   }, [user, sortBy, timePeriod, viewMode]);
 
   const fetchUserStats = async () => {
-    // Get user profile data
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("points, daily_study_streak")
-      .eq("id", user!.id)
-      .single();
+    // Get real XP from global_master_titles (actively updated by all activities)
+    const { data: masterTitle } = await (supabase as any)
+      .from("global_master_titles")
+      .select("total_xp")
+      .eq("user_id", user!.id)
+      .maybeSingle();
+
+    // Get real streak from mastery_streaks (actively updated)
+    const { data: streak } = await (supabase as any)
+      .from("mastery_streaks")
+      .select("current_streak")
+      .eq("user_id", user!.id)
+      .maybeSingle();
 
     // Get challenges completed
     const { data: challenges } = await supabase
@@ -60,30 +72,31 @@ const Leaderboard = () => {
       .eq("user_id", user!.id)
       .not("completed_at", "is", null);
 
+    const userXp = masterTitle?.total_xp || 0;
+
     setUserStats({
-      points: profile?.points || 0,
+      points: userXp,
       challenges: challenges?.length || 0,
       achievements: achievements?.length || 0,
       rooms: rooms?.length || 0,
-      streak: profile?.daily_study_streak || 0,
+      streak: streak?.current_streak || 0,
     });
 
-    // Calculate user rank based on current sort and time period
-    const { data: allProfiles } = await supabase
-      .from("profiles")
-      .select("id, points")
-      .order("points", { ascending: false });
+    // Calculate user rank from global_master_titles (real XP source)
+    const { data: allXp } = await (supabase as any)
+      .from("global_master_titles")
+      .select("user_id, total_xp")
+      .order("total_xp", { ascending: false });
 
-    const rank = allProfiles?.findIndex(p => p.id === user!.id) ?? -1;
+    const rank = allXp?.findIndex((r: any) => r.user_id === user!.id) ?? -1;
     const userPosition = rank + 1;
     setUserRank(userPosition);
-    
+
     // Check if user is in top 100 but not in top 50
     setIsInTop100(userPosition > 50 && userPosition <= 100);
   };
 
   const fetchLeaders = async () => {
-    let query = supabase.from("profiles");
     let leaderData: any[] = [];
 
     // Apply time period filter
@@ -97,81 +110,177 @@ const Leaderboard = () => {
     }
 
     if (sortBy === 'points') {
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, username, display_name, points, level, daily_study_streak")
-        .order("points", { ascending: false })
+      // Use global_master_titles for real XP (actively updated by all activities)
+      const { data: xpData } = await (supabase as any)
+        .from("global_master_titles")
+        .select("user_id, total_xp")
+        .order("total_xp", { ascending: false })
         .limit(50);
-      
-      leaderData = data || [];
+
+      if (xpData && xpData.length > 0) {
+        const userIds = xpData.map((r: any) => r.user_id);
+        const xpMap: Record<string, number> = {};
+        xpData.forEach((r: any) => { xpMap[r.user_id] = r.total_xp; });
+
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, username, display_name, level")
+          .in("id", userIds);
+
+        // Get streaks for display
+        const { data: streaks } = await (supabase as any)
+          .from("mastery_streaks")
+          .select("user_id, current_streak")
+          .in("user_id", userIds);
+        const streakMap: Record<string, number> = {};
+        (streaks || []).forEach((s: any) => { streakMap[s.user_id] = s.current_streak; });
+
+        leaderData = (profiles || []).map(p => ({
+          ...p,
+          points: xpMap[p.id] || 0,
+          daily_study_streak: streakMap[p.id] || 0,
+        })).sort((a, b) => b.points - a.points);
+      }
     } else if (sortBy === 'challenges') {
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, username, display_name, points, level, daily_study_streak");
+      // Use aggregation approach: get challenge counts grouped by user
+      let submissionsQuery = supabase
+        .from("challenge_submissions")
+        .select("user_id");
+      
+      if (dateFilter) {
+        submissionsQuery = submissionsQuery.gte("created_at", dateFilter.toISOString());
+      }
+      
+      const { data: submissions } = await submissionsQuery;
+      
+      if (submissions) {
+        // Count submissions per user
+        const userCounts: Record<string, number> = {};
+        submissions.forEach(s => {
+          userCounts[s.user_id] = (userCounts[s.user_id] || 0) + 1;
+        });
+        
+        // Get top 50 user IDs by count
+        const topUserIds = Object.entries(userCounts)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 50)
+          .map(([id]) => id);
+        
+        if (topUserIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from("profiles")
+            .select("id, username, display_name, level")
+            .in("id", topUserIds);
 
-      if (profiles) {
-        const leadersWithChallenges = await Promise.all(
-          profiles.map(async (profile) => {
-            let submissionsQuery = supabase
-              .from("challenge_submissions")
-              .select("id")
-              .eq("user_id", profile.id);
-            
-            if (dateFilter) {
-              submissionsQuery = submissionsQuery.gte("created_at", dateFilter.toISOString());
-            }
-            
-            const { data: submissions } = await submissionsQuery;
-            
-            return {
-              ...profile,
-              challengeCount: submissions?.length || 0
-            };
-          })
-        );
+          // Get real XP and streaks
+          const { data: xpData } = await (supabase as any)
+            .from("global_master_titles")
+            .select("user_id, total_xp")
+            .in("user_id", topUserIds);
+          const xpMap: Record<string, number> = {};
+          (xpData || []).forEach((r: any) => { xpMap[r.user_id] = r.total_xp; });
 
-        leaderData = leadersWithChallenges
-          .sort((a, b) => b.challengeCount - a.challengeCount)
-          .slice(0, 50);
+          const { data: streaks } = await (supabase as any)
+            .from("mastery_streaks")
+            .select("user_id, current_streak")
+            .in("user_id", topUserIds);
+          const streakMap: Record<string, number> = {};
+          (streaks || []).forEach((s: any) => { streakMap[s.user_id] = s.current_streak; });
+
+          leaderData = (profiles || []).map(p => ({
+            ...p,
+            points: xpMap[p.id] || 0,
+            daily_study_streak: streakMap[p.id] || 0,
+            challengeCount: userCounts[p.id] || 0,
+          })).sort((a, b) => b.challengeCount - a.challengeCount);
+        }
       }
     } else if (sortBy === 'studies') {
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, username, display_name, points, level, daily_study_streak")
-        .order("daily_study_streak", { ascending: false })
+      // Use mastery_streaks for real streak data (actively updated)
+      const { data: streakData } = await (supabase as any)
+        .from("mastery_streaks")
+        .select("user_id, current_streak")
+        .order("current_streak", { ascending: false })
         .limit(50);
-      
-      leaderData = data || [];
+
+      if (streakData && streakData.length > 0) {
+        const userIds = streakData.map((s: any) => s.user_id);
+        const streakMap: Record<string, number> = {};
+        streakData.forEach((s: any) => { streakMap[s.user_id] = s.current_streak; });
+
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, username, display_name, level")
+          .in("id", userIds);
+
+        // Get XP for display
+        const { data: xpData } = await (supabase as any)
+          .from("global_master_titles")
+          .select("user_id, total_xp")
+          .in("user_id", userIds);
+        const xpMap: Record<string, number> = {};
+        (xpData || []).forEach((r: any) => { xpMap[r.user_id] = r.total_xp; });
+
+        leaderData = (profiles || []).map(p => ({
+          ...p,
+          points: xpMap[p.id] || 0,
+          daily_study_streak: streakMap[p.id] || 0,
+        })).sort((a, b) => (streakMap[b.id] || 0) - (streakMap[a.id] || 0));
+      }
     } else if (sortBy === 'rooms') {
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, username, display_name, points, level, daily_study_streak");
+      // Use aggregation approach: get room completions grouped by user
+      let roomsQuery = supabase
+        .from("room_progress")
+        .select("user_id")
+        .not("completed_at", "is", null);
+      
+      if (dateFilter) {
+        roomsQuery = roomsQuery.gte("completed_at", dateFilter.toISOString());
+      }
+      
+      const { data: rooms } = await roomsQuery;
+      
+      if (rooms) {
+        // Count rooms per user
+        const userCounts: Record<string, number> = {};
+        rooms.forEach(r => {
+          userCounts[r.user_id] = (userCounts[r.user_id] || 0) + 1;
+        });
+        
+        // Get top 50 user IDs by count
+        const topUserIds = Object.entries(userCounts)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 50)
+          .map(([id]) => id);
+        
+        if (topUserIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from("profiles")
+            .select("id, username, display_name, level")
+            .in("id", topUserIds);
 
-      if (profiles) {
-        const leadersWithRooms = await Promise.all(
-          profiles.map(async (profile) => {
-            let roomsQuery = supabase
-              .from("room_progress")
-              .select("id")
-              .eq("user_id", profile.id)
-              .not("completed_at", "is", null);
-            
-            if (dateFilter) {
-              roomsQuery = roomsQuery.gte("completed_at", dateFilter.toISOString());
-            }
-            
-            const { data: rooms } = await roomsQuery;
-            
-            return {
-              ...profile,
-              roomsCount: rooms?.length || 0
-            };
-          })
-        );
+          // Get real XP and streaks
+          const { data: xpData } = await (supabase as any)
+            .from("global_master_titles")
+            .select("user_id, total_xp")
+            .in("user_id", topUserIds);
+          const xpMap: Record<string, number> = {};
+          (xpData || []).forEach((r: any) => { xpMap[r.user_id] = r.total_xp; });
 
-        leaderData = leadersWithRooms
-          .sort((a, b) => b.roomsCount - a.roomsCount)
-          .slice(0, 50);
+          const { data: streaks } = await (supabase as any)
+            .from("mastery_streaks")
+            .select("user_id, current_streak")
+            .in("user_id", topUserIds);
+          const streakMap: Record<string, number> = {};
+          (streaks || []).forEach((s: any) => { streakMap[s.user_id] = s.current_streak; });
+
+          leaderData = (profiles || []).map(p => ({
+            ...p,
+            points: xpMap[p.id] || 0,
+            daily_study_streak: streakMap[p.id] || 0,
+            roomsCount: userCounts[p.id] || 0,
+          })).sort((a, b) => b.roomsCount - a.roomsCount);
+        }
       }
     }
 
@@ -255,6 +364,7 @@ const Leaderboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={LEADERBOARD_TOUR} onClose={() => setTourOpen(false)} />}
       
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-700 text-white py-12 px-4">
@@ -262,9 +372,12 @@ const Leaderboard = () => {
           <div className="flex items-center gap-4 mb-6">
             <Trophy className="h-16 w-16" />
             <div>
-              <h1 className="text-5xl font-bold">Leaderboard</h1>
-              <p className="text-purple-200 text-lg">Top Phototheology scholars</p>
+              <h1 className="text-5xl font-bold">{t('leaderboard.title')}</h1>
+              <p className="text-purple-200 text-lg">{t('leaderboard.subtitle')}</p>
             </div>
+            <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="bg-white/10 border-white/20 text-white hover:bg-white/20 gap-1">
+              <GraduationCap className="h-4 w-4" /> Tour
+            </Button>
           </div>
 
           {/* Stats Cards */}
@@ -273,7 +386,7 @@ const Leaderboard = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-white/90 text-sm font-normal flex items-center gap-2">
                   <Crown className="h-4 w-4" />
-                  Your Rank
+                  {t('leaderboard.yourStats.rank')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -285,7 +398,7 @@ const Leaderboard = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-white/90 text-sm font-normal flex items-center gap-2">
                   <Award className="h-4 w-4" />
-                  Points
+                  {t('leaderboard.yourStats.points')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -297,7 +410,7 @@ const Leaderboard = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-white/90 text-sm font-normal flex items-center gap-2">
                   <Building2 className="h-4 w-4" />
-                  Rooms
+                  {t('leaderboard.yourStats.rooms')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -309,7 +422,7 @@ const Leaderboard = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-white/90 text-sm font-normal flex items-center gap-2">
                   <Flame className="h-4 w-4" />
-                  Streak
+                  {t('leaderboard.yourStats.streak')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -321,7 +434,7 @@ const Leaderboard = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-white/90 text-sm font-normal flex items-center gap-2">
                   <Trophy className="h-4 w-4" />
-                  Badges
+                  {t('leaderboard.yourStats.badges')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -344,11 +457,10 @@ const Leaderboard = () => {
                   </div>
                   <div className="flex-1">
                     <h3 className="text-lg font-bold text-amber-800 dark:text-amber-200">
-                      You're in the Top 100! 🔥
+                      {t('leaderboard.top100.title')}
                     </h3>
                     <p className="text-amber-700 dark:text-amber-300">
-                      You're currently ranked <span className="font-bold">#{userRank}</span>. 
-                      Keep pushing — just a little more effort and you'll make it to the <span className="font-bold">Top 50 Board</span>!
+                      {t('leaderboard.top100.description', { rank: userRank })}
                     </p>
                   </div>
                 </div>
@@ -360,8 +472,8 @@ const Leaderboard = () => {
           <div className="flex justify-center mb-6">
             <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as any)} className="w-full max-w-md">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="general">General Rankings</TabsTrigger>
-                <TabsTrigger value="categories">Category Leaders</TabsTrigger>
+                <TabsTrigger value="general">{t('leaderboard.viewModes.general')}</TabsTrigger>
+                <TabsTrigger value="categories">{t('leaderboard.viewModes.categories')}</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
@@ -374,16 +486,16 @@ const Leaderboard = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Calendar className="h-5 w-5" />
-                  Time Period
+                  {t('leaderboard.filters.timePeriod')}
                 </CardTitle>
-                <CardDescription>Filter leaderboard by time range</CardDescription>
+                <CardDescription>{t('leaderboard.filters.timePeriodDescription')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <Tabs value={timePeriod} onValueChange={(v) => setTimePeriod(v as any)}>
                   <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="weekly">Weekly</TabsTrigger>
-                    <TabsTrigger value="monthly">Monthly</TabsTrigger>
-                    <TabsTrigger value="all">All Time</TabsTrigger>
+                    <TabsTrigger value="weekly">{t('leaderboard.filters.weekly')}</TabsTrigger>
+                    <TabsTrigger value="monthly">{t('leaderboard.filters.monthly')}</TabsTrigger>
+                    <TabsTrigger value="all">{t('leaderboard.filters.allTime')}</TabsTrigger>
                   </TabsList>
                 </Tabs>
               </CardContent>
@@ -393,9 +505,9 @@ const Leaderboard = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Target className="h-5 w-5" />
-                  Sort By Metric
+                  {t('leaderboard.filters.sortByMetric')}
                 </CardTitle>
-                <CardDescription>Choose ranking criteria</CardDescription>
+                <CardDescription>{t('leaderboard.filters.chooseRanking')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-2">
@@ -405,7 +517,7 @@ const Leaderboard = () => {
                     className="flex items-center gap-2 justify-start"
                   >
                     <Award className="h-4 w-4" />
-                    Points
+                    {t('leaderboard.metrics.points')}
                   </Button>
                   <Button
                     variant={sortBy === 'rooms' ? 'default' : 'outline'}
@@ -413,7 +525,7 @@ const Leaderboard = () => {
                     className="flex items-center gap-2 justify-start"
                   >
                     <Building2 className="h-4 w-4" />
-                    Rooms
+                    {t('leaderboard.metrics.rooms')}
                   </Button>
                   <Button
                     variant={sortBy === 'studies' ? 'default' : 'outline'}
@@ -421,7 +533,7 @@ const Leaderboard = () => {
                     className="flex items-center gap-2 justify-start"
                   >
                     <Flame className="h-4 w-4" />
-                    Streak
+                    {t('leaderboard.metrics.streak')}
                   </Button>
                   <Button
                     variant={sortBy === 'challenges' ? 'default' : 'outline'}
@@ -429,7 +541,7 @@ const Leaderboard = () => {
                     className="flex items-center gap-2 justify-start"
                   >
                     <Target className="h-4 w-4" />
-                    Challenges
+                    {t('leaderboard.metrics.challenges')}
                   </Button>
                 </div>
               </CardContent>
@@ -440,11 +552,11 @@ const Leaderboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Trophy className="h-5 w-5" />
-                Top Achievers
+                {t('leaderboard.topAchievers')}
               </CardTitle>
               <CardDescription>
-                {timePeriod === 'weekly' ? 'This Week' : timePeriod === 'monthly' ? 'This Month' : 'All Time'} • 
-                Sorted by {sortBy === 'points' ? 'Points' : sortBy === 'rooms' ? 'Rooms Completed' : sortBy === 'studies' ? 'Study Streak' : 'Challenges'}
+                {timePeriod === 'weekly' ? t('leaderboard.filters.thisWeek') : timePeriod === 'monthly' ? t('leaderboard.filters.thisMonth') : t('leaderboard.filters.allTime')} {' \u2022 '}
+                {t('leaderboard.sortedBy')} {sortBy === 'points' ? t('leaderboard.metrics.points') : sortBy === 'rooms' ? t('leaderboard.metrics.roomsCompleted') : sortBy === 'studies' ? t('leaderboard.metrics.studyStreak') : t('leaderboard.metrics.challenges')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -486,17 +598,17 @@ const Leaderboard = () => {
                                 {leader.display_name || leader.username}
                               </p>
                               {isCurrentUser && (
-                                <Badge className="bg-purple-600 hover:bg-purple-700">You</Badge>
+                                <Badge className="bg-purple-600 hover:bg-purple-700">{t('leaderboard.you')}</Badge>
                               )}
                             </div>
                             <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
                               <span className="flex items-center gap-1">
                                 <Award className="h-3.5 w-3.5" />
-                                Level {leader.level}
+                                {t('leaderboard.level', { level: leader.level })}
                               </span>
                               <span className="flex items-center gap-1">
                                 <Flame className="h-3.5 w-3.5" />
-                                {leader.daily_study_streak || 0} day streak
+                                {t('leaderboard.dayStreak', { count: leader.daily_study_streak || 0 })}
                               </span>
                             </div>
                           </div>
@@ -507,7 +619,7 @@ const Leaderboard = () => {
                                 <p className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                                   {leader.points?.toLocaleString() || 0}
                                 </p>
-                                <p className="text-xs text-muted-foreground">points</p>
+                                <p className="text-xs text-muted-foreground">{t('leaderboard.metrics.points')}</p>
                               </>
                             )}
                             {sortBy === 'challenges' && (
@@ -515,7 +627,7 @@ const Leaderboard = () => {
                                 <p className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                                   {(leader.challengeCount || 0).toLocaleString()}
                                 </p>
-                                <p className="text-xs text-muted-foreground">challenges</p>
+                                <p className="text-xs text-muted-foreground">{t('leaderboard.metrics.challenges')}</p>
                               </>
                             )}
                             {sortBy === 'studies' && (
@@ -523,7 +635,7 @@ const Leaderboard = () => {
                                 <p className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
                                   {leader.daily_study_streak || 0}
                                 </p>
-                                <p className="text-xs text-muted-foreground">day streak</p>
+                                <p className="text-xs text-muted-foreground">{t('leaderboard.metrics.dayStreak')}</p>
                               </>
                             )}
                             {sortBy === 'rooms' && (
@@ -531,7 +643,7 @@ const Leaderboard = () => {
                                 <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                                   {(leader.roomsCount || 0).toLocaleString()}
                                 </p>
-                                <p className="text-xs text-muted-foreground">rooms</p>
+                                <p className="text-xs text-muted-foreground">{t('leaderboard.metrics.rooms')}</p>
                               </>
                             )}
                           </div>
@@ -568,11 +680,11 @@ const Leaderboard = () => {
             <div className="space-y-8">
               {Object.entries(categoryLeaders).map(([category, users]) => {
                 const categoryConfig = {
-                  explorer: { icon: Target, color: 'from-blue-500 to-cyan-500', title: 'Top Explorers' },
-                  scholar: { icon: Award, color: 'from-purple-500 to-indigo-500', title: 'Top Scholars' },
-                  perfectionist: { icon: Star, color: 'from-green-500 to-emerald-500', title: 'Top Perfectionists' },
-                  dedicated: { icon: Flame, color: 'from-orange-500 to-red-500', title: 'Most Dedicated' },
-                  master: { icon: Crown, color: 'from-yellow-500 to-amber-500', title: 'Masters' }
+                  explorer: { icon: Target, color: 'from-blue-500 to-cyan-500', title: t('leaderboard.categories.topExplorers') },
+                  scholar: { icon: Award, color: 'from-purple-500 to-indigo-500', title: t('leaderboard.categories.topScholars') },
+                  perfectionist: { icon: Star, color: 'from-green-500 to-emerald-500', title: t('leaderboard.categories.topPerfectionists') },
+                  dedicated: { icon: Flame, color: 'from-orange-500 to-red-500', title: t('leaderboard.categories.mostDedicated') },
+                  master: { icon: Crown, color: 'from-yellow-500 to-amber-500', title: t('leaderboard.categories.masters') }
                 }[category];
 
                 if (!categoryConfig) return null;
@@ -587,7 +699,7 @@ const Leaderboard = () => {
                         </div>
                         <div>
                           <CardTitle>{categoryConfig.title}</CardTitle>
-                          <CardDescription>Top achievers in {category}</CardDescription>
+                          <CardDescription>{t('leaderboard.categories.topAchieversIn', { category })}</CardDescription>
                         </div>
                       </div>
                     </CardHeader>
@@ -595,7 +707,7 @@ const Leaderboard = () => {
                       <div className="space-y-2">
                         {users.length === 0 ? (
                           <p className="text-sm text-muted-foreground text-center py-8">
-                            No users in this category yet
+                            {t('leaderboard.categories.noUsers')}
                           </p>
                         ) : (
                           users.map((leader: any, idx: number) => (
@@ -622,17 +734,17 @@ const Leaderboard = () => {
                                 <div>
                                   <p className="font-semibold">{leader.display_name || leader.username}</p>
                                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <Badge variant="secondary">Level {leader.level || 1}</Badge>
+                                    <Badge variant="secondary">{t('leaderboard.level', { level: leader.level || 1 })}</Badge>
                                     <span className="flex items-center gap-1">
                                       <Flame className="h-3 w-3" />
-                                      {leader.daily_study_streak || 0} day streak
+                                      {t('leaderboard.dayStreak', { count: leader.daily_study_streak || 0 })}
                                     </span>
                                   </div>
                                 </div>
                               </div>
                               <div className="text-right">
                                 <p className="text-lg font-bold">{leader.count}</p>
-                                <p className="text-xs text-muted-foreground">achievements</p>
+                                <p className="text-xs text-muted-foreground">{t('leaderboard.metrics.achievements')}</p>
                               </div>
                             </div>
                           ))

@@ -31,7 +31,28 @@ export function useTrialStatus() {
     }
 
     const checkTrial = async () => {
-      // First check if user has lifetime or active paid subscription in profiles
+      // First do a direct Stripe check to see if they have an active subscription
+      try {
+        const { data: stripeCheck } = await supabase.functions.invoke('check-stripe-subscription');
+        if (stripeCheck?.subscribed) {
+          // User has active Stripe subscription - NOT on trial
+          setStatus({
+            isOnTrial: false,
+            daysLeft: 0,
+            hoursLeft: 0,
+            isExpired: false,
+            isExpiringSoon: false,
+            trialEndsAt: null,
+          });
+          setLoading(false);
+          return;
+        }
+      } catch (e) {
+        // Continue with database check if Stripe check fails
+        console.debug('[useTrialStatus] Stripe check failed, using DB', e);
+      }
+
+      // Fallback: check profile for lifetime or active paid subscription
       const { data: profile } = await supabase
         .from('profiles')
         .select('has_lifetime_access, subscription_status, subscription_tier')
@@ -41,6 +62,23 @@ export function useTrialStatus() {
       // Users with lifetime access or active paid subscriptions are NOT on trial
       if (profile?.has_lifetime_access || 
           (profile?.subscription_status === 'active' && profile?.subscription_tier)) {
+        setStatus({
+          isOnTrial: false,
+          daysLeft: 0,
+          hoursLeft: 0,
+          isExpired: false,
+          isExpiringSoon: false,
+          trialEndsAt: null,
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Check church membership — church members are NOT on trial
+      const { data: churchAccess } = await supabase
+        .rpc('has_church_access', { _user_id: user.id });
+
+      if (churchAccess && churchAccess.length > 0 && churchAccess[0].has_access) {
         setStatus({
           isOnTrial: false,
           daysLeft: 0,

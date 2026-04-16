@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Room } from "@/data/palaceData";
@@ -5,6 +6,8 @@ import { Sparkles, BookOpen, Target, Lightbulb, Lock } from "lucide-react";
 import { JeevesAssistant } from "@/components/JeevesAssistant";
 import { useRoomUnlock } from "@/hooks/useRoomUnlock";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { RoomDemoAudio } from "@/components/audio/RoomDemoAudio";
+import { palaceFloors } from "@/data/palaceData";
 
 interface RoomCardProps {
   room: Room;
@@ -23,11 +26,12 @@ const roomGradients = [
 ];
 
 export const RoomCard = ({ room, floorNumber }: RoomCardProps) => {
+  const { t } = useTranslation();
   const gradients = roomGradients[floorNumber - 1] || ["gradient-palace"];
   const roomIndex = room.id.charCodeAt(0) % gradients.length;
   const gradient = gradients[roomIndex];
   const { isUnlocked, loading, missingPrerequisites } = useRoomUnlock(floorNumber, room.id);
-  
+
   return (
     <div className="grid lg:grid-cols-3 gap-6">
       {/* Room Details */}
@@ -36,7 +40,7 @@ export const RoomCard = ({ room, floorNumber }: RoomCardProps) => {
           <Alert className="mb-4 border-destructive/50 bg-destructive/10">
             <Lock className="h-4 w-4" />
             <AlertDescription>
-              <strong>Room Locked:</strong> Complete these rooms first:
+              <strong>{t('roomCard.locked')}:</strong> {t('roomCard.completeFirst')}
               <ul className="list-disc list-inside mt-2">
                 {missingPrerequisites.map((prereq, idx) => (
                   <li key={idx}>{prereq}</li>
@@ -45,7 +49,7 @@ export const RoomCard = ({ room, floorNumber }: RoomCardProps) => {
             </AlertDescription>
           </Alert>
         )}
-        
+
         <Card className={`hover-lift group border-2 hover:border-primary overflow-hidden animate-scale-in bg-gradient-to-br from-card to-muted/20 ${!isUnlocked ? 'opacity-60' : ''}`}>
           <div className={`h-2 ${gradient}`} />
           <CardHeader>
@@ -70,32 +74,29 @@ export const RoomCard = ({ room, floorNumber }: RoomCardProps) => {
               {room.coreQuestion}
             </CardDescription>
           </CardHeader>
-          
+
           <CardContent className="space-y-4">
-            {/* Purpose Section */}
             <div className="p-4 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl border border-primary/20">
               <div className="flex items-center gap-2 mb-2">
                 <Target className="h-4 w-4 text-primary" />
-                <h4 className="font-bold text-sm text-foreground">Purpose</h4>
+                <h4 className="font-bold text-sm text-foreground">{t('roomCard.purpose')}</h4>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">{room.purpose}</p>
             </div>
-            
-            {/* Method Section */}
+
             <div className="p-4 bg-gradient-to-r from-accent/5 to-palace-orange/5 rounded-xl border border-accent/20">
               <div className="flex items-center gap-2 mb-2">
                 <Lightbulb className="h-4 w-4 text-accent" />
-                <h4 className="font-bold text-sm text-foreground">Method</h4>
+                <h4 className="font-bold text-sm text-foreground">{t('roomCard.method')}</h4>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">{room.method}</p>
             </div>
-            
-            {/* Examples Section */}
+
             {room.examples.length > 0 && (
               <div className="space-y-2">
                 <h4 className="font-bold text-sm text-foreground flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-primary" />
-                  Examples
+                  {t('roomCard.examples')}
                 </h4>
                 <div className="space-y-2">
                   {room.examples.slice(0, 2).map((example, idx) => (
@@ -104,7 +105,7 @@ export const RoomCard = ({ room, floorNumber }: RoomCardProps) => {
                       className="p-3 rounded-lg bg-muted/30 border border-border/50 hover:bg-muted/50 transition-all"
                     >
                       <p className="text-sm text-muted-foreground flex gap-2">
-                        <span className="text-primary font-bold text-base">→</span>
+                        <span className="text-primary font-bold text-base">{'\u2192'}</span>
                         <span className="flex-1">{example}</span>
                       </p>
                     </div>
@@ -112,23 +113,32 @@ export const RoomCard = ({ room, floorNumber }: RoomCardProps) => {
                 </div>
               </div>
             )}
-            
-            {/* Deliverable Section */}
-            <div className="pt-4 border-t-2 border-border/30">
+
+            <div className="pt-4 border-t-2 border-border/30 space-y-3">
               <div className="flex items-start gap-2">
                 <Badge variant="outline" className="text-xs font-semibold">
-                  Deliverable
+                  {t('roomCard.deliverable')}
                 </Badge>
                 <p className="text-xs text-muted-foreground flex-1">
                   {room.deliverable}
                 </p>
               </div>
+
+              {isUnlocked && (
+                <RoomDemoAudio
+                  roomId={room.id}
+                  roomName={room.name}
+                  roomPurpose={room.purpose}
+                  roomMethod={room.method}
+                  floorNumber={floorNumber}
+                  floorName={palaceFloors.find(f => f.number === floorNumber)?.name || `Floor ${floorNumber}`}
+                />
+              )}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Jeeves Assistant for this room */}
       <div className="lg:col-span-1">
         {isUnlocked ? (
           <JeevesAssistant
@@ -143,10 +153,10 @@ export const RoomCard = ({ room, floorNumber }: RoomCardProps) => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Lock className="h-5 w-5" />
-                Locked
+                {t('roomCard.lockedLabel')}
               </CardTitle>
               <CardDescription>
-                Complete prerequisite rooms to unlock Jeeves for this room.
+                {t('roomCard.completePrerequisite')}
               </CardDescription>
             </CardHeader>
           </Card>

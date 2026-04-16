@@ -35,45 +35,98 @@ export const WeeklyLeaderboard = () => {
         dateFilter = monthAgo.toISOString();
       }
 
-      // Get activity counts for users with timeframe filter
-      let query = supabase
-        .from("challenge_submissions")
-        .select("user_id, created_at");
-      
-      if (dateFilter) {
-        query = query.gte("created_at", dateFilter);
-      }
+      // Get XP data from global_master_titles (the real XP source)
+      const { data: masterData } = await supabase
+        .from("global_master_titles")
+        .select("user_id, total_xp, current_floor, global_streak_days")
+        .gt("total_xp", 0)
+        .order("total_xp", { ascending: false })
+        .limit(20);
 
-      const { data: challenges } = await query;
+      if (!masterData || masterData.length === 0) {
+        // Fallback: try challenge_submissions
+        let query = supabase
+          .from("challenge_submissions")
+          .select("user_id, created_at");
+        if (dateFilter) {
+          query = query.gte("created_at", dateFilter);
+        }
+        const { data: challenges } = await query;
+        
+        if (!challenges || challenges.length === 0) {
+          setLeaderboard([]);
+          setUserRank(null);
+          return;
+        }
 
-      if (!challenges || challenges.length === 0) {
-        setLeaderboard([]);
-        setUserRank(null);
+        const userIds = [...new Set(challenges.map(c => c.user_id))];
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, display_name")
+          .in("id", userIds);
+        if (!profiles) return;
+
+        const scoreCounts: Record<string, number> = {};
+        challenges.forEach(c => {
+          scoreCounts[c.user_id] = (scoreCounts[c.user_id] || 0) + 50;
+        });
+
+        const entries: LeaderboardEntry[] = profiles
+          .map(p => ({
+            userId: p.id,
+            displayName: p.display_name || "Anonymous",
+            score: scoreCounts[p.id] || 0,
+            rank: 0,
+          }))
+          .filter(e => e.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 10)
+          .map((e, idx) => ({ ...e, rank: idx + 1 }));
+
+        setLeaderboard(entries);
+        if (user) {
+          const userEntry = entries.find(e => e.userId === user.id);
+          setUserRank(userEntry?.rank || null);
+        }
         return;
       }
 
-      // Get unique user IDs from submissions
-      const userIds = [...new Set(challenges.map(c => c.user_id))];
+      // Also add challenge submission XP for the timeframe
+      let challengeXP: Record<string, number> = {};
+      if (dateFilter) {
+        const { data: challenges } = await supabase
+          .from("challenge_submissions")
+          .select("user_id")
+          .gte("created_at", dateFilter);
+        if (challenges) {
+          challenges.forEach(c => {
+            challengeXP[c.user_id] = (challengeXP[c.user_id] || 0) + 50;
+          });
+        }
+      }
+
+      // Merge XP sources
+      const allUserIds = [...new Set([
+        ...masterData.map(m => m.user_id),
+        ...Object.keys(challengeXP),
+      ])];
 
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("id, display_name")
-        .in("id", userIds);
+        .select("id, display_name, daily_study_streak")
+        .in("id", allUserIds);
 
       if (!profiles) return;
 
-      // Count submissions per user
-      const scoreCounts: Record<string, number> = {};
-      challenges.forEach(c => {
-        scoreCounts[c.user_id] = (scoreCounts[c.user_id] || 0) + 50;
-      });
+      const masterXPMap: Record<string, number> = {};
+      masterData.forEach(m => { masterXPMap[m.user_id] = m.total_xp; });
 
-      // Build leaderboard
+      // Build leaderboard combining all XP sources
       const entries: LeaderboardEntry[] = profiles
         .map(p => ({
           userId: p.id,
           displayName: p.display_name || "Anonymous",
-          score: scoreCounts[p.id] || 0,
+          score: (masterXPMap[p.id] || 0) + (challengeXP[p.id] || 0),
           rank: 0,
         }))
         .filter(e => e.score > 0)

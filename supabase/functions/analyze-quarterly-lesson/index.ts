@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { getContentBehavioralEngine } from "../_shared/content-behavioral-engine.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -47,7 +48,14 @@ Format your response with clear sections and be specific about which rooms and p
         messages: [
           {
             role: 'system',
-            content: 'You are an expert in Adventist theology and the Phototheology Palace framework. Analyze Sabbath School lessons through the lens of the 37-room palace structure, connecting biblical principles to practical application.'
+            content: `You are an expert in Adventist theology and the Phototheology Palace framework. Analyze Sabbath School lessons through the lens of the 37-room palace structure, connecting biblical principles to practical application.
+
+⚠️ THEOLOGICAL GUARDRAILS (NON-NEGOTIABLE):
+- AZAZEL = SATAN, NOT CHRIST: Leviticus 16 scapegoat represents SATAN. NEVER identify it as Jesus.
+- LITTLE HORN = ROME/PAPACY, NOT ANTIOCHUS: Daniel 7 & 8 little horn = Rome. NEVER say Antiochus Epiphanes.
+- TWO-PHASE SANCTUARY: Christ entered HOLY PLACE at ascension (31 AD); MOST HOLY PLACE in 1844. NEVER say Most Holy at ascension.
+- DAY OF ATONEMENT = 1844, NOT THE CROSS: Christ's death = PASSOVER. Day of Atonement = 1844 judgment. NEVER equate death with Atonement.
+- FEAST TYPOLOGY: Spring feasts = First Advent (Passover=death, Firstfruits=resurrection). Fall feasts = Second Advent ministry.`
           },
           {
             role: 'user',

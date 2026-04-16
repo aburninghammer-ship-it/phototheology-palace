@@ -6,11 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
-import { Bot, Sparkles, BookOpen, Dumbbell, Loader2, HelpCircle, Brain, Star, TrendingUp, Building2, BookMarked, CheckCircle2, Lightbulb } from "lucide-react";
+import { Bot, Sparkles, BookOpen, Dumbbell, Loader2, HelpCircle, Brain, Star, TrendingUp, Building2, BookMarked, CheckCircle2, Lightbulb, Mic } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 import { QuickAudioButton } from "@/components/audio";
 import { getFirstName } from "@/utils/userNameUtils";
+import { VoiceInput } from "@/components/analyze/VoiceInput";
 
 interface JeevesAssistantProps {
   roomTag: string;
@@ -340,12 +341,20 @@ export const JeevesAssistant = ({
                   Share your biblical ideas, concepts, or answers. Jeeves will rate your insight and provide detailed feedback with scripture connections.
                 </p>
                 <div className="space-y-3">
-                  <Textarea
-                    value={userThoughts}
-                    onChange={(e) => setUserThoughts(e.target.value)}
-                    placeholder="Share your biblical insight, connection, or concept here... For example: 'I think the bronze serpent in Numbers 21 is a type of Christ being lifted up on the cross...'"
-                    className="bg-background min-h-[120px] resize-none"
-                  />
+                  <div className="relative">
+                    <Textarea
+                      value={userThoughts}
+                      onChange={(e) => setUserThoughts(e.target.value)}
+                      placeholder="Share your biblical insight, connection, or concept here... For example: 'I think the bronze serpent in Numbers 21 is a type of Christ being lifted up on the cross...'"
+                      className="bg-background min-h-[120px] resize-none pr-12"
+                    />
+                    <div className="absolute bottom-3 right-3">
+                      <VoiceInput 
+                        onTranscript={(text) => setUserThoughts(prev => prev + (prev ? " " : "") + text)} 
+                        disabled={loading}
+                      />
+                    </div>
+                  </div>
                   <Button
                     onClick={analyzeThoughts}
                     disabled={loading || !userThoughts.trim()}
@@ -518,13 +527,19 @@ export const JeevesAssistant = ({
                   Ask Jeeves any question about <strong className="text-foreground">{roomName}</strong>
                 </p>
                 <div className="space-y-3">
-                  <Input
-                    value={question}
-                    onChange={(e) => setQuestion(e.target.value)}
-                    placeholder="e.g., Find Christ in Genesis 5"
-                    onKeyDown={(e) => e.key === 'Enter' && askJeeves()}
-                    className="bg-background"
-                  />
+                  <div className="flex gap-2">
+                    <Input
+                      value={question}
+                      onChange={(e) => setQuestion(e.target.value)}
+                      placeholder="e.g., Find Christ in Genesis 5"
+                      onKeyDown={(e) => e.key === 'Enter' && askJeeves()}
+                      className="bg-background flex-1"
+                    />
+                    <VoiceInput 
+                      onTranscript={(text) => setQuestion(prev => prev + (prev ? " " : "") + text)} 
+                      disabled={loading}
+                    />
+                  </div>
                   <Button
                     onClick={askJeeves}
                     disabled={loading || !question.trim()}

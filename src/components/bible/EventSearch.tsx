@@ -123,8 +123,9 @@ export const EventSearch = ({ className }: EventSearchProps) => {
     try {
       const existingRefs = isLoadMore ? results.map(r => r.reference) : [];
       
-      const { data, error } = await supabase.functions.invoke("search-bible-events", {
+      const { data, error } = await supabase.functions.invoke("search-bible", {
         body: { 
+          action: "events",
           events: selectedEvents,
           excludeReferences: existingRefs,
         },

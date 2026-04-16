@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
@@ -7,6 +8,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Room } from "@/data/palaceData";
+import { usePalaceTranslation } from "@/hooks/usePalaceTranslation";
 
 interface RoomTourProps {
   room: Room;
@@ -70,25 +72,29 @@ const floorColors: Record<number, { primary: string; gradient: string; glow: str
 
 export function RoomTour({ room, floorNumber, floorName, onComplete, onSkip }: RoomTourProps) {
   const [currentStep, setCurrentStep] = useState(0);
+  const { t } = useTranslation();
+  const { translateRoom } = usePalaceTranslation();
+  const tr = translateRoom(room);
   const colors = floorColors[floorNumber] || floorColors[1];
+  const translatedFloorName = t(`palace.floors.${floorNumber}.name`, floorName);
 
   const steps = [
     {
       id: "welcome",
-      title: `Welcome to the ${room.name}`,
-      subtitle: `Floor ${floorNumber} • ${floorName}`,
+      title: t('roomTour.welcomeTo', { roomName: tr.name }),
+      subtitle: `${t('roomTour.floor', { number: floorNumber })} • ${translatedFloorName}`,
       content: (
         <div className="space-y-4">
           <div className={`p-4 rounded-xl bg-gradient-to-br ${colors.gradient} border border-white/10`}>
-            <p className="text-lg leading-relaxed">{room.purpose}</p>
+            <p className="text-lg leading-relaxed">{tr.purpose}</p>
           </div>
           <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
             <div className={`p-2 rounded-full bg-gradient-to-br ${colors.primary}`}>
               <Target className="h-4 w-4 text-white" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Core Question</p>
-              <p className="font-medium">{room.coreQuestion}</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('roomTour.coreQuestion')}</p>
+              <p className="font-medium">{tr.coreQuestion}</p>
             </div>
           </div>
         </div>
@@ -96,26 +102,26 @@ export function RoomTour({ room, floorNumber, floorName, onComplete, onSkip }: R
     },
     {
       id: "action",
-      title: "What You'll Do Here",
-      subtitle: "Your task in this room",
+      title: t('roomTour.whatYoullDo'),
+      subtitle: t('roomTour.yourTask'),
       content: (
         <div className="space-y-4">
-          {room.action && (
+          {tr.action && (
             <div className={`p-4 rounded-xl bg-gradient-to-br ${colors.gradient} border border-white/10`}>
               <div className="flex items-start gap-3">
                 <div className={`p-2 rounded-full bg-gradient-to-br ${colors.primary} shrink-0`}>
                   <Zap className="h-5 w-5 text-white" />
                 </div>
-                <p className="text-lg leading-relaxed">{room.action}</p>
+                <p className="text-lg leading-relaxed">{tr.action}</p>
               </div>
             </div>
           )}
-          {room.output && (
+          {tr.output && (
             <div className="flex items-start gap-3 p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
               <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" />
               <div>
-                <p className="text-xs text-emerald-400 uppercase tracking-wide mb-1">Deliverable</p>
-                <p className="text-foreground">{room.output}</p>
+                <p className="text-xs text-emerald-400 uppercase tracking-wide mb-1">{t('roomTour.deliverable')}</p>
+                <p className="text-foreground">{tr.output}</p>
               </div>
             </div>
           )}
@@ -123,9 +129,9 @@ export function RoomTour({ room, floorNumber, floorName, onComplete, onSkip }: R
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Clock className="h-4 w-4" />
               <span>
-                {room.estimatedTime === "quick" && "~5 minutes"}
-                {room.estimatedTime === "standard" && "~15 minutes"}
-                {room.estimatedTime === "deep" && "30+ minutes"}
+                {room.estimatedTime === "quick" && t('roomTour.timeQuick')}
+                {room.estimatedTime === "standard" && t('roomTour.timeStandard')}
+                {room.estimatedTime === "deep" && t('roomTour.timeDeep')}
               </span>
             </div>
           )}
@@ -134,8 +140,8 @@ export function RoomTour({ room, floorNumber, floorName, onComplete, onSkip }: R
     },
     {
       id: "examples",
-      title: "See It In Action",
-      subtitle: "Real examples to inspire you",
+      title: t('roomTour.seeItInAction'),
+      subtitle: t('roomTour.realExamples'),
       content: (
         <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
           {room.examples.slice(0, 4).map((example, i) => (
@@ -161,15 +167,15 @@ export function RoomTour({ room, floorNumber, floorName, onComplete, onSkip }: R
     },
     {
       id: "tips",
-      title: "Pro Tips & Pitfalls",
-      subtitle: "Learn from common mistakes",
+      title: t('roomTour.proTips'),
+      subtitle: t('roomTour.learnFromMistakes'),
       content: (
         <div className="space-y-4">
           {room.quickMode && (
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm font-medium">
                 <Lightbulb className="h-4 w-4 text-amber-400" />
-                <span>Quick Mode Steps</span>
+                <span>{t('roomTour.quickModeSteps')}</span>
               </div>
               <div className="grid gap-2">
                 {room.quickMode.map((step, i) => (
@@ -192,7 +198,7 @@ export function RoomTour({ room, floorNumber, floorName, onComplete, onSkip }: R
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm font-medium">
               <AlertTriangle className="h-4 w-4 text-rose-400" />
-              <span>Avoid These Pitfalls</span>
+              <span>{t('roomTour.avoidPitfalls')}</span>
             </div>
             <div className="space-y-2 max-h-[150px] overflow-y-auto">
               {room.pitfalls.slice(0, 3).map((pitfall, i) => (
@@ -214,8 +220,8 @@ export function RoomTour({ room, floorNumber, floorName, onComplete, onSkip }: R
     },
     {
       id: "start",
-      title: "You're Ready!",
-      subtitle: "Begin your practice",
+      title: t('roomTour.youreReady'),
+      subtitle: t('roomTour.beginPractice'),
       content: (
         <div className="space-y-4">
           <div className={`p-6 rounded-2xl bg-gradient-to-br ${colors.gradient} border border-white/10 text-center`}>
@@ -229,14 +235,14 @@ export function RoomTour({ room, floorNumber, floorName, onComplete, onSkip }: R
             >
               <Sparkles className={`h-12 w-12 ${colors.accent}`} />
             </motion.div>
-            <h3 className="text-xl font-bold mb-2">Room Tour Complete!</h3>
+            <h3 className="text-xl font-bold mb-2">{t('roomTour.tourComplete')}</h3>
             <p className="text-muted-foreground">
-              You now understand the {room.name}. Time to put it into practice!
+              {t('roomTour.tourCompleteDesc', { roomName: tr.name })}
             </p>
           </div>
           <div className="p-4 rounded-lg bg-muted/50 border border-border">
             <p className="text-sm text-center">
-              <span className="font-semibold">Remember:</span> {room.coreQuestion}
+              <span className="font-semibold">{t('roomTour.remember')}</span> {tr.coreQuestion}
             </p>
           </div>
         </div>

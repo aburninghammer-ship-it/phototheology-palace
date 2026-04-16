@@ -1,0 +1,220 @@
+/**
+ * BasicModeSidebar — Left sidebar for Level 1 (Learn) mode
+ * Desktop: vertical sidebar. Mobile: horizontal bottom tab bar.
+ */
+import { cn } from "@/lib/utils";
+import { MessageCircle, BookOpen, Church, Settings, Layers, LayoutGrid, Headphones } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+
+export type BasicTab = "home" | "chat" | "bible" | "chapel" | "study" | "listen";
+
+interface TabItem {
+  id: BasicTab;
+  label: string;
+  icon: typeof MessageCircle;
+  tourId: string;
+  activeGradient: string;
+  activeBorder: string;
+  activeGlow: string;
+  activeText: string;
+  hoverBg: string;
+  iconGlow: string;
+  inactiveText: string;
+}
+
+const TABS: TabItem[] = [
+  {
+    id: "home",
+    label: "Spaces",
+    icon: LayoutGrid,
+    tourId: "tab-home",
+    activeGradient: "bg-gradient-to-r from-emerald-500/20 via-emerald-400/10 to-transparent",
+    activeBorder: "border border-emerald-400/30",
+    activeGlow: "shadow-[0_0_15px_rgba(52,211,153,0.25)]",
+    activeText: "text-emerald-300",
+    inactiveText: "text-emerald-400/70",
+    hoverBg: "hover:bg-emerald-500/10",
+    iconGlow: "drop-shadow-[0_0_6px_rgba(52,211,153,0.6)]",
+  },
+  {
+    id: "chat",
+    label: "Ask Jeeves",
+    icon: MessageCircle,
+    tourId: "tab-chat",
+    activeGradient: "bg-gradient-to-r from-blue-500/20 via-blue-400/10 to-transparent",
+    activeBorder: "border border-blue-400/30",
+    activeGlow: "shadow-[0_0_15px_rgba(96,165,250,0.25)]",
+    activeText: "text-blue-300",
+    inactiveText: "text-blue-400/70",
+    hoverBg: "hover:bg-blue-500/10",
+    iconGlow: "drop-shadow-[0_0_6px_rgba(96,165,250,0.6)]",
+  },
+  {
+    id: "bible",
+    label: "Study Bible",
+    icon: BookOpen,
+    tourId: "tab-bible",
+    activeGradient: "bg-gradient-to-r from-amber-500/20 via-amber-400/10 to-transparent",
+    activeBorder: "border border-amber-400/30",
+    activeGlow: "shadow-[0_0_15px_rgba(251,191,36,0.25)]",
+    activeText: "text-amber-300",
+    inactiveText: "text-amber-400/70",
+    hoverBg: "hover:bg-amber-500/10",
+    iconGlow: "drop-shadow-[0_0_6px_rgba(251,191,36,0.6)]",
+  },
+  {
+    id: "chapel",
+    label: "Chapel",
+    icon: Church,
+    tourId: "tab-chapel",
+    activeGradient: "bg-gradient-to-r from-purple-500/20 via-purple-400/10 to-transparent",
+    activeBorder: "border border-purple-400/30",
+    activeGlow: "shadow-[0_0_15px_rgba(192,132,252,0.25)]",
+    activeText: "text-purple-300",
+    inactiveText: "text-purple-400/70",
+    hoverBg: "hover:bg-purple-500/10",
+    iconGlow: "drop-shadow-[0_0_6px_rgba(192,132,252,0.6)]",
+  },
+  {
+    id: "study",
+    label: "Study Experience",
+    icon: Layers,
+    tourId: "tab-study",
+    activeGradient: "bg-gradient-to-r from-sky-500/20 via-sky-400/10 to-transparent",
+    activeBorder: "border border-sky-400/30",
+    activeGlow: "shadow-[0_0_15px_rgba(56,189,248,0.25)]",
+    activeText: "text-sky-300",
+    inactiveText: "text-sky-400/70",
+    hoverBg: "hover:bg-sky-500/10",
+    iconGlow: "drop-shadow-[0_0_6px_rgba(56,189,248,0.6)]",
+  },
+  {
+    id: "listen",
+    label: "Listen Experience",
+    icon: Headphones,
+    tourId: "tab-listen",
+    activeGradient: "bg-gradient-to-r from-orange-500/20 via-orange-400/10 to-transparent",
+    activeBorder: "border border-orange-400/30",
+    activeGlow: "shadow-[0_0_15px_rgba(251,146,60,0.25)]",
+    activeText: "text-orange-300",
+    inactiveText: "text-orange-400/70",
+    hoverBg: "hover:bg-orange-500/10",
+    iconGlow: "drop-shadow-[0_0_6px_rgba(251,146,60,0.6)]",
+  },
+];
+
+interface BasicModeSidebarProps {
+  activeTab: BasicTab;
+  onTabChange: (tab: BasicTab) => void;
+}
+
+export function BasicModeSidebar({ activeTab, onTabChange }: BasicModeSidebarProps) {
+  const [collapsed, setCollapsed] = useState(false);
+  const navigate = useNavigate();
+
+  return (
+    <>
+      {/* ─── DESKTOP: vertical sidebar (hidden on mobile) ─── */}
+      <aside
+        className={cn(
+          "hidden md:flex flex-col h-full border-r border-border/50 transition-all duration-200 bg-card/80 backdrop-blur-xl",
+          collapsed ? "w-14" : "w-56"
+        )}
+      >
+        <div className="h-12 flex items-center px-3 border-b border-border/50">
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="p-1.5 rounded-md transition-colors text-muted-foreground hover:text-foreground"
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 12h18M3 6h18M3 18h18" />
+            </svg>
+          </button>
+        </div>
+
+        <nav className="flex-1 py-3 px-2 space-y-2 overflow-y-auto">
+          {TABS.map((tab) => {
+            const isActive = activeTab === tab.id;
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                data-tour={tab.tourId}
+                onClick={() => onTabChange(tab.id)}
+                className={cn(
+                  "w-full flex items-center gap-3 rounded-xl transition-all duration-300 text-left backdrop-blur-md",
+                  collapsed ? "justify-center p-2.5" : "px-3 py-2.5",
+                  isActive
+                    ? cn(tab.activeGradient, tab.activeBorder, tab.activeGlow, tab.activeText)
+                    : cn(tab.inactiveText, "hover:text-foreground border border-transparent", tab.hoverBg)
+                )}
+                title={collapsed ? tab.label : undefined}
+              >
+                <Icon className={cn("h-[18px] w-[18px] shrink-0 transition-all duration-300", isActive && tab.iconGlow)} />
+                {!collapsed && (
+                  <span className={cn("text-sm font-medium truncate", isActive && "font-semibold")}>{tab.label}</span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="px-2 pb-3 pt-2 border-t border-border/50">
+          <button
+            onClick={() => navigate("/settings")}
+            className={cn(
+              "w-full flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-300 text-muted-foreground hover:text-foreground hover:bg-muted/30 backdrop-blur-md border border-transparent hover:border-muted-foreground/10",
+              collapsed && "justify-center px-2.5"
+            )}
+          >
+            <Settings className="h-[18px] w-[18px] shrink-0" />
+            {!collapsed && <span className="text-sm">Settings</span>}
+          </button>
+        </div>
+      </aside>
+
+      {/* ─── MOBILE: bottom tab bar (hidden on desktop) ─── */}
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-[60] md:hidden bg-card/95 backdrop-blur-xl border-t border-border/50 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.15)]"
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 6px)" }}
+      >
+        <div className="flex items-center justify-evenly h-[52px] px-0.5">
+          {TABS.map((tab) => {
+            const isActive = activeTab === tab.id;
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                data-tour={tab.tourId}
+                onClick={() => onTabChange(tab.id)}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-0.5 py-1 rounded-lg transition-all min-w-0 flex-1 active:scale-95",
+                  isActive
+                    ? cn("bg-primary/12", tab.activeText)
+                    : tab.inactiveText
+                )}
+              >
+                <Icon className={cn("h-[18px] w-[18px] shrink-0", isActive && tab.iconGlow)} />
+                <span className={cn(
+                  "text-[8px] leading-tight font-medium truncate max-w-full px-0.5",
+                  isActive && "font-semibold"
+                )}>
+                  {tab.id === "study" ? "Study" : tab.id === "listen" ? "Listen" : tab.label}
+                </span>
+              </button>
+            );
+          })}
+          <button
+            onClick={() => navigate("/settings")}
+            className="flex flex-col items-center justify-center gap-0.5 py-1 rounded-lg transition-all min-w-0 flex-1 text-muted-foreground active:scale-95"
+          >
+            <Settings className="h-[18px] w-[18px] shrink-0" />
+            <span className="text-[8px] leading-tight font-medium">Settings</span>
+          </button>
+        </div>
+      </nav>
+    </>
+  );
+}

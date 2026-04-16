@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Trophy, ArrowLeft, Sparkles } from "lucide-react";
+import { Trophy, ArrowLeft, Sparkles, BookOpen, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
@@ -50,8 +52,10 @@ const passages = [
 
 export default function DimensionsRoom() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
+  const [view, setView] = useState<"2d" | "3d">("2d");
   const [currentPassage, setCurrentPassage] = useState(0);
   const [currentDimension, setCurrentDimension] = useState<keyof typeof passages[0]['dimensions']>("literal");
   const [userAnswer, setUserAnswer] = useState("");
@@ -72,8 +76,8 @@ export default function DimensionsRoom() {
   const handleSubmit = () => {
     if (userAnswer.trim().length < 15) {
       toast({
-        title: "Add More Detail",
-        description: "Explain this dimension more fully!",
+        title: t('games.dimensionsRoom.addMoreDetail'),
+        description: t('games.dimensionsRoom.explainMoreFully'),
         variant: "destructive",
       });
       return;
@@ -84,8 +88,8 @@ export default function DimensionsRoom() {
     setScore(score + 1);
     
     toast({
-      title: "✓ Dimension Complete!",
-      description: `${dimensionLabels[currentDimension]} unlocked!`,
+      title: t('games.dimensionsRoom.dimensionComplete'),
+      description: t('games.dimensionsRoom.dimensionUnlocked', { dimension: dimensionLabels[currentDimension] }),
     });
 
     // Move to next dimension or passage
@@ -134,25 +138,25 @@ export default function DimensionsRoom() {
             <Card className="text-center">
               <CardHeader>
                 <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
-                <CardTitle className="text-3xl">Dimensions Room Mastered!</CardTitle>
+                <CardTitle className="text-3xl">{t('games.dimensionsRoom.mastered')}</CardTitle>
                 <CardDescription>
-                  You're seeing Scripture from every angle!
+                  {t('games.dimensionsRoom.masteredDescription')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="text-4xl font-bold text-primary">
-                  5 Dimensions × {passages.length} Passages
+                  {t('games.dimensionsRoom.dimensionsPassages', { passages: passages.length })}
                 </div>
                 <p className="text-muted-foreground">
-                  Like viewing a diamond under five different lights!
+                  {t('games.dimensionsRoom.diamondMetaphor')}
                 </p>
                 <div className="flex gap-4 justify-center">
                   <Button onClick={() => navigate("/games")}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Games
+                    {t('games.common.backToGames')}
                   </Button>
                   <Button onClick={() => window.location.reload()} variant="outline">
-                    Play Again
+                    {t('games.common.playAgain')}
                   </Button>
                 </div>
               </CardContent>
@@ -174,24 +178,27 @@ export default function DimensionsRoom() {
           className="mb-4"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Games
+          {t('games.common.backToGames')}
         </Button>
 
         <Card className="mb-6">
           <CardHeader>
             <div className="flex items-center justify-between mb-2">
-              <Badge variant="secondary">Floor 4 • Dimensions Room (DR)</Badge>
+              <Badge variant="secondary">{t('games.dimensionsRoom.floorBadge')}</Badge>
               <Badge variant="outline">
                 {completedDimensions.size} / {passages.length * dimensions.length}
               </Badge>
             </div>
-            <CardTitle className="text-3xl">💎 Five Dimensions</CardTitle>
+            <CardTitle className="text-3xl">{t('games.dimensionsRoom.title')}</CardTitle>
             <CardDescription>
-              View Scripture like a diamond under five different lights. Each dimension reveals a unique sparkle!
+              {t('games.dimensionsRoom.description')}
             </CardDescription>
+            
             <Progress value={progress} className="mt-4" />
           </CardHeader>
         </Card>
+
+        <>
 
         <Card className="mb-6">
           <CardHeader>
@@ -231,17 +238,17 @@ export default function DimensionsRoom() {
                 {dimensionLabels[currentDimension]}
               </h3>
               <p className="text-sm text-muted-foreground mb-4">
-                {currentDimension === "literal" && "What does the text literally mean in its context?"}
-                {currentDimension === "christ" && "How does this text point to or reveal Jesus Christ?"}
-                {currentDimension === "me" && "How does this apply to my personal life and walk with God?"}
-                {currentDimension === "church" && "How does this apply to the church corporately?"}
-                {currentDimension === "heaven" && "How does this relate to heaven and eternity?"}
+                {currentDimension === "literal" && t('games.dimensionsRoom.promptLiteral')}
+                {currentDimension === "christ" && t('games.dimensionsRoom.promptChrist')}
+                {currentDimension === "me" && t('games.dimensionsRoom.promptMe')}
+                {currentDimension === "church" && t('games.dimensionsRoom.promptChurch')}
+                {currentDimension === "heaven" && t('games.dimensionsRoom.promptHeaven')}
               </p>
 
               <Textarea
                 value={userAnswer}
                 onChange={(e) => setUserAnswer(e.target.value)}
-                placeholder={`Explain the ${currentDimension} dimension of this verse...`}
+                placeholder={t('games.dimensionsRoom.answerPlaceholder', { dimension: currentDimension })}
                 className="min-h-[120px] mb-4"
               />
 
@@ -251,7 +258,7 @@ export default function DimensionsRoom() {
                 className="w-full"
                 size="lg"
               >
-                Submit {dimensionLabels[currentDimension]}
+                {t('games.dimensionsRoom.submitDimension', { dimension: dimensionLabels[currentDimension] })}
               </Button>
             </div>
 
@@ -259,7 +266,7 @@ export default function DimensionsRoom() {
             {completedDimensions.has(`${currentPassage}-${currentDimension}`) && (
               <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
                 <h4 className="font-semibold mb-2 text-green-800 dark:text-green-400">
-                  ✓ Model Answer:
+                  {t('games.dimensionsRoom.modelAnswer')}
                 </h4>
                 <p className="text-sm">{passage.dimensions[currentDimension]}</p>
               </div>
@@ -269,13 +276,15 @@ export default function DimensionsRoom() {
 
         <Card className="bg-purple-50 dark:bg-purple-900/20">
           <CardContent className="pt-6">
-            <h4 className="font-semibold mb-2">💡 Dimensions Room Tip:</h4>
+            <h4 className="font-semibold mb-2">{t('games.dimensionsRoom.tipTitle')}</h4>
             <p className="text-sm text-muted-foreground">
-              Like looking at a diamond, every verse has five facets. Don't stop at one! The same stone reflects different light from different angles. This is how the Bible becomes multi-dimensional.
+              {t('games.dimensionsRoom.tipDescription')}
             </p>
           </CardContent>
         </Card>
+        </>
       </main>
+      <FloatingGameChat gameType="dimensions-room" />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { Video, Users, Send, ArrowLeft, Share2, Copy } from "lucide-react";
+import { Video, Users, Send, ArrowLeft, Share2, Copy, Loader2 } from "lucide-react";
 import { SimpleVoiceRoom } from "@/components/voice";
 
 interface ChatMessage {
@@ -40,11 +41,14 @@ interface ParticipantLocation {
 }
 
 const LiveStudyRoom = () => {
+  const { t } = useTranslation();
   const { roomId } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [room, setRoom] = useState<Room | null>(null);
+  const [roomLoading, setRoomLoading] = useState(true);
+  const [roomError, setRoomError] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [participants, setParticipants] = useState<any[]>([]);
@@ -131,32 +135,39 @@ const LiveStudyRoom = () => {
 
   const fetchUserProfile = async () => {
     const { data: profile } = await supabase
-      .from("profiles")
+      .from("profiles_public_info")
       .select("display_name, username")
       .eq("id", user!.id)
-      .single();
-    
-    if (profile) {
-      setUserDisplayName(profile.display_name || profile.username || "User");
-    }
+      .maybeSingle();
+
+    setUserDisplayName(profile?.display_name || profile?.username || "User");
   };
 
   const fetchRoomDetails = async () => {
-    const { data } = await supabase
+    setRoomLoading(true);
+    setRoomError(null);
+
+    const { data, error } = await supabase
       .from("study_rooms")
       .select("*")
       .eq("id", roomId)
       .single();
-    
-    if (data) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("username")
-        .eq("id", data.host_id)
-        .single();
-      
-      setRoom({ ...data, profiles: profile || { username: "Unknown" } });
+
+    if (error || !data) {
+      setRoom(null);
+      setRoomError(t('liveStudyRoom.roomNotFound'));
+      setRoomLoading(false);
+      return;
     }
+
+    const { data: profile } = await supabase
+      .from("profiles_public_info")
+      .select("username")
+      .eq("id", data.host_id)
+      .maybeSingle();
+
+    setRoom({ ...data, profiles: profile || { username: "Unknown" } });
+    setRoomLoading(false);
   };
 
   const joinRoom = async () => {
@@ -166,7 +177,7 @@ const LiveStudyRoom = () => {
 
     if (error && error.code !== "23505") {
       toast({
-        title: "Error joining room",
+        title: t('liveStudyRoom.errorJoiningRoom'),
         description: error.message,
         variant: "destructive",
       });
@@ -184,10 +195,10 @@ const LiveStudyRoom = () => {
       const messagesWithProfiles = await Promise.all(
         chatData.map(async (msg) => {
           const { data: profile } = await supabase
-            .from("profiles")
+            .from("profiles_public_info")
             .select("username")
             .eq("id", msg.user_id)
-            .single();
+            .maybeSingle();
           
           return { ...msg, profiles: profile || { username: "Unknown" } };
         })
@@ -206,10 +217,10 @@ const LiveStudyRoom = () => {
       const participantsWithProfiles = await Promise.all(
         participantsData.map(async (participant) => {
           const { data: profile } = await supabase
-            .from("profiles")
+            .from("profiles_public_info")
             .select("username")
             .eq("id", participant.user_id)
-            .single();
+            .maybeSingle();
           
           return { ...participant, profiles: profile || { username: "Unknown" } };
         })
@@ -235,7 +246,7 @@ const LiveStudyRoom = () => {
     if (error) {
       console.error("Error sending message:", error);
       toast({
-        title: "Error sending message",
+        title: t('liveStudyRoom.errorSendingMessage'),
         description: error.message,
         variant: "destructive",
       });
@@ -249,13 +260,13 @@ const LiveStudyRoom = () => {
     const inviteLink = `${window.location.origin}/live-study/${roomId}`;
     navigator.clipboard.writeText(inviteLink).then(() => {
       toast({
-        title: "Link copied!",
-        description: "Share this link with your friends to invite them.",
+        title: t('liveStudyRoom.linkCopied'),
+        description: t('liveStudyRoom.linkCopiedDesc'),
       });
     }).catch(() => {
       toast({
-        title: "Failed to copy",
-        description: "Please try again.",
+        title: t('liveStudyRoom.failedToCopy'),
+        description: t('liveStudyRoom.pleaseTryAgain'),
         variant: "destructive",
       });
     });
@@ -267,8 +278,8 @@ const LiveStudyRoom = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Join ${room?.name} on Phototheology Palace`,
-          text: `Join me in this live study session!`,
+          title: t('liveStudyRoom.joinRoomTitle', { name: room?.name }),
+          text: t('liveStudyRoom.joinRoomText'),
           url: inviteLink,
         });
       } catch (error) {
@@ -284,8 +295,8 @@ const LiveStudyRoom = () => {
   const followParticipant = (path: string) => {
     navigate(path);
     toast({
-      title: "Following participant",
-      description: "Navigating to their location",
+      title: t('liveStudyRoom.followingParticipant'),
+      description: t('liveStudyRoom.navigatingToLocation'),
     });
   };
 
@@ -303,6 +314,36 @@ const LiveStudyRoom = () => {
     return pathMap[path] || path.split("/").pop() || "Unknown";
   };
 
+  if (roomLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto mb-3" />
+          <p className="text-muted-foreground">{t('liveStudyRoom.loadingRoom')}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (roomError) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="container mx-auto px-4 pt-24 pb-8">
+          <Card className="max-w-xl mx-auto">
+            <CardHeader>
+              <CardTitle>{t('liveStudyRoom.unableToLoad')}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">{roomError}</p>
+              <Button onClick={() => navigate("/live-study")}>{t('liveStudyRoom.backToLiveStudy')}</Button>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
+  }
+
   if (!room) return null;
 
   return (
@@ -314,7 +355,7 @@ const LiveStudyRoom = () => {
             <div className="flex items-center gap-4 min-w-0 flex-1">
               <Button variant="ghost" onClick={() => navigate("/live-study")} className="flex-shrink-0">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
+                {t('liveStudyRoom.back')}
               </Button>
               <div className="min-w-0 flex-1">
                 <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2 break-words">
@@ -322,22 +363,22 @@ const LiveStudyRoom = () => {
                   <span className="break-words">{room.name}</span>
                 </h1>
                 <p className="text-muted-foreground break-words">
-                  Host: {room.profiles?.username || "Unknown"}
+                  {t('liveStudyRoom.host', { name: room.profiles?.username || t('liveStudyRoom.unknown') })}
                 </p>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2 flex-shrink-0">
               <Badge variant="outline" className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
-                {participants.length} participants
+                {t('liveStudyRoom.participantsCount', { count: participants.length })}
               </Badge>
               <Button variant="outline" onClick={shareInviteLink}>
                 <Share2 className="h-4 w-4 mr-2" />
-                Share
+                {t('liveStudyRoom.share')}
               </Button>
               <Button variant="outline" onClick={copyInviteLink}>
                 <Copy className="h-4 w-4 mr-2" />
-                Copy Link
+                {t('liveStudyRoom.copyLink')}
               </Button>
             </div>
           </div>
@@ -352,7 +393,7 @@ const LiveStudyRoom = () => {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Chat</CardTitle>
+                  <CardTitle>{t('liveStudyRoom.chat')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ScrollArea className="h-[400px] pr-4">
@@ -374,7 +415,7 @@ const LiveStudyRoom = () => {
                   </ScrollArea>
                   <div className="flex gap-2">
                     <Input
-                      placeholder="Type a message..."
+                      placeholder={t('liveStudyRoom.typeMessage')}
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyDown={(e) => {
@@ -394,7 +435,7 @@ const LiveStudyRoom = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Participants</CardTitle>
+                <CardTitle>{t('liveStudyRoom.participants')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ScrollArea className="h-[450px]">
@@ -428,7 +469,7 @@ const LiveStudyRoom = () => {
                               onClick={() => followParticipant(location.currentPath)}
                               className="flex-shrink-0"
                             >
-                              Follow
+                              {t('liveStudyRoom.follow')}
                             </Button>
                           )}
                         </div>

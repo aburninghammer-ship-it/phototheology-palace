@@ -1,87 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { PALACE_SYSTEM_PROMPT, THEOLOGICAL_GUARDRAILS } from "../_shared/palace-prompt.ts";
+import { QUALITY_TESTS, OUTPUT_TYPES, GOLDEN_RULE } from "../_shared/palace-output-engine.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
-
-// CORRECT Phototheology Palace structure per the knowledge bank
-const PALACE_STRUCTURE = `
-## Phototheology Palace Structure (CORRECT)
-
-### Floor 1 - Furnishing (Memory & Visualization)
-- SR (Story Room): What exactly happened—and in what order? Break into beats.
-- IR (Imagination Room): What do you see, hear, feel, smell, taste? Sensory immersion.
-- 24 (24FPS Room): One memorable image per chapter for instant retrieval.
-- BR (Bible Rendered): One glyph per 24-chapter block - compress the canon.
-- TR (Translation Room): Convert words into pictures - verse to icon, book to mural.
-- GR (Gems Room): Combine 2-4 unrelated texts to find rare truths.
-
-### Floor 2 - Investigation (Detective Work)
-- OR (Observation Room): 20-50 observations. Start with WHAT IS HAPPENING before interpretation.
-- DC (Def-Com Room): Define key terms in Greek/Hebrew, consult trusted commentaries.
-- ST (Symbols/Types Room): Track symbols (Lamb, Rock, Light) through Scripture to Christ.
-- QR (Questions Room): Generate 50-100 questions: INTRA, INTER, and PALACE questions.
-- QA (Q&A Room): Let Scripture answer Scripture - cross-reference chains.
-
-### Floor 3 - Freestyle (Connections for Time)
-- NF (Nature Freestyle): See Scripture lessons in nature (Psalm 1's tree, storms, sunrise).
-- PF (Personal Freestyle): Your life becomes the object lesson.
-- BF (Bible Freestyle): Verse genetics - trace relationships between verses.
-- HF (History/Social Freestyle): See lessons in culture, history, current events.
-- LR (Listening Room): Turn conversations and sermons into Scripture connections.
-
-### Floor 4 - Next Level (Christ-Centered Depth)
-- CR (Concentration Room): Every text must reveal Christ. John 5:39, Luke 24:27.
-- DR (Dimensions Room): 5 dimensions - 1D Literal, 2D Christ, 3D Me, 4D Church, 5D Heaven.
-- C6 (Connect 6 Room): Classify by genre - Law, Poetry, Prophecy, Gospel, Epistle, Parable.
-- TRm (Theme Room): Place on walls - Sanctuary, Life of Christ, Great Controversy, Time-Prophecy.
-- TZ (Time Zone Room): 6 zones - Heaven-Past/Now/Future, Earth-Past/Now/Future.
-- PRm (Patterns Room): 40 days, 3 days, deliverer stories - recurring motifs.
-- P‖ (Parallels Room): Mirrored actions - Babel/Pentecost, Exodus/Return from Babylon.
-- FRt (Fruit Room): Does it produce love, joy, peace, patience, kindness, goodness, faith, meekness, temperance?
-
-### Floor 5 - Vision (Prophecy & Sanctuary)
-- BL (Blue/Sanctuary Room): Map to sanctuary furniture - Altar, Laver, Lampstand, Table, Incense, Ark.
-- PR (Prophecy Room): Daniel/Revelation timelines, repeat-and-enlarge patterns.
-- 3A (Three Angels Room): Everlasting Gospel, Babylon Fallen, Warning against the beast.
-
-### Floor 6 - Three Heavens & Cycles
-- Cycles: @Ad (Adamic), @No (Noahic), @Ab (Abrahamic), @Mo (Mosaic), @Cy (Cyrusic), @CyC (Cyrus-Christ), @Sp (Spirit), @Re (Remnant)
-- Heavens: 1H (DoL¹/NE¹), 2H (DoL²/NE²), 3H (DoL³/NE³)
-- JR (Juice Room): Run entire book through all principles.
-
-### Floor 7 - Spiritual & Emotional (Height)
-- FRm (Fire Room): Feel the emotional weight - Gethsemane, Calvary, Pentecost.
-- MR (Meditation Room): Slow marination in truth - Psalm 23, John 15.
-- SRm (Speed Room): Rapid application drills.
-
-### Floor 8 - Master (Reflexive)
-- No rooms - the Palace is inside you. Natural Phototheological thinking.
-`;
-
-const THEOLOGICAL_GUARDRAILS = `
-## CRITICAL THEOLOGICAL GUARDRAILS
-
-NEVER teach or affirm:
-- The scapegoat as Jesus (the scapegoat represents Satan, not Christ)
-- The little horn of Daniel 8 as Antiochus Epiphanes (historicist: it's Rome/Papacy)
-- Anti-Trinitarian interpretations
-- Feast-keeping as salvific
-- Offshoot SDA doctrines
-- Speculation about secret knowledge
-- Sunday-law date-setting
-- Claims contradicting SDA fundamental beliefs
-
-ALWAYS anchor in:
-- Scripture as final authority
-- The Trinity
-- Salvation by grace through faith
-- Christ's divinity and humanity
-- The heavenly sanctuary
-- The prophetic framework of Daniel & Revelation
-- The 28 Fundamental Beliefs
-`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -89,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { mode, verse, verseText, room, rooms, userAnswer, action, difficulty, previousResponses, expound } = await req.json();
+    const { mode, drillType, verse, verseText, thought, room, rooms, userAnswer, action, difficulty, previousResponses, expound } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -103,11 +27,29 @@ serve(async (req) => {
       pro: "Advanced analysis with scholarly depth. Expect familiarity with PT terminology. Challenge them to go deeper."
     };
 
+    // Determine if this is a thought drill or verse drill
+    const isThoughtDrill = drillType === "thought" && thought;
+    const subjectLabel = isThoughtDrill ? "THOUGHT" : "VERSE";
+    const subjectContent = isThoughtDrill ? thought : verse;
+    const subjectText = isThoughtDrill ? thought : (verseText || verse);
+
     let systemPrompt = `You are Jeeves, the wise and engaging AI butler of the Phototheology Palace. You guide users through deep Bible study using the Phototheology method.
 
-Your mission is based on Jesus' words: "Gather up the fragments that remain, that nothing be lost" (John 6:12). Just as Jesus commanded His disciples to gather every fragment after feeding the 5,000, you help believers extract every insight from Scripture—leaving nothing of value behind.
+Your mission is based on Jesus' words: "Gather up the fragments that remain, that nothing be lost" (John 6:12). Just as Jesus commanded His disciples to gather every fragment after feeding the 5,000, you help believers extract every insight—leaving nothing of value behind.
 
-${PALACE_STRUCTURE}
+${isThoughtDrill ? `
+THOUGHT DRILLING MODE:
+You are drilling a THEOLOGICAL THOUGHT or IDEA, not a specific verse. The user has provided a thought, concept, question, or insight they want to explore through the Phototheology Palace.
+
+When drilling a thought:
+- Apply each room's principles to analyze, expand, and deepen the thought
+- Connect the thought to relevant Scripture passages
+- Show how different Palace rooms reveal different facets of the thought
+- Build a comprehensive theological understanding
+- Always ground insights in Scripture while exploring the thought
+` : ''}
+
+${PALACE_SYSTEM_PROMPT}
 
 ${THEOLOGICAL_GUARDRAILS}
 
@@ -122,61 +64,125 @@ STYLE:
 - Use Scripture references to support points
 - Build on previous insights to create a unified study
 
+OUTPUT TYPE: ${OUTPUT_TYPES.fragments.name}
+${OUTPUT_TYPES.fragments.description}
+${OUTPUT_TYPES.fragments.requirements.map(r => `• ${r}`).join('\n')}
+
+QUALITY TESTS (apply to every response):
+${QUALITY_TESTS.map(t => `• ${t.name} (${t.room}): ${t.question}`).join('\n')}
+
+ROOM TAGGING:
+Tag insights with room codes in parentheses: (OR), (ST + CR), (BL + P‖)
+These become clickable links for users to learn each room's methodology.
+
+${GOLDEN_RULE}
+
 CRITICAL: Create a UNIFIED STUDY where each principle naturally flows from and builds upon the previous ones. Reference and connect to earlier discoveries.
 `;
 
     let userPrompt = "";
 
     if (mode === "auto" && rooms) {
-      // Auto-drill: analyze verse through all rooms
+      // Auto-drill: analyze verse/thought through all rooms with 3 VARIATIONS
       const roomCount = rooms.length;
       
       systemPrompt += `\n\nYou are running an AUTO-DRILL. This is a "Gather the Fragments" exercise (John 6:12). 
 
-🎯 MISSION CRITICAL: You MUST provide EXACTLY ${roomCount} responses - ONE for EACH of the ${roomCount} rooms provided. Do NOT skip any room. The goal is to extract ONE principle from EVERY room in the Palace.
+🎯 MISSION CRITICAL: Generate THREE DISTINCT DRILL VARIATIONS. Each variation must:
+- Cover EXACTLY ${roomCount} rooms - ONE response for EACH room provided
+- Use DIFFERENT principle combinations and theological angles per variation
+- Build a unique unified study narrative per variation
+
+Since many rooms contain multiple principles, each variation explores DIFFERENT combinations:
+- Variation 1: Focus on CHRIST-CENTERED connections (typology, sanctuary, prophecy emphasis)
+- Variation 2: Focus on PRACTICAL APPLICATION (personal, church, lifestyle emphasis)  
+- Variation 3: Focus on COSMIC CONTEXT (cycles, heavens, great controversy emphasis)
 
 CRITICAL INSTRUCTIONS:
-- Provide EXACTLY ONE response for EACH of the ${roomCount} rooms - no exceptions, no skipping
-- Use ONLY ONE principle per room - select the most impactful one for this verse
-- You are NOT locked into using rooms in order - start from any floor, room, or cycle that best illuminates this verse
-- Build sequence strategically: whatever room you use first should prepare the way for the next room
+- Generate EXACTLY 3 variations, each with EXACTLY ${roomCount} room responses
+- Each variation must use DIFFERENT primary principles from rooms with multiple principles
+- Each variation builds a unique cohesive study narrative
+- Variations should complement each other, not repeat insights
 - Each response should be focused (2-4 sentences) but substantive
-- Always create a unified study where each response builds upon and references previous discoveries
+- You are NOT locked into room order - build sequence strategically per variation
+${isThoughtDrill ? `- Connect the thought to relevant Scripture in each response
+- Show how the thought relates to each room's principles` : ''}
 
-ROOM REQUIREMENTS:
-${rooms.map((r: any, i: number) => `${i + 1}. ${r.tag} (${r.name}): ${r.coreQuestion}`).join('\n')}
+ROOM LIST (each variation covers ALL ${roomCount} rooms):
+${rooms.map((r: any, i: number) => `${i + 1}. roomId="${r.id}" ${r.tag} (${r.name}): ${r.coreQuestion}`).join('\n')}
 
 SPECIAL INSTRUCTION FOR QUESTIONS ROOM (QR):
-When you reach the Questions Room (QR), generate EXACTLY 15 questions:
-- 5 INTRATEXTUAL questions (about details within this verse/passage)
-- 5 INTERTEXTUAL questions (connecting to other Scripture passages)
-- 5 PALACE questions (applying Phototheology principles from other rooms)
-Label each question clearly with its type.
+In EACH variation, generate EXACTLY 15 questions with different focus:
+- Variation 1 QR: Emphasize typological/prophetic questions
+- Variation 2 QR: Emphasize application/lifestyle questions
+- Variation 3 QR: Emphasize cosmic/historical cycle questions
+Label each: 5 INTRA, 5 INTER, 5 PALACE.
 
-REMEMBER: You MUST generate exactly ${roomCount} responses, one for each room listed above. "Gather up the fragments that remain, that nothing be lost."`;
+REMEMBER: "Gather up the fragments that remain, that nothing be lost." - Different principle combinations reveal different facets of truth.
+
+MAGNUM OPUS DEPTH (MANDATORY FOR ALL VARIATIONS):
+Every drill output must demonstrate at least 2 of these advanced Phototheology thinking patterns:
+- **Cascading Christ-discovery**: Don't stop at ONE Christ connection. Build 5+ layered connections per passage that cascade — each building on the last. Example: Proverbs 1 yields "Son of David" → Wisdom as Christ → rejected Messiah → Judas → 70 AD → covenant lawsuit → Christ as refuge. Seven layers from one chapter.
+- **Structural-timeline mapping**: Show how passage/book structures mirror Christ's ministry timeline. Pentateuch = Son → Deliverer → Sacrifice → Mission → Death-Resurrection. Psalms 22-23-24 = Death → Burial → Resurrection.
+- **Reversed-trap pattern**: When plots or schemes appear in the text, show the cosmic reversal — the cross was a trap for the trappers (Col 2:15).
+- **"What-if" shadow types**: When an OT figure fails where Christ succeeded, frame it as what Christ's story WOULD have been if He sinned.
+- **Multi-type convergence**: Show how multiple OT figures converge on one Christ-event (Moses + Jonah + Elijah = complete Christ timeline from birth to Pentecost).
+- **Sharp preaching line**: Produce at least one quotable synthesis per variation. Pattern: "He was forsaken in Psalm 22, walked through death in Psalm 23, and reigns in Psalm 24."
+
+Each variation should showcase DIFFERENT patterns from this list. These patterns should produce stunning "I never saw that before" moments.`;
       
-      userPrompt = `Run a complete Drill Drill on: "${verse}"
-${verseText ? `\nVerse text: "${verseText}"` : ""}
+      userPrompt = `Run a complete Drill Drill with 3 VARIATIONS on this ${subjectLabel}: "${subjectContent}"
+${!isThoughtDrill && verseText ? `\nVerse text: "${verseText}"` : ""}
+${isThoughtDrill ? `\nThis is a THEOLOGICAL THOUGHT/IDEA to analyze through the Palace, not a Bible verse. Connect it to relevant Scripture as you analyze.` : ""}
 
-🎯 MANDATORY: Analyze through ALL ${roomCount} rooms below. Do NOT skip any room. Each room must receive exactly one response.
+🎯 Generate THREE DISTINCT DRILL VARIATIONS, each analyzing ALL ${roomCount} rooms with different principle combinations.
 
-ROOMS TO ANALYZE (${roomCount} total):
-${rooms.map((r: any, i: number) => `${i + 1}. [${r.tag}] ${r.name} - "${r.coreQuestion}"`).join('\n')}
+ROOMS TO ANALYZE (${roomCount} total, covered in EACH variation):
+${rooms.map((r: any, i: number) => `${i + 1}. roomId="${r.id}" [${r.tag}] ${r.name} - "${r.coreQuestion}"`).join('\n')}
+
+VARIATION THEMES:
+- Variation 1 (Christ-Centered): Prioritize typology, sanctuary, prophecy, symbols pointing to Christ
+- Variation 2 (Practical): Prioritize personal application, church relevance, lifestyle transformation
+- Variation 3 (Cosmic): Prioritize cycles, three heavens, great controversy, historical patterns
 
 CRITICAL REQUIREMENTS:
-1. Generate EXACTLY ${roomCount} responses - one for each room listed above
-2. Use ONLY ONE principle per room - select the most impactful one
-3. Each response must reference and build upon previous room discoveries
-4. Create a unified, cohesive study where insights flow naturally
-5. For Questions Room (QR): Generate exactly 15 questions (5 intra, 5 inter, 5 palace)
-6. DO NOT SKIP ANY ROOM - every room must have a response
+1. Generate EXACTLY 3 variations
+2. Each variation has EXACTLY ${roomCount} responses (one per room)
+3. Each variation uses DIFFERENT principle combinations where rooms have multiple principles
+4. Each variation builds a unique unified study narrative
+5. For QR in each variation: 15 questions with different emphasis per variation
+6. DO NOT SKIP ANY ROOM in any variation
+${isThoughtDrill ? `7. Connect every room's response to relevant Scripture passages` : ""}
 
-Return JSON format with EXACTLY ${roomCount} room responses:
+IMPORTANT: Use the exact roomId values from the ROOMS TO ANALYZE list above (e.g., "sr", "ir", "or", etc.).
+
+Return JSON format:
 {
-  "responses": [
-    { "roomId": "sr", "response": "Your Story Room analysis..." },
-    { "roomId": "ir", "response": "Your Imagination Room analysis..." },
-    ... (continue for ALL ${roomCount} rooms)
+  "variations": [
+    {
+      "theme": "Christ-Centered",
+      "description": "Brief description of this variation's focus",
+      "responses": [
+        { "roomId": "<use exact roomId from list>", "response": "..." },
+        ... (ALL ${roomCount} rooms)
+      ]
+    },
+    {
+      "theme": "Practical Application",
+      "description": "Brief description of this variation's focus",
+      "responses": [
+        { "roomId": "<use exact roomId from list>", "response": "..." },
+        ... (ALL ${roomCount} rooms)
+      ]
+    },
+    {
+      "theme": "Cosmic Context",
+      "description": "Brief description of this variation's focus",
+      "responses": [
+        { "roomId": "<use exact roomId from list>", "response": "..." },
+        ... (ALL ${roomCount} rooms)
+      ]
+    }
   ]
 }`;
     } else if (mode === "guided" && action === "teach") {
@@ -251,50 +257,64 @@ Please:
 5. Connect to broader biblical themes`;
     }
 
-    console.log("Drill-drill request:", { mode, verse, roomCount: rooms?.length || 1 });
+    console.log("Drill-drill request:", { mode, drillType, verse, thought: thought?.substring(0, 50), roomCount: rooms?.length || 1 });
 
-    // Increase token limit significantly for auto mode to accommodate all 35+ rooms
+    // Increase token limit significantly for auto mode to accommodate 3 variations with 35+ rooms each
     const requestBody: any = {
       model: "google/gemini-2.5-flash",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt }
       ],
-      temperature: 0.7,
-      max_tokens: mode === "auto" ? 24000 : 2000, // Increased from 12000 to handle all rooms
+      temperature: 0.8, // Slightly higher for variation diversity
+      max_tokens: mode === "auto" ? 48000 : 2000, // Increased to handle 3 variations
     };
 
-    // Use tool calling for auto mode to ensure structured output
+    // Use tool calling for auto mode to ensure structured output with 3 variations
     if (mode === "auto" && rooms) {
       requestBody.tools = [
         {
           type: "function",
           function: {
-            name: "submit_drill_responses",
-            description: "Submit the analysis responses for each room in the drill",
+            name: "submit_drill_variations",
+            description: "Submit 3 drill variations, each with analysis responses for every room",
             parameters: {
               type: "object",
               properties: {
-                responses: {
+                variations: {
                   type: "array",
+                  minItems: 3,
+                  maxItems: 3,
                   items: {
                     type: "object",
                     properties: {
-                      roomId: { type: "string", description: "The room ID (e.g., 'sr', 'ir', 'or')" },
-                      response: { type: "string", description: "The analysis response for this room" }
+                      theme: { type: "string", description: "The theme of this variation (Christ-Centered, Practical Application, or Cosmic Context)" },
+                      description: { type: "string", description: "Brief description of this variation's focus" },
+                      responses: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            roomId: { type: "string", description: "The room ID (e.g., 'sr', 'ir', 'or')" },
+                            response: { type: "string", description: "The analysis response for this room in this variation" }
+                          },
+                          required: ["roomId", "response"],
+                          additionalProperties: false
+                        }
+                      }
                     },
-                    required: ["roomId", "response"],
+                    required: ["theme", "description", "responses"],
                     additionalProperties: false
                   }
                 }
               },
-              required: ["responses"],
+              required: ["variations"],
               additionalProperties: false
             }
           }
         }
       ];
-      requestBody.tool_choice = { type: "function", function: { name: "submit_drill_responses" } };
+      requestBody.tool_choice = { type: "function", function: { name: "submit_drill_variations" } };
     }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -329,16 +349,18 @@ Please:
     
     // Parse response based on mode
     if (mode === "auto") {
-      // Check for tool call response first
+      // Check for tool call response first (expecting 3 variations)
       const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
       if (toolCall?.function?.arguments) {
         try {
           const parsed = JSON.parse(toolCall.function.arguments);
-          console.log("Parsed tool call response with", parsed.responses?.length, "rooms");
-          return new Response(
-            JSON.stringify(parsed),
-            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
+          console.log("Parsed tool call response with", parsed.variations?.length, "variations");
+          if (parsed.variations?.length >= 1) {
+            return new Response(
+              JSON.stringify(parsed),
+              { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
         } catch (e) {
           console.error("Failed to parse tool call arguments:", e);
         }
@@ -352,17 +374,34 @@ Please:
           const jsonMatch = content.match(/\{[\s\S]*\}/);
           if (jsonMatch) {
             const parsed = JSON.parse(jsonMatch[0]);
-            console.log("Parsed content JSON with", parsed.responses?.length, "rooms");
-            return new Response(
-              JSON.stringify(parsed),
-              { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
+            // Check if it has variations format
+            if (parsed.variations?.length >= 1) {
+              console.log("Parsed content JSON with", parsed.variations.length, "variations");
+              return new Response(
+                JSON.stringify(parsed),
+                { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+              );
+            }
+            // Legacy format support - wrap single responses in a variation
+            if (parsed.responses?.length > 0) {
+              console.log("Converting legacy format to variations");
+              return new Response(
+                JSON.stringify({
+                  variations: [{
+                    theme: "Comprehensive Analysis",
+                    description: "Full palace analysis of the verse",
+                    responses: parsed.responses
+                  }]
+                }),
+                { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+              );
+            }
           }
         } catch (e) {
           console.error("Failed to parse content JSON:", e);
         }
 
-        // Last fallback: create responses from content for each room
+        // Last fallback: create single variation with pending responses
         console.log("Using content fallback for all rooms");
         const fallbackResponses = rooms.map((r: any) => ({
           roomId: r.id,
@@ -371,7 +410,11 @@ Please:
         
         return new Response(
           JSON.stringify({ 
-            responses: fallbackResponses,
+            variations: [{
+              theme: "Analysis Pending",
+              description: "Please regenerate for full analysis",
+              responses: fallbackResponses
+            }],
             rawContent: content
           }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -381,10 +424,14 @@ Please:
       // Complete fallback
       return new Response(
         JSON.stringify({ 
-          responses: rooms.map((r: any) => ({
-            roomId: r.id,
-            response: "Analysis failed to generate. Please try again."
-          }))
+          variations: [{
+            theme: "Error",
+            description: "Analysis failed to generate",
+            responses: rooms.map((r: any) => ({
+              roomId: r.id,
+              response: "Analysis failed to generate. Please try again."
+            }))
+          }]
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );

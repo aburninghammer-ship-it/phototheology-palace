@@ -38,6 +38,21 @@ export function useOutputSpark() {
     if (prefs?.intensity === 'off') return null;
 
     try {
+      // Fetch recent sparks for deduplication
+      const { data: recentSparks } = await supabase
+        .from('sparks')
+        .select('content_hash, title')
+        .eq('user_id', user.id)
+        .is('dismissed_at', null)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      const recentHashes = (recentSparks || [])
+        .filter(s => s.content_hash)
+        .map(s => s.content_hash as string);
+
+      const recentTitles = (recentSparks || []).map(s => s.title);
+
       const { data, error } = await supabase.functions.invoke('generate-spark', {
         body: {
           content: options.content,
@@ -46,8 +61,10 @@ export function useOutputSpark() {
           contextType: options.type,
           contextId: options.contextId,
           mode: prefs?.mode || 'standard',
-          triggerType: 'output', // Signal this is an output-triggered spark
-          outputTitle: options.title
+          triggerType: 'output',
+          outputTitle: options.title,
+          recentHashes,
+          recentTitles
         }
       });
 

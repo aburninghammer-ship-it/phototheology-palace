@@ -262,15 +262,15 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
             transition={{ duration: 3, repeat: Infinity }}
             className="text-6xl font-bold text-amber-50 mb-2"
           >
-            Phototheology
+            Phototheology<span className="text-[0.65em] font-semibold tracking-wide px-2 py-0.5 rounded ml-1 align-middle inline-block" style={{ background: "rgba(255, 255, 255, 0.12)", border: "1px solid rgba(255, 255, 255, 0.25)", color: "#e8e8e8", fontFamily: "'Inter', sans-serif", verticalAlign: "middle", position: "relative", top: "-0.1em" }}>OS</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="text-3xl text-amber-100 font-light tracking-widest"
+            className="text-sm text-amber-100/80 font-light tracking-widest uppercase"
           >
-            PALACE
+            Powered by AI. Built for Biblical Intelligence.
           </motion.p>
         </motion.div>
 

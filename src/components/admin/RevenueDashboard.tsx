@@ -1,13 +1,53 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useRevenueAnalytics } from "@/hooks/useRevenueAnalytics";
-import { Loader2, TrendingUp, TrendingDown, DollarSign, Users, RefreshCw, ArrowDownRight, Target, Percent, Clock, AlertTriangle, Calendar } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, DollarSign, Users, RefreshCw, ArrowDownRight, Target, Percent, Clock, AlertTriangle, Calendar, FileText, Mail, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts';
-
+import { format } from "date-fns";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 export function RevenueDashboard() {
-  const { loading, metrics, trialMetrics, cohorts, onboardingFunnel, refetch } = useRevenueAnalytics();
+  const [sendingEmails, setSendingEmails] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<string | null>(null); // null = all products
+  const [emailResults, setEmailResults] = useState<{ mode: string; successCount?: number; failCount?: number; purchases?: any[]; byProduct?: Record<string, number> } | null>(null);
+  const { loading, metrics, trialMetrics, pdfMetrics, cohorts, onboardingFunnel, refetch } = useRevenueAnalytics();
+
+  const productOptions = [
+    { key: null, label: "All Products" },
+    { key: "genesis-6-days", label: "Genesis in 6 Days ($9)" },
+    { key: "study-suite", label: "Study Suite (discontinued)" },
+    { key: "quick-start-guide", label: "Quick-Start Guide ($12)" },
+  ];
+
+  const handleSendPdfEmails = async (dryRun: boolean) => {
+    setSendingEmails(true);
+    setEmailResults(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-pdf-emails-batch', {
+        body: { dryRun, product: selectedProduct }
+      });
+      
+      if (error) throw error;
+      
+      setEmailResults(data);
+      
+      if (dryRun) {
+        const productLabel = selectedProduct ? productOptions.find(p => p.key === selectedProduct)?.label : 'all products';
+        toast.info(`Found ${data.totalCount} purchasers for ${productLabel}`);
+      } else {
+        toast.success(`Sent ${data.successCount} emails successfully${data.failCount > 0 ? `, ${data.failCount} failed` : ''}`);
+      }
+    } catch (error: any) {
+      console.error('Error sending PDF emails:', error);
+      toast.error(error.message || 'Failed to send emails');
+    } finally {
+      setSendingEmails(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -196,6 +236,173 @@ export function RevenueDashboard() {
             </CardContent>
           </Card>
         </>
+      )}
+
+      {/* PDF Purchases Section */}
+      {pdfMetrics && (
+        <Card className="border-purple-500/20 bg-purple-500/5">
+          <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-purple-500" />
+              PDF Purchases
+            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardDescription>
+                One-time product sales (Genesis in 6 Days, Quick-Start Guide, Study Suite)
+              </CardDescription>
+              <div className="flex items-center gap-2 flex-wrap">
+                <select
+                  className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  value={selectedProduct || ""}
+                  onChange={(e) => setSelectedProduct(e.target.value || null)}
+                >
+                  {productOptions.map((opt) => (
+                    <option key={opt.key || "all"} value={opt.key || ""}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleSendPdfEmails(true)}
+                  disabled={sendingEmails}
+                >
+                  {sendingEmails ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Preview Emails
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => handleSendPdfEmails(false)}
+                  disabled={sendingEmails}
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
+                  {sendingEmails ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
+                  Send PDF Emails
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {/* Email Results */}
+            {emailResults && (
+              <div className="mb-4 p-4 rounded-lg border bg-muted/50">
+                {emailResults.mode === 'dry-run' ? (
+                  <div>
+                    <p className="font-medium text-orange-600 mb-2">
+                      📋 Preview: {emailResults.purchases?.length || 0} purchasers will receive emails
+                    </p>
+                    {emailResults.byProduct && Object.keys(emailResults.byProduct).length > 0 && (
+                      <div className="text-sm text-muted-foreground mb-2">
+                        {Object.entries(emailResults.byProduct).map(([product, count]) => (
+                          <div key={product}>• {product}: {count as number} purchasers</div>
+                        ))}
+                      </div>
+                    )}
+                    {emailResults.purchases && emailResults.purchases.length > 0 && (
+                      <div className="text-sm text-muted-foreground max-h-32 overflow-y-auto border-t pt-2 mt-2">
+                        {emailResults.purchases.map((p: any, i: number) => (
+                          <div key={i} className="flex gap-2">
+                            <span className="text-purple-600">[{p.productName}]</span>
+                            <span>{p.email}</span>
+                            <span className="text-muted-foreground">- {p.name || 'No name'}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Click "Send PDF Emails" to send download links to all purchasers.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-4">
+                    <div className="text-green-600">
+                      ✅ {emailResults.successCount} emails sent successfully
+                    </div>
+                    {emailResults.failCount && emailResults.failCount > 0 && (
+                      <div className="text-red-600">
+                        ❌ {emailResults.failCount} failed
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="grid gap-4 md:grid-cols-2 mb-6">
+              <div className="p-4 rounded-lg bg-background border">
+                <div className="text-3xl font-bold text-purple-600">{pdfMetrics.totalPurchases}</div>
+                <p className="text-sm text-muted-foreground">Total PDF Sales</p>
+              </div>
+              <div className="p-4 rounded-lg bg-background border">
+                <div className="text-3xl font-bold text-green-600">${pdfMetrics.totalRevenue.toFixed(2)}</div>
+                <p className="text-sm text-muted-foreground">Total PDF Revenue</p>
+              </div>
+            </div>
+
+            {pdfMetrics.purchases.length > 0 && (
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Product</TableHead>
+                      <TableHead>Customer</TableHead>
+                      <TableHead className="text-center">PDF Sent</TableHead>
+                      <TableHead className="text-right">Amount</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {pdfMetrics.purchases.slice(0, 20).map((purchase) => (
+                      <TableRow key={purchase.id}>
+                        <TableCell className="font-mono text-sm">
+                          {format(new Date(purchase.date), 'MMM d, yyyy h:mm a')}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="text-purple-600 border-purple-300">
+                            {purchase.product}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col">
+                            {purchase.name && <span className="font-medium">{purchase.name}</span>}
+                            {purchase.email ? (
+                              <span className="text-sm text-muted-foreground flex items-center gap-1">
+                                <Mail className="h-3 w-3" />
+                                {purchase.email}
+                              </span>
+                            ) : (
+                              <span className="text-sm text-muted-foreground italic">Email in Stripe Dashboard</span>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {purchase.pdfSent ? (
+                            <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/30">
+                              ✓ Sent
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
+                              Pending
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right font-mono font-medium text-green-600">
+                          ${purchase.amount.toFixed(2)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                {pdfMetrics.purchases.length > 20 && (
+                  <div className="p-2 text-center text-sm text-muted-foreground border-t">
+                    Showing 20 of {pdfMetrics.purchases.length} purchases
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
 
       {/* Cohort Analysis */}

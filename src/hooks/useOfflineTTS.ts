@@ -99,6 +99,7 @@ export const useOfflineTTS = (verses: Verse[], options?: UseOfflineTTSOptions) =
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = playbackRate;
     utterance.pitch = 1;
+    utterance.lang = 'en-US'; // Force English to prevent Hebrew detection
     
     if (selectedVoice) {
       utterance.voice = selectedVoice;
@@ -216,6 +217,7 @@ export const useOfflineTTS = (verses: Verse[], options?: UseOfflineTTSOptions) =
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = playbackRate;
       utterance.pitch = 1;
+      utterance.lang = 'en-US'; // Force English to prevent Hebrew detection
       
       if (selectedVoice) {
         utterance.voice = selectedVoice;

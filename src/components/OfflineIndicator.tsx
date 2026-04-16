@@ -32,7 +32,7 @@ export const OfflineIndicator = () => {
   if (isOnline && !wasOffline) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 max-w-sm animate-slide-up">
+    <div className="fixed bottom-24 md:bottom-4 right-4 z-50 max-w-sm animate-slide-up">
       <Alert variant={isOnline ? "default" : "destructive"}>
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">

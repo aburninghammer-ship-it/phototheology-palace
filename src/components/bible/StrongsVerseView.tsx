@@ -131,14 +131,15 @@ export const StrongsVerseView = ({
   return (
     <>
       <div
+        id={`verse-${verse.verse}`}
         className={`group cursor-pointer transition-all duration-300 p-3 rounded-lg ${
           isAudioPlaying
             ? "bg-emerald-500/20 border-2 border-emerald-500 shadow-lg ring-2 ring-emerald-500/30 backdrop-blur-md"
             : isSelected
-            ? "bg-white/10 backdrop-blur-md border border-white/20 shadow-lg"
+            ? "bg-primary/10 dark:bg-white/10 backdrop-blur-md border border-primary/30 dark:border-white/20 shadow-lg"
             : isHighlighted
             ? "bg-accent/20 border-2 border-accent shadow-md animate-pulse-glow"
-            : "hover:bg-white/5 border-2 border-transparent"
+            : "hover:bg-muted/50 dark:hover:bg-white/5 border-2 border-transparent"
         }`}
         onClick={onSelect}
       >
@@ -288,7 +289,7 @@ export const StrongsVerseView = ({
       </div>
 
       <Dialog open={analysisDialogOpen} onOpenChange={setAnalysisDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh]">
+        <DialogContent className="w-[95vw] max-w-2xl max-h-[85vh]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-amber-500" />

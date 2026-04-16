@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +25,7 @@ interface AvailableRoom {
 
 export default function EscapeRoom() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isGenerating, setIsGenerating] = useState(false);
   const [isBatchGenerating, setIsBatchGenerating] = useState(false);
   const [mode, setMode] = useState<"room_as_room" | "category_gauntlet" | "floor_race" | "live_mission" | "async_hunt">("room_as_room");
@@ -87,8 +89,6 @@ export default function EscapeRoom() {
     setIsGenerating(true);
     
     try {
-      console.log('Starting escape room generation with:', { mode, category, scenario });
-      
       const { data, error } = await supabase.functions.invoke('generate-escape-room', {
         body: { 
           mode, 
@@ -97,8 +97,6 @@ export default function EscapeRoom() {
           difficulty: mode === 'floor_race' ? difficulty : 'pro'
         }
       });
-
-      console.log('Escape room response:', { data, error });
 
       if (error) {
         console.error('Escape room error:', error);
@@ -109,11 +107,11 @@ export default function EscapeRoom() {
         throw new Error('No room ID returned from server');
       }
 
-      toast.success("Escape room created! Let the challenge begin...");
+      toast.success(t('escapeRoom.roomCreated'));
       navigate(`/escape-room/play/${data.room_id}`);
     } catch (error: any) {
       console.error('Error generating escape room:', error);
-      toast.error(error.message || "Failed to create escape room. Please try again.");
+      toast.error(error.message || t('escapeRoom.failedToCreate'));
     } finally {
       setIsGenerating(false);
     }
@@ -123,7 +121,7 @@ export default function EscapeRoom() {
     setIsBatchGenerating(true);
     
     try {
-      toast.info("Generating multiple escape rooms... This may take a minute.");
+      toast.info(t('escapeRoom.batchGenerating'));
       
       const { data, error } = await supabase.functions.invoke('batch-generate-escape-rooms', {
         body: {}
@@ -131,11 +129,11 @@ export default function EscapeRoom() {
 
       if (error) throw error;
 
-      toast.success(`Successfully generated ${data.generated_count} escape rooms!`);
+      toast.success(t('escapeRoom.batchSuccess', { count: data.generated_count }));
       loadAvailableRooms(); // Refresh the list
     } catch (error) {
       console.error('Error batch generating:', error);
-      toast.error("Failed to batch generate escape rooms.");
+      toast.error(t('escapeRoom.batchFailed'));
     } finally {
       setIsBatchGenerating(false);
     }
@@ -146,9 +144,9 @@ export default function EscapeRoom() {
     const expires = new Date(expiresAt);
     const minutes = Math.floor((expires.getTime() - now.getTime()) / (1000 * 60));
     
-    if (minutes < 60) return `${minutes}m remaining`;
+    if (minutes < 60) return t('escapeRoom.minutesRemaining', { minutes });
     const hours = Math.floor(minutes / 60);
-    return `${hours}h ${minutes % 60}m remaining`;
+    return t('escapeRoom.hoursMinutesRemaining', { hours, minutes: minutes % 60 });
   };
 
   return (
@@ -158,10 +156,10 @@ export default function EscapeRoom() {
       <main className="container mx-auto px-4 pt-24 pb-12 max-w-5xl">
         <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-            PT-Palace Escape Room
+            {t('escapeRoom.title')}
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            60-minute biblical challenge. Race through Palace rooms, solve Scripture puzzles, reach the summit.
+            {t('escapeRoom.subtitle')}
           </p>
         </div>
 
@@ -181,19 +179,19 @@ export default function EscapeRoom() {
                 <div className="p-2 bg-primary/10 rounded-lg">
                   <Zap className="w-6 h-6 text-primary" />
                 </div>
-                <CardTitle className="text-lg">Room-as-Room</CardTitle>
+                <CardTitle className="text-lg">{t('escapeRoom.modes.roomAsRoom.title')}</CardTitle>
               </div>
               <CardDescription>
-                Lock yourself inside ONE Palace room. Master its methodology to escape.
+                {t('escapeRoom.modes.roomAsRoom.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>• 3-6 locks (difficulty-based)</li>
-                <li>• Deep fluency in one method</li>
-                <li>• 2-3 hints (−3 pts each)</li>
-                <li>• Max: 20-40 points</li>
-                <li className="text-xs italic text-primary">30-60 minutes</li>
+                <li>{t('escapeRoom.modes.roomAsRoom.locks')}</li>
+                <li>{t('escapeRoom.modes.roomAsRoom.fluency')}</li>
+                <li>{t('escapeRoom.modes.roomAsRoom.hints')}</li>
+                <li>{t('escapeRoom.modes.roomAsRoom.maxPoints')}</li>
+                <li className="text-xs italic text-primary">{t('escapeRoom.modes.roomAsRoom.time')}</li>
               </ul>
             </CardContent>
           </Card>
@@ -204,19 +202,19 @@ export default function EscapeRoom() {
                 <div className="p-2 bg-accent/10 rounded-lg">
                   <Trophy className="w-6 h-6 text-accent" />
                 </div>
-                <CardTitle className="text-lg">Category Gauntlet</CardTitle>
+                <CardTitle className="text-lg">{t('escapeRoom.modes.categoryGauntlet.title')}</CardTitle>
               </div>
               <CardDescription>
-                3-6 rooms + Meta Boss. Prophecy, Sanctuary, or Gospel-Mission specialty.
+                {t('escapeRoom.modes.categoryGauntlet.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>• 3-6 rooms (difficulty-based)</li>
-                <li>• Escalating complexity</li>
-                <li>• 3 hints (−2 pts each)</li>
-                <li>• Max: 20-45 points</li>
-                <li className="text-xs italic text-accent">30-60 minutes</li>
+                <li>{t('escapeRoom.modes.categoryGauntlet.rooms')}</li>
+                <li>{t('escapeRoom.modes.categoryGauntlet.complexity')}</li>
+                <li>{t('escapeRoom.modes.categoryGauntlet.hints')}</li>
+                <li>{t('escapeRoom.modes.categoryGauntlet.maxPoints')}</li>
+                <li className="text-xs italic text-accent">{t('escapeRoom.modes.categoryGauntlet.time')}</li>
               </ul>
             </CardContent>
           </Card>
@@ -227,19 +225,19 @@ export default function EscapeRoom() {
                 <div className="p-2 bg-primary/10 rounded-lg">
                   <Users className="w-6 h-6 text-primary" />
                 </div>
-                <CardTitle className="text-lg">Live Mission</CardTitle>
+                <CardTitle className="text-lg">{t('escapeRoom.modes.liveMission.title')}</CardTitle>
               </div>
               <CardDescription>
-                House Fire Edition: Real-time apologetics under hostile questioning.
+                {t('escapeRoom.modes.liveMission.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>• 2-5 challenges (difficulty-based)</li>
-                <li>• Teams switch roles</li>
-                <li>• Street-ready training</li>
-                <li>• Max: 20-50 points</li>
-                <li className="text-xs italic text-primary">20-60 minutes</li>
+                <li>{t('escapeRoom.modes.liveMission.challenges')}</li>
+                <li>{t('escapeRoom.modes.liveMission.teamSwitch')}</li>
+                <li>{t('escapeRoom.modes.liveMission.training')}</li>
+                <li>{t('escapeRoom.modes.liveMission.maxPoints')}</li>
+                <li className="text-xs italic text-primary">{t('escapeRoom.modes.liveMission.time')}</li>
               </ul>
             </CardContent>
           </Card>
@@ -250,19 +248,19 @@ export default function EscapeRoom() {
                 <div className="p-2 bg-accent/10 rounded-lg">
                   <Clock className="w-6 h-6 text-accent" />
                 </div>
-                <CardTitle className="text-lg">Async Hunt</CardTitle>
+                <CardTitle className="text-lg">{t('escapeRoom.modes.asyncHunt.title')}</CardTitle>
               </div>
               <CardDescription>
-                24-hour survival: Crisis briefing → team defense → ranking.
+                {t('escapeRoom.modes.asyncHunt.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>• Simple to multi-layered crisis</li>
-                <li>• 300-1000 word defense</li>
-                <li>• Public ranking</li>
-                <li>• Max: 15-35 points</li>
-                <li className="text-xs italic text-accent">12-24 hours</li>
+                <li>{t('escapeRoom.modes.asyncHunt.crisis')}</li>
+                <li>{t('escapeRoom.modes.asyncHunt.defense')}</li>
+                <li>{t('escapeRoom.modes.asyncHunt.ranking')}</li>
+                <li>{t('escapeRoom.modes.asyncHunt.maxPoints')}</li>
+                <li className="text-xs italic text-accent">{t('escapeRoom.modes.asyncHunt.time')}</li>
               </ul>
             </CardContent>
           </Card>
@@ -270,42 +268,42 @@ export default function EscapeRoom() {
 
         <Card className="border-primary/30 bg-card/80 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>Start Your Escape</CardTitle>
-            <CardDescription>Configure your challenge and begin the 60-minute timer</CardDescription>
+            <CardTitle>{t('escapeRoom.startYourEscape')}</CardTitle>
+            <CardDescription>{t('escapeRoom.configureChallenge')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Mode Selection */}
             <div className="space-y-3">
-              <Label className="text-base font-semibold">Game Mode</Label>
+              <Label className="text-base font-semibold">{t('escapeRoom.gameMode')}</Label>
               <RadioGroup value={mode} onValueChange={(v) => setMode(v as any)}>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="room_as_room" id="room_escape" />
                   <Label htmlFor="room_escape" className="cursor-pointer">
-                    Room-as-Room Escape (45 min) - Master one methodology
+                    {t('escapeRoom.modeLabels.roomAsRoom')}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="category_gauntlet" id="gauntlet" />
                   <Label htmlFor="gauntlet" className="cursor-pointer">
-                    Category Gauntlet (60 min) - Specialty focus
+                    {t('escapeRoom.modeLabels.categoryGauntlet')}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="floor_race" id="race" />
                   <Label htmlFor="race" className="cursor-pointer">
-                    Floor-by-Floor Race (30-60 min) - Sprint ascent with difficulty levels
+                    {t('escapeRoom.modeLabels.floorRace')}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="live_mission" id="live" />
                   <Label htmlFor="live" className="cursor-pointer">
-                    Live Mission (30 min) - Apologetics training
+                    {t('escapeRoom.modeLabels.liveMission')}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="async_hunt" id="async" />
                   <Label htmlFor="async" className="cursor-pointer">
-                    Async Hunt (24 hrs) - Crisis response
+                    {t('escapeRoom.modeLabels.asyncHunt')}
                   </Label>
                 </div>
               </RadioGroup>
@@ -315,18 +313,18 @@ export default function EscapeRoom() {
             {(mode === "category_gauntlet" || mode === "room_as_room") && (
               <div className="space-y-3">
                 <Label className="text-base font-semibold">
-                  {mode === "room_as_room" ? "Palace Room" : "Category"}
+                  {mode === "room_as_room" ? t('escapeRoom.palaceRoom') : t('escapeRoom.category')}
                 </Label>
                 <RadioGroup value={category} onValueChange={(v) => setCategory(v)}>
                   {mode === "room_as_room" ? (
                     <div className="space-y-4">
-                      <p className="text-sm text-muted-foreground">Choose any Palace room to escape from:</p>
+                      <p className="text-sm text-muted-foreground">{t('escapeRoom.chooseRoom')}</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-2">
                         {allPalaceRooms.map((room) => (
                           <div key={room.id} className="flex items-center space-x-2">
                             <RadioGroupItem value={room.id} id={room.id} />
                             <Label htmlFor={room.id} className="cursor-pointer text-sm">
-                              <span className="text-xs text-muted-foreground">Floor {room.floor}:</span> {room.label}
+                              <span className="text-xs text-muted-foreground">{t('escapeRoom.floor', { floor: room.floor })}:</span> {room.label}
                             </Label>
                           </div>
                         ))}
@@ -337,19 +335,19 @@ export default function EscapeRoom() {
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="prophecy" id="prophecy" />
                         <Label htmlFor="prophecy" className="cursor-pointer">
-                          Prophecy (Dan/Rev, timelines, symbols)
+                          {t('escapeRoom.categories.prophecy')}
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="sanctuary" id="sanctuary" />
                         <Label htmlFor="sanctuary" className="cursor-pointer">
-                          Sanctuary (Furniture, Feasts, typology)
+                          {t('escapeRoom.categories.sanctuary')}
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="gospel_mission" id="gospel" />
                         <Label htmlFor="gospel" className="cursor-pointer">
-                          Gospel-Mission (Christ-centered, Room 66)
+                          {t('escapeRoom.categories.gospelMission')}
                         </Label>
                       </div>
                     </>
@@ -360,39 +358,39 @@ export default function EscapeRoom() {
 
             {/* Difficulty Selection - Universal for all modes */}
             <div className="space-y-3">
-              <Label className="text-base font-semibold">Difficulty Level</Label>
+              <Label className="text-base font-semibold">{t('escapeRoom.difficultyLevel')}</Label>
               <RadioGroup value={difficulty} onValueChange={(v) => setDifficulty(v as any)}>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="easy" id="diff-easy" />
                   <Label htmlFor="diff-easy" className="cursor-pointer">
-                    Easy - {mode === "floor_race" ? "4 floors" : mode === "room_as_room" ? "3 locks" : mode === "category_gauntlet" ? "3 rooms" : mode === "live_mission" ? "2 challenges" : "Simple crisis"} (~30 min)
+                    {t('escapeRoom.difficulty.easy', { detail: mode === "floor_race" ? t('escapeRoom.diffDetail.floors4') : mode === "room_as_room" ? t('escapeRoom.diffDetail.locks3') : mode === "category_gauntlet" ? t('escapeRoom.diffDetail.rooms3') : mode === "live_mission" ? t('escapeRoom.diffDetail.challenges2') : t('escapeRoom.diffDetail.simpleCrisis') })}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="medium" id="diff-medium" />
                   <Label htmlFor="diff-medium" className="cursor-pointer">
-                    Medium - {mode === "floor_race" ? "5 floors" : mode === "room_as_room" ? "4 locks" : mode === "category_gauntlet" ? "4 rooms" : mode === "live_mission" ? "3 challenges" : "Moderate crisis"} (~40 min)
+                    {t('escapeRoom.difficulty.medium', { detail: mode === "floor_race" ? t('escapeRoom.diffDetail.floors5') : mode === "room_as_room" ? t('escapeRoom.diffDetail.locks4') : mode === "category_gauntlet" ? t('escapeRoom.diffDetail.rooms4') : mode === "live_mission" ? t('escapeRoom.diffDetail.challenges3') : t('escapeRoom.diffDetail.moderateCrisis') })}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="hard" id="diff-hard" />
                   <Label htmlFor="diff-hard" className="cursor-pointer">
-                    Hard - {mode === "floor_race" ? "7 floors" : mode === "room_as_room" ? "5 locks" : mode === "category_gauntlet" ? "5 rooms" : mode === "live_mission" ? "4 challenges" : "Complex crisis"} (~50 min)
+                    {t('escapeRoom.difficulty.hard', { detail: mode === "floor_race" ? t('escapeRoom.diffDetail.floors7') : mode === "room_as_room" ? t('escapeRoom.diffDetail.locks5') : mode === "category_gauntlet" ? t('escapeRoom.diffDetail.rooms5') : mode === "live_mission" ? t('escapeRoom.diffDetail.challenges4') : t('escapeRoom.diffDetail.complexCrisis') })}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="pro" id="diff-pro" />
                   <Label htmlFor="diff-pro" className="cursor-pointer">
-                    Pro - {mode === "floor_race" ? "All 8 floors" : mode === "room_as_room" ? "6 locks" : mode === "category_gauntlet" ? "6 rooms + meta" : mode === "live_mission" ? "5 challenges" : "Multi-layered crisis"} (full 60 min)
+                    {t('escapeRoom.difficulty.pro', { detail: mode === "floor_race" ? t('escapeRoom.diffDetail.allFloors') : mode === "room_as_room" ? t('escapeRoom.diffDetail.locks6') : mode === "category_gauntlet" ? t('escapeRoom.diffDetail.rooms6Meta') : mode === "live_mission" ? t('escapeRoom.diffDetail.challenges5') : t('escapeRoom.diffDetail.multiCrisis') })}
                   </Label>
                 </div>
               </RadioGroup>
               <p className="text-xs text-muted-foreground">
-                {mode === "floor_race" && "Higher difficulty = more floors to race through"}
-                {mode === "room_as_room" && "Higher difficulty = more locks to solve in the room"}
-                {mode === "category_gauntlet" && "Higher difficulty = more rooms in the gauntlet"}
-                {mode === "live_mission" && "Higher difficulty = more apologetics challenges"}
-                {mode === "async_hunt" && "Higher difficulty = more complex multi-layered crisis scenarios"}
+                {mode === "floor_race" && t('escapeRoom.diffHint.floorRace')}
+                {mode === "room_as_room" && t('escapeRoom.diffHint.roomAsRoom')}
+                {mode === "category_gauntlet" && t('escapeRoom.diffHint.categoryGauntlet')}
+                {mode === "live_mission" && t('escapeRoom.diffHint.liveMission')}
+                {mode === "async_hunt" && t('escapeRoom.diffHint.asyncHunt')}
               </p>
             </div>
 
@@ -400,34 +398,34 @@ export default function EscapeRoom() {
             {mode === "live_mission" && (
               <div className="space-y-3">
                 <Label htmlFor="scenario" className="text-base font-semibold">
-                  Scenario (optional)
+                  {t('escapeRoom.scenarioOptional')}
                 </Label>
                 <Input
                   id="scenario"
                   value={scenario}
                   onChange={(e) => setScenario(e.target.value)}
-                  placeholder="e.g., 'Public Square Evangelism' or 'Online Debate'"
+                  placeholder={t('escapeRoom.scenarioPlaceholder')}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Leave blank for default scenarios (Sabbath defense, Sanctuary relevance, etc.)
+                  {t('escapeRoom.scenarioHint')}
                 </p>
               </div>
             )}
 
             {/* Team Mode */}
             <div className="space-y-3">
-              <Label className="text-base font-semibold">Play Style</Label>
+              <Label className="text-base font-semibold">{t('escapeRoom.playStyle')}</Label>
               <RadioGroup value={teamMode} onValueChange={(v) => setTeamMode(v as any)}>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="solo" id="solo" />
                   <Label htmlFor="solo" className="cursor-pointer">
-                    Solo
+                    {t('escapeRoom.solo')}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="team" id="team" />
                   <Label htmlFor="team" className="cursor-pointer">
-                    Team (2-5 players)
+                    {t('escapeRoom.team')}
                   </Label>
                 </div>
               </RadioGroup>
@@ -441,7 +439,7 @@ export default function EscapeRoom() {
                   {mode === "live_mission" ? "30" : mode === "room_as_room" ? "45" : mode === "async_hunt" ? "24h" : "60"}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  {mode === "async_hunt" ? "hours" : "minutes"}
+                  {mode === "async_hunt" ? t('common.hours') : t('common.minutes')}
                 </div>
               </div>
               <div className="text-center">
@@ -449,14 +447,14 @@ export default function EscapeRoom() {
                 <div className="text-2xl font-bold">
                   {mode === "live_mission" ? "3-10" : teamMode === "solo" ? "1" : "2-5"}
                 </div>
-                <div className="text-xs text-muted-foreground">players</div>
+                <div className="text-xs text-muted-foreground">{t('common.players')}</div>
               </div>
               <div className="text-center">
                 <Trophy className="w-6 h-6 text-primary mx-auto mb-2" />
                 <div className="text-2xl font-bold">
                   {mode === "room_as_room" ? "36" : mode === "live_mission" ? "45" : mode === "async_hunt" ? "25" : mode === "category_gauntlet" ? "40" : "41"}
                 </div>
-                <div className="text-xs text-muted-foreground">max points</div>
+                <div className="text-xs text-muted-foreground">{t('common.maxPoints')}</div>
               </div>
             </div>
 
@@ -466,7 +464,7 @@ export default function EscapeRoom() {
               size="lg"
               className="w-full text-lg py-6"
             >
-              {isGenerating ? "Generating Challenge..." : "Start Escape Room"}
+              {isGenerating ? t('escapeRoom.generatingChallenge') : t('escapeRoom.startEscapeRoom')}
             </Button>
 
             <Button
@@ -476,11 +474,11 @@ export default function EscapeRoom() {
               size="sm"
               className="w-full"
             >
-              {isBatchGenerating ? "Batch Generating..." : "Generate Multiple Rooms (Admin)"}
+              {isBatchGenerating ? t('escapeRoom.batchGeneratingBtn') : t('escapeRoom.generateMultipleRooms')}
             </Button>
 
             <p className="text-xs text-center text-muted-foreground">
-              Requires KJV verses. Palace room/principle labeling enforced. No same-principle back-to-back.
+              {t('escapeRoom.requiresKjv')}
             </p>
           </CardContent>
         </Card>
@@ -488,7 +486,7 @@ export default function EscapeRoom() {
         {/* Available Escape Rooms */}
         {availableRooms.length > 0 && (
           <div className="mt-12">
-            <h2 className="text-2xl font-bold mb-6">Available Escape Rooms</h2>
+            <h2 className="text-2xl font-bold mb-6">{t('escapeRoom.availableRooms')}</h2>
             <div className="grid md:grid-cols-2 gap-6">
               {availableRooms.map((room) => (
                 <Card key={room.id} className="border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg cursor-pointer" onClick={() => navigate(`/escape-room/play/${room.id}`)}>
@@ -498,7 +496,7 @@ export default function EscapeRoom() {
                         <CardTitle className="text-lg mb-2">{room.title}</CardTitle>
                         <CardDescription className="flex flex-wrap gap-2">
                           <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary">
-                            {room.mode === 'category_gauntlet' ? 'Category Gauntlet' : 'Floor Race'}
+                            {room.mode === 'category_gauntlet' ? t('escapeRoom.modes.categoryGauntlet.title') : t('escapeRoom.floorRace')}
                           </span>
                           {room.category && (
                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-accent/10 text-accent capitalize">

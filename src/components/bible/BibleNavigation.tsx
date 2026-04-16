@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,6 +68,7 @@ interface GroupSearchResults {
 
 export const BibleNavigation = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { setCustomState, getCustomState } = usePreservePage();
   
   // Restore state from context or use defaults
@@ -191,7 +193,7 @@ export const BibleNavigation = () => {
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-primary" />
-            <h3 className="font-serif text-base sm:text-lg font-semibold">Navigate Bible</h3>
+            <h3 className="font-serif text-base sm:text-lg font-semibold">{t('bible.navigateBible')}</h3>
           </div>
           <PageLockToggle />
         </div>
@@ -200,7 +202,7 @@ export const BibleNavigation = () => {
         <div className="space-y-3">
           <Select value={selectedBook} onValueChange={setSelectedBook}>
             <SelectTrigger className="bg-white/10 backdrop-blur-md border-white/20 hover:border-primary/50 hover:bg-white/15 transition-all text-foreground">
-              <SelectValue placeholder="Select book" />
+              <SelectValue placeholder={t('bible.selectBook')} />
             </SelectTrigger>
             <SelectContent className="max-h-[300px] bg-card/95 backdrop-blur-xl border-white/20 z-50">
               {BIBLE_BOOKS.map((book) => (
@@ -214,7 +216,7 @@ export const BibleNavigation = () => {
           <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <Input
               type="number"
-              placeholder="Chapter"
+              placeholder={t('bible.chapter')}
               value={chapter}
               onChange={(e) => setChapter(e.target.value)}
               min="1"
@@ -222,7 +224,7 @@ export const BibleNavigation = () => {
             />
             <Input
               type="number"
-              placeholder="Verse"
+              placeholder={t('bible.verse')}
               value={verse}
               onChange={(e) => setVerse(e.target.value)}
               min="1"
@@ -235,25 +237,25 @@ export const BibleNavigation = () => {
           onClick={handleNavigate}
           className="w-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-purple hover:shadow-glow hover:scale-[1.02] transition-all duration-300"
         >
-          Go to Chapter
+          {t('bible.goToChapter')}
         </Button>
         
         {/* Search */}
         <div className="pt-3 border-t border-white/10 space-y-3">
           <Tabs value={searchMode} onValueChange={(value) => setSearchMode(value as typeof searchMode)}>
             <TabsList className="grid w-full grid-cols-6 bg-white/10 backdrop-blur-md border border-white/15">
-              <TabsTrigger value="reference" className="text-[10px] sm:text-xs data-[state=active]:bg-primary/30 data-[state=active]:text-primary px-1">Ref</TabsTrigger>
-              <TabsTrigger value="word" className="text-[10px] sm:text-xs data-[state=active]:bg-primary/30 data-[state=active]:text-primary px-1">Word</TabsTrigger>
-              <TabsTrigger value="phrase" className="text-[10px] sm:text-xs data-[state=active]:bg-blue-500/30 data-[state=active]:text-blue-400 px-1">Phrase</TabsTrigger>
-              <TabsTrigger value="theme" className="text-[10px] sm:text-xs data-[state=active]:bg-primary/30 data-[state=active]:text-primary px-1">Theme</TabsTrigger>
-              <TabsTrigger value="event" className="text-[10px] sm:text-xs data-[state=active]:bg-amber-500/30 data-[state=active]:text-amber-400 px-1">Event</TabsTrigger>
-              <TabsTrigger value="group" className="text-[10px] sm:text-xs data-[state=active]:bg-green-500/30 data-[state=active]:text-green-400 px-1">Group</TabsTrigger>
+              <TabsTrigger value="reference" className="text-[10px] sm:text-xs data-[state=active]:bg-primary/30 data-[state=active]:text-primary px-1">{t('bible.ref')}</TabsTrigger>
+              <TabsTrigger value="word" className="text-[10px] sm:text-xs data-[state=active]:bg-primary/30 data-[state=active]:text-primary px-1">{t('bible.word')}</TabsTrigger>
+              <TabsTrigger value="phrase" className="text-[10px] sm:text-xs data-[state=active]:bg-blue-500/30 data-[state=active]:text-blue-400 px-1">{t('bible.phrase')}</TabsTrigger>
+              <TabsTrigger value="theme" className="text-[10px] sm:text-xs data-[state=active]:bg-primary/30 data-[state=active]:text-primary px-1">{t('bible.theme')}</TabsTrigger>
+              <TabsTrigger value="event" className="text-[10px] sm:text-xs data-[state=active]:bg-amber-500/30 data-[state=active]:text-amber-400 px-1">{t('bible.event')}</TabsTrigger>
+              <TabsTrigger value="group" className="text-[10px] sm:text-xs data-[state=active]:bg-green-500/30 data-[state=active]:text-green-400 px-1">{t('bible.group')}</TabsTrigger>
             </TabsList>
             
             <TabsContent value="reference" className="mt-3 space-y-3">
               <form onSubmit={handleSearch} className="flex gap-2">
                 <Input
-                  placeholder="e.g., John 3:16"
+                  placeholder={t('bible.searchPlaceholderRef')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="bg-white/10 backdrop-blur-md border-white/20 hover:border-primary/50 hover:bg-white/15 focus:border-primary focus:bg-white/20 transition-all touch-manipulation placeholder:text-muted-foreground/70"
@@ -267,7 +269,7 @@ export const BibleNavigation = () => {
             <TabsContent value="word" className="mt-3 space-y-3">
               <Select value={searchScope} onValueChange={(value) => setSearchScope(value as BibleScope)}>
                 <SelectTrigger className="bg-white/10 backdrop-blur-md border-white/20 hover:border-primary/50 hover:bg-white/15 transition-all text-foreground">
-                  <SelectValue placeholder="Search scope" />
+                   <SelectValue placeholder={t('bible.searchScope')} />
                 </SelectTrigger>
                 <SelectContent className="bg-card/95 backdrop-blur-xl border-white/20 z-50 max-h-[300px]">
                   {Object.entries(BIBLE_SECTIONS).map(([key, { label }]) => (
@@ -278,7 +280,7 @@ export const BibleNavigation = () => {
               
               <form onSubmit={handleSearch} className="flex gap-2">
                 <Input
-                  placeholder="e.g., love one another"
+                  placeholder={t('bible.searchPlaceholderWord')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="bg-white/10 backdrop-blur-md border-white/20 hover:border-primary/50 hover:bg-white/15 focus:border-primary focus:bg-white/20 transition-all touch-manipulation placeholder:text-muted-foreground/70"
@@ -291,11 +293,11 @@ export const BibleNavigation = () => {
 
             <TabsContent value="phrase" className="mt-3 space-y-3">
               <div className="text-xs text-muted-foreground mb-2">
-                Enter multiple words - find verses containing all/most of them (any order)
+                {t('bible.phraseSearchHint')}
               </div>
               <Select value={searchScope} onValueChange={(value) => setSearchScope(value as BibleScope)}>
                 <SelectTrigger className="bg-white/10 backdrop-blur-md border-white/20 hover:border-primary/50 hover:bg-white/15 transition-all text-foreground">
-                  <SelectValue placeholder="Search scope" />
+                  <SelectValue placeholder={t('bible.searchScope')} />
                 </SelectTrigger>
                 <SelectContent className="bg-card/95 backdrop-blur-xl border-white/20 z-50 max-h-[300px]">
                   {Object.entries(BIBLE_SECTIONS).map(([key, { label }]) => (
@@ -306,7 +308,7 @@ export const BibleNavigation = () => {
               
               <form onSubmit={handlePhraseSearch} className="flex gap-2">
                 <Input
-                  placeholder="e.g., faith hope love"
+                  placeholder={t('bible.searchPlaceholderPhrase')}
                   value={phraseWords}
                   onChange={(e) => setPhraseWords(e.target.value)}
                   className="bg-white/10 backdrop-blur-md border-white/20 hover:border-primary/50 hover:bg-white/15 focus:border-primary focus:bg-white/20 transition-all touch-manipulation placeholder:text-muted-foreground/70"
@@ -328,17 +330,17 @@ export const BibleNavigation = () => {
             <TabsContent value="group" className="mt-3 space-y-3">
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="h-4 w-4 text-green-400" />
-                <span className="text-sm font-medium">Group Texts Search</span>
+                <span className="text-sm font-medium">{t('bible.groupTextsSearch')}</span>
                 <Badge variant="secondary" className="text-xs">AI</Badge>
               </div>
               
               <p className="text-xs text-muted-foreground">
-                Describe multiple related themes and Jeeves will find all relevant KJV verses grouped by topic.
+                {t('bible.groupTextsHint')}
               </p>
 
               <Select value={searchScope} onValueChange={(value) => setSearchScope(value as BibleScope)}>
                 <SelectTrigger className="bg-white/10 backdrop-blur-md border-white/20 hover:border-green-400/50 hover:bg-white/15 transition-all text-foreground">
-                  <SelectValue placeholder="Search scope" />
+                  <SelectValue placeholder={t('bible.searchScope')} />
                 </SelectTrigger>
                 <SelectContent className="bg-card/95 backdrop-blur-xl border-white/20 z-50 max-h-[300px]">
                   {Object.entries(BIBLE_SECTIONS).map(([key, { label }]) => (

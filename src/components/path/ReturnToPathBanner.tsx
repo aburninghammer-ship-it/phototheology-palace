@@ -4,6 +4,7 @@
  */
 
 import { usePath, PATH_INFO, PathType } from "@/hooks/usePath";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -14,6 +15,7 @@ interface ReturnToPathBannerProps {
 }
 
 export function ReturnToPathBanner({ className = "" }: ReturnToPathBannerProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { activePath, isLoading } = usePath();
@@ -32,51 +34,27 @@ export function ReturnToPathBanner({ className = "" }: ReturnToPathBannerProps) 
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 20 }}
         className={`fixed z-30 pointer-events-auto
-          bottom-20 left-1/2 -translate-x-1/2
-          md:bottom-auto md:top-20 md:left-1/2 md:-translate-x-1/2
+          bottom-4 left-1/2 -translate-x-1/2
           ${className}`}
       >
-        {/* Compact mobile version */}
+        {/* Compact transparent version for all screens */}
         <div 
           className={`
-            md:hidden flex items-center gap-2 px-3 py-1.5 rounded-full 
-            backdrop-blur-lg border shadow-lg cursor-pointer
-            ${pathData.bgColor} ${pathData.borderColor}
+            flex items-center gap-2 px-3 py-1.5 rounded-full 
+            bg-background/40 backdrop-blur-sm border border-border/30 
+            shadow-sm cursor-pointer hover:bg-background/60 transition-colors
           `}
           onClick={() => navigate("/path/week")}
         >
-          <Sparkles className="h-3 w-3 text-primary animate-pulse" />
-          <span className="text-xs font-medium">
-            {pathData.icon} Path Active
+          <Sparkles className="h-3 w-3 text-primary/70 animate-pulse" />
+          <span className="text-xs text-muted-foreground">
+            {pathData.icon} {t('path.pathActive', 'Path Active')}
           </span>
-          <ArrowLeft className="h-3 w-3" />
-        </div>
-
-        {/* Full desktop version */}
-        <div 
-          className={`
-            hidden md:flex items-center gap-3 px-4 py-2 rounded-full 
-            backdrop-blur-lg border shadow-lg
-            ${pathData.bgColor} ${pathData.borderColor}
-          `}
-        >
-          <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-          <span className="text-sm font-medium">
-            {pathData.icon} {pathData.name} Training Active
-          </span>
-          <Button
-            variant="secondary"
-            size="sm"
-            className="h-7 px-3 text-xs"
-            onClick={() => navigate("/path/week")}
-          >
-            <ArrowLeft className="h-3 w-3 mr-1" />
-            Return to Path
-          </Button>
+          <ArrowLeft className="h-3 w-3 text-muted-foreground" />
         </div>
       </motion.div>
     </AnimatePresence>

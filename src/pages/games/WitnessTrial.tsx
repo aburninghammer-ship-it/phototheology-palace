@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Scale } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 
 const STREET_OBJECTIONS = [
   "Why should I care about Jesus?",
@@ -19,6 +21,7 @@ const STREET_OBJECTIONS = [
 
 export default function WitnessTrial() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [drawnCards, setDrawnCards] = useState<string[]>([]);
   const [objection, setObjection] = useState("");
   const [defense, setDefense] = useState("");
@@ -35,7 +38,7 @@ export default function WitnessTrial() {
 
   const handleSubmit = async () => {
     if (!defense.trim()) {
-      toast.error("Present your defense");
+      toast.error(t('games.witnessTrial.errorPresentDefense'));
       return;
     }
 
@@ -48,13 +51,13 @@ export default function WitnessTrial() {
       
       if (data.convincing) {
         setScore(prev => prev + 3);
-        toast.success(`Convincing! +3 points`);
+        toast.success(t('games.witnessTrial.convincing'));
       } else {
-        toast.error(`Weak defense: ${data.feedback}`);
+        toast.error(t('games.witnessTrial.weakDefense', { feedback: data.feedback }));
       }
       startTrial();
     } catch (error) {
-      toast.error("Failed to validate");
+      toast.error(t('games.common.errorValidation'));
     } finally {
       setIsSubmitting(false);
     }
@@ -65,11 +68,11 @@ export default function WitnessTrial() {
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-gray-900 to-slate-950 flex items-center justify-center">
         <Card className="max-w-md bg-black/40 border-gray-500/50">
           <CardHeader>
-            <CardTitle className="text-center text-3xl">⚖️ WITNESS TRIAL</CardTitle>
+            <CardTitle className="text-center text-3xl">{t('games.witnessTrial.title')}</CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
-            <p>Answer objections using your 3 drawn cards</p>
-            <Button onClick={startTrial} className="w-full">Start Trial</Button>
+            <p>{t('games.witnessTrial.description')}</p>
+            <Button onClick={startTrial} className="w-full">{t('games.witnessTrial.startTrial')}</Button>
           </CardContent>
         </Card>
       </div>
@@ -81,24 +84,25 @@ export default function WitnessTrial() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <Button variant="ghost" onClick={() => navigate("/games")}>
-            <ArrowLeft className="mr-2" />Back
+            <ArrowLeft className="mr-2" />{t('common.back')}
           </Button>
-          <h1 className="text-4xl font-bold">⚖️ WITNESS TRIAL</h1>
+          <h1 className="text-4xl font-bold">{t('games.witnessTrial.title')}</h1>
           <div className="text-3xl font-bold">{score}</div>
         </div>
         <div className="max-w-3xl mx-auto space-y-6">
           <Card className="bg-black/40">
-            <CardHeader><CardTitle>Objection: {objection}</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('games.witnessTrial.objection', { objection })}</CardTitle></CardHeader>
             <CardContent>
               <div className="flex gap-2 mb-4">
                 {drawnCards.map((c, i) => <div key={i} className="px-4 py-2 bg-primary/20 rounded">{c}</div>)}
               </div>
-              <Textarea value={defense} onChange={(e) => setDefense(e.target.value)} placeholder="Use all 3 cards in your answer..." className="min-h-32" />
-              <Button onClick={handleSubmit} disabled={isSubmitting} className="w-full mt-4">Submit Defense</Button>
+              <Textarea value={defense} onChange={(e) => setDefense(e.target.value)} placeholder={t('games.witnessTrial.defensePlaceholder')} className="min-h-32" />
+              <Button onClick={handleSubmit} disabled={isSubmitting} className="w-full mt-4">{t('games.witnessTrial.submitDefense')}</Button>
             </CardContent>
           </Card>
         </div>
       </div>
+      <FloatingGameChat gameType="witness-trial" />
     </div>
   );
 }

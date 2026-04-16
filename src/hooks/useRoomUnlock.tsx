@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
-import { palaceFloors } from "@/data/palaceData";
+import { useExperienceMode } from "@/contexts/ExperienceModeContext";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 
 export const useRoomUnlock = (floorNumber: number, roomId: string) => {
   const { user } = useAuth();
+  const { mode } = useExperienceMode();
+  const { translatedFloors } = useTranslatedPalaceData();
   const [isUnlocked, setIsUnlocked] = useState(true); // Always unlocked now (soft lock)
   const [loading, setLoading] = useState(true);
   const [missingPrerequisites, setMissingPrerequisites] = useState<string[]>([]);
@@ -12,6 +15,15 @@ export const useRoomUnlock = (floorNumber: number, roomId: string) => {
 
   useEffect(() => {
     const checkUnlock = async () => {
+      // Hard lock: mode-based floor restrictions
+      if (mode === "basic") {
+        setIsUnlocked(false);
+        setLoading(false);
+        return;
+      }
+      // In Learn mode (basic), all floors are locked (handled above)
+      // In Study mode (immersion), all floors are open
+
       if (!user) {
         setIsUnlocked(true);
         setLoading(false);
@@ -52,7 +64,7 @@ export const useRoomUnlock = (floorNumber: number, roomId: string) => {
           }
         }
 
-        const floor = palaceFloors.find(f => f.number === floorNumber);
+        const floor = translatedFloors.find(f => f.number === floorNumber);
         const room = floor?.rooms.find(r => r.id === roomId);
 
         if (!room || !room.prerequisites || room.prerequisites.length === 0) {
@@ -79,7 +91,7 @@ export const useRoomUnlock = (floorNumber: number, roomId: string) => {
         for (const prereq of room.prerequisites) {
           const prereqKey = `${prereq.floor}-${prereq.room}`;
           if (!completedSet.has(prereqKey)) {
-            const prereqFloor = palaceFloors.find(f => f.number === prereq.floor);
+            const prereqFloor = translatedFloors.find(f => f.number === prereq.floor);
             const prereqRoom = prereqFloor?.rooms.find(r => r.id === prereq.room);
             if (prereqRoom) {
               missing.push(prereqRoom.name);
@@ -99,7 +111,7 @@ export const useRoomUnlock = (floorNumber: number, roomId: string) => {
     };
 
     checkUnlock();
-  }, [user, floorNumber, roomId]);
+  }, [user, mode, floorNumber, roomId]);
 
   return { isUnlocked, loading, missingPrerequisites, recommendationWarning };
 };

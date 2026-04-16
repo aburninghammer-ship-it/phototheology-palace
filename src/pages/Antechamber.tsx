@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Castle, CheckCircle, ChevronRight, Shield, BookOpen, Eye, Brain } from 'lucide-react';
@@ -12,6 +13,7 @@ import { Navigation } from '@/components/Navigation';
 const Antechamber = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const { markPalaceEntered } = useGatehouseStatus();
   const [covenantAccepted, setCovenantAccepted] = useState(false);
   const [isEntering, setIsEntering] = useState(false);
@@ -28,8 +30,8 @@ const Antechamber = () => {
     const success = await markPalaceEntered();
     
     if (success) {
-      // Navigate to first room experience
-      navigate('/palace/first-room');
+      // Navigate to goals survey before the palace
+      navigate('/goals-survey');
     } else {
       setIsEntering(false);
     }
@@ -41,16 +43,16 @@ const Antechamber = () => {
         <Navigation />
         <main className="container mx-auto px-4 py-12 max-w-2xl text-center">
           <Castle className="h-16 w-16 mx-auto text-amber-500 mb-6" />
-          <h1 className="text-3xl font-serif font-bold mb-4">Create Your Key</h1>
+          <h1 className="text-3xl font-serif font-bold mb-4">{t('palace.antechamber.createYourKey')}</h1>
           <p className="text-muted-foreground mb-8">
-            To enter the Palace, you must first secure your entry.
+            {t('palace.antechamber.toEnterPalace')}
           </p>
-          <Button 
-            size="lg" 
+          <Button
+            size="lg"
             onClick={() => navigate('/auth?redirect=/antechamber')}
             className="bg-amber-600 hover:bg-amber-700"
           >
-            Secure Your Entry
+            {t('palace.antechamber.secureYourEntry')}
           </Button>
         </main>
       </div>
@@ -72,10 +74,10 @@ const Antechamber = () => {
             <Castle className="h-10 w-10 text-amber-500" />
           </div>
           <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-3">
-            The Antechamber
+            {t('palace.antechamber.theAntechamber')}
           </h1>
           <p className="text-lg text-muted-foreground">
-            Before you enter, understand what lies ahead.
+            {t('palace.antechamber.beforeYouEnter')}
           </p>
         </motion.div>
 
@@ -89,15 +91,15 @@ const Antechamber = () => {
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
               <Eye className="h-5 w-5 text-primary" />
-              What the Palace Is
+              {t('palace.antechamber.whatPalaceIs')}
             </h2>
             <ul className="space-y-3">
               {[
-                'A structured environment for deep Bible study',
-                'Eight floors of progressive training',
-                'Memory architecture that stores Scripture as images',
-                'Pattern recognition across all 66 books',
-                'Christ-centered interpretation at every level',
+                t('palace.antechamber.palaceIs1'),
+                t('palace.antechamber.palaceIs2'),
+                t('palace.antechamber.palaceIs3'),
+                t('palace.antechamber.palaceIs4'),
+                t('palace.antechamber.palaceIs5'),
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3 text-sm">
                   <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
@@ -118,14 +120,14 @@ const Antechamber = () => {
           <Card className="p-6 border-amber-500/30">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
               <Brain className="h-5 w-5 text-amber-500" />
-              What the Palace Requires
+              {t('palace.antechamber.whatPalaceRequires')}
             </h2>
             <ul className="space-y-3">
               {[
-                'Active thinking, not passive reading',
-                'Patience with progressive learning',
-                'Discipline to practice daily',
-                'Humility to unlearn and relearn',
+                t('palace.antechamber.requires1'),
+                t('palace.antechamber.requires2'),
+                t('palace.antechamber.requires3'),
+                t('palace.antechamber.requires4'),
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3 text-sm">
                   <ChevronRight className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
@@ -146,13 +148,13 @@ const Antechamber = () => {
           <Card className="p-6 bg-muted/50">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
               <Shield className="h-5 w-5 text-muted-foreground" />
-              What the Palace Is Not
+              {t('palace.antechamber.whatPalaceIsNot')}
             </h2>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>• A shortcut to biblical knowledge</li>
-              <li>• Entertainment or gamification for its own sake</li>
-              <li>• A replacement for prayer and the Spirit</li>
-              <li>• Elite knowledge for the select few</li>
+              <li>• {t('palace.antechamber.isNot1')}</li>
+              <li>• {t('palace.antechamber.isNot2')}</li>
+              <li>• {t('palace.antechamber.isNot3')}</li>
+              <li>• {t('palace.antechamber.isNot4')}</li>
             </ul>
             <p className="mt-4 text-sm italic">
               "Unto whomsoever much is given, of him shall be much required" — Luke 12:48
@@ -170,13 +172,13 @@ const Antechamber = () => {
           <Card className="p-6 border-2 border-primary/30 bg-primary/5">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-primary" />
-              The Covenant
+              {t('palace.antechamber.theCovenant')}
             </h2>
             <div className="prose prose-sm dark:prose-invert mb-6">
               <p className="text-foreground">
-                This is not passive study.<br />
-                This is training.<br />
-                I am willing to think, test, and grow.
+                {t('palace.antechamber.covenantLine1')}<br />
+                {t('palace.antechamber.covenantLine2')}<br />
+                {t('palace.antechamber.covenantLine3')}
               </p>
             </div>
             
@@ -191,8 +193,7 @@ const Antechamber = () => {
                 htmlFor="covenant" 
                 className="text-sm cursor-pointer leading-relaxed"
               >
-                I understand and choose to continue. I commit to approaching the Palace 
-                as a workman seeking approval, not a spectator seeking entertainment.
+                {t('palace.antechamber.covenantCheckbox')}
               </label>
             </div>
           </Card>
@@ -212,11 +213,11 @@ const Antechamber = () => {
             className="px-12 py-6 text-lg bg-amber-600 hover:bg-amber-700 disabled:opacity-50"
           >
             {isEntering ? (
-              'Opening the gates...'
+              t('palace.antechamber.openingGates')
             ) : (
               <>
                 <Castle className="mr-2 h-5 w-5" />
-                Enter the Palace
+                {t('palace.antechamber.enterThePalace')}
               </>
             )}
           </Button>

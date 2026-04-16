@@ -1,9 +1,85 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Initialize Supabase client for caching
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+// Generate cache key from inputs
+function generateCacheKey(mode: string, cardCode: string | null, storyText: string): string {
+  // Truncate story text to first 500 chars for cache key (same text = same response)
+  const truncatedText = storyText.slice(0, 500);
+  const keyParts = [mode, cardCode || 'none', truncatedText];
+  // Simple hash
+  let hash = 0;
+  const str = keyParts.join('|');
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return `jeeves_${Math.abs(hash).toString(36)}`;
+}
+
+// Check cache for existing response
+async function checkCache(cacheKey: string): Promise<{ response: string; selectedRooms?: string[] } | null> {
+  try {
+    const { data, error } = await supabase
+      .from('jeeves_response_cache')
+      .select('response, selected_rooms, hit_count')
+      .eq('cache_key', cacheKey)
+      .gt('expires_at', new Date().toISOString())
+      .maybeSingle();
+
+    if (error || !data) return null;
+
+    // Increment hit count (fire and forget)
+    supabase
+      .from('jeeves_response_cache')
+      .update({ hit_count: (data.hit_count || 0) + 1 })
+      .eq('cache_key', cacheKey)
+      .then(() => {});
+
+    console.log('✅ Cache HIT for key:', cacheKey);
+    return { response: data.response, selectedRooms: data.selected_rooms };
+  } catch (e) {
+    console.error('Cache check error:', e);
+    return null;
+  }
+}
+
+// Store response in cache
+async function storeInCache(
+  cacheKey: string,
+  mode: string,
+  cardCode: string | null,
+  storyReference: string | null,
+  response: string,
+  selectedRooms?: string[]
+): Promise<void> {
+  try {
+    await supabase
+      .from('jeeves_response_cache')
+      .upsert({
+        cache_key: cacheKey,
+        mode,
+        card_code: cardCode,
+        story_reference: storyReference,
+        response,
+        selected_rooms: selectedRooms,
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days
+      }, { onConflict: 'cache_key' });
+    console.log('✅ Stored in cache:', cacheKey);
+  } catch (e) {
+    console.error('Cache store error:', e);
+  }
+}
 
 // All PT room codes organized by floor
 const ALL_ROOMS = {
@@ -52,9 +128,9 @@ const principleInfo: Record<string, string> = {
   "@CyC": "Cyrus-Christ Cycle - Type to antitype Deliverer",
   "@Sp": "Holy Spirit Cycle - Church age, Pentecost",
   "@Re": "Remnant Cycle - End-time witness to Second Coming",
-  "1H": "First Heaven - Destruction/Restoration (586 BC)",
-  "2H": "Second Heaven - New Covenant order (70 AD)",
-  "3H": "Third Heaven - Final New Creation",
+  "1H": "First Heaven (DoL¹/NE¹) - Day of the LORD: Babylon destroys Jerusalem (586 BC) → Post-exilic restoration",
+  "2H": "Second Heaven (DoL²/NE²) - Day of the LORD: Rome destroys Jerusalem (70 AD) → New Covenant/church order",
+  "3H": "Third Heaven (DoL³/NE³) - Day of the LORD: Final cosmic judgment → Literal New Creation (NOT atmospheric layers!)",
 };
 
 // Simple hash function for text to ensure consistent but varied selection
@@ -285,10 +361,20 @@ serve(async (req) => {
       if (!storyText) {
         throw new Error('Missing required field: storyText');
       }
-      
+
+      // Check cache first
+      const cacheKey = generateCacheKey('gather-fragments', null, storyText);
+      const cached = await checkCache(cacheKey);
+      if (cached) {
+        return new Response(
+          JSON.stringify({ response: cached.response, selectedRooms: cached.selectedRooms, cached: true }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
       const selectedRooms = selectRoomsFromAllFloors(storyText);
       console.log('Selected rooms for gather-fragments:', selectedRooms);
-      
+
       const fragmentsResponse = await generateGatherFragments(
         storyText,
         storyReference || '',
@@ -296,7 +382,10 @@ serve(async (req) => {
         jeevesName || 'Jeeves',
         LOVABLE_API_KEY
       );
-      
+
+      // Store in cache
+      await storeInCache(cacheKey, 'gather-fragments', null, storyReference, fragmentsResponse, selectedRooms);
+
       return new Response(
         JSON.stringify({ response: fragmentsResponse, selectedRooms }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -306,6 +395,18 @@ serve(async (req) => {
     // Standard single-card mode
     if (!cardCode || !storyText) {
       throw new Error('Missing required fields: cardCode and storyText');
+    }
+
+    // Check cache first (only for non-opponent matches - opponent name makes it unique)
+    if (!opponentName) {
+      const cacheKey = generateCacheKey('standard', cardCode, storyText);
+      const cached = await checkCache(cacheKey);
+      if (cached) {
+        return new Response(
+          JSON.stringify({ response: cached.response, cached: true }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     const principleDesc = principleInfo[cardCode] || cardCode;
@@ -378,6 +479,12 @@ Apply this principle to illuminate the text. Show depth, biblical grounding, and
     }
 
     console.log('✅ Generated Jeeves response successfully');
+
+    // Store in cache (only for non-opponent matches)
+    if (!opponentName) {
+      const cacheKey = generateCacheKey('standard', cardCode, storyText);
+      await storeInCache(cacheKey, 'standard', cardCode, storyReference, response);
+    }
 
     return new Response(
       JSON.stringify({ response }),

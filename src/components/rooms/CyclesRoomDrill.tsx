@@ -57,19 +57,6 @@ const CYCLES = [
     keyTexts: ["Genesis 6-9", "1 Peter 3:20", "2 Peter 2:5"]
   },
   {
-    id: "semitic",
-    name: "Semitic",
-    icon: "📜",
-    color: "text-amber-600",
-    bgColor: "bg-amber-500/10",
-    borderColor: "border-amber-500/30",
-    mission: "Lineage, separation, truth preservation",
-    markers: ["Genealogies", "Blessing/curse language", "Separation from nations", "Promised line"],
-    salvationAspect: "Lineage",
-    ptPrinciples: ["Separation", "Truth preservation", "Blessing line"],
-    keyTexts: ["Genesis 10-11", "Genesis 9:26-27", "Luke 3"]
-  },
-  {
     id: "abrahamic",
     name: "Abrahamic",
     icon: "⭐",
@@ -107,6 +94,19 @@ const CYCLES = [
     salvationAspect: "Restoration",
     ptPrinciples: ["Restoration", "Rebuilding", "Divine sovereignty"],
     keyTexts: ["Ezra-Nehemiah", "Daniel 9", "Isaiah 44-45"]
+  },
+  {
+    id: "cyrus-christ",
+    name: "Cyrus-Christ",
+    icon: "✝️",
+    color: "text-rose-600",
+    bgColor: "bg-rose-500/10",
+    borderColor: "border-rose-500/30",
+    mission: "Incarnation, ministry, atonement, covenant fulfillment",
+    markers: ["Incarnation language", "Messianic fulfillment", "Cross/atonement", "New covenant", "Kingdom inauguration"],
+    salvationAspect: "Atonement",
+    ptPrinciples: ["Cross", "Covenant", "Atonement", "Fulfillment"],
+    keyTexts: ["Gospels", "Hebrews 8-10", "Isaiah 53"]
   },
   {
     id: "spirit",

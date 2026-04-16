@@ -16,8 +16,10 @@ import { NotificationAlerts } from "./NotificationAlerts";
 import { PublicAnnouncementsBoard } from "./PublicAnnouncementsBoard";
 import { PersonalDevotionalDiary } from "./PersonalDevotionalDiary";
 import {
-  BookOpen, ArrowRight, Flame, Users, Star, ExternalLink
+  BookOpen, ArrowRight, Flame, Users, Star, ExternalLink, UserSearch, Gamepad2
 } from "lucide-react";
+import { MemberDirectory } from "./MemberDirectory";
+import { LiveMembersStrip } from "./LiveMembersStrip";
 
 interface MemberHomeProps {
   churchId: string;
@@ -106,6 +108,9 @@ export function MemberHome({ churchId, churchName = "Living Manna" }: MemberHome
       {/* Activity Pulse - Shows community is alive */}
       <ActivityPulse churchId={churchId} />
 
+      {/* Live Members Strip - Who's online now */}
+      <LiveMembersStrip churchId={churchId} />
+
       {/* Primary Content: This Week's Study */}
       <Card variant="glass" className="border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
         <CardHeader>
@@ -186,11 +191,61 @@ export function MemberHome({ churchId, churchName = "Living Manna" }: MemberHome
         </Card>
       )}
 
+      {/* Member Directory - Browse your church family */}
+      <MemberDirectory churchId={churchId} />
+
       {/* Featured Sermon */}
       <FeaturedSermon churchId={churchId} />
       
       {/* Prayer Entry */}
       <PrayerEntry churchId={churchId} />
+
+      {/* Community Games - Quick access */}
+      <Card variant="glass" className="border-purple-500/30 bg-gradient-to-br from-purple-500/5 to-transparent">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Gamepad2 className="h-5 w-5 text-purple-500" />
+              <CardTitle className="text-base">Community Games</CardTitle>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs text-muted-foreground"
+              onClick={() => navigate('/games')}
+            >
+              See All 40+
+              <ArrowRight className="h-3 w-3 ml-1" />
+            </Button>
+          </div>
+          <CardDescription className="text-sm">
+            Play and compete with your church family
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {[
+              { name: "PT Scrabble", path: "/pt-scrabble", icon: "🎯", gradient: "from-purple-500/10 to-blue-500/10" },
+              { name: "Chain Chess", path: "/chain-chess", icon: "♟️", gradient: "from-amber-500/10 to-orange-500/10" },
+              { name: "Principle Cards", path: "/games/principle-cards", icon: "🃏", gradient: "from-rose-500/10 to-pink-500/10" },
+              { name: "PT Uno", path: "/games/phototheology-uno", icon: "🎴", gradient: "from-red-500/10 to-yellow-500/10" },
+              { name: "Escape Room", path: "/escape-room", icon: "🚪", gradient: "from-indigo-500/10 to-purple-500/10" },
+              { name: "Treasure Hunt", path: "/treasure-hunt", icon: "🗺️", gradient: "from-yellow-500/10 to-amber-500/10" },
+            ].map((game) => (
+              <Button
+                key={game.path}
+                variant="outline"
+                size="sm"
+                className={`text-sm justify-start bg-gradient-to-r ${game.gradient} hover:opacity-80`}
+                onClick={() => navigate(game.path)}
+              >
+                <span className="mr-1.5">{game.icon}</span>
+                {game.name}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Phototheology Tools - Compact access */}
       <Card variant="glass">
@@ -208,12 +263,25 @@ export function MemberHome({ churchId, churchName = "Living Manna" }: MemberHome
             {[
               { name: "Bible", path: "/bible", icon: "📖" },
               { name: "Jeeves AI", path: "/jeeves", icon: "🎩" },
+              { name: "Devotionals", path: "/devotionals", icon: "🕊️" },
+              { name: "Study Buddy", path: "/study-buddy", icon: "🧠" },
               { name: "Memory Palace", path: "/memory", icon: "🏛️" },
-              { name: "Challenges", path: "/challenge", icon: "🎯" },
+              { name: "Mind Map", path: "/mind-map", icon: "🗺️" },
+              { name: "Study Ideas", path: "/study-ideas", icon: "💡" },
+              { name: "Give Me A Gem", path: "/give-me-a-gem", icon: "💎" },
+              { name: "Reading Plans", path: "/reading-plans", icon: "📅" },
+              { name: "Study Deck", path: "/card-deck", icon: "✨" },
+              { name: "Image Bible", path: "/image-bible", icon: "🖼️" },
+              { name: "Encyclopedia", path: "/encyclopedia", icon: "🔍" },
+              { name: "Notes", path: "/notes", icon: "📝" },
+              { name: "Polish", path: "/polish", icon: "🎬" },
+              { name: "Dojo", path: "/spiritual-training", icon: "⚔️" },
+              { name: "Sermon Builder", path: "/sermon-builder", icon: "🎤" },
+              { name: "Challenges", path: "/daily-challenges", icon: "🎯" },
             ].map((tool, index) => (
-              <Button 
+              <Button
                 key={index}
-                variant="outline" 
+                variant="outline"
                 size="sm"
                 className="text-sm"
                 onClick={() => navigate(tool.path)}

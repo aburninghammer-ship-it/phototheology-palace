@@ -140,7 +140,7 @@ export const useUserStudiesContext = () => {
     const parts: string[] = [];
 
     if (context.userStudies.length > 0) {
-      parts.push("### USER'S PREVIOUS STUDIES ON THIS PASSAGE:");
+      parts.push("### PREVIOUS STUDIES ON THIS PASSAGE:");
       context.userStudies.forEach((study, i) => {
         parts.push(`\n**Study ${i + 1}: "${study.title}"**`);
         // Truncate content to avoid overwhelming the prompt
@@ -153,7 +153,7 @@ export const useUserStudiesContext = () => {
     }
 
     if (context.deckStudies.length > 0) {
-      parts.push("\n### USER'S CARD DECK STUDY INSIGHTS:");
+      parts.push("\n### CARD DECK STUDY INSIGHTS:");
       context.deckStudies.forEach((study, i) => {
         parts.push(`\n**Insight ${i + 1}${study.gem_title ? `: "${study.gem_title}"` : ""}**`);
         if (study.gem_notes) {
@@ -176,7 +176,7 @@ export const useUserStudiesContext = () => {
 
     if (parts.length === 0) return null;
 
-    return parts.join("\n") + "\n\n**INSTRUCTION**: Incorporate insights from the user's previous studies into your commentary where relevant. Build upon their existing understanding and connect new insights to what they've already explored.";
+    return parts.join("\n") + "\n\n**INSTRUCTION**: Incorporate insights from the previous studies into the commentary where relevant. Build upon the existing understanding and connect new insights to what has already been explored.";
   }, []);
 
   return {

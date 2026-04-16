@@ -159,7 +159,7 @@ export const ChainWitness = ({ userThought, disabled }: ChainWitnessProps) => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                 >
-                  <ScrollArea className="max-h-[500px]">
+                  <ScrollArea className="h-[400px]">
                     <div className="space-y-4">
                       {verses.map((verse, index) => (
                         <motion.div

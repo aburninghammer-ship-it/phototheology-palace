@@ -44,7 +44,7 @@ export default function EncyclopediaArticle() {
   const [jeevesResponse, setJeevesResponse] = useState("");
   const [jeevesLoading, setJeevesLoading] = useState(false);
   const [explanationLevel, setExplanationLevel] = useState<string>("2");
-  const [floorFocus, setFloorFocus] = useState<string>("");
+  const [floorFocus, setFloorFocus] = useState<string>("all");
   const tabsRef = useRef<HTMLDivElement>(null);
 
   const scrollToTabs = () => {
@@ -86,7 +86,7 @@ export default function EncyclopediaArticle() {
           mode: mode === "explain" ? "encyclopedia-explain" : "qa",
           articleId: mode === "explain" ? article.id : undefined,
           explanationLevel: mode === "explain" ? explanationLevel : undefined,
-          floorFocus: mode === "explain" ? floorFocus : undefined,
+          floorFocus: mode === "explain" && floorFocus !== "all" ? floorFocus : undefined,
           question: mode === "custom" ? jeevesQuestion : undefined,
           context: mode === "custom" ? `Article: ${article.title}\n${article.summary_1d}` : undefined
         }
@@ -290,7 +290,7 @@ export default function EncyclopediaArticle() {
                             <SelectValue placeholder="All Floors" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">All Floors</SelectItem>
+                            <SelectItem value="all">All Floors</SelectItem>
                             <SelectItem value="Story Floor">Story Floor</SelectItem>
                             <SelectItem value="Detective Floor">Detective Floor</SelectItem>
                             <SelectItem value="Freestyle Floor">Freestyle Floor</SelectItem>

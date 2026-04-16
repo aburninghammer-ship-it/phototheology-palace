@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,17 +7,21 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Scale, Link2, Sparkles } from "lucide-react";
+import { Scale, Link2, Sparkles, GraduationCap } from "lucide-react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { CULTURE_CONTROVERSY_TOUR } from "@/data/guidedTours";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { StyledMarkdownSections } from "@/components/ui/styled-markdown";
 import { motion } from "framer-motion";
 import { QuickAudioButton } from "@/components/audio";
 
 const CultureControversy = () => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [topic, setTopic] = useState("");
   const [analysis, setAnalysis] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
 
   const quickTopics = [
     "Black Lives Matter",
@@ -35,8 +40,8 @@ const CultureControversy = () => {
   const analyzeTopic = async (topicText: string) => {
     if (!topicText.trim()) {
       toast({
-        title: "Please enter a topic",
-        description: "Enter a cultural topic or paste a link to analyze",
+        title: t('challenges.pleaseEnterTopic'),
+        description: t('challenges.enterTopicDescription'),
         variant: "destructive",
       });
       return;
@@ -58,7 +63,7 @@ const CultureControversy = () => {
       setAnalysis(data.content);
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: t('common.error'),
         description: error.message,
         variant: "destructive",
       });
@@ -68,7 +73,7 @@ const CultureControversy = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+    <div className="min-h-screen bg-background relative overflow-x-hidden">
       {/* Animated Background */}
       <div className="fixed inset-0 pointer-events-none">
         <motion.div
@@ -137,7 +142,7 @@ const CultureControversy = () => {
                   <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
                     C&C
                   </Badge>
-                  <span className="text-white/90">Floor 0 - Advanced Modes</span>
+                  <span className="text-white/90">{t('challenges.advancedModes')}</span>
                 </motion.div>
                 <motion.h1
                   initial={{ opacity: 0, y: 20 }}
@@ -145,7 +150,7 @@ const CultureControversy = () => {
                   transition={{ delay: 0.4 }}
                   className="text-5xl font-bold mb-4"
                 >
-                  Culture & Controversy
+                  {t('challenges.cultureControversyTitle')}
                 </motion.h1>
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
@@ -153,13 +158,16 @@ const CultureControversy = () => {
                   transition={{ delay: 0.5 }}
                   className="text-xl text-white/90 max-w-4xl"
                 >
-                  Analyze current events, cultural movements, and political topics through the clear
-                  lens of Jesus' teachings.
+                  {t('challenges.cultureControversySubtitle')}
                 </motion.p>
+                <Button variant="ghost" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="mt-2 text-white/80 hover:text-white hover:bg-white/10 gap-1">
+                  <GraduationCap className="h-4 w-4" /> Guided Tour
+                </Button>
               </div>
             </div>
           </div>
         </motion.div>
+        {tourOpen && <GuidedTourOverlay steps={CULTURE_CONTROVERSY_TOUR} onClose={() => setTourOpen(false)} />}
 
         {/* Analysis Section */}
         <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -171,18 +179,17 @@ const CultureControversy = () => {
             <Card variant="glass" className="mb-8">
               <CardContent className="p-8">
                 <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent">
-                  Analyze a Cultural Topic or Link
+                  {t('challenges.analyzeTopicTitle')}
                 </h2>
                 <p className="text-muted-foreground mb-6">
-                  Enter any cultural topic, or paste a link to a news article, social media post, or
-                  YouTube video.
+                  {t('challenges.analyzeTopicDescription')}
                 </p>
 
                 <div className="flex gap-4 mb-6">
                   <div className="relative flex-1">
                     <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                     <Input
-                      placeholder="e.g., Black Lives Matter, or paste a link..."
+                      placeholder={t('challenges.topicPlaceholder')}
                       value={topic}
                       onChange={(e) => setTopic(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && analyzeTopic(topic)}
@@ -197,19 +204,19 @@ const CultureControversy = () => {
                     {analyzing ? (
                       <>
                         <Sparkles className="mr-2 h-5 w-5 animate-spin" />
-                        Analyzing...
+                        {t('challenges.analyzing')}
                       </>
                     ) : (
                       <>
                         <Sparkles className="mr-2 h-5 w-5" />
-                        Analyze
+                        {t('challenges.analyze')}
                       </>
                     )}
                   </Button>
                 </div>
 
                 <div>
-                  <p className="text-sm font-medium mb-3">Or try:</p>
+                  <p className="text-sm font-medium mb-3">{t('challenges.orTry')}</p>
                   <div className="flex flex-wrap gap-2">
                     {quickTopics.map((quickTopic, index) => (
                       <motion.div
@@ -249,9 +256,9 @@ const CultureControversy = () => {
                       </div>
                       <div>
                         <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">
-                          Biblical Analysis
+                          {t('challenges.biblicalAnalysis')}
                         </h3>
-                        <p className="text-sm text-muted-foreground">Jesus-centered perspective on this topic</p>
+                        <p className="text-sm text-muted-foreground">{t('challenges.jesusCenteredPerspective')}</p>
                       </div>
                     </div>
                     <QuickAudioButton 

@@ -148,7 +148,7 @@ export const observationRoomDrills: DrillQuestion[] = [
   },
   {
     id: "or-3",
-    question: "What should you observe FIRST in the Observation Room?",
+    question: "What should you observe FIRST in any passage?",
     options: [
       "Theological meanings",
       "What is happening: numbers, people, objects, actions",
@@ -156,19 +156,19 @@ export const observationRoomDrills: DrillQuestion[] = [
       "What commentaries say",
     ],
     correctAnswer: 1,
-    explanation: "Start with 'WHAT IS HAPPENING' - count people, objects, actions. '10 virgins, 5 foolish, 5 wise' IS an observation."
+    explanation: "Start with 'WHAT IS HAPPENING' — count the people, objects, and actions. Raw factual details come before interpretation."
   },
   {
     id: "or-4",
-    question: "In Matthew 25:1-4 (Ten Virgins), which is a proper observation?",
+    question: "Which of these is a proper observation (not an interpretation)?",
     options: [
-      "The foolish virgins represent unprepared Christians",
-      "10 virgins total: 5 foolish + 5 wise = exact 50/50 split",
-      "This teaches us to always be ready",
-      "Oil symbolizes the Holy Spirit",
+      "This story teaches us to trust God",
+      "The passage mentions 3 specific people and 2 locations",
+      "The oil in this verse symbolizes the Holy Spirit",
+      "God is showing us to always be prepared",
     ],
     correctAnswer: 1,
-    explanation: "Counting details (10 virgins, 5+5 split) is pure observation. The others are interpretations."
+    explanation: "Counting specific details (3 people, 2 locations) is pure observation. The others are interpretations or applications."
   },
   {
     id: "or-5",
@@ -180,7 +180,111 @@ export const observationRoomDrills: DrillQuestion[] = [
       "Application observations",
     ],
     correctAnswer: 1,
-    explanation: "'What is happening' captures factual details: numbers, who/what/where/when, and actions - the foundation of observation."
+    explanation: "'What is happening' captures factual details: numbers, who/what/where/when, and actions — the foundation of observation."
+  },
+];
+
+// Concentration Room (CR) Drills - Cascading Christ-Discovery (Magnum Opus)
+export const concentrationRoomDrills: DrillQuestion[] = [
+  {
+    id: "cr-1",
+    question: "What is 'Cascading Christ-Discovery' in Phototheology?",
+    options: [
+      "Finding one Christ connection per passage",
+      "Building chains of 5-10 layered Christ connections where each insight opens the next",
+      "Listing every mention of Jesus in a book",
+      "Comparing Christ to one OT figure",
+    ],
+    correctAnswer: 1,
+    explanation: "Cascading Christ-Discovery builds chains of layered connections. Example: Proverbs 1 → 'Son of David' = Solomon/Christ → Wisdom crying in streets = Christ's public ministry → 'stretched out my hand' = rejected Messiah → desolation = 70 AD. Each layer builds on the last."
+  },
+  {
+    id: "cr-2",
+    question: "Which thinking pattern shows how OT books mirror Christ's ministry timeline?",
+    options: [
+      "Multi-Type Convergence",
+      "Structural-Timeline Mapping",
+      "Reversed-Trap Pattern",
+      "What-If Shadow Types",
+    ],
+    correctAnswer: 1,
+    explanation: "Structural-Timeline Mapping shows how books/sequences mirror Christ's ministry. Example: The Pentateuch IS Christ — Genesis=Son, Exodus=Deliverer, Leviticus=Sacrifice, Numbers=Mission, Deuteronomy=Death-Resurrection."
+  },
+  {
+    id: "cr-3",
+    question: "In the Reversed-Trap Pattern, what happened at the cross?",
+    options: [
+      "Satan won a temporary victory",
+      "Christ avoided the trap entirely",
+      "The trap set for Christ became the trap that destroyed the trapper (Col 2:15)",
+      "The disciples sprang the trap early",
+    ],
+    correctAnswer: 2,
+    explanation: "The cross is the ultimate Reversed Trap. It looked like Satan's victory — but it was his destruction. Christ SAW the trap, walked in willingly, and the cross became the instrument of Satan's defeat (Col 2:15)."
+  },
+  {
+    id: "cr-4",
+    question: "What is a 'What-If Shadow Type'?",
+    options: [
+      "A type that is unclear or debatable",
+      "An OT figure who FAILED where Christ SUCCEEDED, showing what would have happened if Christ had sinned",
+      "A hypothetical scenario not found in Scripture",
+      "A type that only appears in the shadows of prophecy",
+    ],
+    correctAnswer: 1,
+    explanation: "What-If Shadow Types use failed OT figures to illuminate Christ's triumph. Example: The man of God in 1 Kings 13 (sent, obedient, then deceived, then judged) = what Christ's story WOULD have looked like if He had sinned. Christ passed every test the types failed."
+  },
+  {
+    id: "cr-5",
+    question: "Which is the best example of Multi-Type Convergence for Christ's ministry?",
+    options: [
+      "David as a type of Christ in all ways",
+      "Moses (deliverer, threatened at birth) + Jonah (death/burial/resurrection) + Elijah (ascension/spirit poured out)",
+      "Abraham offering Isaac",
+      "Joseph in Egypt",
+    ],
+    correctAnswer: 1,
+    explanation: "Multi-Type Convergence shows how MULTIPLE OT figures converge on one aspect of Christ. Moses=deliverer threatened at birth, Jonah=death-burial-resurrection, Elijah=ascension and Spirit poured out — together they map Christ's entire ministry from birth to Pentecost."
+  },
+];
+
+// Parallels Room (P‖) Drills - Structural-Timeline Patterns (Magnum Opus)
+export const parallelsRoomDrills: DrillQuestion[] = [
+  {
+    id: "p-1",
+    question: "How does the Pentateuch map to Christ's ministry timeline?",
+    options: [
+      "Genesis=Law, Exodus=Grace, Leviticus=Faith, Numbers=Hope, Deuteronomy=Love",
+      "Genesis=Son/Identity, Exodus=Deliverer/Mission, Leviticus=Sacrifice/Atonement, Numbers=Church/Mission, Deuteronomy=Death-Resurrection",
+      "Each book represents a different disciple",
+      "The Pentateuch doesn't map to Christ",
+    ],
+    correctAnswer: 1,
+    explanation: "The Pentateuch IS Christ's ministry timeline: Genesis reveals the Son (identity), Exodus the Deliverer (mission), Leviticus the Sacrifice (atonement), Numbers the Church (mission), Deuteronomy the Death and Resurrection (covenant completion)."
+  },
+  {
+    id: "p-2",
+    question: "What structural parallel do Psalms 22-23-24 form?",
+    options: [
+      "Past, Present, Future",
+      "Death, Burial/Journey through death, Resurrection-Ascension",
+      "Father, Son, Holy Spirit",
+      "Creation, Fall, Redemption",
+    ],
+    correctAnswer: 1,
+    explanation: "Psalms 22-23-24 form a sequential Christ-trilogy: Psalm 22 = the cross (death), Psalm 23 = walking through the valley of the shadow of death (burial), Psalm 24 = 'Lift up your heads, O ye gates' — the King of glory entering (resurrection-ascension)."
+  },
+  {
+    id: "p-3",
+    question: "How does Matthew 18:15-17 (church discipline) scale to cosmic application?",
+    options: [
+      "It doesn't — it's only about local church",
+      "Private → witnesses → church → separation mirrors God's prophetic process: Christ comes personally → Two Witnesses 1260 years → Church judgment message 1844 → final separation",
+      "It teaches three steps of evangelism",
+      "It parallels the three angels' messages only",
+    ],
+    correctAnswer: 1,
+    explanation: "This is Micro-to-Macro Scaling. The local church discipline process (private → witnesses → church → separation) mirrors God's cosmic redemptive process: Christ comes personally → Two Witnesses (1260 years) → Church judgment message (1844) → final separation."
   },
 ];
 
@@ -195,6 +299,10 @@ export const getDrillsByRoom = (roomId: string): DrillQuestion[] => {
       return symbolsRoomDrills;
     case "or":
       return observationRoomDrills;
+    case "cr":
+      return concentrationRoomDrills;
+    case "p":
+      return parallelsRoomDrills;
     default:
       return [];
   }
@@ -210,6 +318,10 @@ export const getDrillName = (roomId: string): string => {
       return "Symbol Recognition";
     case "or":
       return "Observation Practice";
+    case "cr":
+      return "Cascading Christ-Discovery";
+    case "p":
+      return "Structural Parallels";
     default:
       return "Practice Drill";
   }

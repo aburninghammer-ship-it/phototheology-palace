@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight } from "lucide-react";
@@ -10,7 +11,7 @@ interface FloorCardProps {
 
 const floorGradients = [
   "gradient-palace",
-  "gradient-royal", 
+  "gradient-royal",
   "gradient-ocean",
   "gradient-forest",
   "gradient-sunset",
@@ -31,9 +32,10 @@ const floorShadows = [
 ];
 
 export const FloorCard = ({ floor }: FloorCardProps) => {
+  const { t } = useTranslation();
   const gradient = floorGradients[floor.number - 1];
   const shadow = floorShadows[floor.number - 1];
-  
+
   return (
     <Link to={`/palace/floor/${floor.number}`}>
       <Card className={`group hover-lift border-2 overflow-hidden transition-all duration-300 animate-fade-in cursor-pointer`}>
@@ -43,10 +45,10 @@ export const FloorCard = ({ floor }: FloorCardProps) => {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-3">
                 <Badge variant="outline" className="font-mono text-xs border-primary/50 text-primary">
-                  Floor {floor.number}
+                  {t('floorCard.floor', { number: floor.number })}
                 </Badge>
                 <Badge className={`${gradient} text-white ${shadow}`}>
-                  {floor.rooms.length} Rooms
+                  {t('floorCard.roomCount', { count: floor.rooms.length })}
                 </Badge>
               </div>
               <CardTitle className="font-serif text-2xl mb-2">

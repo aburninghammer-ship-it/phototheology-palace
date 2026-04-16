@@ -407,14 +407,48 @@ const formatInlineText = (text: string): React.ReactNode => {
       continue;
     }
 
-    // Handle verse references (e.g., John 3:16, Genesis 1:1-5, 1 Corinthians 13:4)
-    const verseMatch = remaining.match(/^([1-3]?\s*[A-Z][a-z]+\s+\d+:\d+(-\d+)?)/);
+    // Handle verse references (e.g., John 3:16, Genesis 1:1-5, 1 Corinthians 13:4, 2 Samuel 7:12-16)
+    // Also handles parentheses around verses: (Luke 1:32-33), (2 Samuel 7:12-16)
+    // And brackets: [John 3:16], [Romans 8:28-30]
+    // And multi-word books: Song of Solomon 1:1
+    const verseMatch = remaining.match(/^([\(\[]?\s*)((?:[1-3]\s+)?[A-Z][a-z]+(?:\s+[oO]f\s+[A-Z][a-z]+)?)\s+(\d+:\d+(?:-\d+)?(?:,\s*\d+(?:-\d+)?)?)(\s*[\)\]]?)/);
     if (verseMatch) {
-      const verseText = verseMatch[1];
+      const openChar = verseMatch[1].trim();
+      const hasOpenParen = openChar === '(';
+      const hasOpenBracket = openChar === '[';
+      const bookName = verseMatch[2].trim();
+      const verseRef = verseMatch[3];
+      const closeChar = verseMatch[4].trim();
+      const hasCloseParen = closeChar === ')';
+      const hasCloseBracket = closeChar === ']';
+      const fullRef = `${bookName} ${verseRef}`;
+
+      if (hasOpenParen) parts.push('(');
+      if (hasOpenBracket) parts.push('[');
       parts.push(
-        <VersePopover key={`verse-${keyCounter++}`} reference={verseText} />
+        <VersePopover key={`verse-${keyCounter++}`} reference={fullRef} />
       );
+      if (hasCloseParen) parts.push(')');
+      if (hasCloseBracket) parts.push(']');
+
       remaining = remaining.slice(verseMatch[0].length);
+      lastCharWasLetter = false;
+      continue;
+    }
+
+    // Handle semicolon-separated multi-book references within parentheses: (Matthew 24; Revelation 13)
+    const multiBookMatch = remaining.match(/^\(([A-Z][a-z]+(?:\s+\d+)?(?::\d+(?:-\d+)?)?(?:;\s*[A-Z][a-z]+(?:\s+\d+)?(?::\d+(?:-\d+)?)?)+)\)/);
+    if (multiBookMatch) {
+      const refs = multiBookMatch[1].split(/;\s*/);
+      parts.push('(');
+      refs.forEach((ref, idx) => {
+        if (idx > 0) parts.push('; ');
+        parts.push(
+          <VersePopover key={`multi-verse-${keyCounter++}`} reference={ref.trim()} />
+        );
+      });
+      parts.push(')');
+      remaining = remaining.slice(multiBookMatch[0].length);
       lastCharWasLetter = false;
       continue;
     }

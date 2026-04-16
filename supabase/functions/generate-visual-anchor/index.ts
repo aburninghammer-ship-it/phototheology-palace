@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt } = await req.json();
+    const { prompt, style = "classical", book, chapter, theme } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (!LOVABLE_API_KEY) {
@@ -28,7 +28,42 @@ serve(async (req) => {
       );
     }
 
-    console.log("Generating image for prompt:", prompt);
+    // Enhanced style descriptors for high-quality biblical art
+    const styleDescriptors: Record<string, string> = {
+      classical: "Renaissance oil painting style, dramatic chiaroscuro lighting like Rembrandt or Caravaggio, rich golden tones, museum-quality fine art",
+      ethereal: "Luminous ethereal style, soft glowing light rays, heavenly atmosphere, delicate watercolor-like gradients, dreamlike quality",
+      epic: "Epic cinematic composition, dramatic wide-angle perspective, volumetric god rays, majestic scale, movie poster quality",
+      symbolic: "Rich symbolic iconography, medieval manuscript illumination meets modern design, gold leaf accents, deep meaningful imagery",
+      naturalistic: "Photorealistic natural lighting, authentic Middle Eastern landscapes, historically accurate clothing and architecture",
+      stainedglass: "Stained glass window aesthetic, vibrant jewel-toned colors, bold outlines, light streaming through colored glass effect"
+    };
+
+    const selectedStyle = styleDescriptors[style] || styleDescriptors.classical;
+    
+    // Build context-aware prompt
+    const contextInfo = book && chapter && theme 
+      ? `Scene from ${book} chapter ${chapter}: "${theme}".` 
+      : "";
+
+    const enhancedPrompt = `Create a stunning, high-quality biblical artwork:
+
+${contextInfo}
+
+Scene: ${prompt}
+
+Art Style: ${selectedStyle}
+
+Requirements:
+- Ultra high resolution, museum-quality artwork
+- Dramatic composition with clear focal point
+- Rich, deep colors with masterful use of light and shadow
+- Emotionally evocative and spiritually meaningful
+- NO text, words, letters, or watermarks in the image
+- Suitable for Bible study visualization and memorization
+- Capture the essence of the biblical narrative
+- Professional fine art quality`;
+
+    console.log("Generating high-quality image for:", { book, chapter, theme, style });
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -37,11 +72,11 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image-preview",
+        model: "google/gemini-3-pro-image-preview",
         messages: [
           {
             role: "user",
-            content: `Create a unique, vivid, memorable visual anchor image for Bible study memorization. ${prompt}. Style: Rich colors, clear symbolic imagery, suitable for mental palace visualization. Make it visually distinct and memorable.`
+            content: enhancedPrompt
           }
         ],
         modalities: ["image", "text"]

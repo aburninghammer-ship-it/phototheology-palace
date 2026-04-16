@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Sparkles, Send, Loader2, ChevronDown, ChevronUp, Search, Save } from "lucide-react";
+import { Sparkles, Send, Loader2, ChevronDown, ChevronUp, Search, Save, Copy, BookmarkPlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
@@ -109,6 +109,64 @@ export const JeevesStudyAssistant = ({
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const copyMessage = (content: string) => {
+    navigator.clipboard.writeText(content);
+    toast({
+      title: "Copied",
+      description: "Response copied to clipboard",
+    });
+  };
+
+  const saveToMyStudies = async (messageIndex: number) => {
+    const message = messages[messageIndex];
+    if (message.role !== "assistant") return;
+
+    const userQuestion = messageIndex > 0 ? messages[messageIndex - 1].content : "";
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "Please log in to save",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const date = new Date().toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      const content = `# Jeeves Study Response\n\n**Date:** ${date}\n\n**Mode:** ${researchMode ? 'Research' : 'Q&A'}\n\n---\n\n## Question\n\n${userQuestion}\n\n## Jeeves Response\n\n${message.content}\n`;
+
+      const tags = extractTags(userQuestion + " " + message.content);
+
+      const { error } = await supabase.from('user_studies').insert({
+        user_id: user.id,
+        title: `Jeeves: ${userQuestion.slice(0, 50)}${userQuestion.length > 50 ? '...' : ''}`,
+        content,
+        tags: ['jeeves', 'jeeves_response', ...tags],
+      });
+
+      if (error) throw error;
+      toast({
+        title: "Saved",
+        description: "Response saved to My Studies",
+      });
+    } catch (error) {
+      console.error("Error saving message:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save response",
+        variant: "destructive",
+      });
     }
   };
 
@@ -287,26 +345,50 @@ export const JeevesStudyAssistant = ({
                           <p className="text-sm font-medium">{msg.content}</p>
                         )}
                       </div>
-                      {msg.role === "assistant" && studyId && researchMode && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => saveToStudy(idx)}
-                          disabled={savingMessageIndex === idx}
-                          className="self-start gap-2"
-                        >
-                          {savingMessageIndex === idx ? (
-                            <>
-                              <Loader2 className="w-3 h-3 animate-spin" />
-                              Saving...
-                            </>
-                          ) : (
-                            <>
-                              <Save className="w-3 h-3" />
-                              Save to Study
-                            </>
+                      {msg.role === "assistant" && (
+                        <div className="flex items-center gap-2 self-start">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => copyMessage(msg.content)}
+                            className="gap-1 h-7 text-xs text-muted-foreground hover:text-foreground"
+                            title="Copy response"
+                          >
+                            <Copy className="w-3 h-3" />
+                            Copy
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => saveToMyStudies(idx)}
+                            className="gap-1 h-7 text-xs text-muted-foreground hover:text-emerald-500"
+                            title="Save to My Studies"
+                          >
+                            <BookmarkPlus className="w-3 h-3" />
+                            Save
+                          </Button>
+                          {studyId && researchMode && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => saveToStudy(idx)}
+                              disabled={savingMessageIndex === idx}
+                              className="gap-1 h-7 text-xs"
+                            >
+                              {savingMessageIndex === idx ? (
+                                <>
+                                  <Loader2 className="w-3 h-3 animate-spin" />
+                                  Appending...
+                                </>
+                              ) : (
+                                <>
+                                  <Save className="w-3 h-3" />
+                                  Append to Study
+                                </>
+                              )}
+                            </Button>
                           )}
-                        </Button>
+                        </div>
                       )}
                     </div>
                   </div>

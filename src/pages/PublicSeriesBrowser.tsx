@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { Search, BookOpen, Users, Loader2, CheckCircle } from "lucide-react";
 
 export default function PublicSeriesBrowser() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [series, setSeries] = useState<any[]>([]);
@@ -38,7 +40,7 @@ export default function PublicSeriesBrowser() {
       setSeries(data || []);
     } catch (error) {
       console.error('Error loading public series:', error);
-      toast.error('Failed to load series');
+      toast.error(t('public.failedToLoadSeries'));
     } finally {
       setLoading(false);
     }
@@ -62,7 +64,7 @@ export default function PublicSeriesBrowser() {
 
   const handleEnroll = async (seriesId: string) => {
     if (!user) {
-      toast.error('Please sign in to enroll');
+      toast.error(t('public.signInToEnroll'));
       return;
     }
 
@@ -78,13 +80,13 @@ export default function PublicSeriesBrowser() {
       if (error) throw error;
 
       setEnrollments([...enrollments, seriesId]);
-      toast.success('Enrolled successfully!');
+      toast.success(t('public.enrolledSuccessfully'));
     } catch (error: any) {
       if (error.code === '23505') {
-        toast.info('Already enrolled in this series');
+        toast.info(t('public.alreadyEnrolled'));
       } else {
         console.error('Error enrolling:', error);
-        toast.error('Failed to enroll');
+        toast.error(t('public.failedToEnroll'));
       }
     } finally {
       setEnrolling(null);
@@ -107,9 +109,9 @@ export default function PublicSeriesBrowser() {
             <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full">
               <Users className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="text-4xl font-bold">Discover Bible Study Series</h1>
+            <h1 className="text-4xl font-bold">{t('public.discoverSeries')}</h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Browse and enroll in public series created by the community. Track your progress and learn together.
+              {t('public.discoverSeriesSubtitle')}
             </p>
           </div>
 
@@ -117,7 +119,7 @@ export default function PublicSeriesBrowser() {
           <div className="relative max-w-md mx-auto">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search series..."
+              placeholder={t('public.searchSeriesPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -134,7 +136,7 @@ export default function PublicSeriesBrowser() {
               <CardContent className="py-12 text-center">
                 <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
                 <p className="text-muted-foreground">
-                  {searchQuery ? 'No series match your search' : 'No public series available yet'}
+                  {searchQuery ? t('public.noSeriesMatch') : t('public.noPublicSeries')}
                 </p>
               </CardContent>
             </Card>
@@ -150,7 +152,7 @@ export default function PublicSeriesBrowser() {
                         {isEnrolled && (
                           <Badge variant="default" className="shrink-0">
                             <CheckCircle className="h-3 w-3 mr-1" />
-                            Enrolled
+                            {t('public.enrolled')}
                           </Badge>
                         )}
                       </div>
@@ -160,7 +162,7 @@ export default function PublicSeriesBrowser() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="flex flex-wrap gap-2">
-                        <Badge variant="secondary">{s.lesson_count} lessons</Badge>
+                        <Badge variant="secondary">{t('public.lessonsCount', { count: s.lesson_count })}</Badge>
                         <Badge variant="outline">{s.audience_type}</Badge>
                         <Badge variant="outline">{s.context}</Badge>
                       </div>
@@ -171,7 +173,7 @@ export default function PublicSeriesBrowser() {
                             className="flex-1"
                             onClick={() => navigate(`/series/${s.id}/study`)}
                           >
-                            Continue Studying
+                            {t('public.continueStudying')}
                           </Button>
                         ) : (
                           <Button 
@@ -182,7 +184,7 @@ export default function PublicSeriesBrowser() {
                             {enrolling === s.id ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
-                              'Enroll'
+                              t('public.enroll')
                             )}
                           </Button>
                         )}
@@ -190,7 +192,7 @@ export default function PublicSeriesBrowser() {
                           variant="outline"
                           onClick={() => navigate(`/series/${s.id}/preview`)}
                         >
-                          Preview
+                          {t('public.preview')}
                         </Button>
                       </div>
                     </CardContent>

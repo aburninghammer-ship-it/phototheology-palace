@@ -32,6 +32,7 @@ export const useAdminAnalytics = () => {
   const [totalPageViews, setTotalPageViews] = useState(0);
   const [totalJeevesQueries, setTotalJeevesQueries] = useState(0);
   const [uniqueUsers, setUniqueUsers] = useState(0);
+  const [liveUsersCount, setLiveUsersCount] = useState(0);
 
   useEffect(() => {
     checkAdminAndFetchData();
@@ -66,8 +67,25 @@ export const useAdminAnalytics = () => {
     }
   };
 
+  const fetchLiveUsers = async () => {
+    // Users are considered "live" if last_seen within the last 60 seconds
+    const oneMinuteAgo = new Date(Date.now() - 60 * 1000).toISOString();
+
+    const { count, error } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .gte('last_seen', oneMinuteAgo);
+
+    if (!error && count !== null) {
+      setLiveUsersCount(count);
+    }
+  };
+
   const fetchAnalytics = async () => {
     const thirtyDaysAgo = subDays(new Date(), 30).toISOString();
+
+    // Also fetch live users
+    await fetchLiveUsers();
 
     // Fetch page views grouped by path
     const { data: pageViews } = await supabase
@@ -133,6 +151,14 @@ export const useAdminAnalytics = () => {
     setDailyActivity(dailyStats);
   };
 
+  // Auto-refresh live users every 10 seconds when admin
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    const interval = setInterval(fetchLiveUsers, 10000);
+    return () => clearInterval(interval);
+  }, [isAdmin]);
+
   return {
     isAdmin,
     loading,
@@ -142,6 +168,8 @@ export const useAdminAnalytics = () => {
     totalPageViews,
     totalJeevesQueries,
     uniqueUsers,
+    liveUsersCount,
     refetch: fetchAnalytics,
+    refetchLiveUsers: fetchLiveUsers,
   };
 };

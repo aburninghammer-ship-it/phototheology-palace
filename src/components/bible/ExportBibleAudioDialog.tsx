@@ -26,9 +26,9 @@ import { Verse } from "@/types/bible";
 import { OPENAI_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
 
 // Mobile-friendly download function
-const downloadAudioFile = async (blob: Blob, filename: string): Promise<boolean> => {
+export const downloadAudioFile = async (blob: Blob, filename: string): Promise<boolean> => {
+  // Try native share API first (mobile), but don't let failures block download
   try {
-    // Check if we can use the native share API with files (mobile)
     if (navigator.share && navigator.canShare) {
       const file = new File([blob], filename, { type: 'audio/wav' });
       const shareData = { files: [file], title: filename };
@@ -38,16 +38,17 @@ const downloadAudioFile = async (blob: Blob, filename: string): Promise<boolean>
         return true;
       }
     }
+  } catch (shareError) {
+    // Share cancelled or failed — fall through to standard download
+    console.log("Share API unavailable or cancelled, using standard download", shareError);
+  }
 
-    // Fallback: Create object URL and trigger download
+  try {
     const url = URL.createObjectURL(blob);
     
-    // For iOS Safari and some mobile browsers, open in new tab
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
     if (isIOS) {
-      // iOS Safari: Open audio in new tab for user to save
       window.open(url, '_blank');
       toast.info("Tap and hold the audio to save it to your device", { duration: 5000 });
       return true;
@@ -59,11 +60,8 @@ const downloadAudioFile = async (blob: Blob, filename: string): Promise<boolean>
     a.download = filename;
     a.style.display = 'none';
     document.body.appendChild(a);
-    
-    // Use click() for most browsers
     a.click();
     
-    // Cleanup after a delay to ensure download starts
     setTimeout(() => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
@@ -77,7 +75,7 @@ const downloadAudioFile = async (blob: Blob, filename: string): Promise<boolean>
 };
 
 // System ambient tracks
-const AMBIENT_TRACKS = [
+export const AMBIENT_TRACKS = [
   { id: "none", name: "No Music", url: "" },
   { id: "flight", name: "Flight", url: "/audio/flight.mp3" },
   { id: "wings-of-stillness", name: "Wings of Stillness", url: "/audio/wings-of-stillness.mp3" },
@@ -89,6 +87,8 @@ const AMBIENT_TRACKS = [
   { id: "when-he-cometh", name: "When He Cometh", url: "/audio/when-he-cometh.mp3" },
   { id: "white-horse", name: "White Horse", url: "/audio/white-horse.mp3" },
   { id: "eternal-echoes", name: "Eternal Echoes", url: "/audio/eternal-echoes.mp3" },
+  { id: "passover1", name: "Passover", url: "/music/Passover1.mp3" },
+  { id: "warrior", name: "Warrior", url: "/music/Warrior.mp3" },
 ];
 
 interface ExportBibleAudioDialogProps {
@@ -168,13 +168,15 @@ export const ExportBibleAudioDialog = ({
       // Get selected music URL
       const musicUrl = AMBIENT_TRACKS.find(t => t.id === selectedTrack)?.url || "";
 
-      // Mix audio
-      const mixedBlob = await mixAndDownload({
+      // Mix audio - convert base64 to data URL for the mixer
+      const firstSegment = audioSegments[0]?.audioContent || "";
+      const speechUrl = `data:audio/mp3;base64,${firstSegment}`;
+      const mixedBlob = await mixAndDownload(
+        speechUrl,
         musicUrl,
-        musicVolume: musicVolume / 100,
-        segments: audioSegments,
-        gapBetweenSegments: 0.8,
-      });
+        musicVolume / 100,
+        `${book}_chapter_${chapter}.wav`
+      );
 
       if (!mixedBlob) {
         throw new Error("Failed to mix audio");

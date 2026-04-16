@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, Users, Heart, Church, ChevronRight, Building2, Sparkles, Target, Flame, Trophy, Gem } from "lucide-react";
@@ -8,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
 import { useEventTracking } from "@/hooks/useEventTracking";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { motion, AnimatePresence } from "framer-motion";
 
 // COMPRESSED ONBOARDING: 2 steps max (assessment → first win)
@@ -42,11 +44,13 @@ const roles = [
 
 export default function Onboarding() {
   const [step, setStep] = useState<OnboardingStep>("assessment");
+  const { t } = useTranslation();
   const [selectedRole, setSelectedRole] = useState<string>("");
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
   const { trackOnboardingStep, trackEvent } = useEventTracking();
+  const { updatePreference } = useUserPreferences();
 
   useEffect(() => {
     trackEvent({ eventType: "onboarding_started" });
@@ -79,10 +83,11 @@ export default function Onboarding() {
       }
       
       localStorage.setItem("onboarding_completed", "true");
+      updatePreference("onboarding_completed", true);
       
       toast({
-        title: "Let's go! 🚀",
-        description: "Your first win awaits in the 24FPS Room",
+        title: t('onboarding.letsGo'),
+        description: t('onboarding.firstWinAwaits'),
       });
       
       // Go directly to first win experience
@@ -95,6 +100,7 @@ export default function Onboarding() {
 
   const handleSkip = () => {
     localStorage.setItem("onboarding_completed", "true");
+    updatePreference("onboarding_completed", true);
     navigate("/palace");
   };
 
@@ -107,12 +113,12 @@ export default function Onboarding() {
             <Building2 className="h-8 w-8 text-white" />
           </div>
           <CardTitle className="text-3xl font-bold">
-            {step === "assessment" ? "What brings you here?" : "Ready for your first win?"}
+            {step === "assessment" ? t('onboarding.whatBringsYou') : t('onboarding.readyFirstWin')}
           </CardTitle>
           <CardDescription className="text-lg mt-2">
-            {step === "assessment" 
-              ? "Pick one — we'll personalize your experience" 
-              : "See the Bible like never before in under 2 minutes"}
+            {step === "assessment"
+              ? t('onboarding.pickOne')
+              : t('onboarding.seeBible')}
           </CardDescription>
         </CardHeader>
 
@@ -146,8 +152,8 @@ export default function Onboarding() {
                             <RoleIcon className={`h-5 w-5 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
                           </div>
                           <div>
-                            <div className="font-semibold">{role.label}</div>
-                            <div className="text-xs text-muted-foreground">{role.description}</div>
+                            <div className="font-semibold">{t('onboarding.role_' + role.value)}</div>
+                            <div className="text-xs text-muted-foreground">{t('onboarding.role_' + role.value + '_desc')}</div>
                           </div>
                         </div>
                       </button>
@@ -157,14 +163,14 @@ export default function Onboarding() {
 
                 <div className="flex justify-between pt-4">
                   <Button variant="ghost" onClick={handleSkip}>
-                    Skip for now
+                    {t('common.skip')}
                   </Button>
                   <Button 
                     onClick={() => setStep("go")} 
                     disabled={!selectedRole}
                     size="lg"
                   >
-                    Continue
+                    {t('common.continue')}
                     <ChevronRight className="ml-2 h-4 w-4" />
                   </Button>
                 </div>
@@ -184,25 +190,25 @@ export default function Onboarding() {
                   <div className="p-4 rounded-lg bg-orange-500/10 border border-orange-500/20">
                     <Flame className="h-8 w-8 mx-auto mb-2 text-orange-500" />
                     <div className="text-2xl font-bold">0</div>
-                    <div className="text-xs text-muted-foreground">Day Streak</div>
+                    <div className="text-xs text-muted-foreground">{t('onboarding.dayStreak')}</div>
                   </div>
                   <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
                     <Trophy className="h-8 w-8 mx-auto mb-2 text-yellow-500" />
                     <div className="text-2xl font-bold">0</div>
-                    <div className="text-xs text-muted-foreground">XP Points</div>
+                    <div className="text-xs text-muted-foreground">{t('onboarding.xpPoints')}</div>
                   </div>
                   <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
                     <Gem className="h-8 w-8 mx-auto mb-2 text-primary" />
                     <div className="text-2xl font-bold">0</div>
-                    <div className="text-xs text-muted-foreground">Gems Saved</div>
+                    <div className="text-xs text-muted-foreground">{t('onboarding.gemsSaved')}</div>
                   </div>
                 </div>
 
                 <div className="bg-muted/50 rounded-lg p-4 text-center">
                   <Sparkles className="h-6 w-6 mx-auto mb-2 text-primary" />
-                  <p className="font-medium mb-1">Your First Win: 24FPS Room</p>
+                  <p className="font-medium mb-1">{t('onboarding.firstWin')}</p>
                   <p className="text-sm text-muted-foreground">
-                    See Genesis as 50 unforgettable images. Match 7 to complete Day 1.
+                    {t('onboarding.firstWinDesc')}
                   </p>
                 </div>
 
@@ -211,12 +217,12 @@ export default function Onboarding() {
                   size="lg" 
                   className="w-full gradient-palace text-white shadow-lg"
                 >
-                  Start My First Win
+                  {t('onboarding.startFirstWin')}
                   <ChevronRight className="ml-2 h-5 w-5" />
                 </Button>
 
                 <p className="text-center text-xs text-muted-foreground">
-                  Takes about 2 minutes • No signup required to try
+                  {t('onboarding.takesAbout')}
                 </p>
               </motion.div>
             )}

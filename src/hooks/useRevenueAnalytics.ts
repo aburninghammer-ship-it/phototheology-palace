@@ -35,13 +35,24 @@ interface OnboardingFunnel {
   dropoff: number;
 }
 
-// Price IDs to MRR mapping (cents)
-const PRICE_TO_MRR: Record<string, number> = {
-  'price_1Qb3SxCibB3mHN3rlv6wGBqD': 9.97, // Essential monthly
-  'price_1Qb3TNCibB3mHN3rBhbB0xRk': 99.97, // Essential yearly (8.33/mo)
-  'price_1Qb3TpCibB3mHN3rElL1v7b6': 14.97, // Premium monthly
-  'price_1Qb3UNCibB3mHN3r3BYEZvbH': 149.97, // Premium yearly (12.50/mo)
-};
+export interface PdfPurchase {
+  id: string;
+  product: string;
+  amount: number;
+  email: string | null;
+  name: string | null;
+  date: string;
+  pdfSent: boolean;
+  pdfSentAt: string | null;
+}
+
+export interface PdfMetrics {
+  totalPurchases: number;
+  totalRevenue: number;
+  purchases: PdfPurchase[];
+}
+
+// Stripe MRR will be fetched from the edge function for accuracy
 
 export function useRevenueAnalytics() {
   const [loading, setLoading] = useState(true);
@@ -50,6 +61,8 @@ export function useRevenueAnalytics() {
   const [cohorts, setCohorts] = useState<CohortData[]>([]);
   const [onboardingFunnel, setOnboardingFunnel] = useState<OnboardingFunnel[]>([]);
   const [monthlyTrend, setMonthlyTrend] = useState<{ month: string; mrr: number; subscribers: number }[]>([]);
+  const [stripeMrr, setStripeMrr] = useState<number | null>(null);
+  const [pdfMetrics, setPdfMetrics] = useState<PdfMetrics | null>(null);
 
   useEffect(() => {
     fetchAllMetrics();
@@ -64,9 +77,39 @@ export function useRevenueAnalytics() {
         fetchCohortData(),
         fetchOnboardingFunnel(),
         fetchMonthlyTrend(),
+        fetchStripeMrr(),
+        fetchPdfPurchases(),
       ]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Fetch PDF purchases from Stripe via edge function
+  const fetchPdfPurchases = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('get-pdf-purchases');
+      if (!error && data?.purchases) {
+        setPdfMetrics({
+          totalPurchases: data.purchases.length,
+          totalRevenue: data.purchases.reduce((sum: number, p: any) => sum + (p.amount || 0), 0),
+          purchases: data.purchases,
+        });
+      }
+    } catch (e) {
+      console.debug('[useRevenueAnalytics] Could not fetch PDF purchases', e);
+    }
+  };
+
+  // Fetch MRR from Stripe via edge function (authoritative source)
+  const fetchStripeMrr = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('get-subscriber-stats');
+      if (!error && data?.stats?.stripe?.total_mrr_cents) {
+        setStripeMrr(data.stats.stripe.total_mrr_cents / 100);
+      }
+    } catch (e) {
+      console.debug('[useRevenueAnalytics] Could not fetch Stripe MRR', e);
     }
   };
 
@@ -143,23 +186,30 @@ export function useRevenueAnalytics() {
     const now = new Date();
     const monthStart = startOfMonth(now);
 
-    // Get all subscriptions
+    // Fetch real MRR from Stripe via edge function - this is the authoritative source
+    let stripeMrr = 0;
+    let stripeActiveCount = 0;
+
+    try {
+      const { data: stripeStats, error: stripeError } = await supabase.functions.invoke('get-subscriber-stats');
+
+      if (!stripeError && stripeStats?.stats?.stripe) {
+        // Convert cents to dollars
+        stripeMrr = (stripeStats.stats.stripe.total_mrr_cents || 0) / 100;
+        // Use Stripe active count as the authoritative source (matches Overview tab)
+        stripeActiveCount = stripeStats.stats.stripe.active_subscriptions || 0;
+      }
+    } catch (err) {
+      console.error('Failed to fetch Stripe stats:', err);
+    }
+
+    // Get database subscription data for other metrics
     const { data: subs } = await supabase
       .from('user_subscriptions')
       .select('subscription_status, subscription_tier, created_at, has_lifetime_access');
 
     const activeSubs = subs?.filter(s => s.subscription_status === 'active') || [];
     const trialSubs = subs?.filter(s => s.subscription_status === 'trial') || [];
-    
-    // Calculate MRR from active subscriptions based on tier
-    let mrr = 0;
-    activeSubs.forEach(sub => {
-      if (sub.subscription_tier === 'premium') {
-        mrr += 14.97;
-      } else if (sub.subscription_tier === 'essential') {
-        mrr += 9.97;
-      }
-    });
 
     // Get cancelled subscriptions from profiles (subscription_cancelled_at)
     const { data: cancelledProfiles } = await supabase
@@ -167,13 +217,13 @@ export function useRevenueAnalytics() {
       .select('id, subscription_cancelled_at')
       .not('subscription_cancelled_at', 'is', null);
 
-    const churnedThisMonth = cancelledProfiles?.filter(p => 
-      p.subscription_cancelled_at && 
+    const churnedThisMonth = cancelledProfiles?.filter(p =>
+      p.subscription_cancelled_at &&
       new Date(p.subscription_cancelled_at) >= monthStart
     ).length || 0;
 
     // New subscribers this month
-    const newThisMonth = activeSubs.filter(s => 
+    const newThisMonth = activeSubs.filter(s =>
       s.created_at && new Date(s.created_at) >= monthStart
     ).length;
 
@@ -181,19 +231,24 @@ export function useRevenueAnalytics() {
     const totalTrials = trialSubs.length + activeSubs.length;
     const conversionRate = totalTrials > 0 ? (activeSubs.length / totalTrials) * 100 : 0;
 
-    // Churn rate
-    const startOfMonthActive = activeSubs.length + churnedThisMonth;
+    // Churn rate - use Stripe count as authoritative
+    const effectiveActiveCount = stripeActiveCount > 0 ? stripeActiveCount : activeSubs.length;
+    const startOfMonthActive = effectiveActiveCount + churnedThisMonth;
     const churnRate = startOfMonthActive > 0 ? (churnedThisMonth / startOfMonthActive) * 100 : 0;
 
+    // MRR from Stripe (authoritative)
+    const finalMrr = Math.round(stripeMrr * 100) / 100;
+
     setMetrics({
-      mrr: Math.round(mrr * 100) / 100,
-      arr: Math.round(mrr * 12 * 100) / 100,
-      activeSubscribers: activeSubs.length,
+      mrr: finalMrr,
+      arr: Math.round(finalMrr * 12 * 100) / 100,
+      // Use Stripe active count to match Overview tab (authoritative source)
+      activeSubscribers: stripeActiveCount > 0 ? stripeActiveCount : activeSubs.length,
       churnedThisMonth,
       churnRate: Math.round(churnRate * 10) / 10,
       newSubscribersThisMonth: newThisMonth,
       conversionRate: Math.round(conversionRate * 10) / 10,
-      averageRevenuePerUser: activeSubs.length > 0 ? Math.round((mrr / activeSubs.length) * 100) / 100 : 0,
+      averageRevenuePerUser: effectiveActiveCount > 0 ? Math.round((finalMrr / effectiveActiveCount) * 100) / 100 : 0,
     });
   };
 
@@ -312,10 +367,21 @@ export function useRevenueAnalytics() {
     setMonthlyTrend(months);
   };
 
+  // Use Stripe MRR as authoritative source when available
+  const finalMetrics = metrics && stripeMrr !== null ? {
+    ...metrics,
+    mrr: stripeMrr,
+    arr: Math.round(stripeMrr * 12 * 100) / 100,
+    averageRevenuePerUser: metrics.activeSubscribers > 0 
+      ? Math.round((stripeMrr / metrics.activeSubscribers) * 100) / 100 
+      : 0,
+  } : metrics;
+
   return {
     loading,
-    metrics,
+    metrics: finalMetrics,
     trialMetrics,
+    pdfMetrics,
     cohorts,
     onboardingFunnel,
     monthlyTrend,

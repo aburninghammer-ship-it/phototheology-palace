@@ -39,103 +39,96 @@ export const useDirectMessages = () => {
   const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch conversations with unread counts
+  // Fetch conversations with unread counts — batched queries to avoid N+1
   const fetchConversations = useCallback(async () => {
     if (!user?.id) {
-      console.log('No user ID, skipping conversation fetch');
       setIsLoading(false);
       return;
     }
 
-    console.log('Fetching conversations for user:', user.id);
     try {
+      // 1. Fetch all conversations in one query
       const { data: convos, error } = await supabase
         .from('conversations')
-        .select(`
-          id,
-          participant1_id,
-          participant2_id,
-          updated_at
-        `)
+        .select('id, participant1_id, participant2_id, updated_at')
         .or(`participant1_id.eq.${user.id},participant2_id.eq.${user.id}`)
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
+      if (!convos || convos.length === 0) {
+        setConversations([]);
+        setIsLoading(false);
+        return;
+      }
 
-      console.log('Found conversations:', convos?.length || 0);
-
-      // Fetch other user profiles and unread counts
-      const conversationsWithData = await Promise.all(
-        (convos || []).map(async (convo) => {
-          const otherId = convo.participant1_id === user.id 
-            ? convo.participant2_id 
-            : convo.participant1_id;
-
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('id, display_name, avatar_url, last_seen')
-            .eq('id', otherId)
-            .single();
-
-          // Get last message
-          const { data: lastMsg } = await supabase
-            .from('messages')
-            .select('*')
-            .eq('conversation_id', convo.id)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .single();
-
-          // Count unread messages - first get read message IDs, then filter
-          // Only query if user.id exists (extra guard)
-          if (!user?.id) {
-            return {
-              ...convo,
-              other_user: profile || {
-                id: otherId,
-                display_name: 'Unknown User',
-                avatar_url: null,
-                last_seen: null
-              },
-              last_message: lastMsg || undefined,
-              unread_count: 0
-            };
-          }
-
-          const { data: readStatus } = await supabase
-            .from('message_read_status')
-            .select('message_id')
-            .eq('user_id', user.id);
-          
-          const readMessageIds = readStatus?.map(r => r.message_id) || [];
-          
-          // Build query for unread messages (user.id is guaranteed to exist here)
-          let unreadQuery = supabase
-            .from('messages')
-            .select('id')
-            .eq('conversation_id', convo.id)
-            .neq('sender_id', user.id);
-          
-          // Only add the NOT IN clause if there are read messages
-          if (readMessageIds.length > 0) {
-            unreadQuery = unreadQuery.not('id', 'in', `(${readMessageIds.join(',')})`);
-          }
-          
-          const { data: unreadMessages } = await unreadQuery;
-
-          return {
-            ...convo,
-            other_user: profile || {
-              id: otherId,
-              display_name: 'Unknown User',
-              avatar_url: null,
-              last_seen: null
-            },
-            last_message: lastMsg || undefined,
-            unread_count: unreadMessages?.length || 0
-          };
-        })
+      // 2. Collect all "other" user IDs and conversation IDs
+      const otherUserIds = convos.map(c =>
+        c.participant1_id === user.id ? c.participant2_id : c.participant1_id
       );
+      const convoIds = convos.map(c => c.id);
+
+      // 3. Batch-fetch profiles, read statuses, and all messages metadata in parallel
+      const [profilesRes, readStatusRes, lastMessagesRes] = await Promise.all([
+        // All profiles in one query
+        supabase
+          .from('profiles')
+          .select('id, display_name, avatar_url, last_seen')
+          .in('id', otherUserIds),
+        // All read message IDs for current user
+        supabase
+          .from('message_read_status')
+          .select('message_id')
+          .eq('user_id', user.id),
+        // Last message + unread count: fetch recent messages per conversation
+        // We get the last message and count unread in JS to avoid N queries
+        supabase
+          .from('messages')
+          .select('id, conversation_id, sender_id, content, created_at, is_deleted, images')
+          .in('conversation_id', convoIds)
+          .order('created_at', { ascending: false })
+      ]);
+
+      // Build lookup maps
+      const profileMap: Record<string, any> = {};
+      (profilesRes.data || []).forEach(p => { profileMap[p.id] = p; });
+
+      const readMessageIds = new Set(
+        (readStatusRes.data || []).map(r => r.message_id)
+      );
+
+      // Group messages by conversation, pick last message and count unread
+      const lastMessageMap: Record<string, any> = {};
+      const unreadCountMap: Record<string, number> = {};
+
+      (lastMessagesRes.data || []).forEach(msg => {
+        // Track last message (first one we see per conversation due to desc order)
+        if (!lastMessageMap[msg.conversation_id]) {
+          lastMessageMap[msg.conversation_id] = msg;
+        }
+        // Count unread: not from me, and not in read set
+        if (msg.sender_id !== user.id && !readMessageIds.has(msg.id)) {
+          unreadCountMap[msg.conversation_id] = (unreadCountMap[msg.conversation_id] || 0) + 1;
+        }
+      });
+
+      // 4. Assemble final conversations array
+      const conversationsWithData = convos.map(convo => {
+        const otherId = convo.participant1_id === user.id
+          ? convo.participant2_id
+          : convo.participant1_id;
+
+        return {
+          ...convo,
+          other_user: profileMap[otherId] || {
+            id: otherId,
+            display_name: 'Unknown User',
+            avatar_url: null,
+            last_seen: null
+          },
+          last_message: lastMessageMap[convo.id] || undefined,
+          unread_count: unreadCountMap[convo.id] || 0
+        };
+      });
 
       setConversations(conversationsWithData);
     } catch (error) {

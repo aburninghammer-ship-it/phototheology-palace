@@ -35,7 +35,7 @@ export function LiveDemoNotification() {
         exit={{ opacity: 0, y: -100, scale: 0.9 }}
         className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] w-[95vw] max-w-md"
       >
-        <div className="bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-xl shadow-2xl p-4 border border-red-400/30">
+        <div className="bg-gradient-to-r from-red-600/90 via-rose-600/90 to-pink-600/90 backdrop-blur-xl text-white rounded-2xl shadow-[0_8px_40px_-8px_rgba(239,68,68,0.6),0_0_0_1px_rgba(255,255,255,0.15)_inset] p-4 border-2 border-red-400/40">
           <div className="flex items-start gap-3">
             {/* Pulsing live indicator */}
             <div className="relative flex-shrink-0 mt-1">

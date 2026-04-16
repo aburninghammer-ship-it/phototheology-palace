@@ -1,6 +1,8 @@
+import { useTranslation } from 'react-i18next';
 import { useFloorProgress } from "@/hooks/useFloorProgress";
 import { FloorProgressTower } from "@/components/mastery/FloorProgressTower";
 import { FloorRequirementsCard } from "@/components/mastery/FloorRequirementsCard";
+import { FloorBadges } from "@/components/mastery/FloorBadges";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { Navigation } from "@/components/Navigation";
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +48,7 @@ const FLOOR_REQUIREMENTS = {
 };
 
 export default function FloorMastery() {
+  const { t } = useTranslation();
   const { floorProgress, globalTitle, isLoading } = useFloorProgress();
 
   if (isLoading) return <LoadingScreen />;
@@ -56,28 +59,32 @@ export default function FloorMastery() {
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">
-            <h1 className="text-4xl font-bold">Floor-Based Mastery</h1>
-            <UserMasterySword 
-              masterTitle={globalTitle?.master_title} 
+            <h1 className="text-4xl font-bold">{t('floorMastery.title')}</h1>
+            <UserMasterySword
+              masterTitle={globalTitle?.master_title}
               currentFloor={globalTitle?.current_floor || 0}
               size="lg"
             />
           </div>
           <p className="text-foreground/80">
-            Climb the Palace floor by floor. Each level builds on the previous. Every step forward
-            is progress — keep climbing! Your sword color shows your current mastery level.
+            {t('floorMastery.subtitle')}
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* Left: Tower Visualization */}
+        {/* Floor Completion Badges */}
+        <FloorBadges 
+          completedFloors={(floorProgress || [])
+            .filter((f: any) => f.floor_completed_at)
+            .map((f: any) => f.floor_number)} 
+        />
+
+        <div className="grid lg:grid-cols-2 gap-6 mt-6">
           <div>
             <FloorProgressTower floors={floorProgress || []} globalTitle={globalTitle} />
           </div>
 
-          {/* Right: Requirements Breakdown */}
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Floor Requirements</h2>
+            <h2 className="text-2xl font-bold">{t('floorMastery.requirements')}</h2>
             {Object.entries(FLOOR_REQUIREMENTS).map(([floor, reqs]) => {
               const floorNum = parseInt(floor);
               const floorData = floorProgress?.find((f: any) => f.floor_number === floorNum);
@@ -93,16 +100,15 @@ export default function FloorMastery() {
           </div>
         </div>
 
-        {/* Black Master Hall of Fame */}
         {globalTitle?.master_title === "black" && (
           <div className="mt-8 p-6 rounded-lg bg-gradient-to-r from-black via-gray-900 to-black border-2 border-yellow-500">
             <div className="text-center space-y-2">
-              <h2 className="text-3xl font-bold text-white">⚫ BLACK MASTER ⚫</h2>
+              <h2 className="text-3xl font-bold text-white">{t('floorMastery.blackMaster')}</h2>
               <p className="text-yellow-500 font-medium">
-                You have conquered all 8 floors. You are a Phototheology Grandmaster.
+                {t('floorMastery.blackMasterDesc')}
               </p>
               <Badge className="bg-yellow-500 text-black text-lg px-4 py-2">
-                Palace Completed
+                {t('floorMastery.palaceCompleted')}
               </Badge>
             </div>
           </div>

@@ -24,8 +24,8 @@ const roomGamesMap: Record<string, RoomGame[]> = {
   sr: [
     { id: "sr-sequence", name: "Story Sequence", description: "Arrange Bible stories in correct chronological order", path: "/games/room-game/sr-sequence", icon: "📖", difficulty: "easy", xpReward: 25 },
     { id: "sr-genesis", name: "Genesis HighRise", description: "Build the Genesis tower chapter by chapter", path: "/games/room-game/sr-genesis", icon: "🏗️", difficulty: "medium", xpReward: 35 },
-    { id: "sr-beat-builder", name: "Beat Builder", description: "Create story beats from narrative passages", path: "/games/room-game/sr-beat-builder", icon: "🎬", difficulty: "medium", xpReward: 30 },
-    { id: "sr-story-race", name: "Story Race", description: "Speed-match stories to their beat lists", path: "/games/room-game/sr-story-race", icon: "🏃", difficulty: "hard", xpReward: 40 },
+    { id: "sr-beat-builder", name: "Scene Builder", description: "Store vivid scenes from narrative passages", path: "/games/room-game/sr-beat-builder", icon: "🎬", difficulty: "medium", xpReward: 30 },
+    { id: "sr-story-race", name: "Story Race", description: "Speed-match stories to their scene sequences", path: "/games/room-game/sr-story-race", icon: "🏃", difficulty: "hard", xpReward: 40 },
     { id: "sr-narrative-chain", name: "Narrative Chain", description: "Chain connected stories across books", path: "/games/room-game/sr-narrative-chain", icon: "🔗", difficulty: "hard", xpReward: 45 },
   ],
   ir: [

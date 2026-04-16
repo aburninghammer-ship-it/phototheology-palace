@@ -12,6 +12,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
 import { BlueprintMap } from "@/components/blueprint/BlueprintMap";
+import { BlueprintEnhancedFeatures } from "@/components/blueprint/BlueprintEnhancedFeatures";
+import { useTranslation } from "react-i18next";
 
 export default function BlueprintMarriage() {
   const [selectedArticle, setSelectedArticle] = useState<number | null>(null);
@@ -19,16 +21,17 @@ export default function BlueprintMarriage() {
   const [completedArticles, setCompletedArticles] = useState<number[]>([]);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
-  const currentArticle = selectedArticle 
-    ? SANCTUARY_MARRIAGE_ARTICLES.find(a => a.id === selectedArticle) 
+  const currentArticle = selectedArticle
+    ? SANCTUARY_MARRIAGE_ARTICLES.find(a => a.id === selectedArticle)
     : null;
 
   const handleComplete = async (articleId: number) => {
     if (!user) {
       toast({
-        title: "Sign in required",
-        description: "Please sign in to track your progress",
+        title: t('common.signInRequired'),
+        description: t('common.signInToTrackProgress'),
         variant: "destructive"
       });
       return;
@@ -49,14 +52,14 @@ export default function BlueprintMarriage() {
 
       setCompletedArticles(prev => [...prev, articleId]);
       toast({
-        title: "Progress saved!",
-        description: `${SANCTUARY_MARRIAGE_ARTICLES.find(a => a.id === articleId)?.name} completed`,
+        title: t('common.progressSaved'),
+        description: t('common.articleCompleted', { name: SANCTUARY_MARRIAGE_ARTICLES.find(a => a.id === articleId)?.name }),
       });
     } catch (error) {
       console.error('Error saving progress:', error);
       toast({
-        title: "Error",
-        description: "Failed to save progress. Please try again.",
+        title: t('common.error'),
+        description: t('common.failedToSaveProgress'),
         variant: "destructive"
       });
     }
@@ -65,7 +68,7 @@ export default function BlueprintMarriage() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
+
       <main className="container mx-auto px-4 py-8 space-y-8">
         {!selectedArticle ? (
           <>
@@ -79,14 +82,14 @@ export default function BlueprintMarriage() {
               </p>
               <div className="flex justify-center">
                 <EnhancedSocialShare
-                  title="The Sanctuary Blueprint for Dating, Courtship & Marriage"
-                  content="Discover God's 6-step blueprint for relationships—from dating to covenant marriage. A powerful sanctuary-based guide!"
+                  title={t('blueprint.marriage.shareTitle')}
+                  content={t('blueprint.marriage.shareContent')}
                   url={window.location.href}
-                  defaultMessage="🏛️ Just discovered this amazing resource: The Sanctuary Blueprint for Dating, Courtship & Marriage!\n\nIt maps God's 6-step sanctuary pattern to relationships—from surrender & self-reflection to covenant marriage.\n\nThis has completely changed how I view relationships! 💍✨"
-                  buttonText="Share This Resource"
+                  defaultMessage={t('blueprint.marriage.shareDefaultMessage')}
+                  buttonText={t('blueprint.common.shareThisResource')}
                 />
               </div>
-              
+
               {/* Sanctuary Explanation */}
               <Card variant="glass" className="max-w-4xl mx-auto">
                 <CardContent className="pt-6">
@@ -115,27 +118,28 @@ export default function BlueprintMarriage() {
               items={SANCTUARY_MARRIAGE_ARTICLES.map(article => ({
                 id: article.id,
                 name: article.name,
-                step: `Step ${article.id}`
+                step: t('blueprint.common.stepLabel', { step: article.id })
               }))}
               completedItems={completedArticles}
               onItemClick={setSelectedArticle}
             />
           </>
         ) : (
+          <>
           <Card variant="glass">
             <CardHeader>
-              <Button 
-                variant="ghost" 
-                onClick={() => setSelectedArticle(null)} 
+              <Button
+                variant="ghost"
+                onClick={() => setSelectedArticle(null)}
                 className="w-fit mb-4"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Overview
+                {t('common.backToOverview')}
               </Button>
               <div className="flex items-center gap-2 mb-2">
-                <Badge variant="secondary">Article {currentArticle?.id} of 6</Badge>
+                <Badge variant="secondary">{t('blueprint.common.articleOfTotal', { article: currentArticle?.id, total: 6 })}</Badge>
                 {completedArticles.includes(currentArticle?.id || 0) && (
-                  <Badge className="bg-green-500">Completed</Badge>
+                  <Badge className="bg-green-500">{t('common.completed')}</Badge>
                 )}
               </div>
               <div className="flex items-start gap-3">
@@ -156,7 +160,7 @@ export default function BlueprintMarriage() {
                   <div className="bg-background/60 backdrop-blur-sm p-4 rounded-xl border border-primary/20 shadow-lg">
                     <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
                       <BookOpen className="h-5 w-5 text-primary" />
-                      Sanctuary Meaning
+                      {t('blueprint.common.sanctuaryMeaning')}
                     </h3>
                     <p className="text-base">{currentArticle?.sanctuaryMeaning}</p>
                   </div>
@@ -165,7 +169,7 @@ export default function BlueprintMarriage() {
                   <div className="bg-primary/10 backdrop-blur-sm p-4 rounded-xl border border-primary/30 shadow-lg">
                     <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
                       <Heart className="h-5 w-5 text-primary" />
-                      Marriage Principle
+                      {t('blueprint.marriage.marriagePrinciple')}
                     </h3>
                     <p className="text-lg font-semibold text-primary">
                       "{currentArticle?.marriagePrinciple}"
@@ -174,7 +178,7 @@ export default function BlueprintMarriage() {
 
                   {/* Detailed Teaching */}
                   <div>
-                    <h3 className="font-semibold text-lg mb-3 text-primary">Teaching</h3>
+                    <h3 className="font-semibold text-lg mb-3 text-primary">{t('blueprint.common.teaching')}</h3>
                     <div className="prose prose-sm max-w-none">
                       <p className="whitespace-pre-line leading-relaxed">
                         {currentArticle?.detailedTeaching}
@@ -184,7 +188,7 @@ export default function BlueprintMarriage() {
 
                   {/* Reflection Questions */}
                   <div className="bg-yellow-500/10 backdrop-blur-sm p-4 rounded-xl border border-yellow-500/20 shadow-lg">
-                    <h3 className="font-semibold text-lg mb-3">💭 Reflection Questions</h3>
+                    <h3 className="font-semibold text-lg mb-3">{t('blueprint.common.reflectionQuestions')}</h3>
                     <ul className="space-y-2">
                       {currentArticle?.reflectionQuestions.map((question, i) => (
                         <li key={i} className="text-sm">• {question}</li>
@@ -194,7 +198,7 @@ export default function BlueprintMarriage() {
 
                   {/* Couple Exercises */}
                   <div className="bg-blue-500/10 backdrop-blur-sm p-4 rounded-xl border border-blue-500/20 shadow-lg">
-                    <h3 className="font-semibold text-lg mb-3">👫 Exercises for Couples</h3>
+                    <h3 className="font-semibold text-lg mb-3">{t('blueprint.marriage.exercisesForCouples')}</h3>
                     <ol className="space-y-3">
                       {currentArticle?.coupleExercises.map((exercise, i) => (
                         <li key={i} className="text-sm">
@@ -206,7 +210,7 @@ export default function BlueprintMarriage() {
 
                   {/* Scripture References */}
                   <div className="bg-purple-500/10 backdrop-blur-sm p-4 rounded-xl border border-purple-500/20 shadow-lg">
-                    <h3 className="font-semibold text-lg mb-3">📖 Scripture References</h3>
+                    <h3 className="font-semibold text-lg mb-3">{t('blueprint.common.scriptureReferences')}</h3>
                     <ul className="space-y-1">
                       {currentArticle?.scriptureReferences.map((ref, i) => (
                         <li key={i} className="text-sm">• {ref}</li>
@@ -216,15 +220,15 @@ export default function BlueprintMarriage() {
 
                   {/* Prayer Prompt */}
                   <div className="bg-primary/15 backdrop-blur-sm p-4 rounded-xl border border-primary/30 shadow-lg">
-                    <h3 className="font-semibold text-lg mb-2 text-primary">🙏 Prayer Together</h3>
+                    <h3 className="font-semibold text-lg mb-2 text-primary">{t('blueprint.marriage.prayerTogether')}</h3>
                     <p className="italic text-base">{currentArticle?.prayerPrompt}</p>
                   </div>
 
                   {/* Notes Section */}
                   <div className="space-y-3">
-                    <h3 className="font-semibold text-lg">📝 Your Notes & Reflections</h3>
+                    <h3 className="font-semibold text-lg">{t('blueprint.common.yourNotesAndReflections')}</h3>
                     <Textarea
-                      placeholder="Write your thoughts, commitments, and insights here..."
+                      placeholder={t('blueprint.marriage.notesPlaceholder')}
                       className="min-h-[150px]"
                       value={notes[currentArticle?.id || 0] || ""}
                       onChange={(e) => setNotes(prev => ({
@@ -242,13 +246,29 @@ export default function BlueprintMarriage() {
                       onClick={() => handleComplete(currentArticle?.id || 0)}
                     >
                       <CheckCircle2 className="mr-2 h-5 w-5" />
-                      Mark as Complete
+                      {t('common.markAsComplete')}
                     </Button>
                   )}
                 </div>
               </ScrollArea>
             </CardContent>
           </Card>
+
+          {/* Interactive Study Tools */}
+          <BlueprintEnhancedFeatures
+            blueprintType="marriage"
+            currentArticleId={currentArticle?.id}
+            currentArticleTitle={currentArticle?.name}
+            currentArticleContent={currentArticle?.detailedTeaching}
+            dailyCheckItems={[
+              t('blueprint.marriage.dailyCheck.readPrinciple'),
+              t('blueprint.marriage.dailyCheck.prayedTogether'),
+              t('blueprint.marriage.dailyCheck.practicedExercise'),
+              t('blueprint.marriage.dailyCheck.meaningfulConversation'),
+              t('blueprint.marriage.dailyCheck.showedLove')
+            ]}
+          />
+          </>
         )}
       </main>
     </div>

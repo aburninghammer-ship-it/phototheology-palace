@@ -1,760 +1,822 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState, useCallback } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { Trophy, MessageSquare, Sparkles, Target, Share2, Copy, MessagesSquare } from "lucide-react";
+import {
+  Trophy, MessageSquare, Sparkles, Target, ChevronDown, Bot, User, Users,
+  BookOpen, Building2, Lightbulb, Send, Loader2, ArrowRight, RotateCcw, ArrowLeft
+} from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { EmojiPicker } from "@/components/EmojiPicker";
-import { SimpleVoiceRoom } from "@/components/voice";
-import { ChatInput } from "@/components/ChatInput";
+import {
+  ptRooms, biblicalBooks, ptPrinciples,
+  type PTRoom, type BiblicalBook, type PTPrinciple
+} from "@/data/chainChessData";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { motion, AnimatePresence } from "framer-motion";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { useGameMultiplayer } from "@/hooks/useGameMultiplayer";
+import { MultiplayerLobby } from "@/components/games/MultiplayerLobby";
 
+// Types
 interface Move {
-  player: string;
-  verse?: string; // User's verse response
+  id: string;
+  player: "user" | "jeeves" | string; // string for multiplayer player IDs
+  playerName?: string;
+  verse: string;
+  verseText: string;
   commentary: string;
-  category?: string;
-  challengeCategory?: string; // Challenge for next player
-  jeeves_feedback?: string;
+  challengeType: "room" | "book" | "principle";
+  challengeId: string;
+  challengeName: string;
   score?: number;
+  ruling?: {
+    approved: boolean;
+    explanation: string;
+    score: number;
+  };
   timestamp: string;
 }
 
+interface GameSettings {
+  difficulty: "kids" | "adults";
+  enabledCategories: {
+    books: boolean;
+    rooms: boolean;
+    principles: boolean;
+  };
+}
+
+interface GameState {
+  status: "mode-select" | "setup" | "loading" | "in_progress" | "completed" | "mp-lobby";
+  settings: GameSettings;
+  moves: Move[];
+  currentChallenge?: {
+    type: "room" | "book" | "principle";
+    id: string;
+    name: string;
+  };
+  playerScore: number;
+  jeevesScore: number;
+  roundNumber: number;
+  currentTurn: "user" | "jeeves";
+  winner?: "user" | "jeeves" | "tie";
+}
+
+type GameMode = "jeeves" | "multiplayer";
+
 const ChainChess = () => {
-  const { gameId, mode } = useParams<{ gameId: string; mode?: string }>();
-  const { user, loading } = useAuth();
+  const { gameId, mode: routeMode } = useParams<{ gameId: string; mode?: string }>();
+  const [searchParams] = useSearchParams();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
-  const [game, setGame] = useState<any>(null);
-  const [moves, setMoves] = useState<Move[]>([]);
-  const [currentVerse, setCurrentVerse] = useState("John 3:16");
-  const [verseText, setVerseText] = useState("");
-  const [commentary, setCommentary] = useState("");
-  const [challengeCategory, setChallengeCategory] = useState<string>("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [selectedCategoryBase, setSelectedCategoryBase] = useState<string>("");
-  const [specificChallenge, setSpecificChallenge] = useState<string>("");
-  const [isMyTurn, setIsMyTurn] = useState(false);
-  const [processing, setProcessing] = useState(false);
-  const [userScore, setUserScore] = useState(0);
-  const [opponentScore, setOpponentScore] = useState(0);
-  const [gameStarted, setGameStarted] = useState(false);
-  const [selectedGameCategories, setSelectedGameCategories] = useState<string[]>([]);
-  const [difficultyLevel, setDifficultyLevel] = useState<"kids" | "adults">("adults");
+
+  // Game mode
+  const [gameMode, setGameMode] = useState<GameMode | null>(
+    routeMode === "jeeves" ? "jeeves" : null
+  );
+
+  // Multiplayer hook
+  const mp = useGameMultiplayer("chain_chess");
+
+  // Game state
+  const [gameState, setGameState] = useState<GameState>({
+    status: routeMode === "jeeves" ? "setup" : "mode-select",
+    settings: {
+      difficulty: "adults",
+      enabledCategories: {
+        books: true,
+        rooms: true,
+        principles: true,
+      },
+    },
+    moves: [],
+    playerScore: 0,
+    jeevesScore: 0,
+    roundNumber: 0,
+    currentTurn: "jeeves",
+  });
+
+  // Input state for user's turn
   const [userVerse, setUserVerse] = useState("");
-  const [chatMessages, setChatMessages] = useState<Array<{ userId: string; userName: string; message: string; timestamp: string }>>([]);
-  const [userDisplayName, setUserDisplayName] = useState<string>("");
-  const [whoStarts, setWhoStarts] = useState<"jeeves" | "player" | null>(null);
+  const [userCommentary, setUserCommentary] = useState("");
+  const [userChallengeType, setUserChallengeType] = useState<"room" | "book" | "principle">("book");
+  const [userChallengeId, setUserChallengeId] = useState("");
+  const [processing, setProcessing] = useState(false);
 
-  const categories = ["Books of the Bible", "Rooms of the Palace", "Principles of the Palace"];
-  const isVsJeeves = mode === "jeeves";
+  // UI state
+  const [showRules, setShowRules] = useState(false);
 
-  // Pool of verses to randomly select from
-  const versePool = [
-    "John 3:16", "Psalm 23:1", "Romans 8:28", "Philippians 4:13", "Proverbs 3:5-6",
-    "Isaiah 40:31", "Jeremiah 29:11", "Matthew 6:33", "2 Timothy 3:16", "Hebrews 11:1",
-    "1 Corinthians 13:4", "Ephesians 2:8", "Romans 12:2", "Joshua 1:9", "Psalm 46:1",
-    "Matthew 28:19", "John 14:6", "Galatians 5:22", "Colossians 3:2", "James 1:2-3",
-    "1 Peter 5:7", "Revelation 21:4", "Genesis 1:1", "Exodus 20:3", "Deuteronomy 6:5",
-    "Psalm 119:105", "Isaiah 53:5", "Matthew 5:16", "Luke 6:31", "Acts 1:8",
-    "Romans 3:23", "1 John 4:8", "Revelation 3:20", "Mark 16:15", "John 1:1"
-  ];
+  // ===== MULTIPLAYER: Sync game state from room =====
+  useEffect(() => {
+    if (gameMode !== "multiplayer" || !mp.room) return;
 
-  const getRandomVerse = () => {
-    return versePool[Math.floor(Math.random() * versePool.length)];
+    // When room becomes active, transition ALL clients to in_progress
+    if (mp.room.status === "active") {
+      const rs = (mp.room.game_state as any) || {};
+      const moves: Move[] = rs.moves || [];
+      const lastMove = moves.length > 0 ? moves[moves.length - 1] : null;
+
+      setGameState(prev => {
+        // Only update if we're not already in_progress or if game_state changed
+        const newStatus = "in_progress";
+        return {
+          ...prev,
+          status: newStatus,
+          moves,
+          settings: rs.settings || prev.settings,
+          currentChallenge: lastMove ? {
+            type: lastMove.challengeType,
+            id: lastMove.challengeId,
+            name: lastMove.challengeName,
+          } : undefined,
+          playerScore: rs.scores?.[user?.id || ""] || 0,
+          jeevesScore: 0,
+          roundNumber: rs.roundNumber || Math.ceil(moves.length / 2) || 1,
+          currentTurn: "user",
+        };
+      });
+    } else if (mp.room.status === "completed") {
+      setGameState(prev => ({ ...prev, status: "completed" }));
+    }
+  }, [mp.room?.game_state, mp.room?.status, gameMode, user?.id]);
+
+  // Get available challenge options based on enabled categories
+  const getAvailableChallengeTypes = useCallback(() => {
+    const types: ("room" | "book" | "principle")[] = [];
+    if (gameState.settings.enabledCategories.books) types.push("book");
+    if (gameState.settings.enabledCategories.rooms) types.push("room");
+    if (gameState.settings.enabledCategories.principles) types.push("principle");
+    return types;
+  }, [gameState.settings.enabledCategories]);
+
+  // ===== MODE SELECTION =====
+  const selectMode = (mode: GameMode) => {
+    setGameMode(mode);
+    if (mode === "jeeves") {
+      setGameState(prev => ({ ...prev, status: "setup" }));
+    } else {
+      setGameState(prev => ({ ...prev, status: "mp-lobby" }));
+    }
   };
 
-  useEffect(() => {
-    if (user && gameId && gameId !== "new") {
-      loadGame();
-    }
-  }, [user, gameId]);
-
-  useEffect(() => {
-    if (user) {
-      fetchUserProfile();
-    }
-  }, [user]);
-
-  const fetchUserProfile = async () => {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("display_name, username")
-      .eq("id", user!.id)
-      .single();
-    
-    if (profile) {
-      setUserDisplayName(profile.display_name || profile.username || "User");
-    }
-  };
-
-  useEffect(() => {
-    if (gameId) {
-      const gameChannel = supabase
-        .channel(`game_${gameId}`)
-        .on("postgres_changes", { event: "*", schema: "public", table: "game_moves", filter: `game_id=eq.${gameId}` }, () => {
-          loadMoves();
-        })
-        .subscribe();
-
-      // Chat channel for text messages
-      const chatChannel = supabase
-        .channel(`chat_${gameId}`)
-        .on("broadcast", { event: "message" }, ({ payload }) => {
-          setChatMessages((prev) => [...prev, payload]);
-        })
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(gameChannel);
-        supabase.removeChannel(chatChannel);
-      };
-    }
-  }, [gameId]);
-
-  const startGameWithCategories = async () => {
-    if (selectedGameCategories.length === 0) {
-      toast({
-        title: "Select Categories",
-        description: "Please select at least one category to play with",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!whoStarts) {
-      toast({
-        title: "Choose Who Starts",
-        description: "Please select who should make the first move",
-        variant: "destructive",
-      });
-      return;
-    }
+  // ===== MULTIPLAYER: Start game from lobby =====
+  const handleMpStartGame = async () => {
+    if (!mp.room || mp.players.length < 2) return;
 
     try {
-      console.log("=== STARTING NEW GAME ===");
-      console.log("isVsJeeves:", isVsJeeves);
-      console.log("mode:", mode);
-      console.log("whoStarts:", whoStarts);
-      
-      // Jeeves chooses the verse if he starts, otherwise use a random one for player to respond to
-      const randomVerse = whoStarts === "jeeves" ? getRandomVerse() : getRandomVerse();
-      
-      // Create new game
+      const firstPlayer = mp.players[0];
+      const initialState = {
+        version: 3,
+        settings: gameState.settings,
+        moves: [],
+        scores: Object.fromEntries(mp.players.map(p => [p.user_id, 0])),
+        roundNumber: 1,
+        phase: "waiting_for_move",
+      };
+
+      await mp.startGame(initialState, firstPlayer.user_id);
+
+      // Immediately transition host UI (opponent will sync via realtime/polling)
+      setGameState(prev => ({
+        ...prev,
+        status: "in_progress",
+        moves: [],
+        roundNumber: 1,
+        playerScore: 0,
+        jeevesScore: 0,
+      }));
+    } catch (error: any) {
+      console.error("Error starting multiplayer game:", error);
+      toast({
+        title: "Could not start game",
+        description: error?.message || "Please try again",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // ===== MULTIPLAYER: Submit move =====
+  const submitMultiplayerMove = async () => {
+    if (!userVerse.trim() || !userCommentary.trim() || !userChallengeId || !mp.room || !user) return;
+
+    setProcessing(true);
+    try {
+      const currentState = mp.room.game_state as any;
+      const moves: Move[] = currentState.moves || [];
+      const currentChallenge = moves.length > 0 ? {
+        type: moves[moves.length - 1].challengeType,
+        id: moves[moves.length - 1].challengeId,
+        name: moves[moves.length - 1].challengeName,
+      } : undefined;
+
+      // Have Jeeves judge the move
+      const { data: judgment, error: judgmentError } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "chain-chess-v3-judge",
+          userVerse,
+          userCommentary,
+          challengeType: currentChallenge?.type,
+          challengeId: currentChallenge?.id,
+          challengeName: currentChallenge?.name,
+          previousMoves: moves,
+          difficulty: gameState.settings.difficulty,
+        },
+      });
+
+      if (judgmentError) throw judgmentError;
+
+      const challengeName = getChallengeNameById(userChallengeType, userChallengeId);
+      const myPlayer = mp.players.find(p => p.user_id === user.id);
+
+      const newMove: Move = {
+        id: crypto.randomUUID(),
+        player: user.id,
+        playerName: myPlayer?.display_name || "Player",
+        verse: userVerse,
+        verseText: judgment.verseText || "",
+        commentary: userCommentary,
+        challengeType: userChallengeType,
+        challengeId: userChallengeId,
+        challengeName,
+        ruling: {
+          approved: judgment.approved,
+          explanation: judgment.explanation,
+          score: judgment.score || 0,
+        },
+        timestamp: new Date().toISOString(),
+      };
+
+      const newMoves = [...moves, newMove];
+      const scores = { ...(currentState.scores || {}) };
+      if (judgment.approved) {
+        scores[user.id] = (scores[user.id] || 0) + (judgment.score || 0);
+      }
+
+      // Determine next player
+      const myIndex = mp.players.findIndex(p => p.user_id === user.id);
+      const nextPlayer = mp.players[(myIndex + 1) % mp.players.length];
+
+      await mp.updateGameState(
+        {
+          ...currentState,
+          moves: newMoves,
+          scores,
+          roundNumber: Math.ceil(newMoves.length / mp.players.length) + 1,
+        },
+        nextPlayer.user_id
+      );
+
+      // Clear input
+      setUserVerse("");
+      setUserCommentary("");
+      setUserChallengeId("");
+
+      if (judgment.approved) {
+        toast({ title: "✅ Connection Approved!", description: `+${judgment.score} points!` });
+      } else {
+        toast({ title: "❌ Weak Connection", description: judgment.explanation, variant: "destructive" });
+      }
+    } catch (error: any) {
+      console.error("Error submitting multiplayer move:", error);
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  // ===== SOLO: Start the game - Jeeves goes first =====
+  const startGame = async () => {
+    if (!user) return;
+
+    const availableTypes = getAvailableChallengeTypes();
+    if (availableTypes.length === 0) {
+      toast({
+        title: "Select at least one category",
+        description: "Please enable at least one challenge category",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setGameState(prev => ({ ...prev, status: "loading" }));
+    setProcessing(true);
+
+    try {
       const { data: newGame, error } = await supabase
         .from("games")
-        .insert({
-          game_type: "chain_chess",
-          player1_id: user!.id,
-          player2_id: isVsJeeves ? null : null,
-          current_turn: whoStarts === "player" ? user!.id : null,
+        .insert([{
+          game_type: "chain_chess_v3",
+          player1_id: user.id,
           status: "in_progress",
-          game_state: { 
-            categories: selectedGameCategories,
-            verse: randomVerse,
-            difficulty: difficultyLevel,
-            whoStarts: whoStarts,
-            isVsJeeves: isVsJeeves || mode === "jeeves" // Always store this flag!
-          },
-        })
+          game_state: JSON.parse(JSON.stringify({
+            version: 3,
+            settings: gameState.settings,
+            playerScore: 0,
+            jeevesScore: 0,
+            roundNumber: 1,
+          })),
+        }])
         .select()
         .single();
 
       if (error) throw error;
 
-      setGame(newGame);
-      setCurrentVerse(randomVerse);
-      await fetchVerseText(randomVerse);
-      setGameStarted(true);
-      
-      // Navigate immediately to the game page
-      const newUrl = `/games/chain-chess/${newGame.id}${isVsJeeves ? "/jeeves" : ""}`;
-      console.log("Navigating to:", newUrl);
-      navigate(newUrl, { replace: true });
-      
-      if (whoStarts === "jeeves") {
-        // Jeeves makes first move - show processing state
-        setProcessing(true);
-        toast({
-          title: "Jeeves is preparing his opening...",
-          description: "Please wait while Jeeves crafts his first move",
-        });
-        console.log("=== Triggering Jeeves opening move (non-blocking) ===");
-        // Don't await - let it run in background
-        jeevesMove(newGame.id, true);
-      } else {
-        // Player goes first
-        setIsMyTurn(true);
-      }
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const toggleGameCategory = (category: string) => {
-    setSelectedGameCategories(prev => 
-      prev.includes(category) 
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
-    );
-  };
-
-  const fetchVerseText = async (verseRef: string) => {
-    // Common verse fallbacks
-    const verseFallbacks: Record<string, string> = {
-      "John 3:16": "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.",
-      "Psalm 23:1": "The LORD is my shepherd; I shall not want.",
-      "Romans 8:28": "And we know that all things work together for good to them that love God, to them who are the called according to his purpose.",
-      "Philippians 4:13": "I can do all things through Christ which strengtheneth me.",
-      "Proverbs 3:5": "Trust in the LORD with all thine heart; and lean not unto thine own understanding."
-    };
-
-    try {
-      const parts = verseRef.match(/^(\d?\s?\w+)\s(\d+):(\d+)$/);
-      if (parts) {
-        const [, book, chapter, verse] = parts;
-        const formattedBook = book.trim().replace(/\s+/g, '%20');
-        
-        const response = await fetch(
-          `https://bible-api.com/${formattedBook}%20${chapter}:${verse}?translation=kjv`,
-          { signal: AbortSignal.timeout(5000) }
-        );
-        
-        if (!response.ok) {
-          throw new Error(`API returned ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data.text) {
-          setVerseText(data.text.trim());
-          return;
-        } else if (data.verses && data.verses[0]) {
-          setVerseText(data.verses[0].text.trim());
-          return;
-        }
-      }
-      
-      // Use fallback if available
-      setVerseText(verseFallbacks[verseRef] || "Verse text temporarily unavailable. Please try refreshing the page.");
-    } catch (error) {
-      console.error("Error fetching verse text:", error);
-      setVerseText(verseFallbacks[verseRef] || "Verse text temporarily unavailable. Please try refreshing the page.");
-    }
-  };
-
-  const loadGame = async () => {
-    console.log("=== LOAD GAME ===");
-    console.log("gameId:", gameId);
-    console.log("mode from URL:", mode);
-    console.log("isVsJeeves:", isVsJeeves);
-    
-    const { data } = await supabase
-      .from("games")
-      .select("*")
-      .eq("id", gameId)
-      .single();
-
-    if (data) {
-      console.log("Game data loaded:", data);
-      console.log("Game state:", data.game_state);
-      
-      setGame(data);
-      const gameState = data.game_state as any;
-      const verse = gameState?.verse || "John 3:16";
-      setCurrentVerse(verse);
-      await fetchVerseText(verse);
-      setSelectedGameCategories(gameState?.categories || categories);
-      setGameStarted(true);
-      
-      // Determine if this is a Jeeves game from game state or URL
-      const isJeevesGame = gameState?.isVsJeeves || isVsJeeves || mode === "jeeves";
-      
-      // If current_turn is null AND it's a Jeeves game, Jeeves should move
-      // If current_turn is user.id, it's the user's turn
-      // If current_turn is null but NOT a Jeeves game (PvP), we're waiting for opponent
-      if (data.current_turn === user!.id) {
-        setIsMyTurn(true);
-        console.log("It's the user's turn");
-      } else if (data.current_turn === null && isJeevesGame) {
-        // It's Jeeves' turn - trigger Jeeves to respond
-        console.log("It's Jeeves' turn - triggering Jeeves move");
-        setIsMyTurn(false);
-        setProcessing(true);
-        // Delay to let UI render, then trigger Jeeves
-        setTimeout(() => {
-          jeevesMove(gameId!, false);
-        }, 1000);
-      } else {
-        setIsMyTurn(false);
-        console.log("Waiting for opponent");
-      }
-      
-      console.log("isMyTurn set to:", data.current_turn === user!.id);
-      console.log("current_turn:", data.current_turn);
-      console.log("user id:", user!.id);
-      console.log("isJeevesGame:", isJeevesGame);
-      
-      loadMoves();
-    } else {
-      console.log("No game data found");
-    }
-  };
-
-  const loadMoves = async () => {
-    console.log("=== Loading Moves ===");
-    console.log("Game ID:", gameId);
-    
-    // Note: We don't update isMyTurn here anymore - that's handled in loadGame
-    // to avoid race conditions with Jeeves auto-triggering
-    
-    const { data, error } = await supabase
-      .from("game_moves")
-      .select("*")
-      .eq("game_id", gameId)
-      .order("created_at", { ascending: true });
-
-    console.log("Moves query result:", { data, error });
-
-    if (error) {
-      console.error("Error loading moves:", error);
-      return;
-    }
-
-    if (data) {
-      const formattedMoves = data.map((move) => {
-        const moveData = move.move_data as any;
-        return {
-          player: moveData.player,
-          verse: moveData.verse,
-          commentary: moveData.commentary,
-          category: moveData.category,
-          challengeCategory: moveData.challengeCategory,
-          jeeves_feedback: moveData.jeeves_feedback,
-          score: moveData.score,
-          timestamp: move.created_at,
-        };
-      });
-      
-      console.log("Formatted moves:", formattedMoves);
-      setMoves(formattedMoves);
-
-      // Calculate scores
-      const userMoves = formattedMoves.filter(m => m.player === "user");
-      const opponentMoves = formattedMoves.filter(m => m.player !== "user");
-      const newUserScore = userMoves.reduce((sum, m) => sum + (m.score || 0), 0);
-      const newOpponentScore = opponentMoves.reduce((sum, m) => sum + (m.score || 0), 0);
-      
-      console.log("Scores - User:", newUserScore, "Opponent:", newOpponentScore);
-      setUserScore(newUserScore);
-      setOpponentScore(newOpponentScore);
-    }
-  };
-
-  const jeevesMove = async (currentGameId: string, isFirst = false, userChallenge?: string) => {
-    setProcessing(true);
-    try {
-      console.log("=== Jeeves Move Start ===");
-      console.log("First move:", isFirst);
-      console.log("Current verse:", currentVerse);
-      console.log("Game ID:", currentGameId);
-      console.log("Available categories:", selectedGameCategories);
-      console.log("User's challenge to Jeeves:", userChallenge);
-      
-      // Reload moves to get the latest including user's just-submitted move
-      const { data: latestMoves } = await supabase
-        .from("game_moves")
-        .select("*")
-        .eq("game_id", currentGameId)
-        .order("created_at", { ascending: true });
-      
-      const formattedMoves = latestMoves?.map((move) => {
-        const moveData = move.move_data as any;
-        return {
-          player: moveData.player,
-          verse: moveData.verse,
-          commentary: moveData.commentary,
-          category: moveData.category,
-          challengeCategory: moveData.challengeCategory,
-          jeeves_feedback: moveData.jeeves_feedback,
-          score: moveData.score,
-          timestamp: move.created_at,
-        };
-      }) || [];
-      
-      console.log("Latest moves for Jeeves:", formattedMoves);
-      
-      const { data, error } = await supabase.functions.invoke("jeeves", {
+      const { data: jeevesData, error: jeevesError } = await supabase.functions.invoke("jeeves", {
         body: {
-          mode: "chain-chess",
-          verse: currentVerse,
-          isFirstMove: isFirst,
-          previousMoves: formattedMoves,
-          availableCategories: selectedGameCategories,
-          difficulty: game?.game_state?.difficulty || difficultyLevel,
+          mode: "chain-chess-v3-opening",
+          difficulty: gameState.settings.difficulty,
+          enabledCategories: gameState.settings.enabledCategories,
         },
       });
 
-      console.log("=== Jeeves Response ===");
-      console.log("Data:", data);
-      console.log("Error:", error);
+      if (jeevesError) throw jeevesError;
 
-      if (error) {
-        console.error("Jeeves invoke error:", error);
-        toast({
-          title: "Jeeves Error",
-          description: error.message || "Failed to get response from Jeeves",
-          variant: "destructive",
-        });
-        throw error;
-      }
-
-      if (!data) {
-        console.error("No data received from Jeeves");
-        toast({
-          title: "Error",
-          description: "No response from Jeeves",
-          variant: "destructive",
-        });
-        throw new Error("No data received from Jeeves");
-      }
-
-      if (!data.commentary || data.commentary.trim() === "") {
-        console.error("Jeeves response missing commentary (thought):", data);
-        toast({
-          title: "Error",
-          description: "Jeeves did not provide a thought/commentary. Please check the console logs.",
-          variant: "destructive",
-        });
-        throw new Error("Jeeves did not provide commentary (thought)");
-      }
-
-      // Validate challenge specificity
-      if (data.challengeCategory) {
-        const hasSpecificName = data.challengeCategory.includes(" - ");
-        if (!hasSpecificName) {
-          console.warn("Jeeves provided generic challenge:", data.challengeCategory);
-          // Try to make it more specific
-          if (data.challengeCategory.includes("Books of the Bible")) {
-            data.challengeCategory = "Books of the Bible - Romans";
-          } else if (data.challengeCategory.includes("Rooms of the Palace")) {
-            data.challengeCategory = "Rooms of the Palace - Story Room";
-          } else if (data.challengeCategory.includes("Principles")) {
-            data.challengeCategory = "Principles of the Palace - 2D";
-          }
-        }
-      }
-
-      console.log("=== Creating Jeeves Move ===");
-      const move = {
+      const openingMove: Move = {
+        id: crypto.randomUUID(),
         player: "jeeves",
-        verse: data.verse || currentVerse,
-        commentary: data.commentary,
-        challengeCategory: data.challengeCategory || "Books of the Bible",
-        score: data.score || 8,
+        verse: jeevesData.verse,
+        verseText: jeevesData.verseText,
+        commentary: jeevesData.commentary,
+        challengeType: jeevesData.challengeType,
+        challengeId: jeevesData.challengeId,
+        challengeName: jeevesData.challengeName,
+        score: 0,
         timestamp: new Date().toISOString(),
       };
 
-      console.log("Saving Jeeves move:", move);
-
-      const { error: insertError } = await supabase.from("game_moves").insert({
-        game_id: currentGameId,
+      await supabase.from("game_moves").insert({
+        game_id: newGame.id,
         player_id: null,
-        move_data: move,
+        move_data: JSON.parse(JSON.stringify(openingMove)),
       });
 
-      if (insertError) {
-        console.error("Error saving move:", insertError);
-        throw insertError;
+      setGameState(prev => ({
+        ...prev,
+        status: "in_progress",
+        moves: [openingMove],
+        currentChallenge: {
+          type: jeevesData.challengeType,
+          id: jeevesData.challengeId,
+          name: jeevesData.challengeName,
+        },
+        jeevesScore: 1,
+        roundNumber: 1,
+        currentTurn: "user",
+      }));
+
+      if (!gameState.settings.enabledCategories[userChallengeType + "s" as keyof typeof gameState.settings.enabledCategories]) {
+        setUserChallengeType(availableTypes[0]);
       }
 
-      // If this is the first move and Jeeves chose a verse, update the game verse
-      if (isFirst && data.verse) {
-        setCurrentVerse(data.verse);
-        await fetchVerseText(data.verse);
-        
-        // Update game state with Jeeves' chosen verse
-        await supabase
-          .from("games")
-          .update({
-            game_state: {
-              categories: selectedGameCategories,
-              verse: data.verse,
-              difficulty: game?.game_state?.difficulty || difficultyLevel,
-              whoStarts: "jeeves"
-            }
-          })
-          .eq("id", currentGameId);
-      }
-
-      setChallengeCategory(data.challengeCategory);
-      setIsMyTurn(true);
-
-      // Reload moves to ensure the new move is displayed
-      await loadMoves();
-
-      // Update game state
-      await supabase
-        .from("games")
-        .update({
-          current_turn: user!.id,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", currentGameId);
+      navigate(`/games/chain-chess/${newGame.id}/jeeves`, { replace: true });
     } catch (error: any) {
-      console.error("Jeeves move error:", error);
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+      console.error("Error starting game:", error);
+      toast({ title: "Error starting game", description: error.message, variant: "destructive" });
+      setGameState(prev => ({ ...prev, status: "setup" }));
     } finally {
       setProcessing(false);
     }
   };
 
-  const submitMove = async () => {
-    if (!commentary.trim() || !selectedCategory || !userVerse.trim()) {
-      toast({
-        title: "Missing information",
-        description: "Please provide your verse, commentary, and challenge category",
-        variant: "destructive",
-      });
+  // ===== SOLO: Submit user's move =====
+  const submitUserMove = async () => {
+    if (!userVerse.trim()) {
+      toast({ title: "Enter a verse", description: "Please provide a Bible verse reference", variant: "destructive" });
       return;
     }
-
-    if (!selectedCategory.includes(" - ")) {
-      toast({
-        title: "Incomplete challenge",
-        description: "Please specify the exact book, room, or principle for your challenge",
-        variant: "destructive",
-      });
+    if (!userCommentary.trim()) {
+      toast({ title: "Add commentary", description: "Please write commentary connecting your verse to the challenge", variant: "destructive" });
+      return;
+    }
+    if (!userChallengeId) {
+      toast({ title: "Select a challenge", description: "Please select a challenge for Jeeves", variant: "destructive" });
       return;
     }
 
     setProcessing(true);
+
     try {
-      // Get Jeeves feedback and score
-      const { data: feedback, error: feedbackError } = await supabase.functions.invoke("jeeves", {
+      const currentChallenge = gameState.currentChallenge;
+
+      const { data: judgment, error: judgmentError } = await supabase.functions.invoke("jeeves", {
         body: {
-          mode: "chain-chess-feedback",
-          verse: currentVerse,
-          userVerse: userVerse,
-          userCommentary: commentary,
-          challengeCategory: challengeCategory,
-          newChallengeCategory: selectedCategory,
-          previousMoves: moves,
-          difficulty: game?.game_state?.difficulty || difficultyLevel,
+          mode: "chain-chess-v3-judge",
+          userVerse,
+          userCommentary,
+          challengeType: currentChallenge?.type,
+          challengeId: currentChallenge?.id,
+          challengeName: currentChallenge?.name,
+          previousMoves: gameState.moves,
+          difficulty: gameState.settings.difficulty,
         },
       });
 
-      if (feedbackError) throw feedbackError;
+      if (judgmentError) throw judgmentError;
 
-      const move = {
+      const challengeName = getChallengeNameById(userChallengeType, userChallengeId);
+
+      const userMove: Move = {
+        id: crypto.randomUUID(),
         player: "user",
         verse: userVerse,
-        commentary: commentary,
-        challengeCategory: selectedCategory,
-        jeeves_feedback: feedback.feedback,
-        score: feedback.score,
+        verseText: judgment.verseText || "",
+        commentary: userCommentary,
+        challengeType: userChallengeType,
+        challengeId: userChallengeId,
+        challengeName,
+        ruling: {
+          approved: judgment.approved,
+          explanation: judgment.explanation,
+          score: judgment.score || 0,
+        },
         timestamp: new Date().toISOString(),
       };
 
       await supabase.from("game_moves").insert({
         game_id: gameId,
-        player_id: user!.id,
-        move_data: move,
+        player_id: user?.id,
+        move_data: JSON.parse(JSON.stringify(userMove)),
       });
 
-      // Store the challenge before clearing form
-      const userChallengeToJeeves = selectedCategory;
+      const newMoves = [...gameState.moves, userMove];
+      const newPlayerScore = gameState.playerScore + (judgment.approved ? judgment.score : 0);
 
-      // Clear form
-      setCommentary("");
+      setGameState(prev => ({
+        ...prev,
+        moves: newMoves,
+        playerScore: newPlayerScore,
+        currentTurn: "jeeves",
+      }));
+
       setUserVerse("");
-      setSelectedCategory("");
-      setSelectedCategoryBase("");
-      setSpecificChallenge("");
-      setIsMyTurn(false);
+      setUserCommentary("");
+      setUserChallengeId("");
 
-      // Update game state - set turn to NULL (Jeeves' turn)
-      await supabase
-        .from("games")
-        .update({
-          current_turn: null, // null means it's Jeeves' turn
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", gameId);
-
-      toast({
-        title: "Response submitted!",
-        description: `Scored ${feedback.score}/10 - Jeeves is thinking...`,
-      });
-
-      // Wait a bit and reload moves to show user's move
-      await new Promise(resolve => setTimeout(resolve, 500));
-      await loadMoves();
-
-      // Determine if this is a Jeeves game from URL mode OR game state
-      const gameState = game?.game_state as any;
-      const isJeevesGame = isVsJeeves || gameState?.isVsJeeves || mode === "jeeves";
-      
-      console.log("=== Checking if Jeeves should respond ===");
-      console.log("isVsJeeves:", isVsJeeves);
-      console.log("mode:", mode);
-      console.log("gameState.isVsJeeves:", gameState?.isVsJeeves);
-      console.log("Final isJeevesGame:", isJeevesGame);
-      
-      // Jeeves responds after loading user's move
-      if (isJeevesGame) {
-        console.log("=== Triggering Jeeves Response ===");
-        console.log("Game ID:", gameId);
-        console.log("User's challenge:", userChallengeToJeeves);
-        console.log("isVsJeeves:", isVsJeeves);
-        console.log("mode:", mode);
-        
-        setTimeout(async () => {
-          try {
-            console.log("=== Jeeves Move Triggered ===");
-            await jeevesMove(gameId!, false, userChallengeToJeeves);
-          } catch (error) {
-            console.error("Error in Jeeves move setTimeout:", error);
-            toast({
-              title: "Error",
-              description: "Jeeves encountered an error responding. Please refresh the page.",
-              variant: "destructive",
-            });
-            setIsMyTurn(true);
-            setProcessing(false);
-          }
-        }, 1500);
+      if (judgment.approved) {
+        toast({ title: "✅ Connection Approved!", description: `+${judgment.score} points! ${judgment.explanation}` });
       } else {
-        console.log("NOT triggering Jeeves - isVsJeeves:", isVsJeeves, "mode:", mode, "gameState.isVsJeeves:", gameState?.isVsJeeves);
+        toast({ title: "❌ Connection Weak", description: judgment.explanation, variant: "destructive" });
       }
+
+      setTimeout(() => getJeevesResponse(newMoves, userChallengeType, userChallengeId, challengeName), 1500);
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-      setIsMyTurn(true); // Re-enable form on error
+      console.error("Error submitting move:", error);
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {
       setProcessing(false);
     }
   };
 
-  const endGame = async () => {
+  // ===== SOLO: Get Jeeves' response =====
+  const getJeevesResponse = async (
+    currentMoves: Move[],
+    challengeType: "room" | "book" | "principle",
+    challengeId: string,
+    challengeName: string
+  ) => {
+    setProcessing(true);
+
     try {
-      const winner = userScore > opponentScore ? user!.id : null;
-      
-      await supabase
-        .from("games")
-        .update({
-          status: "completed",
-          winner_id: winner,
-        })
-        .eq("id", gameId);
-
-      // Award points to winner
-      if (winner) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("points")
-          .eq("id", winner)
-          .single();
-        
-        if (profile) {
-          await supabase
-            .from("profiles")
-            .update({ points: (profile.points || 0) + 10 })
-            .eq("id", winner);
-        }
-      }
-
-      toast({
-        title: "Game Over!",
-        description: winner === user!.id ? "Congratulations! You won!" : "Good game! Jeeves won this round.",
+      const { data: jeevesData, error: jeevesError } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "chain-chess-v3-response",
+          challengeType,
+          challengeId,
+          challengeName,
+          previousMoves: currentMoves,
+          difficulty: gameState.settings.difficulty,
+          enabledCategories: gameState.settings.enabledCategories,
+        },
       });
 
-      navigate("/games");
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
+      if (jeevesError) throw jeevesError;
 
-  const copyInviteLink = () => {
-    const inviteLink = window.location.href;
-    navigator.clipboard.writeText(inviteLink).then(() => {
-      toast({
-        title: "Link copied!",
-        description: "Share this link to invite someone to watch or join.",
-      });
-    }).catch(() => {
-      toast({
-        title: "Failed to copy",
-        description: "Please try again.",
-        variant: "destructive",
-      });
-    });
-  };
-
-  const shareInviteLink = async () => {
-    const inviteLink = window.location.href;
-    
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `Chain Chess Game`,
-          text: `Join my Chain Chess game on Phototheology Palace!`,
-          url: inviteLink,
-        });
-      } catch (error) {
-        if ((error as Error).name !== 'AbortError') {
-          copyInviteLink();
-        }
-      }
-    } else {
-      copyInviteLink();
-    }
-  };
-
-  const sendChatMessage = async (message: string) => {
-    if (!gameId) return;
-    
-    const chatChannel = supabase.channel(`chat_${gameId}`);
-    await chatChannel.send({
-      type: "broadcast",
-      event: "message",
-      payload: {
-        userId: user!.id,
-        userName: userDisplayName || "User",
-        message,
+      const jeevesMove: Move = {
+        id: crypto.randomUUID(),
+        player: "jeeves",
+        verse: jeevesData.verse,
+        verseText: jeevesData.verseText,
+        commentary: jeevesData.commentary,
+        challengeType: jeevesData.challengeType,
+        challengeId: jeevesData.challengeId,
+        challengeName: jeevesData.challengeName,
+        score: jeevesData.score || 1,
         timestamp: new Date().toISOString(),
-      },
-    });
+      };
+
+      await supabase.from("game_moves").insert({
+        game_id: gameId,
+        player_id: null,
+        move_data: JSON.parse(JSON.stringify(jeevesMove)),
+      });
+
+      setGameState(prev => ({
+        ...prev,
+        moves: [...prev.moves, jeevesMove],
+        currentChallenge: {
+          type: jeevesData.challengeType,
+          id: jeevesData.challengeId,
+          name: jeevesData.challengeName,
+        },
+        jeevesScore: prev.jeevesScore + 1,
+        roundNumber: prev.roundNumber + 1,
+        currentTurn: "user",
+      }));
+    } catch (error: any) {
+      console.error("Error getting Jeeves response:", error);
+      toast({ title: "Jeeves encountered an error", description: error.message, variant: "destructive" });
+      setGameState(prev => ({ ...prev, currentTurn: "user" }));
+    } finally {
+      setProcessing(false);
+    }
   };
 
-  if (loading) {
+  // Get challenge name by ID
+  const getChallengeNameById = (type: "room" | "book" | "principle", id: string): string => {
+    switch (type) {
+      case "room": return ptRooms.find(r => r.id === id)?.name || id;
+      case "book": return biblicalBooks.find(b => b.id === id)?.name || id;
+      case "principle": return ptPrinciples.find(p => p.id === id)?.name || id;
+      default: return id;
+    }
+  };
+
+  // Load existing solo game
+  useEffect(() => {
+    if (user && gameId && gameId !== "new" && gameMode === "jeeves") {
+      loadGame();
+    }
+  }, [user, gameId, gameMode]);
+
+  const loadGame = async () => {
+    try {
+      const { data: game } = await supabase
+        .from("games")
+        .select("*")
+        .eq("id", gameId)
+        .single();
+
+      if (game) {
+        const state = game.game_state as any;
+
+        const { data: movesData } = await supabase
+          .from("game_moves")
+          .select("*")
+          .eq("game_id", gameId)
+          .order("created_at", { ascending: true });
+
+        const loadedMoves = movesData?.map(m => m.move_data as unknown as Move) || [];
+        const lastMove = loadedMoves[loadedMoves.length - 1];
+
+        setGameState({
+          status: game.status === "completed" ? "completed" : "in_progress",
+          settings: state.settings || {
+            difficulty: "adults",
+            enabledCategories: { books: true, rooms: true, principles: true },
+          },
+          moves: loadedMoves,
+          currentChallenge: lastMove ? {
+            type: lastMove.challengeType,
+            id: lastMove.challengeId,
+            name: lastMove.challengeName,
+          } : undefined,
+          playerScore: state.playerScore || loadedMoves.filter(m => m.player === "user" && m.ruling?.approved).reduce((sum, m) => sum + (m.ruling?.score || 0), 0),
+          jeevesScore: state.jeevesScore || loadedMoves.filter(m => m.player === "jeeves").length,
+          roundNumber: state.roundNumber || Math.ceil(loadedMoves.length / 2),
+          currentTurn: lastMove?.player === "jeeves" ? "user" : "jeeves",
+          winner: state.winner,
+        });
+      }
+    } catch (error) {
+      console.error("Error loading game:", error);
+    }
+  };
+
+  // ===== RENDER HELPERS =====
+
+  const getPlayerLabel = (move: Move) => {
+    if (gameMode === "multiplayer") {
+      return move.playerName || (move.player === user?.id ? "You" : "Opponent");
+    }
+    return move.player === "jeeves" ? "Jeeves" : "You";
+  };
+
+  const isOwnMove = (move: Move) => {
+    if (gameMode === "multiplayer") return move.player === user?.id;
+    return move.player === "user";
+  };
+
+  const renderMove = (move: Move, index: number) => {
+    const isMine = isOwnMove(move);
+    const isJeeves = move.player === "jeeves";
+    
+    return (
+      <motion.div
+        key={move.id}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.1 }}
+        className={`flex gap-4 ${!isMine ? "flex-row" : "flex-row-reverse"}`}
+      >
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+          isJeeves ? "bg-primary/20 text-primary" : isMine ? "bg-secondary text-secondary-foreground" : "bg-accent text-accent-foreground"
+        }`}>
+          {isJeeves ? <Bot className="h-5 w-5" /> : <User className="h-5 w-5" />}
+        </div>
+        
+        <Card className={`flex-1 ${isJeeves ? "bg-primary/5 border-primary/20" : isMine ? "bg-secondary/30" : "bg-accent/20 border-accent/30"}`}>
+          <CardContent className="pt-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <Badge variant={isJeeves ? "default" : isMine ? "secondary" : "outline"}>
+                {getPlayerLabel(move)}
+              </Badge>
+              <span className="text-xs text-muted-foreground">
+                {gameMode === "multiplayer" 
+                  ? `Move ${index + 1}` 
+                  : `Round ${Math.ceil((index + 1) / 2)}`}
+              </span>
+            </div>
+
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-primary">{move.verse}</p>
+              <p className="text-sm italic text-muted-foreground border-l-2 border-primary/30 pl-3">
+                "{move.verseText}"
+              </p>
+            </div>
+
+            <div className="text-sm">
+              <p className="font-medium mb-1">Commentary:</p>
+              <p className="text-muted-foreground">{move.commentary}</p>
+            </div>
+
+            {move.ruling && (
+              <div className={`p-2 rounded text-sm ${move.ruling.approved ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"}`}>
+                <p className="font-medium">{move.ruling.approved ? "✅ Approved" : "❌ Weak Connection"}</p>
+                <p className="text-xs mt-1">{move.ruling.explanation}</p>
+                {move.ruling.approved && <p className="text-xs font-bold mt-1">+{move.ruling.score} points</p>}
+              </div>
+            )}
+
+            <div className="pt-2 border-t border-border">
+              <p className="text-sm">
+                <span className="font-medium">Challenge for opponent: </span>
+                <Badge variant="outline" className="ml-1">
+                  {move.challengeType === "book" && <BookOpen className="h-3 w-3 mr-1" />}
+                  {move.challengeType === "room" && <Building2 className="h-3 w-3 mr-1" />}
+                  {move.challengeType === "principle" && <Lightbulb className="h-3 w-3 mr-1" />}
+                  {move.challengeName}
+                </Badge>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    );
+  };
+
+  // Shared challenge input UI
+  const renderChallengeInput = (onSubmit: () => void, opponentLabel: string) => (
+    <Card className="border-primary/50">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Target className="h-5 w-5" />
+          Your Turn
+        </CardTitle>
+        {gameState.currentChallenge && (
+          <CardDescription>
+            Respond to the challenge: <Badge variant="outline">{gameState.currentChallenge.name}</Badge>
+          </CardDescription>
+        )}
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label>Your Verse</Label>
+          <Input
+            placeholder="e.g., John 3:16"
+            value={userVerse}
+            onChange={(e) => setUserVerse(e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Your Commentary (explain the connection)</Label>
+          <Textarea
+            placeholder="Explain how your verse connects to the challenge and builds on the chain..."
+            value={userCommentary}
+            onChange={(e) => setUserCommentary(e.target.value)}
+            rows={4}
+          />
+        </div>
+
+        <Separator />
+
+        <div className="space-y-4">
+          <Label>Your Challenge for {opponentLabel}</Label>
+          
+          <div className="flex gap-2 flex-wrap">
+            {gameState.settings.enabledCategories.books && (
+              <Button
+                variant={userChallengeType === "book" ? "default" : "outline"}
+                size="sm"
+                onClick={() => { setUserChallengeType("book"); setUserChallengeId(""); }}
+              >
+                <BookOpen className="h-4 w-4 mr-1" /> Book
+              </Button>
+            )}
+            {gameState.settings.enabledCategories.rooms && (
+              <Button
+                variant={userChallengeType === "room" ? "default" : "outline"}
+                size="sm"
+                onClick={() => { setUserChallengeType("room"); setUserChallengeId(""); }}
+              >
+                <Building2 className="h-4 w-4 mr-1" /> Room
+              </Button>
+            )}
+            {gameState.settings.enabledCategories.principles && (
+              <Button
+                variant={userChallengeType === "principle" ? "default" : "outline"}
+                size="sm"
+                onClick={() => { setUserChallengeType("principle"); setUserChallengeId(""); }}
+              >
+                <Lightbulb className="h-4 w-4 mr-1" /> Principle
+              </Button>
+            )}
+          </div>
+
+          <Select value={userChallengeId} onValueChange={setUserChallengeId}>
+            <SelectTrigger>
+              <SelectValue placeholder={`Select a ${userChallengeType}...`} />
+            </SelectTrigger>
+            <SelectContent className="max-h-[300px]">
+              {userChallengeType === "book" && biblicalBooks.map(book => (
+                <SelectItem key={book.id} value={book.id}>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={book.testament === "OT" ? "secondary" : "default"} className="text-xs">
+                      {book.testament}
+                    </Badge>
+                    {book.name}
+                  </div>
+                </SelectItem>
+              ))}
+              {userChallengeType === "room" && ptRooms.map(room => (
+                <SelectItem key={room.id} value={room.id}>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-xs">{room.tag}</Badge>
+                    {room.name}
+                  </div>
+                </SelectItem>
+              ))}
+              {userChallengeType === "principle" && ptPrinciples.map(principle => (
+                <SelectItem key={principle.id} value={principle.id}>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-xs">{principle.shortName}</Badge>
+                    {principle.name}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <Button 
+          onClick={onSubmit} 
+          className="w-full" 
+          size="lg"
+          disabled={processing || !userVerse || !userCommentary || !userChallengeId}
+        >
+          {processing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+          Submit Move
+        </Button>
+      </CardContent>
+    </Card>
+  );
+
+  // Loading
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -762,420 +824,292 @@ const ChainChess = () => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-24 md:pb-8">
       <Navigation />
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto space-y-6">
-          <div className="flex items-center justify-between">
-            <h1 className="text-4xl font-bold flex items-center gap-2">
-              <Trophy className="h-8 w-8 text-yellow-500" />
-              Chain Chess
-            </h1>
-            {gameStarted && (
-              <div className="flex gap-2 items-center">
-                <Badge variant="secondary" className="text-lg">
-                  <Target className="mr-2 h-4 w-4" />
-                  You: {userScore}
+        <div className="max-w-4xl mx-auto space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold flex items-center gap-3">
+                <Trophy className="h-8 w-8 text-yellow-500" />
+                Chain Chess
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                {gameMode === "multiplayer" 
+                  ? "Build a chain of connected Scripture with friends"
+                  : "Build a chain of connected Scripture with Jeeves"}
+              </p>
+            </div>
+
+            {(gameState.status === "in_progress" || gameState.status === "completed") && gameMode === "jeeves" && (
+              <div className="flex items-center gap-3">
+                <Badge variant="secondary" className="text-lg px-4 py-2">
+                  <User className="mr-2 h-4 w-4" /> You: {gameState.playerScore}
                 </Badge>
-                <Badge variant="secondary" className="text-lg">
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  {isVsJeeves ? "Jeeves" : "Opponent"}: {opponentScore}
+                <Badge variant="secondary" className="text-lg px-4 py-2">
+                  <Bot className="mr-2 h-4 w-4" /> Jeeves: {gameState.jeevesScore}
                 </Badge>
-                <Button variant="outline" size="sm" onClick={shareInviteLink}>
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Share
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setGameState({
+                      status: "setup",
+                      settings: gameState.settings,
+                      moves: [],
+                      currentTurn: "jeeves",
+                      playerScore: 0,
+                      jeevesScore: 0,
+                      roundNumber: 1,
+                    });
+                    setUserVerse("");
+                    setUserCommentary("");
+                  }}
+                  className="gap-1.5"
+                >
+                  <RotateCcw className="h-4 w-4" /> New Game
                 </Button>
-                <Button variant="outline" size="sm" onClick={copyInviteLink}>
-                  <Copy className="h-4 w-4 mr-2" />
-                  Copy Link
-                </Button>
+              </div>
+            )}
+
+            {gameState.status === "in_progress" && gameMode === "multiplayer" && mp.room && (
+              <div className="flex items-center gap-3 flex-wrap">
+                {mp.players.map(p => {
+                  const scores = (mp.room?.game_state as any)?.scores || {};
+                  return (
+                    <Badge key={p.id} variant={p.user_id === user.id ? "default" : "secondary"} className="text-sm px-3 py-1.5">
+                      <User className="mr-1 h-3 w-3" />
+                      {p.display_name}: {scores[p.user_id] || 0}
+                    </Badge>
+                  );
+                })}
               </div>
             )}
           </div>
 
-          {!gameStarted && (
-            <Card className="max-w-2xl mx-auto">
+          {/* Rules */}
+          <Collapsible open={showRules} onOpenChange={setShowRules}>
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" className="w-full justify-between">
+                <span>How to Play</span>
+                <ChevronDown className={`h-4 w-4 transition-transform ${showRules ? "rotate-180" : ""}`} />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <Card className="mt-2">
+                <CardContent className="pt-4 space-y-3 text-sm">
+                  <p><strong>1.</strong> {gameMode === "multiplayer" ? "Player 1" : "Jeeves"} opens with a Bible verse, commentary, and a challenge.</p>
+                  <p><strong>2.</strong> You respond with a verse that meets the challenge, add your commentary, and issue a new challenge.</p>
+                  <p><strong>3.</strong> Jeeves judges the connection and scores the move.</p>
+                  <p><strong>4.</strong> Continue building a chain of connected Scripture!</p>
+                  <Separator />
+                  <p className="text-muted-foreground">
+                    <strong>Challenge Types:</strong> Books of the Bible, PT Rooms, or PT Principles
+                  </p>
+                </CardContent>
+              </Card>
+            </CollapsibleContent>
+          </Collapsible>
+
+          {/* ===== MODE SELECT ===== */}
+          {gameState.status === "mode-select" && (
+            <Card>
               <CardHeader>
-                <CardTitle className="text-2xl">Setup Chain Chess with Jeeves</CardTitle>
-                <CardDescription>
-                  Configure your game settings before starting
-                </CardDescription>
+                <CardTitle>Choose Your Mode</CardTitle>
+                <CardDescription>Play solo against Jeeves or challenge a friend</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-3">
-                  <label className="text-sm font-medium">Difficulty Level</label>
-                  <div className="flex gap-3">
-                    <Button
-                      variant={difficultyLevel === "kids" ? "default" : "outline"}
-                      onClick={() => setDifficultyLevel("kids")}
-                      className="flex-1"
-                    >
-                      Kids
-                    </Button>
-                    <Button
-                      variant={difficultyLevel === "adults" ? "default" : "outline"}
-                      onClick={() => setDifficultyLevel("adults")}
-                      className="flex-1"
-                    >
-                      Adults
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <label className="text-sm font-medium">Who should start first?</label>
-                  <CardDescription className="text-sm">
-                    Choose who makes the opening move
-                  </CardDescription>
-                  <div className="flex gap-3">
-                    <Button
-                      variant={whoStarts === "jeeves" ? "default" : "outline"}
-                      onClick={() => setWhoStarts("jeeves")}
-                      className="flex-1 h-auto py-4"
-                    >
-                      <div>
-                        <div className="font-semibold">🤖 Jeeves Starts</div>
-                        <div className="text-xs opacity-80 mt-1">
-                          Jeeves will choose the verse and give an exposition
-                        </div>
-                      </div>
-                    </Button>
-                    <Button
-                      variant={whoStarts === "player" ? "default" : "outline"}
-                      onClick={() => setWhoStarts("player")}
-                      className="flex-1 h-auto py-4"
-                    >
-                      <div>
-                        <div className="font-semibold">👤 You Start</div>
-                        <div className="text-xs opacity-80 mt-1">
-                          You choose the verse and make the first move
-                        </div>
-                      </div>
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <label className="text-sm font-medium">Game Categories</label>
-                  <CardDescription className="text-sm">
-                    Select which categories can be used for challenges
-                  </CardDescription>
-                  {categories.map((cat) => (
-                    <Button
-                      key={cat}
-                      variant={selectedGameCategories.includes(cat) ? "default" : "outline"}
-                      onClick={() => toggleGameCategory(cat)}
-                      className="w-full h-auto py-4 text-left justify-start"
-                    >
-                      <div>
-                        <div className="font-semibold">{cat}</div>
-                        <div className="text-sm opacity-80">
-                          {cat === "Books of the Bible" && "Connect to other scripture passages"}
-                          {cat === "Rooms of the Palace" && "Relate to Phototheology Palace principles"}
-                          {cat === "Principles of the Palace" && "Apply specific lenses (2D/3D, Time Zones, etc.)"}
-                        </div>
-                      </div>
-                    </Button>
-                  ))}
-                </div>
-                <Button 
-                  onClick={startGameWithCategories}
-                  className="w-full"
-                  size="lg"
-                  disabled={selectedGameCategories.length === 0 || !whoStarts}
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Button
+                  variant="outline"
+                  className="h-auto p-6 flex flex-col items-center gap-3 hover:bg-primary/5 hover:border-primary/50"
+                  onClick={() => selectMode("jeeves")}
                 >
-                  Start Game ({difficultyLevel === "kids" ? "Kids" : "Adults"} Level)
+                  <Bot className="h-10 w-10 text-primary" />
+                  <div className="text-center">
+                    <p className="font-bold text-lg">vs Jeeves</p>
+                    <p className="text-sm text-muted-foreground">Play solo against the AI butler</p>
+                  </div>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-auto p-6 flex flex-col items-center gap-3 hover:bg-accent/50 hover:border-accent"
+                  onClick={() => selectMode("multiplayer")}
+                >
+                  <Users className="h-10 w-10 text-accent-foreground" />
+                  <div className="text-center">
+                    <p className="font-bold text-lg">vs Player</p>
+                    <p className="text-sm text-muted-foreground">Challenge a friend with room codes</p>
+                  </div>
                 </Button>
               </CardContent>
             </Card>
           )}
 
-          {gameStarted && (
-            <>
+          {/* ===== MULTIPLAYER LOBBY ===== */}
+          {gameState.status === "mp-lobby" && gameMode === "multiplayer" && (
+            <MultiplayerLobby
+              room={mp.room}
+              players={mp.players}
+              loading={mp.loading}
+              isHost={mp.isHost}
+              minPlayers={2}
+              maxPlayers={2}
+              gameName="PT Chain Chess"
+              onCreateRoom={(max) => mp.createRoom(max)}
+              onJoinRoom={(code) => mp.joinRoom(code)}
+              onStartGame={handleMpStartGame}
+              onLeaveRoom={mp.leaveRoom}
+              onBack={() => {
+                setGameMode(null);
+                setGameState(prev => ({ ...prev, status: "mode-select" }));
+              }}
+            />
+          )}
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Current Verse</CardTitle>
-              <CardDescription className="text-lg font-semibold">{currentVerse}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-foreground leading-relaxed italic">
-                {verseText || "Loading verse text..."}
-              </p>
-            </CardContent>
-          </Card>
+          {/* ===== SOLO SETUP ===== */}
+          {gameState.status === "setup" && gameMode === "jeeves" && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Start a New Game</CardTitle>
+                <CardDescription>Configure your Chain Chess game vs Jeeves</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">Difficulty</Label>
+                  <div className="flex gap-3">
+                    <Button
+                      variant={gameState.settings.difficulty === "kids" ? "default" : "outline"}
+                      onClick={() => setGameState(prev => ({ ...prev, settings: { ...prev.settings, difficulty: "kids" } }))}
+                      className="flex-1"
+                    >Kids</Button>
+                    <Button
+                      variant={gameState.settings.difficulty === "adults" ? "default" : "outline"}
+                      onClick={() => setGameState(prev => ({ ...prev, settings: { ...prev.settings, difficulty: "adults" } }))}
+                      className="flex-1"
+                    >Adults</Button>
+                  </div>
+                </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="md:col-span-2 space-y-6">
-              {!isVsJeeves && gameId && (
-                <SimpleVoiceRoom
-                  roomId={gameId}
-                  userId={user!.id}
-                  userName={userDisplayName || "User"}
-                />
-              )}
-              
-              <Card className="flex flex-col" style={{ height: '800px' }}>
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">Challenge Categories</Label>
+                  <p className="text-xs text-muted-foreground">Select which types of challenges can be used</p>
+                  <div className="space-y-2">
+                    {[
+                      { key: "books", label: "Books of the Bible", icon: BookOpen },
+                      { key: "rooms", label: "PT Palace Rooms", icon: Building2 },
+                      { key: "principles", label: "PT Principles", icon: Lightbulb },
+                    ].map(({ key, label, icon: Icon }) => (
+                      <div key={key} className="flex items-center gap-2">
+                        <Checkbox
+                          id={key}
+                          checked={gameState.settings.enabledCategories[key as keyof typeof gameState.settings.enabledCategories]}
+                          onCheckedChange={(checked) => setGameState(prev => ({
+                            ...prev,
+                            settings: {
+                              ...prev.settings,
+                              enabledCategories: { ...prev.settings.enabledCategories, [key]: !!checked },
+                            },
+                          }))}
+                        />
+                        <Label htmlFor={key} className="flex items-center gap-2">
+                          <Icon className="h-4 w-4" /> {label}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={() => {
+                    setGameMode(null);
+                    setGameState(prev => ({ ...prev, status: "mode-select" }));
+                  }}>
+                    <ArrowLeft className="h-4 w-4 mr-2" /> Back
+                  </Button>
+                  <Button onClick={startGame} className="flex-1" size="lg" disabled={processing}>
+                    {processing ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Jeeves is preparing...</>
+                    ) : (
+                      <><Sparkles className="mr-2 h-4 w-4" /> Start Game</>
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Loading Screen */}
+          {gameState.status === "loading" && (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary mb-4" />
+                <p className="text-lg font-medium">Jeeves is preparing the opening verse...</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* ===== GAME IN PROGRESS ===== */}
+          {gameState.status === "in_progress" && (
+            <div className="space-y-6">
+              {/* Move History */}
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5" />
-                    Game Conversation
+                    <MessageSquare className="h-5 w-5" /> Game History
                   </CardTitle>
-                  {challengeCategory && (
-                    <CardDescription className="text-sm">
-                      Current Challenge: <Badge variant="outline">{challengeCategory}</Badge>
-                    </CardDescription>
-                  )}
                 </CardHeader>
-                <CardContent className="flex-1 flex flex-col space-y-4">
-                  <ScrollArea className="flex-1 pr-4">
-                    <div className="space-y-4">
-                      {moves.map((move, idx) => (
-                        <div key={idx} className={`p-4 rounded-lg ${move.player === "jeeves" ? "bg-purple-50 dark:bg-purple-900/20" : "bg-blue-50 dark:bg-blue-900/20"}`}>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge variant={move.player === "jeeves" ? "default" : "secondary"}>
-                              {move.player === "jeeves" ? "Jeeves" : "You"}
-                            </Badge>
-                            {move.score && (
-                              <Badge variant="outline">
-                                <Trophy className="mr-1 h-3 w-3" />
-                                {move.score}/10
-                              </Badge>
-                            )}
-                          </div>
-                          
-                          {move.verse && (
-                            <p className="text-sm font-semibold text-primary mb-2">
-                              {move.player === "jeeves" ? "Jeeves' Verse: " : "Your Verse: "}
-                              {move.verse}
-                            </p>
-                          )}
-                          
-                          {move.commentary ? (
-                            <div className="mb-2">
-                              {move.player === "jeeves" && (
-                                <p className="text-xs font-semibold text-purple-600 dark:text-purple-400 mb-1">
-                                  💭 Jeeves' Thought:
-                                </p>
-                              )}
-                              <p className="text-foreground">
-                                {move.commentary}
-                              </p>
-                            </div>
-                          ) : (
-                            <div className="mb-2 p-2 bg-destructive/10 rounded border border-destructive/20">
-                              <p className="text-xs text-destructive">
-                                ⚠️ Missing commentary - there was an error.
-                              </p>
-                            </div>
-                          )}
-                          
-                          {move.challengeCategory && (
-                            <div className="mt-2 p-2 bg-background/50 rounded border-l-2 border-primary">
-                              <p className="text-sm font-semibold text-primary">
-                                Challenge: {move.challengeCategory}
-                              </p>
-                            </div>
-                          )}
-                          
-                          {move.jeeves_feedback && (
-                            <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded border-l-4 border-purple-500">
-                              <p className="text-sm font-semibold text-purple-600 dark:text-purple-400 mb-1">
-                                Jeeves' Feedback:
-                              </p>
-                              <p className="text-sm">{move.jeeves_feedback}</p>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                      {processing && (
-                        <div className="text-center text-muted-foreground">
-                          <Sparkles className="h-6 w-6 animate-spin mx-auto mb-2" />
-                          Thinking...
+                <CardContent>
+                  <ScrollArea className="h-[400px] pr-4">
+                    <div className="space-y-6">
+                      <AnimatePresence>
+                        {gameState.moves.map((move, index) => renderMove(move, index))}
+                      </AnimatePresence>
+
+                      {/* First move prompt for multiplayer host */}
+                      {gameMode === "multiplayer" && gameState.moves.length === 0 && mp.isMyTurn && (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <Sparkles className="h-8 w-8 mx-auto mb-2 text-primary" />
+                          <p>You go first! Submit a verse and challenge to start the chain.</p>
                         </div>
                       )}
                     </div>
                   </ScrollArea>
-
-                  {isMyTurn && !processing ? (
-                    <div className="space-y-3 pt-4 border-t">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Your Verse</label>
-                        <input
-                          type="text"
-                          placeholder={
-                            challengeCategory?.includes(" - ") 
-                              ? `Add a verse related to: ${challengeCategory.split(" - ")[1]}`
-                              : "Add a verse from the challenged category (e.g., Romans 8:28)"
-                          }
-                          value={userVerse}
-                          onChange={(e) => setUserVerse(e.target.value)}
-                          className="w-full px-3 py-2 border rounded-md bg-background"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Your Commentary</label>
-                        <Textarea
-                          placeholder="Build on Jeeves' thought and connect your verse..."
-                          value={commentary}
-                          onChange={(e) => setCommentary(e.target.value)}
-                          rows={4}
-                        />
-                        <div className="flex justify-end">
-                          <EmojiPicker 
-                            onEmojiSelect={(emoji) => setCommentary(commentary + emoji)}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-3">
-                        <label className="text-sm font-medium">Challenge Jeeves with:</label>
-                        
-                        {/* Step 1: Select Category */}
-                        <div className="flex flex-wrap gap-2">
-                          {selectedGameCategories.map((cat) => (
-                            <Button
-                              key={cat}
-                              variant={selectedCategoryBase === cat ? "default" : "outline"}
-                              onClick={() => {
-                                setSelectedCategoryBase(cat);
-                                setSpecificChallenge("");
-                                setSelectedCategory("");
-                              }}
-                              size="sm"
-                            >
-                              {cat}
-                            </Button>
-                          ))}
-                        </div>
-
-                        {/* Step 2: Enter Specific Challenge */}
-                        {selectedCategoryBase && (
-                          <div className="space-y-2 p-3 bg-muted/50 rounded-lg">
-                            <label className="text-xs font-medium text-muted-foreground">
-                              {selectedCategoryBase === "Books of the Bible" && "Which book? (e.g., Romans, Daniel, Psalms)"}
-                              {selectedCategoryBase === "Rooms of the Palace" && "Which room? (e.g., Story Room, Gems Room, Fire Room)"}
-                              {selectedCategoryBase === "Principles of the Palace" && "Which principle? (e.g., 2D/3D, Time Zones, Repeat & Enlarge)"}
-                            </label>
-                            <input
-                              type="text"
-                              placeholder={
-                                selectedCategoryBase === "Books of the Bible" ? "e.g., Romans" :
-                                selectedCategoryBase === "Rooms of the Palace" ? "e.g., Story Room" :
-                                "e.g., 2D/3D"
-                              }
-                              value={specificChallenge}
-                              onChange={(e) => {
-                                setSpecificChallenge(e.target.value);
-                                setSelectedCategory(`${selectedCategoryBase} - ${e.target.value}`);
-                              }}
-                              className="w-full px-3 py-2 border rounded-md bg-background text-sm"
-                            />
-                            {specificChallenge && (
-                              <p className="text-xs text-primary">
-                                ✓ Challenge set: {selectedCategoryBase} - {specificChallenge}
-                              </p>
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      <Button onClick={submitMove} className="w-full" disabled={!commentary.trim() || !selectedCategory.includes(" - ") || !userVerse.trim()}>
-                        Submit Response
-                      </Button>
-
-                      {moves.length >= 6 && (
-                        <Button onClick={endGame} variant="secondary" className="w-full">
-                          End Game
-                        </Button>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 border-t">
-                      {processing ? (
-                        <>
-                          <Sparkles className="h-8 w-8 animate-spin mx-auto mb-2 text-purple-500" />
-                          <p className="text-sm text-muted-foreground">
-                            {isVsJeeves ? "Jeeves is thinking..." : "Waiting for opponent..."}
-                          </p>
-                        </>
-                      ) : (
-                        <div className="space-y-4">
-                          <p className="text-sm text-muted-foreground">
-                            Waiting for your turn...
-                          </p>
-                          
-                          {/* Fallback button to manually trigger Jeeves if he's stuck */}
-                          {(isVsJeeves || game?.game_state?.isVsJeeves) && gameStarted && moves.length > 0 && (
-                            <div className="mt-4 pt-4 border-t">
-                              <p className="text-xs text-muted-foreground mb-2">
-                                Jeeves not responding?
-                              </p>
-                              <Button
-                                onClick={() => {
-                                  const lastMove = moves[moves.length - 1];
-                                  const userChallenge = lastMove?.challengeCategory;
-                                  console.log("Manual Jeeves trigger - last challenge:", userChallenge);
-                                  jeevesMove(gameId!, false, userChallenge);
-                                }}
-                                variant="outline"
-                                size="sm"
-                                className="w-full"
-                              >
-                                <Sparkles className="mr-2 h-4 w-4" />
-                                Jeeves, it's your turn
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )}
                 </CardContent>
               </Card>
-            </div>
 
-            {/* Text Chat Sidebar */}
-            {!isVsJeeves && (
-              <div className="space-y-4">
-                <Card className="h-[600px] flex flex-col">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <MessagesSquare className="h-5 w-5" />
-                      Text Chat
-                    </CardTitle>
-                    <CardDescription>
-                      Chat with your opponent
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex-1 flex flex-col">
-                    <ScrollArea className="flex-1 pr-4 mb-4">
-                      <div className="space-y-3">
-                        {chatMessages.map((msg, idx) => (
-                          <div
-                            key={idx}
-                            className={`p-3 rounded-lg ${
-                              msg.userId === user!.id
-                                ? "bg-primary/10 ml-auto max-w-[80%]"
-                                : "bg-muted mr-auto max-w-[80%]"
-                            }`}
-                          >
-                            <p className="text-xs text-muted-foreground mb-1">
-                              {msg.userId === user!.id ? "You" : msg.userName}
-                            </p>
-                            <p className="text-sm">{msg.message}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                    <ChatInput onSend={sendChatMessage} placeholder="Send a message..." />
+              {/* SOLO: User Input */}
+              {gameMode === "jeeves" && gameState.currentTurn === "user" && !processing && (
+                renderChallengeInput(submitUserMove, "Jeeves")
+              )}
+
+              {/* MULTIPLAYER: User Input */}
+              {gameMode === "multiplayer" && mp.isMyTurn && !processing && (
+                renderChallengeInput(submitMultiplayerMove, "your opponent")
+              )}
+
+              {/* MULTIPLAYER: Waiting for opponent */}
+              {gameMode === "multiplayer" && !mp.isMyTurn && (
+                <Card className="border-accent/30">
+                  <CardContent className="py-8 text-center">
+                    <Loader2 className="h-8 w-8 animate-spin mx-auto text-accent-foreground mb-4" />
+                    <p className="text-muted-foreground">
+                      Waiting for {mp.players.find(p => p.user_id === mp.room?.current_turn_user_id)?.display_name || "opponent"}...
+                    </p>
                   </CardContent>
                 </Card>
-              </div>
-            )}
-          </div>
-          </>
+              )}
+
+              {/* SOLO: Jeeves thinking */}
+              {gameMode === "jeeves" && (processing || gameState.currentTurn === "jeeves") && (
+                <Card className="border-primary/30">
+                  <CardContent className="py-8 text-center">
+                    <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary mb-4" />
+                    <p className="text-muted-foreground">Jeeves is thinking...</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           )}
         </div>
       </main>

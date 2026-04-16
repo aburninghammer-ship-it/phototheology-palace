@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { Resend } from "https://esm.sh/resend@4.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -20,6 +21,14 @@ const PLAN_PRICES = {
   premium_annual: "price_1SZNyuFGDAd3RU8IjeGIvPEb",    // Premium $150/year
 };
 
+// Price amounts in cents
+const PLAN_AMOUNTS: Record<string, number> = {
+  essential_monthly: 900,
+  essential_annual: 9000,
+  premium_monthly: 1500,
+  premium_annual: 15000,
+};
+
 // Map plan to tier for profile update
 const PLAN_TIERS = {
   essential_monthly: "essential",
@@ -27,6 +36,130 @@ const PLAN_TIERS = {
   premium_monthly: "premium",
   premium_annual: "premium",
 };
+
+// Send notification email directly
+async function sendTrialNotification(
+  userEmail: string,
+  userName: string,
+  amount: number,
+  tier: string,
+  billing: string,
+  stripeCustomerId?: string,
+) {
+  const resendKey = Deno.env.get("RESEND_API_KEY");
+  if (!resendKey) {
+    logStep("RESEND_API_KEY not set, skipping notification");
+    return;
+  }
+
+  try {
+    const resend = new Resend(resendKey);
+    const formattedAmount = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount / 100);
+
+    const tierLabel = tier.charAt(0).toUpperCase() + tier.slice(1).toLowerCase();
+    const billingLabel = billing === 'annual' ? 'year' : 'month';
+
+    const purchaseTime = new Date().toLocaleString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      timeZoneName: 'short'
+    });
+
+    const trialEndDate = new Date();
+    trialEndDate.setDate(trialEndDate.getDate() + 7);
+    const formattedTrialEnd = trialEndDate.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    const stripeCustomerLink = stripeCustomerId 
+      ? `https://dashboard.stripe.com/customers/${stripeCustomerId}`
+      : null;
+
+    await resend.emails.send({
+      from: "Phototheology Notifications <noreply@thephototheologyapp.com>",
+      to: ["aburninghammer@gmail.com"],
+      subject: `🆓 New Trial Started: ${userName || userEmail} → ${tierLabel} (${formattedAmount}/${billingLabel} after trial)`,
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 24px; border-radius: 12px 12px 0 0;">
+            <h1 style="color: #f5d742; margin: 0; font-size: 24px;">
+              🆓 New Trial Started!
+            </h1>
+            <p style="color: #adb5bd; margin: 8px 0 0 0; font-size: 14px;">
+              Someone started a 7-day free trial
+            </p>
+          </div>
+          
+          <div style="background: #f8f9fa; padding: 24px; border: 1px solid #e9ecef;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 12px 0; border-bottom: 1px solid #dee2e6;">
+                  <strong style="color: #495057;">Customer</strong>
+                </td>
+                <td style="padding: 12px 0; border-bottom: 1px solid #dee2e6; text-align: right;">
+                  ${userName || 'Not provided'}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 12px 0; border-bottom: 1px solid #dee2e6;">
+                  <strong style="color: #495057;">Email</strong>
+                </td>
+                <td style="padding: 12px 0; border-bottom: 1px solid #dee2e6; text-align: right;">
+                  <a href="mailto:${userEmail}" style="color: #007bff;">${userEmail}</a>
+                </td>
+              </tr>
+              <tr style="background: #fff3e0;">
+                <td style="padding: 12px 0; border-bottom: 1px solid #dee2e6;">
+                  <strong style="color: #ef6c00;">⏳ Trial Status</strong>
+                </td>
+                <td style="padding: 12px 0; border-bottom: 1px solid #dee2e6; text-align: right; color: #ef6c00;">
+                  7-Day Free Trial (ends ${formattedTrialEnd})
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 12px 0; border-bottom: 1px solid #dee2e6;">
+                  <strong style="color: #495057;">Plan After Trial</strong>
+                </td>
+                <td style="padding: 12px 0; border-bottom: 1px solid #dee2e6; text-align: right;">
+                  ${tierLabel} (${billing === 'annual' ? 'Annual' : 'Monthly'}) - ${formattedAmount}/${billingLabel}
+                </td>
+              </tr>
+            </table>
+            
+            ${stripeCustomerLink ? `
+            <div style="margin-top: 20px; padding: 16px; background: #fff; border-radius: 8px; border: 1px solid #dee2e6;">
+              <strong style="color: #6c757d; font-size: 12px; text-transform: uppercase;">Stripe Dashboard</strong>
+              <div style="margin-top: 8px;">
+                <a href="${stripeCustomerLink}" style="color: #007bff;">View Customer →</a>
+              </div>
+            </div>
+            ` : ''}
+          </div>
+          
+          <div style="background: #212529; padding: 16px; border-radius: 0 0 12px 12px; text-align: center;">
+            <p style="color: #adb5bd; margin: 0; font-size: 12px;">
+              Trial started at: ${purchaseTime}
+            </p>
+          </div>
+        </div>
+      `,
+    });
+
+    logStep("Trial notification email sent successfully");
+  } catch (error) {
+    logStep("Failed to send notification email", { error: String(error) });
+  }
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -59,12 +192,13 @@ serve(async (req) => {
     const planKey = `${plan}_${billing}` as keyof typeof PLAN_PRICES;
     const priceId = PLAN_PRICES[planKey];
     const tier = PLAN_TIERS[planKey];
+    const amount = PLAN_AMOUNTS[planKey] || 0;
     
     if (!priceId) {
       throw new Error(`Invalid plan configuration: ${planKey}. Available: ${Object.keys(PLAN_PRICES).join(', ')}`);
     }
 
-    logStep("Plan selected", { plan, billing, planKey, priceId, tier });
+    logStep("Plan selected", { plan, billing, planKey, priceId, tier, amount });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
@@ -91,7 +225,7 @@ serve(async (req) => {
       ],
       mode: "subscription",
     subscription_data: {
-        trial_period_days: 14, // 14-day full access trial
+        trial_period_days: 7, // 7-day full access trial
         metadata: {
           user_id: user.id,
           plan: plan,
@@ -99,8 +233,8 @@ serve(async (req) => {
           tier: tier,
         },
       },
-      success_url: `${origin}/pricing?trial=success`,
-      cancel_url: `${origin}/pricing?trial=cancelled`,
+      success_url: `${origin}/gatehouse?trial=success`,
+      cancel_url: `${origin}/auth?trial=cancelled`,
       metadata: {
         user_id: user.id,
         plan: plan,
@@ -111,6 +245,7 @@ serve(async (req) => {
     });
 
     logStep("Checkout session created", { sessionId: session.id, url: session.url, priceId, tier });
+    // NOTE: Notification is NOT sent here - it's sent by stripe-webhook after payment success
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

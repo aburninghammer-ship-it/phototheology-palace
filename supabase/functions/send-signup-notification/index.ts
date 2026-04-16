@@ -12,7 +12,7 @@ interface SignupNotificationRequest {
   userEmail: string;
   displayName?: string;
   userId: string;
-  subscriptionTier?: string; // 'free', 'essential', 'premium', 'student'
+  subscriptionTier?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -23,15 +23,26 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { userEmail, displayName, userId, subscriptionTier }: SignupNotificationRequest = await req.json();
 
-    console.log("Sending signup notification for:", { userEmail, userId, subscriptionTier });
+    console.log("Signup notification request for:", { userEmail, userId, subscriptionTier });
 
-    // Determine tier label and emoji for subject
-    const tier = subscriptionTier || 'free';
+    const tier = subscriptionTier || 'pending';
+
+    // Skip notification for pending signups — only notify on completed signups
+    if (tier === 'pending' || tier === 'free' || !subscriptionTier) {
+      console.log("Skipping admin notification for pending/incomplete signup:", userEmail);
+      return new Response(JSON.stringify({ skipped: true, reason: "pending signup" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
     const tierLabel = tier.charAt(0).toUpperCase() + tier.slice(1).toLowerCase();
     const tierEmoji = tier === 'premium' ? '👑' 
       : tier === 'essential' ? '⭐' 
       : tier === 'student' ? '🎓'
-      : '🆓'; // Free
+      : tier === 'church' ? '⛪'
+      : tier === 'trial' ? '🔑'
+      : '✅';
 
     const emailResponse = await resend.emails.send({
       from: "Phototheology Notifications <noreply@thephototheologyapp.com>",

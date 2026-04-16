@@ -163,8 +163,8 @@ export function useDevotionals() {
 
         if (error) {
           // Check for specific error types
-          if (error.message?.includes("FunctionsFetchError") || error.message?.includes("Failed to send")) {
-            throw new Error("The devotional is still being generated. This can take 2-5 minutes for longer devotionals. Please check back in a moment.");
+          if (error.message?.includes("FunctionsFetchError") || error.message?.includes("Failed to send") || error.message?.includes("network")) {
+            throw new Error("Day 1 generation timed out. The system will automatically retry. Please check back in a few minutes.");
           }
           throw error;
         }
@@ -172,8 +172,8 @@ export function useDevotionals() {
         return data;
       } catch (err: any) {
         // Handle timeout/network errors more gracefully
-        if (err.name === "FunctionsFetchError" || err.message?.includes("Failed to send")) {
-          throw new Error("Generation is in progress. For 40-day devotionals, this can take several minutes. Please wait and refresh the page.");
+        if (err.name === "FunctionsFetchError" || err.message?.includes("Failed to send") || err.message?.includes("network")) {
+          throw new Error("Day 1 generation timed out. The system will automatically retry. Please check back in a few minutes.");
         }
         throw err;
       }
@@ -181,15 +181,45 @@ export function useDevotionals() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["devotional-plans"] });
       toast({
-        title: "Devotional Generated!",
-        description: "Your personalized devotional is ready.",
+        title: "Day 1 Generated!",
+        description: "Your devotional has started. Subsequent days will unlock daily.",
+      });
+    },
+    onError: (error) => {
+      // For timeouts, show an encouraging message since the system will auto-retry
+      const isTimeout = error.message?.includes("timed out") || error.message?.includes("retry") || error.message?.includes("network");
+      toast({
+        title: isTimeout ? "Taking Longer Than Expected" : "Generation Issue",
+        description: isTimeout 
+          ? "Your devotional is being prepared. Please wait a moment and try again."
+          : error.message,
+        variant: "default",
+      });
+    },
+  });
+
+  // Update a plan's title/theme
+  const updatePlan = useMutation({
+    mutationFn: async (params: { planId: string; title: string; theme: string }) => {
+      const { error } = await supabase
+        .from("devotional_plans")
+        .update({ title: params.title, theme: params.theme })
+        .eq("id", params.planId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["devotional-plans"] });
+      toast({
+        title: "Devotional Updated",
+        description: "Title and theme have been saved.",
       });
     },
     onError: (error) => {
       toast({
-        title: "Generation In Progress",
+        title: "Error updating devotional",
         description: error.message,
-        variant: "default",
+        variant: "destructive",
       });
     },
   });
@@ -213,13 +243,63 @@ export function useDevotionals() {
     },
   });
 
+  // Extend an existing devotional plan
+  const extendPlan = useMutation({
+    mutationFn: async (params: {
+      planId: string;
+      additionalDays: number;
+      theme: string;
+      format: string;
+      studyStyle: string;
+      existingDuration: number;
+    }) => {
+      const startFromDay = params.existingDuration + 1;
+
+      const { data, error } = await supabase.functions.invoke("generate-devotional", {
+        body: {
+          planId: params.planId,
+          theme: params.theme,
+          format: params.format,
+          duration: params.additionalDays,
+          studyStyle: params.studyStyle,
+          isExtension: true,
+          startFromDay,
+          existingDuration: params.existingDuration,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["devotional-plans"] });
+      queryClient.invalidateQueries({ queryKey: ["devotional-plan", variables.planId] });
+      queryClient.invalidateQueries({ queryKey: ["devotional-days", variables.planId] });
+      toast({
+        title: "Devotional Extended!",
+        description: `Added ${variables.additionalDays} more days to your journey.`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Extension In Progress",
+        description: error.message || "Your devotional is being extended. Please wait...",
+        variant: "default",
+      });
+    },
+  });
+
   return {
     plans,
     plansLoading,
     createPlan,
+    updatePlan,
     generateDevotional,
+    extendPlan,
     deletePlan,
     isGenerating: generateDevotional.isPending,
+    isExtending: extendPlan.isPending,
   };
 }
 
@@ -306,20 +386,24 @@ export function useDevotionalPlan(planId: string) {
       if (error) throw error;
 
       // Recalculate completed count from actual progress
-      const { count } = await supabase
+      const { count, error: countError } = await supabase
         .from("devotional_progress")
         .select("*", { count: "exact", head: true })
         .eq("plan_id", planId)
         .eq("user_id", user?.id);
-      
+
+      if (countError) throw countError;
+
       const completedCount = count || 0;
-      await supabase
+      const { error: updateError } = await supabase
         .from("devotional_plans")
         .update({
           current_day: completedCount,
           ...(completedCount >= (plan?.duration || 0) ? { status: "completed", completed_at: new Date().toISOString() } : {}),
         })
         .eq("id", planId);
+
+      if (updateError) throw updateError;
 
       return data;
     },

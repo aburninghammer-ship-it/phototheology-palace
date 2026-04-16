@@ -1,32 +1,93 @@
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import { SEO } from "@/components/SEO";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, Star, Crown, Zap, GraduationCap, Building2, ArrowRight, CreditCard, Gift } from "lucide-react";
+import { Check, Sparkles, Star, Crown, Zap, Building2, ArrowRight, CreditCard, Gift, GraduationCap, Volume2, Headphones, Mic, BookOpen } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
+import confetti from "canvas-confetti";
+import { useTrackedPaymentLinks } from "@/hooks/useTrackedPaymentLinks";
+import { useTranslation } from "react-i18next";
 
 export default function Pricing() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
   const [isStartingTrial, setIsStartingTrial] = useState(false);
+  const paymentLinks = useTrackedPaymentLinks();
 
-  // Handle trial success/cancelled from Stripe redirect
+  // Handle trial/subscription success/cancelled from Stripe redirect
   useEffect(() => {
     const trialStatus = searchParams.get('trial');
+    const subscriptionStatus = searchParams.get('subscription');
+
+    const triggerCelebration = () => {
+      const duration = 3000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+      const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+
+      const interval = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          return;
+        }
+        const particleCount = 50 * (timeLeft / duration);
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+          colors: ['#9b87f5', '#7E69AB', '#FFD700', '#FFA500', '#FF6B6B'],
+        });
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+          colors: ['#9b87f5', '#7E69AB', '#FFD700', '#FFA500', '#FF6B6B'],
+        });
+      }, 250);
+    };
+
+    const sendPurchaseNotification = async (isTrialing: boolean, tier: string) => {
+      try {
+        await supabase.functions.invoke('send-purchase-notification', {
+          body: {
+            userEmail: user?.email || 'Unknown',
+            userName: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Unknown',
+            amount: 0, // Will be populated from Stripe on backend if needed
+            currency: 'usd',
+            subscriptionTier: tier,
+            isTrialing,
+            billingInterval: billingPeriod === 'annual' ? 'year' : 'month',
+          },
+        });
+        console.log('Purchase notification sent successfully');
+      } catch (error) {
+        console.error('Failed to send purchase notification:', error);
+      }
+    };
+
     if (trialStatus === 'success') {
-      toast.success("🎉 Your 14-day free trial has started! Enjoy full Premium access.");
+      triggerCelebration();
+      toast.success(t('pricing.toasts.trialStarted'));
+      // Send notification for trial start
+      sendPurchaseNotification(true, 'premium');
       navigate('/palace', { replace: true });
     } else if (trialStatus === 'cancelled') {
-      toast.info("Trial checkout was cancelled. No worries, you can try again anytime!");
+      toast.info(t('pricing.toasts.trialCancelled'));
+    } else if (subscriptionStatus === 'cancelled') {
+      toast.info(t('pricing.toasts.subscriptionCancelled'));
     }
-  }, [searchParams, navigate]);
+  }, [searchParams, navigate, user, billingPeriod]);
 
   const startTrialNow = () => {
     if (!user) {
@@ -47,24 +108,167 @@ export default function Pricing() {
     try {
       const { data: profile } = await supabase
         .from("profiles")
-        .select("subscription_status, is_student")
+        .select("subscription_status, is_student, has_lifetime_access, payment_source")
         .eq("id", user.id)
         .single();
 
+      // Check if user already has access
+      if (profile?.has_lifetime_access) {
+        toast.success(t('pricing.toasts.lifetimeAccess'));
+        navigate("/palace");
+        return;
+      }
+
       if (profile?.is_student) {
-        toast.success("You already have free student access!");
+        toast.success(t('pricing.toasts.studentAccess'));
         navigate("/palace");
         return;
       }
 
       if (profile?.subscription_status === "active") {
-        toast.success("You already have an active subscription!");
+        toast.success(t('pricing.toasts.activeSubscription'));
         navigate("/palace");
         return;
       }
 
-      // Call edge function to create Stripe checkout with trial
-      const { data, error } = await supabase.functions.invoke('create-trial-checkout', {
+      // Check for Patreon access
+      const { data: patreonConnection } = await supabase
+        .from("patreon_connections")
+        .select("is_active_patron, entitled_cents")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (patreonConnection?.is_active_patron && patreonConnection.entitled_cents >= 1500) {
+        await supabase
+          .from("profiles")
+          .update({
+            subscription_status: "active",
+            subscription_tier: "premium",
+            payment_source: "patreon",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", user.id);
+        toast.success(t('pricing.toasts.patreonLinked'));
+        navigate("/palace");
+        return;
+      }
+
+      // Check for Pickaxe access
+      const { data: pickaxeConnection } = await supabase
+        .from("pickaxe_connections")
+        .select("is_paid_user")
+        .eq("pickaxe_email", user.email?.toLowerCase() || "")
+        .eq("is_paid_user", true)
+        .maybeSingle();
+
+      if (pickaxeConnection?.is_paid_user) {
+        await supabase
+          .from("profiles")
+          .update({
+            subscription_status: "active",
+            subscription_tier: "premium",
+            payment_source: "pickaxe" as any,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", user.id);
+        toast.success(t('pricing.toasts.pickaxeLinked'));
+        navigate("/palace");
+        return;
+      }
+
+      // Check if this is a Lock-In Pass guest (skip trial, go straight to payment)
+      const skipTrial = searchParams.get('skip_trial') === 'true';
+
+      if (skipTrial) {
+        // Direct subscription checkout — no trial period
+        const { data, error } = await supabase.functions.invoke('create-subscription-checkout', {
+          body: { plan, billing: billingPeriod },
+        });
+        if (error) throw error;
+        if (data?.url) {
+          window.location.href = data.url;
+        }
+      } else {
+        // No external membership - proceed with Stripe checkout for trial
+        const { data, error } = await supabase.functions.invoke('create-trial-checkout', {
+          body: { plan, billing: billingPeriod },
+        });
+        if (error) throw error;
+        if (data?.url) {
+          window.location.href = data.url;
+        }
+      }
+    } catch (error: any) {
+      console.error("Error starting trial:", error);
+      toast.error(t('pricing.toasts.trialFailed'));
+    } finally {
+      setIsStartingTrial(false);
+    }
+  };
+
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [studentEmail, setStudentEmail] = useState('');
+  const [isStudentCheckout, setIsStudentCheckout] = useState(false);
+
+  const startStudentCheckout = async () => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    if (!studentEmail.trim()) {
+      toast.error("Please enter your .edu student email");
+      return;
+    }
+    const domain = studentEmail.trim().toLowerCase().split('@')[1] || '';
+    if (!domain.endsWith('.edu') && !domain.endsWith('.edu.au') && !domain.endsWith('.ac.uk') && !domain.endsWith('.edu.br') && !domain.endsWith('.edu.mx')) {
+      toast.error("Please enter a valid .edu email address");
+      return;
+    }
+    setIsStudentCheckout(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-student-checkout', {
+        body: { studentEmail: studentEmail.trim() },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error: any) {
+      console.error("Error starting student checkout:", error);
+      toast.error(error.message || "Failed to start student checkout");
+    } finally {
+      setIsStudentCheckout(false);
+    }
+  };
+
+  const startDirectSubscription = async (plan: 'essential' | 'premium' | 'unlimited') => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+
+    setIsSubscribing(true);
+    try {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("subscription_status, is_student")
+        .eq("id", user.id)
+        .single();
+
+      if (profile?.is_student) {
+        toast.success(t('pricing.toasts.studentAccess'));
+        navigate("/palace");
+        return;
+      }
+
+      if (profile?.subscription_status === "active") {
+        toast.success(t('pricing.toasts.activeSubscription'));
+        navigate("/palace");
+        return;
+      }
+
+      // Call edge function to create Stripe checkout without trial
+      const { data, error } = await supabase.functions.invoke('create-subscription-checkout', {
         body: { plan, billing: billingPeriod },
       });
 
@@ -73,133 +277,164 @@ export default function Pricing() {
         window.location.href = data.url;
       }
     } catch (error: any) {
-      console.error("Error starting trial:", error);
-      toast.error("Failed to start trial. Please try again.");
+      console.error("Error starting subscription:", error);
+      toast.error(t('pricing.toasts.subscriptionFailed'));
     } finally {
-      setIsStartingTrial(false);
+      setIsSubscribing(false);
     }
   };
 
-  // SIMPLIFIED: 5 bullets max per plan (Ascend-style clarity)
+  // 4 plans: Free Trial, Essential, Premium, Unlimited
   const plans = [
     {
+      id: "free",
+      name: "Free",
+      icon: BookOpen,
+      iconColor: "text-muted-foreground",
+      monthlyPrice: "$0",
+      annualPrice: "$0",
+      period: "forever",
+      description: "Explore the Bible with core tools — no credit card, no expiration.",
+      badge: "No Card Required",
+      badgeVariant: "outline" as const,
+      ctaText: user ? "Current Plan" : "Get Started",
+      ctaVariant: "outline" as const,
+      monthlyUrl: "#",
+      annualUrl: "#",
+      features: [
+        "Bible Reader (text only)",
+        "Daily Verse & Devotionals",
+        "Morning & Night Watch (pre-recorded)",
+        "Floor 1 Rooms (Story, 24FPS, Image Bible)",
+        "Achievements & Bookmarks",
+        "Community (read-only)",
+      ],
+      audioNote: "Pre-recorded only",
+    },
+    {
       id: "trial",
-      name: "14-Day Free Trial",
+      name: t('pricing.plans.trial.name'),
       icon: Sparkles,
       iconColor: "text-green-600",
       monthlyPrice: "$0",
       annualPrice: "$0",
-      period: "for 14 days",
-      description: "Full Premium access — no restrictions",
-      badge: "Start Free Today",
+      period: t('pricing.plans.trial.period'),
+      description: t('pricing.plans.trial.description'),
+      badge: t('pricing.plans.trial.badge'),
       badgeVariant: "default" as const,
-      ctaText: "Start Free Trial",
+      ctaText: t('pricing.plans.trial.cta'),
       ctaVariant: "default" as const,
       monthlyUrl: "#",
       annualUrl: "#",
       features: [
-        "All 8 Palace Floors unlocked",
-        "Unlimited AI conversations",
-        "All games, courses & tools",
-        "No credit card required to start",
-        "Cancel anytime",
+        t('pricing.plans.trial.features.allFloors'),
+        t('pricing.plans.trial.features.unlimitedAI'),
+        t('pricing.plans.trial.features.allGames'),
+        t('pricing.plans.trial.features.sevenDaysFree'),
+        t('pricing.plans.trial.features.cancelAnytime'),
       ],
+      audioNote: "Browser TTS only",
     },
     {
       id: "essential",
-      name: "Essential",
-      icon: Star,
+      name: t('pricing.plans.essential.name'),
+      icon: Zap,
       iconColor: "text-blue-600",
       monthlyPrice: "$9",
       annualPrice: "$90",
       monthlySavings: null,
-      annualSavings: "Save $18/year",
-      period: "per month",
-      description: "Perfect for serious Bible students",
-      badge: "Great for Beginners",
+      annualSavings: t('pricing.plans.essential.annualSavings'),
+      period: t('pricing.plans.essential.period'),
+      description: t('pricing.plans.essential.description'),
+      badge: t('pricing.plans.essential.badge'),
       badgeVariant: "secondary" as const,
-      ctaText: "Get Essential",
+      ctaText: t('pricing.plans.essential.cta'),
       ctaVariant: "default" as const,
-      monthlyUrl: "https://buy.stripe.com/4gM8wP6U37zoavefiY6EU07",
-      annualUrl: "https://buy.stripe.com/4gM8wPguD4ncdHqc6M6EU0a",
+      monthlyUrl: paymentLinks.essentialMonthly,
+      annualUrl: paymentLinks.essentialAnnual,
       features: [
-        "8 Palace Floors + AI Assistant",
-        "90-Day Training Course",
-        "Sermon Builder + Research Mode",
-        "Memory tools & flashcards",
-        "Basic Dojo access (3 lessons)",
+        t('pricing.plans.essential.features.allFloors'),
+        t('pricing.plans.essential.features.bibleReader'),
+        t('pricing.plans.essential.features.coreGames'),
+        t('pricing.plans.essential.features.basicAI'),
+        "15 HD Audio requests/mo (OpenAI)",
+        t('pricing.plans.essential.features.emailSupport'),
       ],
+      audioNote: "15 HD Audio/mo",
     },
     {
       id: "premium",
-      name: "Premium",
+      name: t('pricing.plans.premium.name'),
       icon: Crown,
       iconColor: "text-purple-600",
       monthlyPrice: "$15",
       annualPrice: "$150",
       monthlySavings: null,
-      annualSavings: "Save $30/year",
-      period: "per month",
-      description: "Complete mastery system",
-      badge: "Most Popular",
+      annualSavings: t('pricing.plans.premium.annualSavings'),
+      period: t('pricing.plans.premium.period'),
+      description: t('pricing.plans.premium.description'),
+      badge: t('pricing.plans.premium.badge'),
       badgeVariant: "default" as const,
-      ctaText: "Get Premium",
+      ctaText: t('pricing.plans.premium.cta'),
       ctaVariant: "default" as const,
-      monthlyUrl: "https://buy.stripe.com/aFa3cvemv7zo46Q9YE6EU08",
-      annualUrl: "https://buy.stripe.com/eVq8wPfqz06WcDm7Qw6EU0b",
       popular: true,
       features: [
-        "Everything in Essential +",
-        "Complete Art of War Dojo (30+ lessons)",
-        "All 4 specialized AI GPTs",
-        "Unlimited Treasure Hunts & Escape Rooms",
-        "Priority support + early access",
+        t('pricing.plans.premium.features.allFloors'),
+        t('pricing.plans.premium.features.artOfWar'),
+        t('pricing.plans.premium.features.specializedAI'),
+        "75 HD Audio requests/mo (OpenAI)",
+        t('pricing.plans.premium.features.unlimitedHunts'),
+        t('pricing.plans.premium.features.prioritySupport'),
       ],
+      audioNote: "75 HD Audio/mo",
     },
     {
-      id: "student",
-      name: "Student",
-      icon: GraduationCap,
-      iconColor: "text-green-600",
-      monthlyPrice: "FREE",
-      annualPrice: "FREE",
+      id: "unlimited",
+      name: "Unlimited",
+      icon: Headphones,
+      iconColor: "text-amber-500",
+      monthlyPrice: "$49",
+      annualPrice: "$490",
       monthlySavings: null,
-      annualSavings: null,
-      period: "with .edu email",
-      description: "Full Premium for students",
-      badge: ".edu Required",
+      annualSavings: "Save $98/yr",
+      period: "/month",
+      description: "Maximum AI voice power. 8-voice ElevenLabs suite, Immerse Mode, and all features unlocked.",
+      badge: "Power User",
       badgeVariant: "default" as const,
-      ctaText: "Verify Student",
+      ctaText: "Go Unlimited",
       ctaVariant: "default" as const,
-      monthlyUrl: "/student-verify",
-      annualUrl: "/student-verify",
-      stripePriceId: "price_1STVXrFGDAd3RU8Ia2NbKJWo",
       features: [
-        "Everything in Premium — FREE",
-        "Valid for 1 academic year",
-        "No credit card required",
-        "Auto-renews with .edu verification",
-        "Supporting Christian education",
+        "Everything in Premium",
+        "250 OpenAI HD Audio/mo",
+        "50 ElevenLabs Premium HD/mo",
+        "8-voice immersive suite (Epic, Ancient, Scholar...)",
+        "Immerse Mode cinematic playback",
+        "All features & future releases",
       ],
+      audioNote: "250 HD + 50 Premium HD/mo",
     },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      <SEO title={t('pricing.seo.title')} description={t('pricing.seo.description')} />
       <Navigation />
       
       <div className="container mx-auto px-4 pt-24 pb-12">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <Badge className="mb-4 gradient-palace text-white border-0">
+          <Badge className="mb-4 gradient-palace text-white border-0 px-4 py-2 text-sm">
             <Sparkles className="h-3 w-3 mr-1" />
-            14-Day Free Trial • Full Access
+            {t('pricing.hero.badge')}
           </Badge>
           <h1 className="text-5xl md:text-6xl font-bold bg-gradient-palace bg-clip-text text-transparent mb-4">
-            Master Bible Study for Free
+            {t('pricing.hero.title')}
           </h1>
-          <p className="text-xl text-muted-foreground max-w-xl mx-auto">
-            14-day trial. Full access. $9-15/mo after.
+          <p className="text-xl text-muted-foreground max-w-xl mx-auto mb-2">
+            {t('pricing.hero.subtitle')}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {t('pricing.hero.afterTrial')}
           </p>
           
           {/* Billing Period Toggle - Enhanced */}
@@ -213,66 +448,86 @@ export default function Pricing() {
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Monthly
+                {t('pricing.billing.monthly')}
               </button>
               <button
                 onClick={() => setBillingPeriod('annual')}
                 className={`px-6 py-3 rounded-xl font-semibold text-base transition-all ${
-                  billingPeriod === 'annual' 
-                    ? 'bg-primary text-primary-foreground shadow-lg scale-105' 
+                  billingPeriod === 'annual'
+                    ? 'bg-primary text-primary-foreground shadow-lg scale-105'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Annual
+                {t('pricing.billing.annual')}
               </button>
             </div>
             {billingPeriod === 'annual' && (
               <Badge variant="default" className="gradient-palace text-white border-0 px-4 py-2 text-base animate-pulse">
                 <Sparkles className="h-4 w-4 mr-2" />
-                Save 2 Months Free - Best Value!
+                {t('pricing.billing.annualSavingsBadge')}
               </Badge>
             )}
           </div>
         </div>
 
         {/* Start Trial CTA - Primary */}
-        <Card className="mb-8 border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-accent/10 max-w-2xl mx-auto">
-          <CardContent className="p-6 text-center">
-            <Badge className="mb-3 gradient-palace text-white border-0">
+        <Card className="mb-8 border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-accent/10 max-w-2xl mx-auto shadow-xl">
+          <CardContent className="p-8 text-center">
+            <Badge className="mb-4 gradient-palace text-white border-0 px-4 py-2">
               <Sparkles className="h-3 w-3 mr-1" />
-              Most Popular Choice
+              {t('pricing.trialCta.badge')}
             </Badge>
-            <h3 className="text-xl font-bold mb-2">Start Your 14-Day Free Trial</h3>
-            <p className="text-muted-foreground mb-4">
-              Get instant access to all Premium features — no restrictions.
-              <span className="flex items-center justify-center gap-1 mt-1 text-sm font-medium text-primary">
-                <CreditCard className="h-3 w-3" /> Credit card required • Cancel anytime
-              </span>
+            <h3 className="text-2xl font-bold mb-3">{t('pricing.trialCta.title')}</h3>
+            <p className="text-muted-foreground mb-2">
+              {t('pricing.trialCta.descriptionPrefix')} <span className="font-semibold text-foreground">{t('pricing.trialCta.instantAccess')}</span> {t('pricing.trialCta.descriptionSuffix')}
             </p>
-            <Button 
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-6 text-sm">
+              <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary">
+                <Check className="h-3 w-3" /> {t('pricing.trialCta.noCharge')}
+              </span>
+              <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-muted text-muted-foreground">
+                <CreditCard className="h-3 w-3" /> {t('pricing.trialCta.cancelAnytime')}
+              </span>
+            </div>
+            <Button
               onClick={startTrialNow}
-              className="gradient-palace"
+              className="gradient-palace text-lg px-8 py-6 h-auto"
               disabled={isStartingTrial}
             >
-              {isStartingTrial ? "Starting..." : "Start 14-Day Free Trial"}
-              <ArrowRight className="ml-2 h-4 w-4" />
+              {isStartingTrial ? t('pricing.trialCta.starting') : t('pricing.trialCta.startButton')}
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
+            <p className="text-xs text-muted-foreground mt-4">
+              {t('pricing.trialCta.reminder')}
+            </p>
           </CardContent>
         </Card>
 
-        {/* Access Code Link */}
-        <div className="text-center mb-8">
-          <p className="text-sm text-muted-foreground mb-2">Have a special access code?</p>
-          <Button 
-            asChild
-            variant="outline"
-            className="gap-2"
-          >
-            <Link to="/access">
-              <Gift className="h-4 w-4" />
-              Redeem Access Code
-            </Link>
-          </Button>
+        {/* Access Code & Gift Links */}
+        <div className="text-center mb-8 space-y-3">
+          <p className="text-sm text-muted-foreground mb-2">{t('pricing.accessCode.prompt')}</p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Button
+              asChild
+              variant="outline"
+              className="gap-2"
+            >
+              <Link to="/access">
+                <Gift className="h-4 w-4" />
+                {t('pricing.accessCode.redeem')}
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="gap-2 border-amber-500/30 text-amber-600 hover:bg-amber-500/10"
+            >
+              <Link to="/gift">
+                <Gift className="h-4 w-4" />
+                Gift PhototheologyOS or Share a Day Pass
+              </Link>
+            </Button>
+          </div>
         </div>
 
         {/* Church Plans CTA */}
@@ -284,14 +539,14 @@ export default function Pricing() {
                   <Building2 className="h-8 w-8 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold mb-2">Looking for Church Licensing?</h3>
+                  <h3 className="text-2xl font-bold mb-2">{t('pricing.church.title')}</h3>
                   <p className="text-muted-foreground mb-3">
-                    Unite your entire congregation around one discipleship system. Get bulk pricing for 50-300 members.
+                    {t('pricing.church.description')}
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">Church-Wide Campaigns</Badge>
-                    <Badge variant="secondary">Member Management</Badge>
-                    <Badge variant="secondary">Analytics</Badge>
+                    <Badge variant="secondary">{t('pricing.church.campaigns')}</Badge>
+                    <Badge variant="secondary">{t('pricing.church.memberManagement')}</Badge>
+                    <Badge variant="secondary">{t('pricing.church.analytics')}</Badge>
                   </div>
                 </div>
               </div>
@@ -301,7 +556,7 @@ export default function Pricing() {
                 className="whitespace-nowrap gap-2"
               >
                 <Link to="/church-signup">
-                  View Church Plans
+                  {t('pricing.church.viewPlans')}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
@@ -309,80 +564,124 @@ export default function Pricing() {
           </CardContent>
         </Card>
 
-        {/* Pricing Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        {/* Student Discount */}
+        <Card className="mb-12 border-2 border-emerald-500/20 bg-gradient-to-r from-emerald-500/5 to-teal-500/10 max-w-4xl mx-auto">
+          <CardContent className="p-6 md:p-8">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-start gap-4">
+                <div className="p-3 rounded-lg bg-emerald-500/10">
+                  <GraduationCap className="h-8 w-8 text-emerald-500" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-2xl font-bold">Student Plan</h3>
+                    <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">$7/mo</Badge>
+                  </div>
+                  <p className="text-muted-foreground mb-3">
+                    Full Premium access at a student rate. Just verify your .edu email to unlock the discount.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-2 w-full">
+                    <input
+                      type="email"
+                      placeholder="your.name@university.edu"
+                      value={studentEmail}
+                      onChange={(e) => setStudentEmail(e.target.value)}
+                      className="flex-1 px-4 py-2 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    />
+                    <Button
+                      onClick={startStudentCheckout}
+                      disabled={isStudentCheckout}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white whitespace-nowrap gap-2"
+                    >
+                      {isStudentCheckout ? 'Verifying...' : 'Get Student Rate'}
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Accepted: .edu, .ac.uk, .edu.au, and other academic domains
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
           {plans.map((plan) => (
             <Card
               key={plan.id}
               className={`glass-card relative ${
-                plan.popular ? "border-primary shadow-2xl shadow-primary/20 scale-105" : ""
-              }`}
+                plan.popular ? "border-primary shadow-2xl shadow-primary/20 scale-[1.03]" : ""
+              } ${plan.id === "unlimited" ? "border-amber-500/40 shadow-lg shadow-amber-500/10" : ""}`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                   <Badge className="gradient-palace text-white border-0">
                     <Star className="h-3 w-3 mr-1 fill-current" />
-                    Most Popular
+                    {t('pricing.mostPopular')}
+                  </Badge>
+                </div>
+              )}
+              {plan.id === "unlimited" && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                  <Badge className="bg-amber-500 text-white border-0">
+                    <Headphones className="h-3 w-3 mr-1" />
+                    HD Audio
                   </Badge>
                 </div>
               )}
 
-              <CardHeader className="text-center pb-8">
-                <div className="mx-auto mb-4 p-4 rounded-2xl bg-muted/50 w-fit">
-                  <plan.icon className={`h-8 w-8 ${plan.iconColor}`} />
+              <CardHeader className="text-center pb-6">
+                <div className="mx-auto mb-3 p-3 rounded-2xl bg-muted/50 w-fit">
+                  <plan.icon className={`h-7 w-7 ${plan.iconColor}`} />
                 </div>
                 <Badge variant={plan.badgeVariant} className="mx-auto mb-2">
                   {plan.badge}
                 </Badge>
-                <CardTitle className="text-2xl mb-2">{plan.name}</CardTitle>
-                <CardDescription>{plan.description}</CardDescription>
-                <div className="mt-4">
-                  <div className="text-5xl font-bold">
+                <CardTitle className="text-xl mb-1">{plan.name}</CardTitle>
+                <CardDescription className="text-xs">{plan.description}</CardDescription>
+                <div className="mt-3">
+                  <div className="text-4xl font-bold">
                     {billingPeriod === 'monthly' ? plan.monthlyPrice : plan.annualPrice}
                   </div>
-                  <div className="text-sm text-muted-foreground mt-1">
+                  <div className="text-xs text-muted-foreground mt-1">
                     {plan.id === 'free' ? (
                       `/ ${plan.period}`
-                    ) : plan.id === 'student' ? (
-                      `/ ${plan.period}`
                     ) : billingPeriod === 'monthly' ? (
-                      '/ per month'
+                      t('pricing.perMonth')
                     ) : (
-                      '/ per year'
+                      t('pricing.perYear')
                     )}
                   </div>
                   {billingPeriod === 'annual' && plan.annualSavings && (
-                    <Badge variant="secondary" className="mt-2">
+                    <Badge variant="secondary" className="mt-2 text-xs">
                       {plan.annualSavings}
                     </Badge>
                   )}
                 </div>
+                {/* Audio badge */}
+                {plan.audioNote && (
+                  <div className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                    <Volume2 className="h-3.5 w-3.5" />
+                    <span>{plan.audioNote}</span>
+                  </div>
+                )}
               </CardHeader>
 
               <CardContent className="pb-6">
-                <ul className="space-y-3">
+                <ul className="space-y-2.5">
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-2">
-                      <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                      <span className="text-sm">{feature}</span>
+                      <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                      <span className="text-xs">{feature}</span>
                     </li>
                   ))}
                 </ul>
               </CardContent>
 
               <CardFooter>
-                {plan.id === "student" ? (
-                  <Button
-                    asChild
-                    variant={plan.ctaVariant}
-                    className="w-full bg-green-600 hover:bg-green-700"
-                    size="lg"
-                  >
-                    <Link to={billingPeriod === 'monthly' ? plan.monthlyUrl : plan.annualUrl}>
-                      {plan.ctaText}
-                    </Link>
-                  </Button>
-                ) : plan.id === "trial" ? (
+                {plan.id === "trial" ? (
                   <Button
                     onClick={startTrialNow}
                     variant={plan.ctaVariant}
@@ -390,22 +689,17 @@ export default function Pricing() {
                     size="lg"
                     disabled={isStartingTrial}
                   >
-                    {isStartingTrial ? "Starting..." : plan.ctaText}
+                    {isStartingTrial ? t('pricing.trialCta.starting') : plan.ctaText}
                   </Button>
                 ) : (
                   <Button
-                    asChild
+                    onClick={() => startDirectSubscription(plan.id as 'essential' | 'premium' | 'unlimited')}
                     variant={plan.ctaVariant}
-                    className="w-full gradient-palace"
+                    className={`w-full ${plan.id === 'unlimited' ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'gradient-palace'}`}
                     size="lg"
+                    disabled={isSubscribing}
                   >
-                    <a
-                      href={billingPeriod === 'monthly' ? plan.monthlyUrl : plan.annualUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {plan.ctaText} {billingPeriod === 'annual' ? '(Annual)' : '(Monthly)'}
-                    </a>
+                    {isSubscribing ? t('pricing.processing') : `${plan.ctaText} ${billingPeriod === 'annual' ? t('pricing.annualLabel') : t('pricing.monthlyLabel')}`}
                   </Button>
                 )}
               </CardFooter>
@@ -413,189 +707,155 @@ export default function Pricing() {
           ))}
         </div>
 
+        {/* Audio Engine Comparison */}
+        <div className="mt-16 max-w-5xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-muted/50">
+              <Headphones className="h-5 w-5 text-primary" />
+              <span className="font-medium">Audio Experience by Tier</span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-3 max-w-lg mx-auto">
+              All text-based AI (Jeeves, Gem Mining, Defense Mode) is <strong className="text-foreground">free and unlimited</strong> on every tier. Audio is where tiers differ.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Browser TTS */}
+            <Card className="border-border">
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto p-3 rounded-full bg-muted w-fit mb-2">
+                  <Volume2 className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <CardTitle className="text-lg">Browser TTS</CardTitle>
+                <Badge variant="secondary">Free</Badge>
+              </CardHeader>
+              <CardContent className="text-center space-y-2">
+                <p className="text-sm text-muted-foreground">Built-in device voice. Functional but robotic.</p>
+                <p className="text-xs text-muted-foreground">Included with: <strong>All tiers</strong></p>
+                <p className="text-xs text-muted-foreground">Cost to you: <strong className="text-green-500">$0</strong></p>
+              </CardContent>
+            </Card>
+
+            {/* OpenAI HD */}
+            <Card className="border-primary/30">
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto p-3 rounded-full bg-primary/10 w-fit mb-2">
+                  <Mic className="h-6 w-6 text-primary" />
+                </div>
+                <CardTitle className="text-lg">HD Audio</CardTitle>
+                <Badge>Standard</Badge>
+              </CardHeader>
+              <CardContent className="text-center space-y-2">
+                <p className="text-sm text-muted-foreground">Natural, high-quality AI voice. Smooth and clear narration.</p>
+                <p className="text-xs text-muted-foreground">Included with: <strong>Essential, Premium, Unlimited</strong></p>
+                <p className="text-xs text-muted-foreground">1 credit per request</p>
+              </CardContent>
+            </Card>
+
+            {/* ElevenLabs Premium HD */}
+            <Card className="border-amber-500/30 bg-gradient-to-b from-amber-500/5 to-transparent">
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto p-3 rounded-full bg-amber-500/10 w-fit mb-2">
+                  <Headphones className="h-6 w-6 text-amber-500" />
+                </div>
+                <CardTitle className="text-lg">Premium HD</CardTitle>
+                <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30">8 Voices</Badge>
+              </CardHeader>
+              <CardContent className="text-center space-y-2">
+                <p className="text-sm text-muted-foreground">8 cinematic voices: Epic, Ancient, Scholar, Preacher, and more. Immerse Mode.</p>
+                <p className="text-xs text-muted-foreground">Included with: <strong>Unlimited ($49/mo)</strong></p>
+                <p className="text-xs text-muted-foreground">5 credits per request (or buy credit packs)</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Credit Packs callout */}
+          <div className="mt-6 text-center p-4 rounded-xl border border-dashed border-muted-foreground/30 bg-muted/20">
+            <p className="text-sm text-muted-foreground">
+              <CreditCard className="h-4 w-4 inline mr-1.5 -mt-0.5" />
+              Need more audio? <strong>Credit Packs</strong> are available on any tier — 25 HD requests for $5, up to 150 for $25.
+            </p>
+          </div>
+        </div>
+
         {/* Compare Plans Section */}
         <div className="mt-16">
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-muted/50">
               <Zap className="h-5 w-5 text-primary" />
-              <span className="font-medium">Feature Comparison</span>
+              <span className="font-medium">{t('pricing.comparison.title')}</span>
             </div>
           </div>
           
-          <Card className="glass-card max-w-5xl mx-auto">
+          <Card className="glass-card max-w-6xl mx-auto">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left p-4 font-semibold">Feature</th>
-                      <th className="text-center p-4 font-semibold">Free Trial</th>
-                      <th className="text-center p-4 font-semibold">Essential</th>
-                      <th className="text-center p-4 font-semibold bg-primary/5">Premium</th>
-                      <th className="text-center p-4 font-semibold">Student</th>
+                      <th className="text-left p-3 font-semibold">{t('pricing.comparison.feature')}</th>
+                      <th className="text-center p-3 font-semibold">{t('pricing.comparison.freeTrial')}</th>
+                      <th className="text-center p-3 font-semibold">{t('pricing.comparison.essential')}</th>
+                      <th className="text-center p-3 font-semibold bg-primary/5">{t('pricing.comparison.premium')}</th>
+                      <th className="text-center p-3 font-semibold bg-amber-500/5">Unlimited</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr className="border-b">
-                      <td className="p-4">The Palace (8 Floors, 40+ Rooms)</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="p-3">{t('pricing.comparison.rows.palace')}</td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-primary/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">Bible Reader with Strong's & Chain References</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="p-3">Text AI (Jeeves, Gems, Defense)</td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-primary/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                    </tr>
+                    <tr className="border-b bg-amber-500/5">
+                      <td className="p-3 font-semibold">🔊 Audio Engine</td>
+                      <td className="text-center p-3 text-muted-foreground text-xs">Browser TTS</td>
+                      <td className="text-center p-3 text-xs">HD Audio<br/><span className="text-muted-foreground">15/mo</span></td>
+                      <td className="text-center p-3 bg-primary/5 text-xs">HD Audio<br/><span className="text-muted-foreground">75/mo</span></td>
+                      <td className="text-center p-3 bg-amber-500/5 text-xs font-semibold">HD + Premium HD<br/><span className="text-muted-foreground">250 + 50/mo</span></td>
+                    </tr>
+                    <tr className="border-b bg-amber-500/5">
+                      <td className="p-3 font-semibold">🎧 8-Voice Immerse Mode</td>
+                      <td className="text-center p-3 text-muted-foreground">—</td>
+                      <td className="text-center p-3 text-muted-foreground">—</td>
+                      <td className="text-center p-3 bg-primary/5 text-muted-foreground">—</td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">Core Games (Chain Chess, Verse Match, etc.)</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="p-3">{t('pricing.comparison.rows.artOfWar')}</td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 text-muted-foreground">{t('pricing.comparison.limited')}</td>
+                      <td className="text-center p-3 bg-primary/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">20+ Palace-Based Games</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="p-3">{t('pricing.comparison.rows.specializedAI')}</td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 text-muted-foreground">{t('pricing.comparison.basic')}</td>
+                      <td className="text-center p-3 bg-primary/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">Kids Games (All Ages)</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="p-3">{t('pricing.comparison.rows.prioritySupport')}</td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 text-muted-foreground">{t('pricing.comparison.email')}</td>
+                      <td className="text-center p-3 bg-primary/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">Escape Rooms & Treasure Hunts</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4 text-muted-foreground">Limited</td>
-                      <td className="text-center p-4 bg-primary/5">Unlimited</td>
-                      <td className="text-center p-4">Unlimited</td>
-                    </tr>
-                    <tr className="border-b bg-yellow-500/5">
-                      <td className="p-4 font-semibold">⚔️ Art of War Dojo - Complete System</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4 text-muted-foreground">3 Lessons Only</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4 pl-8">→ All 30+ War Lessons</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4 pl-8">→ 12 Supernatural Weapons</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4 text-muted-foreground">2 Only</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4 pl-8">→ 4 Creature Combat Styles</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4 text-muted-foreground">1 Only</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4 pl-8">→ Spiritual Eponyms & Time Zones</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4 pl-8">→ Rank Progression System (7 Levels)</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4">Phototheology GPT (Main AI)</td>
-                      <td className="text-center p-4 text-muted-foreground">Limited</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4">All 4 Specialized AI GPTs</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4">The Blueprint Course</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4">All Courses (Daniel, Revelation, Kids)</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4">Sermon Builder & 5 Smooth Stones</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4">Research Mode with Citations</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4">Bible Image Library</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4">Prophecy Watch & Culture Analysis</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4">Live Study Rooms & Partners</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4">Community & Leaderboards</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr>
-                      <td className="p-4">Priority Support</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4">—</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="p-3">Credit Packs Available</td>
+                      <td className="text-center p-3 text-muted-foreground">—</td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-primary/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                     </tr>
                   </tbody>
                 </table>
@@ -604,34 +864,84 @@ export default function Pricing() {
           </Card>
         </div>
 
-        {/* FAQ or Additional Info */}
-        <Card className="glass-card mt-12 max-w-3xl mx-auto">
+        {/* Why We Require a Card - Transparency Section */}
+        <Card className="glass-card mt-12 max-w-3xl mx-auto border-2 border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-orange-500/5">
           <CardHeader>
-            <CardTitle>Frequently Asked Questions</CardTitle>
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-amber-500/20">
+                <CreditCard className="h-6 w-6 text-amber-600" />
+              </div>
+              <CardTitle>{t('pricing.cardUpfront.title')}</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-muted-foreground leading-relaxed">
+              {t('pricing.cardUpfront.description')}
+            </p>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="p-4 rounded-lg bg-background/50 border">
+                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-primary" />
+                  {t('pricing.cardUpfront.aiCosts.title')}
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  {t('pricing.cardUpfront.aiCosts.description')}
+                </p>
+              </div>
+
+              <div className="p-4 rounded-lg bg-background/50 border">
+                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-primary" />
+                  {t('pricing.cardUpfront.sustainability.title')}
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  {t('pricing.cardUpfront.sustainability.description')}
+                </p>
+              </div>
+
+              <div className="p-4 rounded-lg bg-background/50 border">
+                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-500" />
+                  {t('pricing.cardUpfront.noCharge.title')}
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  {t('pricing.cardUpfront.noCharge.description')}
+                </p>
+              </div>
+
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* FAQ or Additional Info */}
+        <Card className="glass-card mt-8 max-w-3xl mx-auto">
+          <CardHeader>
+            <CardTitle>{t('pricing.faq.title')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <h3 className="font-semibold mb-2">Can I cancel anytime?</h3>
+              <h3 className="font-semibold mb-2">{t('pricing.faq.cancelAnytime.question')}</h3>
               <p className="text-sm text-muted-foreground">
-                Yes! You can cancel your subscription at any time. Your access continues until the end of your billing period.
+                {t('pricing.faq.cancelAnytime.answer')}
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-2">What payment methods do you accept?</h3>
+              <h3 className="font-semibold mb-2">{t('pricing.faq.paymentMethods.question')}</h3>
               <p className="text-sm text-muted-foreground">
-                We accept all major credit cards through our secure Stripe payment processor.
+                {t('pricing.faq.paymentMethods.answer')}
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-2">Is my free trial really free?</h3>
+              <h3 className="font-semibold mb-2">{t('pricing.faq.whyCard.question')}</h3>
               <p className="text-sm text-muted-foreground">
-                Absolutely! No credit card required. You get full access to all features for 7 days with no commitments.
+                {t('pricing.faq.whyCard.answer')}
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-2">How does the student plan work?</h3>
+              <h3 className="font-semibold mb-2">{t('pricing.faq.cantAfford.question')}</h3>
               <p className="text-sm text-muted-foreground">
-                Students with a valid .edu email get free Premium access for 1 year. After that, you'll need to verify your student status again to renew.
+                {t('pricing.faq.cantAfford.answerPrefix')} <Link to="/contact" className="text-primary hover:underline">{t('pricing.faq.cantAfford.reachOut')}</Link> {t('pricing.faq.cantAfford.answerSuffix')}
               </p>
             </div>
           </CardContent>

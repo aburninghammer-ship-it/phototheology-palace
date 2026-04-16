@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { BIBLE_REFERENCE_TOUR } from "@/data/guidedTours";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,16 +28,19 @@ import {
   MapPin,
   Calendar,
   BarChart3,
-  Loader2
+  Loader2,
+  GraduationCap
 } from "lucide-react";
 
 const BibleReference = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchCategory, setSearchCategory] = useState<"events" | "maps" | "prophecy" | "charts" | "people">("events");
   const [searchResults, setSearchResults] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -57,8 +63,8 @@ const BibleReference = () => {
     } catch (error: any) {
       console.error("Encyclopedia search error:", error);
       toast({
-        title: "Search Failed",
-        description: error.message || "Failed to search encyclopedia",
+        title: t('bibleRef.searchFailed', 'Search Failed'),
+        description: error.message || t('bibleRef.failedToSearch', 'Failed to search encyclopedia'),
         variant: "destructive",
       });
     } finally {
@@ -323,7 +329,7 @@ const BibleReference = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+    <div className="min-h-screen bg-background relative overflow-x-hidden">
       {/* Animated Background */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse" />
@@ -333,6 +339,7 @@ const BibleReference = () => {
       </div>
 
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={BIBLE_REFERENCE_TOUR} onClose={() => setTourOpen(false)} />}
       
       <div className="container mx-auto px-4 py-8 max-w-7xl relative z-10">
         <motion.div 
@@ -350,20 +357,23 @@ const BibleReference = () => {
               <Building2 className="h-12 w-12 text-primary" />
             </motion.div>
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              Phototheology Codebook
+              {t('bibleRef.title', 'Phototheology Codebook')}
             </h1>
           </div>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Complete Reference Manual: Principles, Cycles, Symbols & Memory Tools
+            {t('bibleRef.subtitle', 'Complete Reference Manual: Principles, Cycles, Symbols & Memory Tools')}
           </p>
           <div className="flex items-center justify-center gap-2 mt-4">
             <Badge variant="secondary" className="bg-primary/20 border-primary/30">
               <Sparkles className="h-3 w-3 mr-1" />
-              8 Floors • 8 Cycles • 3 Heavens
+              {t('bibleRef.badgeSummary', '8 Floors \u2022 8 Cycles \u2022 3 Heavens')}
             </Badge>
             <Badge variant="outline" className="backdrop-blur-sm">
-              Complete PT System
+              {t('bibleRef.completePTSystem', 'Complete PT System')}
             </Badge>
+            <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+              <GraduationCap className="h-4 w-4" /> Tour
+            </Button>
           </div>
         </motion.div>
 
@@ -376,19 +386,19 @@ const BibleReference = () => {
             <TabsList className="grid grid-cols-4 w-full max-w-2xl mx-auto backdrop-blur-sm bg-background/50">
               <TabsTrigger value="principles" className="gap-2">
                 <Building2 className="h-4 w-4" />
-                PT Principles
+                {t('bibleRef.tabPrinciples', 'PT Principles')}
               </TabsTrigger>
               <TabsTrigger value="cycles" className="gap-2">
                 <Clock className="h-4 w-4" />
-                Cycles & Heavens
+                {t('bibleRef.tabCycles', 'Cycles & Heavens')}
               </TabsTrigger>
               <TabsTrigger value="symbols" className="gap-2">
                 <Code className="h-4 w-4" />
-                Symbol Library
+                {t('bibleRef.tabSymbols', 'Symbol Library')}
               </TabsTrigger>
               <TabsTrigger value="memory" className="gap-2">
                 <ImageIcon className="h-4 w-4" />
-                Memory Tools
+                {t('bibleRef.tabMemory', 'Memory Tools')}
               </TabsTrigger>
             </TabsList>
 
@@ -396,8 +406,8 @@ const BibleReference = () => {
               {/* Palace Floors */}
               <div className="space-y-4">
                 <div className="text-center mb-6">
-                  <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">The Eight-Floor Palace</h2>
-                  <p className="text-muted-foreground">Each floor builds on the one below - ascending from memory to mastery</p>
+                  <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">{t('bibleRef.eightFloorPalace', 'The Eight-Floor Palace')}</h2>
+                  <p className="text-muted-foreground">{t('bibleRef.eightFloorPalaceDesc', 'Each floor builds on the one below - ascending from memory to mastery')}</p>
                 </div>
                 
                 {floors.map((floor, index) => (
@@ -411,9 +421,9 @@ const BibleReference = () => {
                       <CardHeader className="bg-primary/5 backdrop-blur-sm">
                         <div className="flex items-start justify-between">
                           <div>
-                            <Badge variant="outline" className="mb-2 bg-primary/10 border-primary/30">Floor {floor.number}</Badge>
-                            <CardTitle className="text-2xl">{floor.name}</CardTitle>
-                            <CardDescription className="mt-1">{floor.focus}</CardDescription>
+                            <Badge variant="outline" className="mb-2 bg-primary/10 border-primary/30">{t('bibleRef.floorNumber', 'Floor {{number}}', { number: floor.number })}</Badge>
+                            <CardTitle className="text-2xl">{t(`bibleRef.floor${floor.number}.name`, floor.name)}</CardTitle>
+                            <CardDescription className="mt-1">{t(`bibleRef.floor${floor.number}.focus`, floor.focus)}</CardDescription>
                           </div>
                           <Building2 className="h-8 w-8 text-primary opacity-50" />
                         </div>
@@ -427,8 +437,8 @@ const BibleReference = () => {
                                   <div className="flex items-start gap-2 flex-1">
                                     <Badge variant="secondary" className="text-xs bg-primary/20">{room.code}</Badge>
                                     <div className="flex-1">
-                                      <div className="font-semibold text-sm">{room.name}</div>
-                                      <div className="text-xs text-muted-foreground mt-1">{room.purpose}</div>
+                                      <div className="font-semibold text-sm">{t(`bibleRef.room.${room.code}.name`, room.name)}</div>
+                                      <div className="text-xs text-muted-foreground mt-1">{t(`bibleRef.room.${room.code}.purpose`, room.purpose)}</div>
                                     </div>
                                   </div>
                                   {room.link && (
@@ -448,7 +458,7 @@ const BibleReference = () => {
                         </CardContent>
                       ) : (
                         <CardContent className="pt-6">
-                          <p className="text-sm text-muted-foreground italic">{floor.description}</p>
+                          <p className="text-sm text-muted-foreground italic">{t(`bibleRef.floor${floor.number}.description`, floor.description)}</p>
                         </CardContent>
                       )}
                     </Card>
@@ -458,10 +468,10 @@ const BibleReference = () => {
 
               {/* Five Ascensions & Four Expansions */}
               <div className="flex items-center justify-between mb-4 mt-8">
-                <h3 className="text-xl font-bold">Framework: Ascensions & Expansions</h3>
+                <h3 className="text-xl font-bold">{t('bibleRef.frameworkTitle', 'Framework: Ascensions & Expansions')}</h3>
                 <Button variant="outline" size="sm" onClick={() => navigate("/ascensions-expansions")} className="gap-2 backdrop-blur-sm bg-background/50">
                   <Layers className="h-4 w-4" />
-                  Learn More
+                  {t('bibleRef.learnMore', 'Learn More')}
                 </Button>
               </div>
               <div className="grid gap-6 md:grid-cols-2">
@@ -477,8 +487,8 @@ const BibleReference = () => {
                         <div className="flex items-center gap-3">
                           <Layers className="h-6 w-6 text-primary" />
                           <div>
-                            <CardTitle>{item.title}</CardTitle>
-                            <CardDescription>{item.subtitle}</CardDescription>
+                            <CardTitle>{t(`bibleRef.framework.${idx}.title`, item.title)}</CardTitle>
+                            <CardDescription>{t(`bibleRef.framework.${idx}.subtitle`, item.subtitle)}</CardDescription>
                           </div>
                         </div>
                       </CardHeader>
@@ -488,8 +498,8 @@ const BibleReference = () => {
                             <div key={i} className="flex items-start gap-2 p-2 rounded bg-accent/20 backdrop-blur-sm border border-accent/20">
                               <Badge variant="outline" className="text-xs bg-primary/10">{step.level}</Badge>
                               <div className="flex-1">
-                                <div className="font-semibold text-sm">{step.name}</div>
-                                <div className="text-xs text-muted-foreground">{step.focus}</div>
+                                <div className="font-semibold text-sm">{t(`bibleRef.ascension.${step.level}.name`, step.name)}</div>
+                                <div className="text-xs text-muted-foreground">{t(`bibleRef.ascension.${step.level}.focus`, step.focus)}</div>
                               </div>
                             </div>
                           ))}
@@ -497,8 +507,8 @@ const BibleReference = () => {
                             <div key={i} className="flex items-start gap-2 p-2 rounded bg-accent/20 backdrop-blur-sm border border-accent/20">
                               <Badge variant="outline" className="text-xs bg-primary/10">{dim.code}</Badge>
                               <div className="flex-1">
-                                <div className="font-semibold text-sm">{dim.name}</div>
-                                <div className="text-xs text-muted-foreground">{dim.focus}</div>
+                                <div className="font-semibold text-sm">{t(`bibleRef.expansion.${dim.code}.name`, dim.name)}</div>
+                                <div className="text-xs text-muted-foreground">{t(`bibleRef.expansion.${dim.code}.focus`, dim.focus)}</div>
                               </div>
                             </div>
                           ))}
@@ -514,8 +524,8 @@ const BibleReference = () => {
               {/* The Eight Cycles */}
               <div>
                 <div className="text-center mb-6">
-                  <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">The Eight Cycles</h2>
-                  <p className="text-muted-foreground">Fall → Covenant → Sanctuary → Enemy → Restoration</p>
+                  <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">{t('bibleRef.eightCycles', 'The Eight Cycles')}</h2>
+                  <p className="text-muted-foreground">{t('bibleRef.cyclePattern', 'Fall \u2192 Covenant \u2192 Sanctuary \u2192 Enemy \u2192 Restoration')}</p>
                 </div>
                 
                 <div className="space-y-4">
@@ -532,13 +542,13 @@ const BibleReference = () => {
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
                                 <Badge variant="secondary" className="bg-primary/20 border-primary/30">{cycle.code}</Badge>
-                                <CardTitle className="text-xl">{cycle.name}</CardTitle>
+                                <CardTitle className="text-xl">{t(`bibleRef.cycle.${cycle.code}.name`, cycle.name)}</CardTitle>
                               </div>
                               <CardDescription className="text-sm italic mb-3">
-                                {cycle.description}
+                                {t(`bibleRef.cycle.${cycle.code}.description`, cycle.description)}
                               </CardDescription>
                               <div className="p-3 rounded-lg bg-accent/20 backdrop-blur-sm text-sm border border-accent/20">
-                                <div className="font-mono text-xs leading-relaxed">{cycle.pattern}</div>
+                                <div className="font-mono text-xs leading-relaxed">{t(`bibleRef.cycle.${cycle.code}.pattern`, cycle.pattern)}</div>
                               </div>
                             </div>
                             <Target className="h-6 w-6 text-primary opacity-50 flex-shrink-0" />
@@ -553,8 +563,8 @@ const BibleReference = () => {
               {/* Three Heavens */}
               <div className="mt-8">
                 <div className="text-center mb-6">
-                  <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">The Three Heavens</h2>
-                  <p className="text-muted-foreground">Day-of-the-LORD Horizons: Judgment → Renewal</p>
+                  <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">{t('bibleRef.threeHeavens', 'The Three Heavens')}</h2>
+                  <p className="text-muted-foreground">{t('bibleRef.threeHeavensDesc', 'Day-of-the-LORD Horizons: Judgment \u2192 Renewal')}</p>
                 </div>
                 
                 <div className="space-y-4">
@@ -572,18 +582,18 @@ const BibleReference = () => {
                               <Badge className="text-lg px-3 py-1 gradient-palace">{heaven.code}</Badge>
                             </div>
                             <div className="flex-1">
-                              <CardTitle className="text-xl mb-2">{heaven.name}</CardTitle>
-                              <CardDescription className="mb-3">{heaven.description}</CardDescription>
+                              <CardTitle className="text-xl mb-2">{t(`bibleRef.heaven.${heaven.code}.name`, heaven.name)}</CardTitle>
+                              <CardDescription className="mb-3">{t(`bibleRef.heaven.${heaven.code}.description`, heaven.description)}</CardDescription>
                               <div className="space-y-2 text-sm">
                                 <div className="p-2 rounded bg-destructive/10 backdrop-blur-sm border border-destructive/20">
-                                  <span className="font-semibold">Judgment:</span> {heaven.judgment}
+                                  <span className="font-semibold">{t('bibleRef.judgment', 'Judgment:')}</span> {t(`bibleRef.heaven.${heaven.code}.judgment`, heaven.judgment)}
                                 </div>
                                 <div className="p-2 rounded bg-primary/10 backdrop-blur-sm border border-primary/20">
-                                  <span className="font-semibold">Renewal:</span> {heaven.renewal}
+                                  <span className="font-semibold">{t('bibleRef.renewal', 'Renewal:')}</span> {t(`bibleRef.heaven.${heaven.code}.renewal`, heaven.renewal)}
                                 </div>
                                 <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2">
-                                  <div><span className="font-semibold">Cycles:</span> {heaven.cycles}</div>
-                                  <div><span className="font-semibold">Key Texts:</span> {heaven.texts}</div>
+                                  <div><span className="font-semibold">{t('bibleRef.cycles', 'Cycles:')}</span> {heaven.cycles}</div>
+                                  <div><span className="font-semibold">{t('bibleRef.keyTexts', 'Key Texts:')}</span> {heaven.texts}</div>
                                 </div>
                               </div>
                             </div>
@@ -607,14 +617,14 @@ const BibleReference = () => {
                       <div>
                         <CardTitle className="text-2xl flex items-center gap-2">
                           <Sparkles className="h-6 w-6 text-primary" />
-                          Current Prophecy Updates
+                          {t('bibleRef.currentProphecyUpdates', 'Current Prophecy Updates')}
                         </CardTitle>
                         <CardDescription className="mt-2">
-                          Track real-time fulfillment of biblical prophecy in today's world
+                          {t('bibleRef.trackProphecy', 'Track real-time fulfillment of biblical prophecy in today\'s world')}
                         </CardDescription>
                       </div>
                       <Button onClick={() => navigate('/prophecy-watch')} className="gap-2 gradient-palace shadow-elegant">
-                        View Updates
+                        {t('bibleRef.viewUpdates', 'View Updates')}
                         <ChevronRight className="h-4 w-4" />
                       </Button>
                     </div>
@@ -622,21 +632,21 @@ const BibleReference = () => {
                   <CardContent>
                     <div className="grid gap-3 md:grid-cols-3">
                       <div className="p-3 rounded-lg bg-background/50 backdrop-blur-sm border border-border/50">
-                        <div className="font-semibold text-sm mb-1">World Events</div>
+                        <div className="font-semibold text-sm mb-1">{t('bibleRef.worldEvents', 'World Events')}</div>
                         <div className="text-xs text-muted-foreground">
-                          Current events mapped to prophetic timelines
+                          {t('bibleRef.worldEventsDesc', 'Current events mapped to prophetic timelines')}
                         </div>
                       </div>
                       <div className="p-3 rounded-lg bg-background/50 backdrop-blur-sm border border-border/50">
-                        <div className="font-semibold text-sm mb-1">Signs Tracking</div>
+                        <div className="font-semibold text-sm mb-1">{t('bibleRef.signsTracking', 'Signs Tracking')}</div>
                         <div className="text-xs text-muted-foreground">
-                          Monitor fulfillment of end-time signs
+                          {t('bibleRef.signsTrackingDesc', 'Monitor fulfillment of end-time signs')}
                         </div>
                       </div>
                       <div className="p-3 rounded-lg bg-background/50 backdrop-blur-sm border border-border/50">
-                        <div className="font-semibold text-sm mb-1">Biblical Analysis</div>
+                        <div className="font-semibold text-sm mb-1">{t('bibleRef.biblicalAnalysis', 'Biblical Analysis')}</div>
                         <div className="text-xs text-muted-foreground">
-                          Compare headlines with Scripture
+                          {t('bibleRef.biblicalAnalysisDesc', 'Compare headlines with Scripture')}
                         </div>
                       </div>
                     </div>
@@ -647,8 +657,8 @@ const BibleReference = () => {
 
             <TabsContent value="symbols" className="space-y-6">
               <div className="text-center mb-6">
-                <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Symbol Library</h2>
-                <p className="text-muted-foreground">God's universal language across Scripture</p>
+                <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">{t('bibleRef.symbolLibrary', 'Symbol Library')}</h2>
+                <p className="text-muted-foreground">{t('bibleRef.symbolLibraryDesc', 'God\'s universal language across Scripture')}</p>
               </div>
 
               {symbols.map((section, idx) => (
@@ -662,7 +672,7 @@ const BibleReference = () => {
                     <CardHeader>
                       <div className="flex items-center gap-3">
                         <Code className="h-6 w-6 text-primary" />
-                        <CardTitle>{section.category}</CardTitle>
+                        <CardTitle>{t(`bibleRef.symbolCategory.${idx}`, section.category)}</CardTitle>
                       </div>
                     </CardHeader>
                     <CardContent>
@@ -672,20 +682,20 @@ const BibleReference = () => {
                             {item.symbol && (
                               <>
                                 <div className="flex-shrink-0 w-32">
-                                  <Badge variant="outline" className="w-full justify-center bg-primary/10">{item.symbol}</Badge>
+                                  <Badge variant="outline" className="w-full justify-center bg-primary/10">{String(t(`bibleRef.symbol.${idx}.${i}.symbol`, item.symbol))}</Badge>
                                 </div>
                                 <ChevronRight className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                                <div className="text-sm flex-1">{item.meaning}</div>
+                                <div className="text-sm flex-1">{String(t(`bibleRef.symbol.${idx}.${i}.meaning`, item.meaning))}</div>
                               </>
                             )}
                             {item.event1 && (
                               <div className="flex-1 space-y-1 text-sm">
                                 <div className="flex items-center gap-2">
-                                  <Badge variant="outline" className="text-xs bg-primary/10">{item.event1}</Badge>
-                                  <span className="text-muted-foreground">↔</span>
-                                  <Badge variant="outline" className="text-xs bg-primary/10">{item.event2}</Badge>
+                                  <Badge variant="outline" className="text-xs bg-primary/10">{String(t(`bibleRef.symbol.${idx}.${i}.event1`, item.event1))}</Badge>
+                                  <span className="text-muted-foreground">{'\u2194'}</span>
+                                  <Badge variant="outline" className="text-xs bg-primary/10">{String(t(`bibleRef.symbol.${idx}.${i}.event2`, item.event2))}</Badge>
                                 </div>
-                                <div className="text-muted-foreground">{item.parallel}</div>
+                                <div className="text-muted-foreground">{String(t(`bibleRef.symbol.${idx}.${i}.parallel`, item.parallel))}</div>
                               </div>
                             )}
                           </div>
@@ -699,8 +709,8 @@ const BibleReference = () => {
 
             <TabsContent value="memory" className="space-y-6">
               <div className="text-center mb-6">
-                <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Memory Tools</h2>
-                <p className="text-muted-foreground">Transform Scripture into unforgettable visual patterns</p>
+                <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">{t('bibleRef.memoryTools', 'Memory Tools')}</h2>
+                <p className="text-muted-foreground">{t('bibleRef.memoryToolsDesc', 'Transform Scripture into unforgettable visual patterns')}</p>
               </div>
 
               <div className="grid gap-6 md:grid-cols-2">
@@ -715,18 +725,18 @@ const BibleReference = () => {
                       <CardHeader>
                         <div className="flex items-center gap-3">
                           <ImageIcon className="h-6 w-6 text-primary" />
-                          <CardTitle>{tool.name}</CardTitle>
+                          <CardTitle>{t(`bibleRef.memoryTool.${idx}.name`, tool.name)}</CardTitle>
                         </div>
-                        <CardDescription>{tool.description}</CardDescription>
+                        <CardDescription>{t(`bibleRef.memoryTool.${idx}.description`, tool.description)}</CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-3">
                         <div className="p-3 rounded-lg bg-accent/20 backdrop-blur-sm border border-accent/20">
-                          <div className="text-xs font-semibold text-muted-foreground mb-1">Example:</div>
-                          <div className="text-sm">{tool.example}</div>
+                          <div className="text-xs font-semibold text-muted-foreground mb-1">{t('bibleRef.example', 'Example:')}</div>
+                          <div className="text-sm">{t(`bibleRef.memoryTool.${idx}.example`, tool.example)}</div>
                         </div>
                         <div className="p-3 rounded-lg bg-primary/10 backdrop-blur-sm border border-primary/20">
-                          <div className="text-xs font-semibold text-muted-foreground mb-1">Purpose:</div>
-                          <div className="text-sm">{tool.purpose}</div>
+                          <div className="text-xs font-semibold text-muted-foreground mb-1">{t('bibleRef.purpose', 'Purpose:')}</div>
+                          <div className="text-sm">{t(`bibleRef.memoryTool.${idx}.purpose`, tool.purpose)}</div>
                         </div>
                       </CardContent>
                     </Card>
@@ -744,23 +754,23 @@ const BibleReference = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Sparkles className="h-5 w-5 text-primary" />
-                      Start Using These Tools
+                      {t('bibleRef.startUsingTools', 'Start Using These Tools')}
                     </CardTitle>
                     <CardDescription>
-                      All memory tools are integrated throughout the Phototheology app
+                      {t('bibleRef.startUsingToolsDesc', 'All memory tools are integrated throughout the Phototheology app')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <Button variant="outline" className="w-full justify-between backdrop-blur-sm bg-background/50 hover:bg-primary/10" onClick={() => navigate("/palace")}>
-                      Explore the Palace
+                      {t('bibleRef.explorePalace', 'Explore the Palace')}
                       <ChevronRight className="h-4 w-4" />
                     </Button>
-                    <Button variant="outline" className="w-full justify-between backdrop-blur-sm bg-background/50 hover:bg-primary/10" onClick={() => navigate("/bible-rendered-room")}>
-                      Bible Rendered Room
+                    <Button variant="outline" className="w-full justify-between backdrop-blur-sm bg-background/50 hover:bg-primary/10" onClick={() => navigate("/palace/floor/1/room/br")}>
+                      {t('bibleRef.bibleRenderedRoom', 'Bible Rendered Room')}
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                     <Button variant="outline" className="w-full justify-between backdrop-blur-sm bg-background/50 hover:bg-primary/10" onClick={() => navigate("/bible")}>
-                      Study Scripture
+                      {t('bibleRef.studyScripture', 'Study Scripture')}
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </CardContent>
@@ -774,10 +784,10 @@ const BibleReference = () => {
                 <CardHeader>
                   <CardTitle className="text-3xl flex items-center gap-2">
                     <Book className="h-8 w-8 text-primary" />
-                    Bible Encyclopedia
+                    {t('bibleRef.bibleEncyclopedia', 'Bible Encyclopedia')}
                   </CardTitle>
                   <CardDescription className="text-lg">
-                    Comprehensive biblical reference powered by AI with Seventh-day Adventist understanding
+                    {t('bibleRef.encyclopediaDesc', 'Comprehensive biblical reference powered by AI with Seventh-day Adventist understanding')}
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -790,7 +800,7 @@ const BibleReference = () => {
                   onClick={() => setSearchCategory("events")}
                 >
                   <Calendar className="h-4 w-4 mr-2" />
-                  Events
+                  {t('bibleRef.events', 'Events')}
                 </Button>
                 <Button
                   variant={searchCategory === "maps" ? "default" : "outline"}
@@ -798,7 +808,7 @@ const BibleReference = () => {
                   onClick={() => setSearchCategory("maps")}
                 >
                   <MapPin className="h-4 w-4 mr-2" />
-                  Maps
+                  {t('bibleRef.maps', 'Maps')}
                 </Button>
                 <Button
                   variant={searchCategory === "prophecy" ? "default" : "outline"}
@@ -806,7 +816,7 @@ const BibleReference = () => {
                   onClick={() => setSearchCategory("prophecy")}
                 >
                   <Sparkles className="h-4 w-4 mr-2" />
-                  Prophecy
+                  {t('bibleRef.prophecy', 'Prophecy')}
                 </Button>
                 <Button
                   variant={searchCategory === "charts" ? "default" : "outline"}
@@ -814,7 +824,7 @@ const BibleReference = () => {
                   onClick={() => setSearchCategory("charts")}
                 >
                   <BarChart3 className="h-4 w-4 mr-2" />
-                  Charts
+                  {t('bibleRef.charts', 'Charts')}
                 </Button>
                 <Button
                   variant={searchCategory === "people" ? "default" : "outline"}
@@ -822,7 +832,7 @@ const BibleReference = () => {
                   onClick={() => setSearchCategory("people")}
                 >
                   <Users className="h-4 w-4 mr-2" />
-                  People
+                  {t('bibleRef.people', 'People')}
                 </Button>
               </div>
 
@@ -831,24 +841,24 @@ const BibleReference = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Search className="h-5 w-5" />
-                    {searchCategory === "events" && "Search Biblical Events"}
-                    {searchCategory === "maps" && "Search Places & Geography"}
-                    {searchCategory === "prophecy" && "Search Prophetic Events (SDA Understanding)"}
-                    {searchCategory === "charts" && "Search Timelines & Charts"}
-                    {searchCategory === "people" && "Search Biblical People"}
+                    {searchCategory === "events" && t('bibleRef.searchEvents', 'Search Biblical Events')}
+                    {searchCategory === "maps" && t('bibleRef.searchMaps', 'Search Places & Geography')}
+                    {searchCategory === "prophecy" && t('bibleRef.searchProphecy', 'Search Prophetic Events (SDA Understanding)')}
+                    {searchCategory === "charts" && t('bibleRef.searchCharts', 'Search Timelines & Charts')}
+                    {searchCategory === "people" && t('bibleRef.searchPeople', 'Search Biblical People')}
                   </CardTitle>
                   <CardDescription>
-                    {searchCategory === "events" && "Major events, miracles, and historical moments in scripture"}
-                    {searchCategory === "maps" && "Biblical locations, journeys, and geographical context"}
-                    {searchCategory === "prophecy" && "Prophetic timelines and end-time events from an SDA perspective"}
-                    {searchCategory === "charts" && "Visual timelines, genealogies, and comparative charts"}
-                    {searchCategory === "people" && "Biographical information about biblical figures"}
+                    {searchCategory === "events" && t('bibleRef.searchEventsDesc', 'Major events, miracles, and historical moments in scripture')}
+                    {searchCategory === "maps" && t('bibleRef.searchMapsDesc', 'Biblical locations, journeys, and geographical context')}
+                    {searchCategory === "prophecy" && t('bibleRef.searchProphecyDesc', 'Prophetic timelines and end-time events from an SDA perspective')}
+                    {searchCategory === "charts" && t('bibleRef.searchChartsDesc', 'Visual timelines, genealogies, and comparative charts')}
+                    {searchCategory === "people" && t('bibleRef.searchPeopleDesc', 'Biographical information about biblical figures')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex gap-2">
                     <Input
-                      placeholder={`Search ${searchCategory}...`}
+                      placeholder={t('bibleRef.searchPlaceholder', 'Search {{category}}...', { category: searchCategory })}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => {
@@ -867,12 +877,12 @@ const BibleReference = () => {
                       {isSearching ? (
                         <>
                           <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Searching...
+                          {t('bibleRef.searching', 'Searching...')}
                         </>
                       ) : (
                         <>
                           <Search className="h-4 w-4 mr-2" />
-                          Search
+                          {t('bibleRef.search', 'Search')}
                         </>
                       )}
                     </Button>
@@ -881,41 +891,41 @@ const BibleReference = () => {
                   {/* Quick Examples */}
                   {!searchResults && (
                     <div className="pt-4 border-t border-border/50">
-                      <div className="text-sm font-semibold mb-2 text-muted-foreground">Quick Examples:</div>
+                      <div className="text-sm font-semibold mb-2 text-muted-foreground">{t('bibleRef.quickExamples', 'Quick Examples:')}</div>
                       <div className="flex gap-2 flex-wrap">
                         {searchCategory === "events" && (
                           <>
-                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Exodus from Egypt"); }}>Exodus from Egypt</Badge>
-                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Babylonian Captivity"); }}>Babylonian Captivity</Badge>
-                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Pentecost"); }}>Pentecost</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Exodus from Egypt"); }}>{t('bibleRef.exampleExodus', 'Exodus from Egypt')}</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Babylonian Captivity"); }}>{t('bibleRef.exampleBabylon', 'Babylonian Captivity')}</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Pentecost"); }}>{t('bibleRef.examplePentecost', 'Pentecost')}</Badge>
                           </>
                         )}
                         {searchCategory === "maps" && (
                           <>
-                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Jerusalem in Jesus' time"); }}>Jerusalem in Jesus' time</Badge>
-                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Paul's missionary journeys"); }}>Paul's journeys</Badge>
-                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("The Promised Land"); }}>Promised Land</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Jerusalem in Jesus' time"); }}>{t('bibleRef.exampleJerusalem', "Jerusalem in Jesus' time")}</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Paul's missionary journeys"); }}>{t('bibleRef.examplePaulJourneys', "Paul's journeys")}</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("The Promised Land"); }}>{t('bibleRef.examplePromisedLand', 'Promised Land')}</Badge>
                           </>
                         )}
                         {searchCategory === "prophecy" && (
                           <>
-                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("70 weeks prophecy"); }}>70 weeks prophecy</Badge>
-                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("2300 day prophecy"); }}>2300 days</Badge>
-                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Mark of the Beast"); }}>Mark of the Beast</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("70 weeks prophecy"); }}>{t('bibleRef.example70Weeks', '70 weeks prophecy')}</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("2300 day prophecy"); }}>{t('bibleRef.example2300Days', '2300 days')}</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Mark of the Beast"); }}>{t('bibleRef.exampleMarkBeast', 'Mark of the Beast')}</Badge>
                           </>
                         )}
                         {searchCategory === "charts" && (
                           <>
-                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Daniel 2 timeline"); }}>Daniel 2 timeline</Badge>
-                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Kings of Israel and Judah"); }}>Kings chart</Badge>
-                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Sanctuary services"); }}>Sanctuary services</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Daniel 2 timeline"); }}>{t('bibleRef.exampleDaniel2', 'Daniel 2 timeline')}</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Kings of Israel and Judah"); }}>{t('bibleRef.exampleKingsChart', 'Kings chart')}</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Sanctuary services"); }}>{t('bibleRef.exampleSanctuary', 'Sanctuary services')}</Badge>
                           </>
                         )}
                         {searchCategory === "people" && (
                           <>
-                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("King David"); }}>King David</Badge>
-                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Apostle Paul"); }}>Apostle Paul</Badge>
-                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Prophet Daniel"); }}>Prophet Daniel</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("King David"); }}>{t('bibleRef.exampleKingDavid', 'King David')}</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Apostle Paul"); }}>{t('bibleRef.exampleApostlePaul', 'Apostle Paul')}</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Prophet Daniel"); }}>{t('bibleRef.exampleProphetDaniel', 'Prophet Daniel')}</Badge>
                           </>
                         )}
                       </div>

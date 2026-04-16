@@ -574,8 +574,8 @@ export const BibleFreestyleGame = ({ roomId, roomName }: BibleFreestyleGameProps
                   </div>
                 </div>
 
-                {/* Help Button - Only hints, not answer */}
-                {!evaluation && (
+                {/* Help Button - Only for beginner difficulty */}
+                {!evaluation && selectedDifficulty === "beginner" && (
                   <div className="flex gap-2">
                     {challenge.hint && !showHint && (
                       <Button 
@@ -591,7 +591,7 @@ export const BibleFreestyleGame = ({ roomId, roomName }: BibleFreestyleGameProps
                   </div>
                 )}
                 
-                {showHint && challenge.hint && !evaluation && (
+                {showHint && challenge.hint && !evaluation && selectedDifficulty === "beginner" && (
                   <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
                     <p className="text-sm italic">💡 <strong>Hint:</strong> {challenge.hint}</p>
                     <p className="text-xs text-muted-foreground mt-1">This is just a hint—you still need to find the connection!</p>

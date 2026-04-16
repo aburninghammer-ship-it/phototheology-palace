@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -58,7 +59,9 @@ async function generateSpark(
   apiKey: string,
   triggerType?: 'dwell' | 'output',
   outputTitle?: string,
-  userName?: string
+  userName?: string,
+  recentTitles?: string[],
+  recentInsights?: string[]
 ): Promise<{
   spark_type: 'connection' | 'pattern' | 'application';
   title: string;
@@ -86,17 +89,43 @@ async function generateSpark(
     : '';
 
   // Personal greeting with user's name
-  const personalGreeting = userName 
+  const personalGreeting = userName
     ? `Address the user warmly by name as "Hey ${userName}" or similar in the recognition line.`
     : '';
 
-  const systemPrompt = `You are Jeeves, a Phototheology discovery engine. Your task is to generate ONE high-quality "Discovery Spark" based on the user's study content.
+  // Deduplication instruction based on recent sparks — include titles AND insight summaries
+  const insights = recentInsights || [];
+  const deduplicationInstruction = recentTitles && recentTitles.length > 0
+    ? `\n⚠️ CRITICAL — DO NOT REPEAT. The user has already seen these sparks:
+${recentTitles.slice(0, 15).map((t: string, i: number) => {
+  const insight = insights[i];
+  return insight ? `- "${t}" → ${insight.slice(0, 80)}…` : `- "${t}"`;
+}).join('\n')}
+
+HARD RULES FOR UNIQUENESS:
+1. Do NOT restate the same theological point in different words.
+2. Do NOT cover the same Scripture passage from a slightly different angle.
+3. Do NOT generate a spark whose core idea overlaps with ANY spark above.
+4. Each spark must introduce a GENUINELY NEW concept, connection, or application.
+5. If you cannot produce something truly novel, return an empty JSON object: {}
+6. Better to generate nothing than to repeat.`
+    : '';
+
+  let systemPrompt = `You are Jeeves, a Phototheology discovery engine. Your task is to generate ONE high-quality "Discovery Spark" based on the user's study content.
+
+⚠️ THEOLOGICAL GUARDRAILS (NON-NEGOTIABLE):
+- AZAZEL = SATAN, NOT CHRIST (Leviticus 16 scapegoat = Satan)
+- LITTLE HORN = ROME/PAPACY, NOT ANTIOCHUS (Daniel 7 & 8)
+- TWO-PHASE SANCTUARY: Holy Place at ascension (31 AD); Most Holy Place in 1844
+- DAY OF ATONEMENT = 1844, NOT THE CROSS (Christ's death = Passover)
+- SPRING FEASTS = First Advent; FALL FEASTS = Second Advent ministry
 
 A Discovery Spark surfaces hidden connections, patterns, or applications that the student may not have noticed.
 
 ${modeInstructions[mode]}
 ${outputContext}
 ${personalGreeting}
+${deduplicationInstruction}
 
 RULES:
 - Generate exactly ONE spark
@@ -104,7 +133,7 @@ RULES:
 - Title should be evocative and memorable (3-6 words)
 - Recognition should ${userName ? `start with a warm greeting using "${userName}" and then ` : ''}acknowledge what the user ${triggerType === 'output' ? 'just completed' : 'is studying'} (1 line)
 - Insight should be substantive but focused (3-6 sentences)
-- Include 2-4 related Scripture targets for exploration
+- ALWAYS include 3-5 related Scripture references in the explore.targets array - this is REQUIRED
 - Be Christ-centered when natural
 - IMPORTANT: If you mention Scripture wording, it MUST be KJV and exact. If you are not 100% sure of the exact KJV wording, do NOT quote it—only cite the reference.
 - No markdown formatting
@@ -131,6 +160,15 @@ ${content}
 
 Generate ONE discovery spark that would genuinely deepen their understanding${triggerType === 'output' ? ' and celebrate their work' : ''}.`;
 
+  // RAG corpus injection
+  const ragResult = await getCorpusContext({
+    query: content.slice(0, 4000),
+    matchCount: 2,
+  });
+  if (ragResult.chunkCount > 0) {
+    systemPrompt += ragResult.corpusContext;
+  }
+
   console.log('Generating spark for', surface, 'context...');
 
   try {
@@ -146,7 +184,7 @@ Generate ONE discovery spark that would genuinely deepen their understanding${tr
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
-        temperature: 0.85,
+        temperature: 0.7,
       }),
     });
 
@@ -171,7 +209,13 @@ Generate ONE discovery spark that would genuinely deepen their understanding${tr
     }
 
     const parsed = JSON.parse(jsonStr);
-    
+
+    // If AI returned empty object (nothing novel to say), skip
+    if (!parsed.title || !parsed.insight) {
+      console.log('⏭️ AI declined to generate — no novel spark available');
+      return null;
+    }
+
     return {
       ...parsed,
       content_hash: hashContent(content)
@@ -322,7 +366,9 @@ serve(async (req) => {
       LOVABLE_API_KEY,
       triggerType,
       outputTitle,
-      userName
+      userName,
+      body.recentTitles,
+      body.recentInsights
     );
 
     if (!generatedSpark) {

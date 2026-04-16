@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, RefreshCw, AlertTriangle, CheckCircle, User, Search } from "lucide-react";
+import { Loader2, RefreshCw, AlertTriangle, CheckCircle, User, Search, Wrench, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -17,12 +17,15 @@ interface SubscriptionRecord {
   stripe_subscription_id: string | null;
   has_mismatch: boolean;
   mismatch_reason?: string;
+  has_lifetime_access?: boolean;
+  trial_ends_at?: string | null;
 }
 
 export function SubscriptionMismatches() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState<string | null>(null);
+  const [fixingUser, setFixingUser] = useState<string | null>(null);
   const [records, setRecords] = useState<SubscriptionRecord[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showMismatchesOnly, setShowMismatchesOnly] = useState(true);
@@ -51,10 +54,6 @@ export function SubscriptionMismatches() {
       if (error) throw error;
 
       // Get user emails
-      const { data: users } = await supabase
-        .rpc('is_admin_user', { _user_id: (await supabase.auth.getUser()).data.user?.id });
-
-      // For admin, get email addresses from profiles or auth
       const userIds = subscriptions?.map(s => s.user_id) || [];
       
       // Get profiles for display names/emails
@@ -70,25 +69,23 @@ export function SubscriptionMismatches() {
         let hasMismatch = false;
         let mismatchReason = "";
 
+        const hasLifetimeAccess = sub.has_lifetime_access || false;
+
         // Check for potential issues
-        if (sub.subscription_status === 'active' && !sub.stripe_subscription_id) {
-          // Active without Stripe subscription - might be lifetime or church
-          if (!sub.has_lifetime_access) {
-            hasMismatch = true;
-            mismatchReason = "Active status but no Stripe subscription";
-          }
+        // Issue 1: Active status but no Stripe subscription AND no lifetime access
+        if (sub.subscription_status === 'active' && !sub.stripe_subscription_id && !hasLifetimeAccess) {
+          hasMismatch = true;
+          mismatchReason = "Active status but no Stripe subscription (no lifetime access)";
         }
 
-        if (sub.stripe_subscription_id && sub.subscription_status !== 'active') {
-          // Has Stripe subscription but not active
-          if (sub.subscription_status !== 'trial') {
-            hasMismatch = true;
-            mismatchReason = "Has Stripe subscription but status is not active";
-          }
+        // Issue 2: Has Stripe subscription but status is not active/trial
+        if (sub.stripe_subscription_id && !['active', 'trial'].includes(sub.subscription_status || '')) {
+          hasMismatch = true;
+          mismatchReason = "Has Stripe subscription but status is not active/trial";
         }
 
-        // Check for expired trials
-        if (sub.subscription_status === 'trial' && sub.trial_ends_at) {
+        // Issue 3: Expired trial (only if no Stripe subscription and no lifetime access)
+        if (sub.subscription_status === 'trial' && sub.trial_ends_at && !sub.stripe_subscription_id && !hasLifetimeAccess) {
           const trialEnd = new Date(sub.trial_ends_at);
           if (trialEnd < new Date()) {
             hasMismatch = true;
@@ -105,6 +102,8 @@ export function SubscriptionMismatches() {
           stripe_subscription_id: sub.stripe_subscription_id,
           has_mismatch: hasMismatch,
           mismatch_reason: mismatchReason,
+          has_lifetime_access: hasLifetimeAccess,
+          trial_ends_at: sub.trial_ends_at,
         };
       });
 
@@ -130,7 +129,7 @@ export function SubscriptionMismatches() {
       
       toast({
         title: "Sync Complete",
-        description: `Synced ${data?.updated || 0} subscriptions. ${data?.errors || 0} errors.`,
+        description: `Synced ${data?.summary?.updated || 0} subscriptions. ${data?.summary?.errors || 0} errors.`,
       });
       
       await loadSubscriptionData();
@@ -144,6 +143,71 @@ export function SubscriptionMismatches() {
     } finally {
       setSyncing(null);
     }
+  };
+
+  const handleFixUser = async (userId: string) => {
+    setFixingUser(userId);
+    try {
+      const { data, error } = await supabase.functions.invoke('fix-subscription-mismatch', {
+        body: { user_id: userId },
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Fixed",
+        description: `Updated ${data?.email}: ${data?.new_status?.subscription_status || 'free'} (${data?.new_status?.subscription_tier || 'none'})`,
+      });
+      
+      await loadSubscriptionData();
+    } catch (error: any) {
+      console.error("Fix error:", error);
+      toast({
+        title: "Fix Failed",
+        description: error.message || "Failed to fix subscription",
+        variant: "destructive",
+      });
+    } finally {
+      setFixingUser(null);
+    }
+  };
+
+  const handleAutoFixAll = async () => {
+    const mismatchedUsers = records.filter(r => r.has_mismatch);
+    if (mismatchedUsers.length === 0) {
+      toast({
+        title: "No Issues",
+        description: "No mismatches to fix",
+      });
+      return;
+    }
+
+    setSyncing("auto-fix");
+    let fixed = 0;
+    let errors = 0;
+
+    for (const user of mismatchedUsers) {
+      try {
+        const { error } = await supabase.functions.invoke('fix-subscription-mismatch', {
+          body: { user_id: user.user_id },
+        });
+        if (error) {
+          errors++;
+        } else {
+          fixed++;
+        }
+      } catch {
+        errors++;
+      }
+    }
+
+    toast({
+      title: "Auto-Fix Complete",
+      description: `Fixed ${fixed} users. ${errors} errors.`,
+    });
+
+    await loadSubscriptionData();
+    setSyncing(null);
   };
 
   const filteredRecords = records.filter(record => {
@@ -186,22 +250,43 @@ export function SubscriptionMismatches() {
                 Compare database records with Stripe subscriptions
               </CardDescription>
             </div>
-            <Button 
-              onClick={handleSyncAll} 
-              disabled={syncing === "all"}
-            >
-              {syncing === "all" ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Syncing All...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Sync All from Stripe
-                </>
+            <div className="flex gap-2">
+              {mismatchCount > 0 && (
+                <Button 
+                  onClick={handleAutoFixAll} 
+                  disabled={syncing !== null}
+                  variant="destructive"
+                >
+                  {syncing === "auto-fix" ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Fixing All...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="h-4 w-4 mr-2" />
+                      Auto-Fix All ({mismatchCount})
+                    </>
+                  )}
+                </Button>
               )}
-            </Button>
+              <Button 
+                onClick={handleSyncAll} 
+                disabled={syncing !== null}
+              >
+                {syncing === "all" ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Syncing All...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Sync All from Stripe
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -233,12 +318,13 @@ export function SubscriptionMismatches() {
                   <TableHead>Stripe Customer</TableHead>
                   <TableHead>Stripe Subscription</TableHead>
                   <TableHead>Issue</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredRecords.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                       {showMismatchesOnly 
                         ? "No subscription mismatches found!" 
                         : "No subscriptions found matching your search"}
@@ -253,11 +339,16 @@ export function SubscriptionMismatches() {
                           <div>
                             <div className="font-medium">{record.email}</div>
                             <div className="text-xs text-muted-foreground">{record.user_id.slice(0, 8)}...</div>
+                            {record.has_lifetime_access && (
+                              <div className="flex gap-1 mt-1">
+                                <Badge variant="secondary" className="text-xs">Lifetime</Badge>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={record.db_status === 'active' ? 'default' : 'secondary'}>
+                        <Badge variant={record.db_status === 'active' ? 'default' : record.db_status === 'trial' ? 'secondary' : 'outline'}>
                           {record.db_status || 'none'}
                         </Badge>
                       </TableCell>
@@ -278,13 +369,32 @@ export function SubscriptionMismatches() {
                         {record.has_mismatch ? (
                           <div className="flex items-center gap-2 text-destructive">
                             <AlertTriangle className="h-4 w-4" />
-                            <span className="text-xs">{record.mismatch_reason}</span>
+                            <span className="text-xs max-w-[200px]">{record.mismatch_reason}</span>
                           </div>
                         ) : (
                           <div className="flex items-center gap-2 text-green-600">
                             <CheckCircle className="h-4 w-4" />
                             <span className="text-xs">OK</span>
                           </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {record.has_mismatch && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleFixUser(record.user_id)}
+                            disabled={fixingUser === record.user_id}
+                          >
+                            {fixingUser === record.user_id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <>
+                                <Wrench className="h-4 w-4 mr-1" />
+                                Fix
+                              </>
+                            )}
+                          </Button>
                         )}
                       </TableCell>
                     </TableRow>

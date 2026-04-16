@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Flame, Trophy, Gem, Building2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,6 +19,7 @@ interface IdentityLoopWidgetProps {
 }
 
 export function IdentityLoopWidget({ compact = false, className }: IdentityLoopWidgetProps) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [stats, setStats] = useState<IdentityStats>({
     streak: 0,
@@ -103,7 +105,7 @@ export function IdentityLoopWidget({ compact = false, className }: IdentityLoopW
       >
         <Flame className="h-5 w-5 mx-auto mb-1 text-orange-500" />
         <div className="text-lg font-bold">{stats.streak}</div>
-        <div className="text-xs text-muted-foreground">Streak</div>
+        <div className="text-xs text-muted-foreground">{t('identity.streak')}</div>
       </Link>
       <Link 
         to="/leaderboard"
@@ -111,7 +113,7 @@ export function IdentityLoopWidget({ compact = false, className }: IdentityLoopW
       >
         <Trophy className="h-5 w-5 mx-auto mb-1 text-yellow-500" />
         <div className="text-lg font-bold">{stats.xp}</div>
-        <div className="text-xs text-muted-foreground">XP</div>
+        <div className="text-xs text-muted-foreground">{t('identity.xp')}</div>
       </Link>
       <Link 
         to="/my-studies"
@@ -119,7 +121,7 @@ export function IdentityLoopWidget({ compact = false, className }: IdentityLoopW
       >
         <Gem className="h-5 w-5 mx-auto mb-1 text-primary" />
         <div className="text-lg font-bold">{stats.gems}</div>
-        <div className="text-xs text-muted-foreground">Gems</div>
+        <div className="text-xs text-muted-foreground">{t('identity.gems')}</div>
       </Link>
       <Link 
         to="/mastery"
@@ -127,7 +129,7 @@ export function IdentityLoopWidget({ compact = false, className }: IdentityLoopW
       >
         <Building2 className="h-5 w-5 mx-auto mb-1 text-purple-500" />
         <div className="text-lg font-bold">{stats.roomsCompleted}</div>
-        <div className="text-xs text-muted-foreground">Rooms</div>
+        <div className="text-xs text-muted-foreground">{t('identity.rooms')}</div>
       </Link>
     </div>
   );

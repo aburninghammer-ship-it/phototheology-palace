@@ -52,6 +52,114 @@ export const usePreservePageState = () => {
   }, [location.pathname, saveScrollPosition]);
 };
 
+// Hook to preserve tab state across navigation
+export const usePreserveTabState = (defaultTab: string): [string, (tab: string) => void] => {
+  const location = useLocation();
+  const { setCustomState, getCustomState } = usePageState();
+
+  // Get stored tab or use default
+  const storedTab = getCustomState<string>(location.pathname, "activeTab");
+  const [activeTab, setActiveTabInternal] = useState(storedTab || defaultTab);
+
+  // Restore tab on mount
+  useEffect(() => {
+    const stored = getCustomState<string>(location.pathname, "activeTab");
+    if (stored) {
+      setActiveTabInternal(stored);
+    }
+  }, [location.pathname, getCustomState]);
+
+  // Save tab when it changes
+  const setActiveTab = useCallback((tab: string) => {
+    setActiveTabInternal(tab);
+    setCustomState(location.pathname, "activeTab", tab);
+  }, [location.pathname, setCustomState]);
+
+  return [activeTab, setActiveTab];
+};
+
+// Hook to preserve form/input state across navigation
+export const usePreserveFormState = <T extends Record<string, any>>(defaultState: T): [T, (updates: Partial<T>) => void, (key: keyof T, value: any) => void] => {
+  const location = useLocation();
+  const { setCustomState, getCustomState } = usePageState();
+
+  // Get stored form state or use default
+  const storedState = getCustomState<T>(location.pathname, "formState");
+  const [formState, setFormStateInternal] = useState<T>(storedState || defaultState);
+
+  // Restore form state on mount
+  useEffect(() => {
+    const stored = getCustomState<T>(location.pathname, "formState");
+    if (stored) {
+      setFormStateInternal(stored);
+    }
+  }, [location.pathname, getCustomState]);
+
+  // Update entire form state
+  const updateFormState = useCallback((updates: Partial<T>) => {
+    setFormStateInternal(prev => {
+      const newState = { ...prev, ...updates };
+      setCustomState(location.pathname, "formState", newState);
+      return newState;
+    });
+  }, [location.pathname, setCustomState]);
+
+  // Update single field
+  const setFormField = useCallback((key: keyof T, value: any) => {
+    setFormStateInternal(prev => {
+      const newState = { ...prev, [key]: value };
+      setCustomState(location.pathname, "formState", newState);
+      return newState;
+    });
+  }, [location.pathname, setCustomState]);
+
+  return [formState, updateFormState, setFormField];
+};
+
+// Combined hook for pages with both scroll and tabs
+export const usePreservePage = (defaultTab?: string) => {
+  usePreservePageState();
+  const tabState = defaultTab ? usePreserveTabState(defaultTab) : undefined;
+  return { activeTab: tabState?.[0], setActiveTab: tabState?.[1] };
+};
+
+// Hook for persisting any state value - works like useState but persists to localStorage
+export function usePersistedState<T>(
+  key: string,
+  defaultValue: T
+): [T, React.Dispatch<React.SetStateAction<T>>] {
+  const location = useLocation();
+  const { setCustomState, getCustomState } = usePageState();
+  const storageKey = `${location.pathname}:${key}`;
+
+  // Initialize from stored value or default
+  const [value, setValueInternal] = useState<T>(() => {
+    const stored = getCustomState<T>(storageKey, key);
+    return stored !== undefined ? stored : defaultValue;
+  });
+
+  // Restore on mount (in case context loaded after initial render)
+  useEffect(() => {
+    const stored = getCustomState<T>(storageKey, key);
+    if (stored !== undefined) {
+      setValueInternal(stored);
+    }
+  }, [storageKey, key, getCustomState]);
+
+  // Wrapper that saves to context on every change
+  const setValue: React.Dispatch<React.SetStateAction<T>> = useCallback((action) => {
+    setValueInternal(prev => {
+      const newValue = typeof action === 'function'
+        ? (action as (prev: T) => T)(prev)
+        : action;
+      setCustomState(storageKey, key, newValue);
+      return newValue;
+    });
+  }, [storageKey, key, setCustomState]);
+
+  return [value, setValue];
+}
+
 const STORAGE_KEY = "pt_page_states";
 
 // Serialize Map to JSON-compatible format

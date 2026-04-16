@@ -24,7 +24,6 @@ export const AllIncompleteProcesses = () => {
   const handleContinue = (activeProcess: string, lastLocation: string | null) => {
     // Navigate to the appropriate feature based on active process
     const routes: Record<string, string> = {
-      'Read Me The Bible': '/read-me-the-bible',
       'Palace Study': '/palace',
       'Daily Devotional': '/devotional',
       'Memory Palace': '/memory-palace'

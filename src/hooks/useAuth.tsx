@@ -10,23 +10,42 @@ export const useAuth = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set up auth state listener
+    let isMounted = true;
+
+    // Listener for ONGOING auth changes (does NOT control loading)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (!isMounted) return;
+        console.log("[Auth] State change event:", event, "User:", session?.user?.email ?? "none");
         setSession(session);
         setUser(session?.user ?? null);
-        setLoading(false);
+        // Do NOT set loading here — initial load handles that
       }
     );
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    // INITIAL load (controls loading state)
+    const initializeAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (!isMounted) return;
 
-    return () => subscription.unsubscribe();
+        if (error) {
+          console.error("[Auth] Error getting session:", error);
+        }
+        console.log("[Auth] Initial session check:", session?.user?.email ?? "no session", "Expires:", session?.expires_at ? new Date(session.expires_at * 1000).toISOString() : "n/a");
+        setSession(session);
+        setUser(session?.user ?? null);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    initializeAuth();
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {

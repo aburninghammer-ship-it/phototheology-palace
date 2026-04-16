@@ -1,0 +1,2 @@
+ALTER TABLE public.bible_images DROP CONSTRAINT bible_images_room_type_check;
+ALTER TABLE public.bible_images ADD CONSTRAINT bible_images_room_type_check CHECK (room_type = ANY (ARRAY['translation'::text, '24fps'::text, 'Chapter Image'::text]));

@@ -134,11 +134,30 @@ export function AnnouncementsAdmin({ churchId }: AnnouncementsAdminProps) {
         if (error) throw error;
         toast.success("Announcement updated");
       } else {
-        const { error } = await supabase
+        const { data: newAnnouncement, error } = await supabase
           .from('church_announcements')
-          .insert(announcementData);
+          .insert(announcementData)
+          .select()
+          .single();
         if (error) throw error;
         toast.success("Announcement created");
+
+        // Send email notifications to church members (fire-and-forget)
+        if (newAnnouncement) {
+          supabase.functions.invoke('send-church-notification-email', {
+            body: {
+              churchId,
+              notificationType: 'announcement',
+              referenceId: newAnnouncement.id,
+              title: title.trim(),
+              message: message.trim(),
+            }
+          }).then(res => {
+            if (res.data?.sent > 0) {
+              toast.success(`Email sent to ${res.data.sent} members`);
+            }
+          }).catch(err => console.error('Email notification error:', err));
+        }
       }
 
       setDialogOpen(false);

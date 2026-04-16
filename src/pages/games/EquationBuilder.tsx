@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,6 +34,7 @@ const DOCTRINE_PROMPTS = [
 
 export default function EquationBuilder() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [availablePieces, setAvailablePieces] = useState<string[]>([]);
   const [selectedPieces, setSelectedPieces] = useState<string[]>([]);
@@ -66,17 +69,17 @@ export default function EquationBuilder() {
 
   const shareEquationToCommunity = async () => {
     if (!user) {
-      toast.error("Please sign in to share");
+      toast.error(t('games.equationBuilder.errorSignIn'));
       return;
     }
 
     if (selectedPieces.length < 3) {
-      toast.error("Build an equation with at least 3 pieces first");
+      toast.error(t('games.equationBuilder.errorMinPieces'));
       return;
     }
 
     if (!explanation.trim()) {
-      toast.error("Add an explanation before sharing");
+      toast.error(t('games.equationBuilder.errorAddExplanation'));
       return;
     }
 
@@ -155,10 +158,10 @@ Can you improve this equation or offer insights? Share your thoughts!`;
         }
       });
 
-      toast.success("Equation shared to community! All online users notified.");
+      toast.success(t('games.equationBuilder.sharedToCommunity'));
     } catch (error) {
       console.error("Error sharing to community:", error);
-      toast.error("Failed to share to community");
+      toast.error(t('games.equationBuilder.errorSharing'));
     } finally {
       setSharingToCommunity(false);
     }
@@ -166,11 +169,11 @@ Can you improve this equation or offer insights? Share your thoughts!`;
 
   const handleSubmit = async () => {
     if (selectedPieces.length < 3) {
-      toast.error("Build an equation with at least 3 pieces");
+      toast.error(t('games.equationBuilder.errorMinPieces'));
       return;
     }
     if (!explanation.trim()) {
-      toast.error("Explain what your equation means");
+      toast.error(t('games.equationBuilder.errorExplainEquation'));
       return;
     }
 
@@ -192,19 +195,19 @@ Can you improve this equation or offer insights? Share your thoughts!`;
 
       if (clarity === "excellent") {
         setScore(prev => prev + 3);
-        toast.success(`Gospel clarity! +3 points. ${feedback}`);
+        toast.success(t('games.equationBuilder.gospelClarity', { feedback }));
       } else if (clarity === "good") {
         setScore(prev => prev + 2);
-        toast.success(`Good equation! +2 points. ${feedback}`);
+        toast.success(t('games.equationBuilder.goodEquation', { feedback }));
       } else {
         setScore(prev => prev + 1);
-        toast.info(`Needs work: ${feedback}`);
+        toast.info(t('games.equationBuilder.needsWork', { feedback }));
       }
       
       startRound();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to validate equation");
+      toast.error(t('games.equationBuilder.errorValidation'));
     } finally {
       setIsSubmitting(false);
     }
@@ -216,21 +219,21 @@ Can you improve this equation or offer insights? Share your thoughts!`;
         <div className="flex justify-between items-center mb-8">
           <Button variant="ghost" onClick={() => navigate("/games")} className="text-white">
             <ArrowLeft className="mr-2" />
-            Back
+            {t('common.back')}
           </Button>
           <h1 className="text-4xl font-bold text-fuchsia-400" style={{ fontFamily: "'Cinzel', serif" }}>
-            🧮 EQUATION BUILDER
+            {t('games.equationBuilder.title')}
           </h1>
           <div className="text-right">
             <div className="text-fuchsia-400 text-3xl font-bold">{score}</div>
-            <div className="text-fuchsia-200/60 text-sm">POINTS</div>
+            <div className="text-fuchsia-200/60 text-sm">{t('games.common.points')}</div>
           </div>
         </div>
 
         <div className="max-w-5xl mx-auto space-y-6">
           <Card className="bg-black/40 border-fuchsia-500/50">
             <CardHeader>
-              <CardTitle className="text-fuchsia-300">Doctrine Challenge</CardTitle>
+              <CardTitle className="text-fuchsia-300">{t('games.equationBuilder.doctrineChallenge')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl text-fuchsia-100 font-bold text-center py-4">
@@ -243,13 +246,13 @@ Can you improve this equation or offer insights? Share your thoughts!`;
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-fuchsia-300">
                 <Calculator className="w-5 h-5" />
-                Your Equation (3-5 pieces)
+                {t('games.equationBuilder.yourEquation')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="bg-black/60 border border-fuchsia-500/30 rounded-lg p-4 min-h-20 flex items-center gap-2 mb-4">
                 {selectedPieces.length === 0 ? (
-                  <span className="text-fuchsia-200/40">Click pieces below to build equation...</span>
+                  <span className="text-fuchsia-200/40">{t('games.equationBuilder.clickPieces')}</span>
                 ) : (
                   selectedPieces.map((piece, idx) => (
                     <Button
@@ -282,13 +285,13 @@ Can you improve this equation or offer insights? Share your thoughts!`;
 
           <Card className="bg-black/40 border-fuchsia-500/50">
             <CardHeader>
-              <CardTitle className="text-fuchsia-300">Explain Your Equation</CardTitle>
+              <CardTitle className="text-fuchsia-300">{t('games.equationBuilder.explainEquation')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <Textarea
                 value={explanation}
                 onChange={(e) => setExplanation(e.target.value)}
-                placeholder="Explain what each piece means and how your equation answers the doctrine challenge..."
+                placeholder={t('games.equationBuilder.explanationPlaceholder')}
                 className="bg-black/60 border-fuchsia-500/30 text-white min-h-32"
               />
               
@@ -311,12 +314,12 @@ Can you improve this equation or offer insights? Share your thoughts!`;
                     {sharingToCommunity ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Sharing...
+                        {t('games.equationBuilder.sharing')}
                       </>
                     ) : (
                       <>
                         <Share2 className="h-4 w-4 mr-2" />
-                        Share to Community
+                        {t('games.equationBuilder.shareToCommunity')}
                       </>
                     )}
                   </Button>
@@ -325,16 +328,17 @@ Can you improve this equation or offer insights? Share your thoughts!`;
 
               <div className="flex gap-2">
                 <Button onClick={handleSubmit} disabled={isSubmitting} className="flex-1">
-                  {isSubmitting ? "Validating..." : "Submit Equation"}
+                  {isSubmitting ? t('games.common.validating') : t('games.equationBuilder.submitEquation')}
                 </Button>
                 <Button onClick={startRound} variant="outline">
-                  New Challenge
+                  {t('games.equationBuilder.newChallenge')}
                 </Button>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
+      <FloatingGameChat gameType="equation-builder" />
     </div>
   );
 }

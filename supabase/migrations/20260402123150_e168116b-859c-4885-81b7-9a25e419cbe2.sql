@@ -1,0 +1,1 @@
+UPDATE daily_audio_devotionals SET status = 'pending', updated_at = now() WHERE day_number = 92;

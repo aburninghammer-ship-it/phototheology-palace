@@ -50,12 +50,12 @@ export const OnboardingGuide = ({ roomId, roomName, onComplete }: OnboardingGuid
   const steps = [
     {
       title: "Welcome to the Story Room! 🎬",
-      description: "You're about to learn the foundation of biblical memory - breaking stories into memorable 'beats'.",
+      description: "You're about to learn the foundation of the entire Palace - storing Bible stories as vivid mental movies.",
       icon: Sparkles,
       gradient: STEP_GRADIENTS[0],
       content: (
         <div className="space-y-3 text-sm">
-          <p className="text-muted-foreground">Think of Bible stories like movies. Each major event is a "beat" - a single, memorable frame.</p>
+          <p className="text-muted-foreground">Think of Bible stories like movies. Each major moment is a scene you store — a vivid piece of furniture in your Palace.</p>
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -66,7 +66,7 @@ export const OnboardingGuide = ({ roomId, roomName, onComplete }: OnboardingGuid
               <p className="text-xs text-muted-foreground">Dream → Coat → Pit → Caravan → Prison → Palace</p>
             </div>
           </motion.div>
-          <p className="text-muted-foreground">That's 6 beats that tell the whole arc. Simple. Memorable. Powerful.</p>
+          <p className="text-muted-foreground">That's 6 scenes stored as a mental movie. Simple. Vivid. Permanent furniture in your Palace.</p>
         </div>
       )
     },
@@ -98,8 +98,8 @@ export const OnboardingGuide = ({ roomId, roomName, onComplete }: OnboardingGuid
       )
     },
     {
-      title: "Create Your Beats",
-      description: "Use the practice area below to write 3-7 punchy beats.",
+      title: "Store Your Scenes",
+      description: "Use the practice area below to identify 3-7 vivid scenes.",
       icon: Target,
       gradient: STEP_GRADIENTS[2],
       content: (
@@ -111,8 +111,8 @@ export const OnboardingGuide = ({ roomId, roomName, onComplete }: OnboardingGuid
           >
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-green-500/10" />
             <div className="relative p-4 border-l-4 border-emerald-500">
-              <p className="font-semibold mb-1">✅ Good Beats:</p>
-              <p className="text-xs text-muted-foreground">Coat, Pit, Caravan (concrete nouns)</p>
+              <p className="font-semibold mb-1">✅ Good Scenes:</p>
+              <p className="text-xs text-muted-foreground">Coat, Pit, Caravan (concrete, vivid, storable)</p>
             </div>
           </motion.div>
           <motion.div 

@@ -1,0 +1,1 @@
+ALTER TABLE public.pre_approved_emails ADD COLUMN IF NOT EXISTS winback_email_sent_at timestamptz DEFAULT NULL;

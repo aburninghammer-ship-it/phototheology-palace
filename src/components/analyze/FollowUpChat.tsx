@@ -5,9 +5,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  MessageCircle, Send, Loader2, Sparkles, ThumbsUp, ThumbsDown, 
-  Lightbulb, ChevronDown, ChevronUp, BookOpen, Save, FileText
+import {
+  MessageCircle, Send, Loader2, Sparkles, ThumbsUp, ThumbsDown,
+  Lightbulb, ChevronDown, ChevronUp, BookOpen, Save, FileText, Copy, BookmarkPlus
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -322,6 +322,49 @@ export const FollowUpChat = ({
     }
   };
 
+  const copyMessage = (content: string) => {
+    navigator.clipboard.writeText(content);
+    toast.success("Copied to clipboard!");
+  };
+
+  const saveIndividualMessage = async (messageIndex: number) => {
+    const message = messages[messageIndex];
+    if (message.role !== "assistant") return;
+
+    const userQuestion = messageIndex > 0 ? messages[messageIndex - 1]?.content : "Follow-up question";
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Please log in to save");
+        return;
+      }
+
+      const date = new Date().toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      const content = `# Jeeves Follow-up Response\n\n**Date:** ${date}\n\n**Context:** Thought Analysis Follow-up\n\n---\n\n## Question\n\n${userQuestion}\n\n## Jeeves Response\n\n${message.content}\n`;
+
+      const { error } = await supabase.from('user_studies').insert({
+        user_id: user.id,
+        title: `Follow-up: ${userQuestion.slice(0, 50)}${userQuestion.length > 50 ? '...' : ''}`,
+        content,
+        tags: ['jeeves', 'follow-up', 'thought-analysis'],
+        category: 'jeeves_response',
+      });
+
+      if (error) throw error;
+      toast.success("Saved to My Studies!");
+    } catch (error) {
+      console.error("Error saving message:", error);
+      toast.error("Failed to save");
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -477,7 +520,27 @@ export const FollowUpChat = ({
                                   </div>
                                 </div>
                                 <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/30">
-                                  <QuickAudioButton text={msg.content} variant="ghost" size="sm" />
+                                  <div className="flex items-center gap-1">
+                                    <QuickAudioButton text={msg.content} variant="ghost" size="sm" />
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+                                      onClick={() => copyMessage(msg.content)}
+                                      title="Copy response"
+                                    >
+                                      <Copy className="h-3 w-3" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-7 w-7 p-0 text-muted-foreground hover:text-emerald-400"
+                                      onClick={() => saveIndividualMessage(i)}
+                                      title="Save to My Studies"
+                                    >
+                                      <BookmarkPlus className="h-3 w-3" />
+                                    </Button>
+                                  </div>
                                   <div className="flex items-center gap-1">
                                     <span className="text-xs text-muted-foreground mr-1">Helpful?</span>
                                     <Button

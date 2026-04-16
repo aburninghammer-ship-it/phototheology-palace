@@ -1,0 +1,1 @@
+INSERT INTO pre_approved_emails (email, access_type) VALUES ('kenandpam337@gmail.com', 'promotional_1_months') ON CONFLICT (email) DO UPDATE SET access_type = 'promotional_1_months';

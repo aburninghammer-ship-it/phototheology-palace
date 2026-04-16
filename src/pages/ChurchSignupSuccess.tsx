@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +14,7 @@ import { toast } from "sonner";
 type Status = "verifying" | "success" | "error";
 
 export default function ChurchSignupSuccess() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const location = useLocation();
@@ -28,7 +30,7 @@ export default function ChurchSignupSuccess() {
 
     if (!user) {
       setStatus("error");
-      setErrorMessage("Please sign in to finish setting up your church admin dashboard.");
+      setErrorMessage(t('church.errorSignInToFinish'));
       return;
     }
 
@@ -40,7 +42,7 @@ export default function ChurchSignupSuccess() {
     });
 
     if (error || !data?.success) {
-      const msg = (data && data.error) || error?.message || "Could not finish church setup.";
+      const msg = (data && data.error) || error?.message || t('church.errorCouldNotFinish');
       setStatus("error");
       setErrorMessage(msg);
       toast.error(msg);
@@ -49,7 +51,7 @@ export default function ChurchSignupSuccess() {
 
     setChurchId(data.church_id || null);
     setStatus("success");
-    toast.success("Church setup complete");
+    toast.success(t('church.setupComplete'));
   }, [sessionId, user]);
 
   useEffect(() => {
@@ -64,14 +66,14 @@ export default function ChurchSignupSuccess() {
 
   if (status === "verifying") {
     return (
-      <div className="min-h-screen gradient-dreamy flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="max-w-md w-full">
           <CardContent className="pt-6">
             <div className="text-center">
               <Loader2 className="h-16 w-16 animate-spin text-primary mx-auto mb-4" />
-              <h1 className="text-2xl font-bold mb-2">Finalizing Your Church Setup...</h1>
+              <h1 className="text-2xl font-bold mb-2">{t('church.finalizingSetup')}</h1>
               <p className="text-muted-foreground">
-                Creating your church workspace and admin dashboard.
+                {t('church.finalizingDescription')}
               </p>
             </div>
           </CardContent>
@@ -84,7 +86,7 @@ export default function ChurchSignupSuccess() {
     const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
 
     return (
-      <div className="min-h-screen gradient-dreamy">
+      <div className="min-h-screen bg-background">
         <Navigation />
 
         <div className="container mx-auto max-w-2xl px-4 py-20">
@@ -93,30 +95,30 @@ export default function ChurchSignupSuccess() {
               <div className="flex items-center justify-center">
                 <XCircle className="h-16 w-16 text-destructive" />
               </div>
-              <CardTitle className="text-center">Setup Not Finished Yet</CardTitle>
+              <CardTitle className="text-center">{t('church.setupNotFinished')}</CardTitle>
               <CardDescription className="text-center">
-                {errorMessage || "We couldn't confirm your church setup."}
+                {errorMessage || t('church.errorCouldNotConfirm')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Alert>
                 <AlertDescription>
-                  If youre not signed in, please sign in and then retry. If you are signed in and this keeps happening, contact support and include your checkout session id.
+                  {t('church.errorHelpText')}
                 </AlertDescription>
               </Alert>
 
               <div className="grid gap-2 sm:grid-cols-2">
                 {!user ? (
-                  <Button onClick={() => navigate(`/auth?redirect=${redirect}`)}>Sign In</Button>
+                  <Button onClick={() => navigate(`/auth?redirect=${redirect}`)}>{t('common.signIn')}</Button>
                 ) : (
-                  <Button onClick={finalize}>Retry Setup</Button>
+                  <Button onClick={finalize}>{t('church.retrySetup')}</Button>
                 )}
-                <Button variant="outline" onClick={() => navigate("/church-admin")}>Go to Church Admin</Button>
+                <Button variant="outline" onClick={() => navigate("/church-admin")}>{t('church.goToChurchAdmin')}</Button>
               </div>
 
               {sessionId && (
                 <div className="text-xs text-muted-foreground">
-                  Session: {sessionId}
+                  {t('church.session')}: {sessionId}
                 </div>
               )}
             </CardContent>
@@ -129,7 +131,7 @@ export default function ChurchSignupSuccess() {
   }
 
   return (
-    <div className="min-h-screen gradient-dreamy">
+    <div className="min-h-screen bg-background">
       <Navigation />
 
       <div className="container mx-auto max-w-2xl px-4 py-20">
@@ -137,17 +139,17 @@ export default function ChurchSignupSuccess() {
           <CardContent className="pt-6">
             <div className="text-center">
               <CheckCircle className="h-16 w-16 text-primary mx-auto mb-4" />
-              <h1 className="text-3xl font-bold mb-2">Church Setup Complete!</h1>
+              <h1 className="text-3xl font-bold mb-2">{t('church.churchSetupComplete')}</h1>
               <p className="text-muted-foreground mb-6">
-                Your church space is ready. You can now manage members, invitations, campaigns, and Living Manna.
+                {t('church.churchSetupCompleteDescription')}
               </p>
 
               {churchId && (
-                <div className="text-xs text-muted-foreground mb-6">Church ID: {churchId}</div>
+                <div className="text-xs text-muted-foreground mb-6">{t('church.churchId')}: {churchId}</div>
               )}
 
               <Button onClick={() => navigate("/church-admin")} size="lg" className="w-full">
-                Go to Admin Dashboard
+                {t('church.goToAdminDashboard')}
               </Button>
             </div>
           </CardContent>
@@ -158,4 +160,3 @@ export default function ChurchSignupSuccess() {
     </div>
   );
 }
-

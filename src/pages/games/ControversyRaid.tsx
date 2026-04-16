@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Swords, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 
 const WARFARE_CARDS = [
   { code: "|GC", name: "Great Controversy Wall" },
@@ -27,6 +29,7 @@ const TARGET_ISSUES = [
 
 export default function ControversyRaid() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [hand, setHand] = useState<typeof WARFARE_CARDS>([]);
   const [currentIssue, setCurrentIssue] = useState("");
   const [selectedCard, setSelectedCard] = useState("");
@@ -49,11 +52,11 @@ export default function ControversyRaid() {
 
   const handleSubmit = async () => {
     if (!selectedCard) {
-      toast.error("Select a card to use");
+      toast.error(t('games.controversyRaid.errorSelectCard'));
       return;
     }
     if (!diagnosis.trim()) {
-      toast.error("Write your biblical diagnosis");
+      toast.error(t('games.controversyRaid.errorWriteDiagnosis'));
       return;
     }
 
@@ -75,14 +78,14 @@ export default function ControversyRaid() {
 
       if (isTight) {
         setScore(prev => prev + points);
-        toast.success(`Stronghold captured! +${points} points`);
+        toast.success(t('games.controversyRaid.strongholdCaptured', { points }));
         startRound();
       } else {
-        toast.error(`Diagnosis weak: ${feedback}`);
+        toast.error(t('games.controversyRaid.diagnosisWeak', { feedback }));
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to validate");
+      toast.error(t('games.common.errorValidation'));
     } finally {
       setIsSubmitting(false);
     }
@@ -94,14 +97,14 @@ export default function ControversyRaid() {
         <div className="flex justify-between items-center mb-8">
           <Button variant="ghost" onClick={() => navigate("/games")} className="text-white">
             <ArrowLeft className="mr-2" />
-            Back
+            {t('common.back')}
           </Button>
           <h1 className="text-4xl font-bold text-rose-400" style={{ fontFamily: "'Cinzel', serif" }}>
-            ⚔️ CONTROVERSY RAID
+            {t('games.controversyRaid.title')}
           </h1>
           <div className="text-right">
             <div className="text-rose-400 text-3xl font-bold">{score}</div>
-            <div className="text-rose-200/60 text-sm">STRONGHOLDS</div>
+            <div className="text-rose-200/60 text-sm">{t('games.controversyRaid.strongholds')}</div>
           </div>
         </div>
 
@@ -110,7 +113,7 @@ export default function ControversyRaid() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-rose-300">
                 <Swords className="w-6 h-6" />
-                Target Issue
+                {t('games.controversyRaid.targetIssue')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -124,7 +127,7 @@ export default function ControversyRaid() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-rose-300">
                 <Shield className="w-6 h-6" />
-                Your Warfare Cards
+                {t('games.controversyRaid.warfareCards')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -146,27 +149,28 @@ export default function ControversyRaid() {
 
           <Card className="bg-black/40 border-rose-500/50">
             <CardHeader>
-              <CardTitle className="text-rose-300">Biblical Diagnosis</CardTitle>
+              <CardTitle className="text-rose-300">{t('games.controversyRaid.biblicalDiagnosis')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <Textarea
                 value={diagnosis}
                 onChange={(e) => setDiagnosis(e.target.value)}
-                placeholder="Use your selected card to diagnose this issue biblically. Include at least one verse..."
+                placeholder={t('games.controversyRaid.diagnosisPlaceholder')}
                 className="bg-black/60 border-rose-500/30 text-white min-h-40"
               />
               <div className="flex gap-2">
                 <Button onClick={handleSubmit} disabled={isSubmitting} className="flex-1">
-                  {isSubmitting ? "Validating..." : "Capture Stronghold"}
+                  {isSubmitting ? t('games.common.validating') : t('games.controversyRaid.captureStronghold')}
                 </Button>
                 <Button onClick={startRound} variant="outline">
-                  New Issue
+                  {t('games.controversyRaid.newIssue')}
                 </Button>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
+      <FloatingGameChat gameType="controversy-raid" />
     </div>
   );
 }

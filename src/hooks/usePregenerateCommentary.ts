@@ -40,7 +40,8 @@ export const usePregenerateCommentary = (verses: SequenceVerse[]) => {
     };
 
     // Start pre-generation after a short delay to not block UI
-    const timer = setTimeout(pregenerate, 1000);
+    // Reduced from 1000ms to 200ms for faster mobile experience
+    const timer = setTimeout(pregenerate, 200);
     return () => clearTimeout(timer);
   }, [verses]);
 };

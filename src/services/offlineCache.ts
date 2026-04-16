@@ -1,4 +1,5 @@
 import { Chapter } from "@/types/bible";
+import { isValidChapter } from "@/data/bibleBooks";
 
 const CACHE_KEY_PREFIX = "bible_chapter_";
 const CACHE_EXPIRY_DAYS = 30;
@@ -170,13 +171,16 @@ export const preCacheSurrounding = async (
   ];
   
   for (const item of toCache) {
-    if (item.chapter < 1) continue;
+    // Validate chapter is within valid range for the book
+    if (!isValidChapter(item.book, item.chapter)) continue;
     
     const cached = getCachedChapter(item.book, item.chapter, item.translation);
     if (!cached) {
       try {
         const data = await fetchFn(item.book, item.chapter, item.translation);
-        cacheChapter(item.book, item.chapter, item.translation, data);
+        if (data.verses && data.verses.length > 0) {
+          cacheChapter(item.book, item.chapter, item.translation, data);
+        }
       } catch {
         // Silently fail for pre-caching
       }

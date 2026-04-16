@@ -72,7 +72,7 @@ export const GuidedPathChecklist = ({ className, minimized = false }: GuidedPath
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 20 }}
         className={cn(
-          "fixed bottom-4 right-4 z-40 w-80",
+          "fixed bottom-24 md:bottom-4 right-4 z-40 w-80",
           "bg-background/95 backdrop-blur-lg border border-border rounded-xl shadow-2xl",
           className
         )}
@@ -173,7 +173,7 @@ export const GuidedPathChecklist = ({ className, minimized = false }: GuidedPath
                 <div className="p-4 pt-0">
                   <Button 
                     className="w-full" 
-                    onClick={() => navigate('/gems-room')}
+                    onClick={() => navigate('/give-me-a-gem')}
                   >
                     <Sparkles className="w-4 h-4 mr-2" />
                     Save Your First Gem

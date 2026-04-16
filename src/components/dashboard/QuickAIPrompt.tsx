@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Bot, Send, Sparkles, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { VoiceInput } from "@/components/analyze/VoiceInput";
 
 const quickPrompts = [
   "Explain sanctuary typology",
@@ -28,6 +29,10 @@ export function QuickAIPrompt() {
     navigate(`/jeeves?q=${encodeURIComponent(prompt)}`);
   };
 
+  const handleVoiceTranscript = (text: string) => {
+    setQuery(prev => prev + (prev ? " " : "") + text);
+  };
+
   return (
     <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-background to-accent/5">
       <CardContent className="p-4 space-y-4">
@@ -47,13 +52,17 @@ export function QuickAIPrompt() {
           </div>
         </div>
 
-        {/* Input */}
+        {/* Input with Voice */}
         <form onSubmit={handleSubmit} className="flex gap-2">
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Ask anything about the Bible..."
             className="flex-1 bg-background/50 border-primary/20 focus:border-primary"
+          />
+          <VoiceInput 
+            onTranscript={handleVoiceTranscript} 
+            disabled={false}
           />
           <Button 
             type="submit" 

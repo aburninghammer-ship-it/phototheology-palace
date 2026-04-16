@@ -1,8 +1,11 @@
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Youtube, Globe, Play } from "lucide-react";
 
 export default function PowerOfTheLamb() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-900 via-red-800 to-orange-900">
       {/* Header */}
@@ -14,10 +17,10 @@ export default function PowerOfTheLamb() {
             </div>
           </div>
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
-            Power of the Lamb
+            {t('palace.powerOfTheLamb.title')}
           </h1>
           <p className="text-xl text-red-100 max-w-2xl mx-auto leading-relaxed">
-            Discovering the transformative power of Christ through deep biblical teaching and prophetic insight
+            {t('palace.powerOfTheLamb.subtitle')}
           </p>
         </div>
       </div>
@@ -31,10 +34,10 @@ export default function PowerOfTheLamb() {
                 <div className="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center">
                   <Youtube className="w-7 h-7 text-white" />
                 </div>
-                <CardTitle className="text-2xl text-foreground">YouTube Channel</CardTitle>
+                <CardTitle className="text-2xl text-foreground">{t('palace.powerOfTheLamb.youtubeChannel')}</CardTitle>
               </div>
               <p className="text-muted-foreground">
-                Watch powerful teachings, sermons, and prophetic messages
+                {t('palace.powerOfTheLamb.youtubeDesc')}
               </p>
             </CardHeader>
             <CardContent className="pt-6 space-y-4">
@@ -42,10 +45,10 @@ export default function PowerOfTheLamb() {
                 <div className="text-center space-y-4">
                   <div className="text-6xl mb-4">📺</div>
                   <h3 className="text-2xl font-bold text-foreground mb-2">
-                    Watch Our Content
+                    {t('palace.powerOfTheLamb.watchOurContent')}
                   </h3>
                   <p className="text-foreground/80 leading-relaxed">
-                    Discover powerful teachings, sermons, and prophetic messages on our YouTube channel
+                    {t('palace.powerOfTheLamb.watchOurContentDesc')}
                   </p>
                 </div>
               </div>
@@ -63,13 +66,13 @@ export default function PowerOfTheLamb() {
                     className="flex items-center justify-center gap-2"
                   >
                     <Youtube className="w-5 h-5" />
-                    Visit YouTube Channel
+                    {t('palace.powerOfTheLamb.visitYouTube')}
                     <ExternalLink className="w-4 h-4" />
                   </a>
                 </Button>
 
                 <p className="text-center text-sm text-muted-foreground">
-                  Subscribe for weekly biblical teachings and prophetic insights
+                  {t('palace.powerOfTheLamb.subscribeWeekly')}
                 </p>
               </div>
             </CardContent>
@@ -82,10 +85,10 @@ export default function PowerOfTheLamb() {
                 <div className="w-12 h-12 rounded-full bg-orange-600 flex items-center justify-center">
                   <Globe className="w-7 h-7 text-white" />
                 </div>
-                <CardTitle className="text-2xl text-foreground">Official Website</CardTitle>
+                <CardTitle className="text-2xl text-foreground">{t('palace.powerOfTheLamb.officialWebsite')}</CardTitle>
               </div>
               <p className="text-muted-foreground">
-                Explore articles, resources, and ministry updates
+                {t('palace.powerOfTheLamb.websiteDesc')}
               </p>
             </CardHeader>
             <CardContent className="pt-6 space-y-6">
@@ -96,8 +99,7 @@ export default function PowerOfTheLamb() {
                     powerofthelamb.com
                   </h3>
                   <p className="text-foreground/80 leading-relaxed">
-                    Your source for in-depth biblical teaching, prophetic analysis, 
-                    and spiritual resources to deepen your walk with Christ.
+                    {t('palace.powerOfTheLamb.websiteLongDesc')}
                   </p>
                 </div>
               </div>
@@ -115,13 +117,13 @@ export default function PowerOfTheLamb() {
                     className="flex items-center justify-center gap-2"
                   >
                     <Globe className="w-5 h-5" />
-                    Visit Website
+                    {t('palace.powerOfTheLamb.visitWebsite')}
                     <ExternalLink className="w-4 h-4" />
                   </a>
                 </Button>
 
                 <p className="text-center text-sm text-muted-foreground">
-                  Discover biblical truths and prophetic insights
+                  {t('palace.powerOfTheLamb.discoverTruths')}
                 </p>
               </div>
             </CardContent>
@@ -133,32 +135,32 @@ export default function PowerOfTheLamb() {
           <Card className="bg-white/95 backdrop-blur-sm border-2 border-red-200">
             <CardHeader className="bg-gradient-to-r from-red-50 via-orange-50 to-red-50">
               <CardTitle className="text-2xl text-center text-foreground">
-                Ministry Focus
+                {t('palace.powerOfTheLamb.ministryFocus')}
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="grid md:grid-cols-3 gap-6">
                 <div className="text-center p-6 bg-gradient-to-br from-red-50 to-orange-50 rounded-lg border border-red-200">
                   <div className="text-4xl mb-3">📚</div>
-                  <h4 className="font-bold text-lg mb-2 text-foreground">Biblical Teaching</h4>
+                  <h4 className="font-bold text-lg mb-2 text-foreground">{t('palace.powerOfTheLamb.biblicalTeaching')}</h4>
                   <p className="text-sm text-foreground/80">
-                    Deep dives into Scripture with Phototheology principles and prophetic understanding
+                    {t('palace.powerOfTheLamb.biblicalTeachingDesc')}
                   </p>
                 </div>
 
                 <div className="text-center p-6 bg-gradient-to-br from-orange-50 to-red-50 rounded-lg border border-orange-200">
                   <div className="text-4xl mb-3">🔮</div>
-                  <h4 className="font-bold text-lg mb-2 text-foreground">Prophetic Insight</h4>
+                  <h4 className="font-bold text-lg mb-2 text-foreground">{t('palace.powerOfTheLamb.propheticInsight')}</h4>
                   <p className="text-sm text-foreground/80">
-                    Understanding end-time prophecies and their relevance to current events
+                    {t('palace.powerOfTheLamb.propheticInsightDesc')}
                   </p>
                 </div>
 
                 <div className="text-center p-6 bg-gradient-to-br from-red-50 to-orange-50 rounded-lg border border-red-200">
                   <div className="text-4xl mb-3">✝️</div>
-                  <h4 className="font-bold text-lg mb-2 text-foreground">Spiritual Formation</h4>
+                  <h4 className="font-bold text-lg mb-2 text-foreground">{t('palace.powerOfTheLamb.spiritualFormation')}</h4>
                   <p className="text-sm text-foreground/80">
-                    Practical guidance for growing in Christ and living out biblical principles
+                    {t('palace.powerOfTheLamb.spiritualFormationDesc')}
                   </p>
                 </div>
               </div>
@@ -173,11 +175,10 @@ export default function PowerOfTheLamb() {
               <div className="max-w-2xl mx-auto space-y-6">
                 <div className="text-5xl">🔥</div>
                 <h2 className="text-3xl md:text-4xl font-bold">
-                  Join the Movement
+                  {t('palace.powerOfTheLamb.joinTheMovement')}
                 </h2>
                 <p className="text-xl text-red-100 leading-relaxed">
-                  Connect with a community passionate about understanding God&apos;s Word 
-                  through the power of visual theology and prophetic insight.
+                  {t('palace.powerOfTheLamb.joinDesc')}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
                   <Button 
@@ -192,7 +193,7 @@ export default function PowerOfTheLamb() {
                       className="flex items-center gap-2"
                     >
                       <Youtube className="w-5 h-5" />
-                      Subscribe on YouTube
+                      {t('palace.powerOfTheLamb.subscribeOnYouTube')}
                     </a>
                   </Button>
                   <Button 
@@ -208,7 +209,7 @@ export default function PowerOfTheLamb() {
                       className="flex items-center gap-2"
                     >
                       <Globe className="w-5 h-5" />
-                      Explore Website
+                      {t('palace.powerOfTheLamb.exploreWebsite')}
                     </a>
                   </Button>
                 </div>

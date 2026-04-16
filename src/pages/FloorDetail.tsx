@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
-import { palaceFloors } from "@/data/palaceData";
+import { useTranslation } from 'react-i18next';
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,17 +14,19 @@ import { motion } from "framer-motion";
 import { SequentialMasteryNotice } from "@/components/palace/SequentialMasteryNotice";
 
 export default function FloorDetail() {
+  const { t } = useTranslation();
+  const { translatedFloors } = useTranslatedPalaceData();
   const { floorNumber } = useParams();
   const { user } = useAuth();
-  const floor = palaceFloors.find(f => f.number === Number(floorNumber));
+  const floor = translatedFloors.find(f => f.number === Number(floorNumber));
 
   if (!floor) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">Floor Not Found</h1>
+          <h1 className="text-4xl font-bold mb-4">{t('floorDetail.notFound')}</h1>
           <Link to="/palace">
-            <Button>Return to Palace</Button>
+            <Button>{t('floorDetail.returnToPalace')}</Button>
           </Link>
         </div>
       </div>
@@ -32,7 +35,7 @@ export default function FloorDetail() {
 
   const gradient = [
     "gradient-palace",
-    "gradient-royal", 
+    "gradient-royal",
     "gradient-ocean",
     "gradient-forest",
     "gradient-sunset",
@@ -42,87 +45,85 @@ export default function FloorDetail() {
   ][floor.number - 1];
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <div className="min-h-screen bg-gradient-subtle overflow-y-auto">
       <Navigation />
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="container mx-auto px-4 py-8 pb-24 max-w-6xl">
         <Link to="/palace">
           <Button variant="ghost" className="mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Palace
+            {t('floorDetail.backToPalace')}
           </Button>
         </Link>
 
         <div className={`${gradient} rounded-2xl p-10 mb-8 text-white relative overflow-hidden shadow-2xl`}>
-          {/* Animated background pattern */}
           <div className="absolute inset-0 opacity-10 pointer-events-none">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl animate-pulse" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
           </div>
-          
+
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <Badge variant="outline" className="text-white border-white/70 text-lg px-4 py-1 font-bold backdrop-blur-sm bg-white/10">
-                  Floor {floor.number}
+                  {t('floorDetail.floor', { number: floor.number })}
                 </Badge>
                 <Badge variant="outline" className="text-white border-white/70 px-4 py-1 backdrop-blur-sm bg-white/10">
-                  {floor.rooms.length} Rooms ✨
+                  {t('floorDetail.rooms', { count: floor.rooms.length })}
                 </Badge>
               </div>
               <HowItWorksDialog
-                title={`How to Use Floor ${floor.number}`}
+                title={t('floorDetail.howToUse', { number: floor.number })}
                 steps={[
                   {
-                    title: `Floor ${floor.number}: ${floor.name}`,
-                    description: floor.description,
+                    title: `${t('floorDetail.floor', { number: floor.number })}: ${t(`floorDetail.floorName${floor.number}`, floor.name)}`,
+                    description: t(`floorDetail.floorDesc${floor.number}`, floor.description),
                     highlights: [
-                      floor.subtitle,
-                      `${floor.rooms.length} rooms to explore`,
-                      "Each room teaches specific principles"
+                      t(`floorDetail.floorSubtitle${floor.number}`, floor.subtitle),
+                      t('floorDetail.roomsToExplore', { count: floor.rooms.length }),
+                      t('floorDetail.eachRoomTeaches')
                     ],
                     icon: Layers,
                   },
                   {
-                    title: "Room Cards",
-                    description: "Each card represents a room on this floor. Click any room card to dive deeper into its specific teachings and exercises.",
+                    title: t('floorDetail.roomCards'),
+                    description: t('floorDetail.roomCardsDesc'),
                     highlights: [
-                      "Room code and full name",
-                      "Detailed description",
-                      "Click to explore"
+                      t('floorDetail.roomCodeAndName'),
+                      t('floorDetail.detailedDesc'),
+                      t('floorDetail.clickToExplore')
                     ],
                     icon: BookOpen,
                   },
                   {
-                    title: "Room Codes",
-                    description: "Every room has a unique code (like SR, OR, CR) used throughout the Phototheology system for quick reference.",
+                    title: t('floorDetail.roomCodes'),
+                    description: t('floorDetail.roomCodesDesc'),
                     highlights: [
-                      "Short memorable codes",
-                      "Used in Bible study",
-                      "Part of PT language"
+                      t('floorDetail.shortCodes'),
+                      t('floorDetail.usedInStudy'),
+                      t('floorDetail.partOfPTLanguage')
                     ],
                     icon: Code,
                   },
                   {
-                    title: "Practical Application",
-                    description: "Use these rooms when studying Scripture to organize your insights and apply the correct principles to each passage.",
+                    title: t('floorDetail.practicalApp'),
+                    description: t('floorDetail.practicalAppDesc'),
                     highlights: [
-                      "Systematic Bible study",
-                      "Organized thinking",
-                      "Christ-centered approach"
+                      t('floorDetail.systematicStudy'),
+                      t('floorDetail.organizedThinking'),
+                      t('floorDetail.christCentered')
                     ],
                     icon: Lightbulb,
                   },
                 ]}
               />
             </div>
-            
-            <h1 className="text-5xl md:text-6xl font-serif font-black mb-3 drop-shadow-2xl tracking-tight">{floor.name}</h1>
-            <p className="text-2xl md:text-3xl mb-5 opacity-95 font-medium drop-shadow-lg">{floor.subtitle} ✨</p>
-            <p className="text-lg opacity-90 leading-relaxed max-w-3xl drop-shadow-md">{floor.description}</p>
+
+            <h1 className="text-5xl md:text-6xl font-serif font-black mb-3 drop-shadow-2xl tracking-tight">{t(`floorDetail.floorName${floor.number}`, floor.name)}</h1>
+            <p className="text-2xl md:text-3xl mb-5 opacity-95 font-medium drop-shadow-lg">{t(`floorDetail.floorSubtitle${floor.number}`, floor.subtitle)} ✨</p>
+            <p className="text-lg opacity-90 leading-relaxed max-w-3xl drop-shadow-md">{t(`floorDetail.floorDesc${floor.number}`, floor.description)}</p>
           </div>
         </div>
 
-        {/* Sequential Mastery Notice */}
         <div className="mb-6">
           <SequentialMasteryNotice floorNumber={floor.number} />
         </div>

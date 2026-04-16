@@ -2,11 +2,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Share2, Facebook, Twitter, Linkedin, Copy, Check, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { Share2, Facebook, Twitter, Linkedin, Copy, Check, Mail } from "lucide-react";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
 
 interface EnhancedSocialShareProps {
   title: string;
@@ -17,6 +14,10 @@ interface EnhancedSocialShareProps {
   buttonVariant?: "default" | "outline" | "secondary" | "ghost" | "link" | "destructive";
 }
 
+const openIntent = (intentUrl: string) => {
+  window.open(intentUrl, "_blank", "noopener,noreferrer,width=600,height=500");
+};
+
 export const EnhancedSocialShare = ({
   title,
   content,
@@ -25,104 +26,38 @@ export const EnhancedSocialShare = ({
   buttonText = "Share",
   buttonVariant = "outline"
 }: EnhancedSocialShareProps) => {
-  const { user } = useAuth();
   const [open, setOpen] = useState(false);
-  const [customMessage, setCustomMessage] = useState(defaultMessage || `${title}\n\n${content}`);
-  const [posting, setPosting] = useState<string | null>(null);
+  const suiteUrl = "https://phototheologybible.com";
+  // Ensure we always share the production URL, not dev/supabase URLs
+  const shareUrl = url.includes('phototheologybible.com') ? url : url.replace(/https?:\/\/[^/]+/, suiteUrl);
+  const [customMessage, setCustomMessage] = useState(defaultMessage || `${title}\n\n${content}\n\n— Shared from Phototheology Palace\n✨ Explore more: ${suiteUrl}`);
   const [copied, setCopied] = useState(false);
-
-  const { data: connections } = useQuery({
-    queryKey: ['social-connections', user?.id],
-    queryFn: async () => {
-      if (!user) return [];
-      const { data, error } = await supabase
-        .from('social_media_connections')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('is_active', true);
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user && open,
-  });
-
-  const isConnected = (platform: string) => {
-    return connections?.some(c => c.platform === platform);
-  };
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(`${customMessage}\n\n${url}`);
+      await navigator.clipboard.writeText(`${customMessage}\n\n${shareUrl}`);
       setCopied(true);
       toast.success("Copied to clipboard!");
       setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
+    } catch {
       toast.error("Failed to copy");
     }
   };
 
-  const handlePost = async (platform: 'facebook' | 'twitter' | 'linkedin') => {
-    if (!user) {
-      toast.error("Please sign in to share");
-      return;
-    }
-
-    if (!isConnected(platform)) {
-      toast.error(`Please connect your ${platform} account first in Profile Settings`);
-      return;
-    }
-
-    setPosting(platform);
-
-    try {
-      const { error } = await supabase.functions.invoke('post-to-social', {
-        body: {
-          platform,
-          content: customMessage,
-          url,
-        }
-      });
-
-      if (error) throw error;
-
-      toast.success(`Posted to ${platform} successfully!`);
-      setOpen(false);
-    } catch (error: any) {
-      console.error(`Error posting to ${platform}:`, error);
-      toast.error(error.message || `Failed to post to ${platform}`);
-    } finally {
-      setPosting(null);
-    }
+  const handleTwitter = () => {
+    openIntent(`https://twitter.com/intent/tweet?text=${encodeURIComponent(customMessage)}&url=${encodeURIComponent(shareUrl)}`);
   };
 
-  const handleNativeShare = async (platform: 'facebook' | 'twitter' | 'linkedin') => {
-    // Try Web Share API first (most reliable)
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: title,
-          text: customMessage,
-          url: url,
-        });
-        toast.success("Shared successfully!");
-        return;
-      } catch (error) {
-        // User cancelled or share failed, continue to fallback
-        if ((error as Error).name !== 'AbortError') {
-          console.error('Web Share API error:', error);
-        }
-      }
-    }
+  const handleFacebook = () => {
+    openIntent(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(customMessage)}`);
+  };
 
-    // Fallback: Copy to clipboard and show platform-specific instructions
-    try {
-      await navigator.clipboard.writeText(`${customMessage}\n\n${url}`);
-      const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
-      toast.success(`Link copied! Open ${platformName} to paste and share.`);
-    } catch (error) {
-      toast.error("Unable to share. Please copy the link manually.");
-    }
+  const handleLinkedIn = () => {
+    openIntent(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`);
+  };
+
+  const handleEmail = () => {
+    window.location.href = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`${customMessage}\n\n${shareUrl}`)}`;
   };
 
   return (
@@ -133,12 +68,12 @@ export const EnhancedSocialShare = ({
           {buttonText}
         </Button>
       </DialogTrigger>
-      
+
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Share {title}</DialogTitle>
           <DialogDescription>
-            Customize your message and share to your connected social accounts
+            Customize your message, then share to any platform
           </DialogDescription>
         </DialogHeader>
 
@@ -146,23 +81,8 @@ export const EnhancedSocialShare = ({
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-medium">Your Message</label>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleCopy}
-                className="h-8 gap-2"
-              >
-                {copied ? (
-                  <>
-                    <Check className="h-3 w-3" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-3 w-3" />
-                    Copy Message
-                  </>
-                )}
+              <Button variant="ghost" size="sm" onClick={handleCopy} className="h-8 gap-2">
+                {copied ? <><Check className="h-3 w-3" /> Copied!</> : <><Copy className="h-3 w-3" /> Copy</>}
               </Button>
             </div>
             <Textarea
@@ -170,61 +90,30 @@ export const EnhancedSocialShare = ({
               onChange={(e) => setCustomMessage(e.target.value)}
               rows={4}
               placeholder="Add your thoughts..."
-              className="w-full"
             />
-            <p className="text-xs text-muted-foreground mt-1">
-              💡 Tip: Click "Copy Message" then paste into your social post
-            </p>
           </div>
 
           <div>
             <label className="text-sm font-medium mb-2 block">Share Link</label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={url}
-                readOnly
-                className="flex-1 px-3 py-2 text-sm border rounded-md bg-muted"
-              />
-            </div>
+            <input type="text" value={shareUrl} readOnly className="w-full px-3 py-2 text-sm border rounded-md bg-muted" />
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium block">Share To</label>
-            <div className="grid grid-cols-3 gap-2">
-              <Button
-                variant="outline"
-                className="gap-2"
-                onClick={() => handleNativeShare('facebook')}
-              >
-                <Facebook className="h-4 w-4 text-blue-600" />
-                Facebook
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="outline" className="gap-2" onClick={handleTwitter}>
+                <Twitter className="h-4 w-4 text-sky-500" /> X / Twitter
               </Button>
-
-              <Button
-                variant="outline"
-                className="gap-2"
-                onClick={() => handleNativeShare('twitter')}
-              >
-                <Twitter className="h-4 w-4 text-sky-500" />
-                Twitter
+              <Button variant="outline" className="gap-2" onClick={handleFacebook}>
+                <Facebook className="h-4 w-4 text-blue-600" /> Facebook
               </Button>
-
-              <Button
-                variant="outline"
-                className="gap-2"
-                onClick={() => handleNativeShare('linkedin')}
-              >
-                <Linkedin className="h-4 w-4 text-blue-700" />
-                LinkedIn
+              <Button variant="outline" className="gap-2" onClick={handleLinkedIn}>
+                <Linkedin className="h-4 w-4 text-blue-700" /> LinkedIn
+              </Button>
+              <Button variant="outline" className="gap-2" onClick={handleEmail}>
+                <Mail className="h-4 w-4" /> Email
               </Button>
             </div>
-            
-            {!user && (
-              <p className="text-xs text-muted-foreground mt-2">
-                Sign in to connect social accounts for direct posting
-              </p>
-            )}
           </div>
         </div>
       </DialogContent>

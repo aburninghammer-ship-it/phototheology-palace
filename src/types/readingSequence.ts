@@ -1,4 +1,5 @@
-import { VoiceId } from "@/hooks/useTextToSpeech";
+// Voice ID type for reading sequences
+type VoiceId = string;
 
 export interface SequenceItem {
   id: string;

@@ -19,6 +19,7 @@ import { useOfflineNotes, OfflineNote } from "@/hooks/useOfflineNotes";
 import { format } from "date-fns";
 import { useSparks } from "@/hooks/useSparks";
 import { SparkContainer, SparkSettings } from "@/components/sparks";
+import { VoiceInputButton } from "@/components/ui/VoiceInputButton";
 
 interface QuickNotesProps {
   className?: string;
@@ -253,18 +254,31 @@ export const QuickNotes = ({ className = "", compact = false }: QuickNotesProps)
         {isAdding && (
           <Card className="mb-4 border-primary/30">
             <CardContent className="pt-4 space-y-3">
-              <Input
-                placeholder="Note title (optional)"
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-              />
-              <Textarea
-                placeholder="Write your thoughts, contemplations, insights..."
-                value={newContent}
-                onChange={(e) => setNewContent(e.target.value)}
-                className="min-h-[100px]"
-                autoFocus
-              />
+              <div className="relative">
+                <Input
+                  placeholder="Note title (optional)"
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  className="pr-10"
+                />
+                <VoiceInputButton
+                  onTranscript={(text) => setNewTitle(prev => prev + (prev ? ' ' : '') + text)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2"
+                />
+              </div>
+              <div className="relative">
+                <Textarea
+                  placeholder="Write your thoughts, contemplations, insights..."
+                  value={newContent}
+                  onChange={(e) => setNewContent(e.target.value)}
+                  className="min-h-[100px] pr-10"
+                  autoFocus
+                />
+                <VoiceInputButton
+                  onTranscript={(text) => setNewContent(prev => prev + (prev ? ' ' : '') + text)}
+                  className="absolute right-2 top-2"
+                />
+              </div>
               <div className="flex gap-2">
                 <Button onClick={handleAddNote} disabled={!newContent.trim()}>
                   <Check className="h-4 w-4 mr-1" />
@@ -288,17 +302,30 @@ export const QuickNotes = ({ className = "", compact = false }: QuickNotesProps)
                 <CardContent className="pt-4">
                   {editingId === note.id ? (
                     <div className="space-y-3">
-                      <Input
-                        value={editTitle}
-                        onChange={(e) => setEditTitle(e.target.value)}
-                        placeholder="Title"
-                      />
-                      <Textarea
-                        value={editContent}
-                        onChange={(e) => setEditContent(e.target.value)}
-                        className="min-h-[80px]"
-                        autoFocus
-                      />
+                      <div className="relative">
+                        <Input
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          placeholder="Title"
+                          className="pr-10"
+                        />
+                        <VoiceInputButton
+                          onTranscript={(text) => setEditTitle(prev => prev + (prev ? ' ' : '') + text)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2"
+                        />
+                      </div>
+                      <div className="relative">
+                        <Textarea
+                          value={editContent}
+                          onChange={(e) => setEditContent(e.target.value)}
+                          className="min-h-[80px] pr-10"
+                          autoFocus
+                        />
+                        <VoiceInputButton
+                          onTranscript={(text) => setEditContent(prev => prev + (prev ? ' ' : '') + text)}
+                          className="absolute right-2 top-2"
+                        />
+                      </div>
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-muted-foreground">Auto-saving...</span>
                         <Button size="sm" variant="ghost" onClick={stopEditing}>

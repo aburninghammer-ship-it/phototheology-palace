@@ -10,6 +10,8 @@ import { SANCTUARY_STRONGHOLD_ARTICLES, STRONGHOLD_BLUEPRINT_INTRO } from "@/dat
 import { useToast } from "@/hooks/use-toast";
 import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
 import { BlueprintMap } from "@/components/blueprint/BlueprintMap";
+import { BlueprintEnhancedFeatures } from "@/components/blueprint/BlueprintEnhancedFeatures";
+import { useTranslation } from "react-i18next";
 
 const STORAGE_KEY = "stronghold_blueprint_progress";
 
@@ -18,6 +20,7 @@ export default function BlueprintStronghold() {
   const [notes, setNotes] = useState<Record<number, string>>({});
   const [completedArticles, setCompletedArticles] = useState<number[]>([]);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -28,14 +31,14 @@ export default function BlueprintStronghold() {
     }
   }, []);
 
-  const currentArticle = selectedArticle 
-    ? SANCTUARY_STRONGHOLD_ARTICLES.find(a => a.id === selectedArticle) 
+  const currentArticle = selectedArticle
+    ? SANCTUARY_STRONGHOLD_ARTICLES.find(a => a.id === selectedArticle)
     : null;
 
   const handleComplete = (articleId: number) => {
     const newCompleted = [...completedArticles, articleId];
     setCompletedArticles(newCompleted);
-    
+
     const progressData = {
       notes,
       completed: newCompleted
@@ -43,15 +46,15 @@ export default function BlueprintStronghold() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(progressData));
 
     toast({
-      title: "Progress saved!",
-      description: `${SANCTUARY_STRONGHOLD_ARTICLES.find(a => a.id === articleId)?.name} completed`,
+      title: t('common.progressSaved'),
+      description: t('common.articleCompleted', { name: SANCTUARY_STRONGHOLD_ARTICLES.find(a => a.id === articleId)?.name }),
     });
   };
 
   const handleNotesChange = (articleId: number, value: string) => {
     const newNotes = { ...notes, [articleId]: value };
     setNotes(newNotes);
-    
+
     const progressData = {
       notes: newNotes,
       completed: completedArticles
@@ -62,7 +65,7 @@ export default function BlueprintStronghold() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
+
       <main className="container mx-auto px-4 py-8 space-y-8">
         {!selectedArticle ? (
           <>
@@ -76,14 +79,14 @@ export default function BlueprintStronghold() {
               </p>
               <div className="flex justify-center">
                 <EnhancedSocialShare
-                  title="The Sanctuary Blueprint for Breaking Strongholds & Habits"
-                  content="God's 6-step architectural demolition plan for sin patterns, addictions, and mental strongholds."
+                  title={t('blueprint.stronghold.shareTitle')}
+                  content={t('blueprint.stronghold.shareContent')}
                   url={window.location.href}
-                  defaultMessage="⚡ This resource is a game-changer for anyone fighting strongholds:\n\nThe Sanctuary Blueprint for Breaking Strongholds maps God's 6-step freedom process—from renunciation and accountability to renewed mind and covenant identity.\n\nStrongholds break by process, not willpower. 🔥🛡️"
-                  buttonText="Share This Resource"
+                  defaultMessage={t('blueprint.stronghold.shareDefaultMessage')}
+                  buttonText={t('blueprint.common.shareThisResource')}
                 />
               </div>
-              
+
               {/* Sanctuary Explanation */}
               <div className="max-w-4xl mx-auto bg-muted/30 p-8 rounded-lg border-2 border-primary/30">
                 <div className="prose prose-sm max-w-none dark:prose-invert">
@@ -107,27 +110,28 @@ export default function BlueprintStronghold() {
               items={SANCTUARY_STRONGHOLD_ARTICLES.map(article => ({
                 id: article.id,
                 name: article.name,
-                step: `Step ${article.id}`
+                step: t('blueprint.common.stepLabel', { step: article.id })
               }))}
               completedItems={completedArticles}
               onItemClick={setSelectedArticle}
             />
           </>
         ) : (
+          <>
           <Card>
             <CardHeader>
-              <Button 
-                variant="ghost" 
-                onClick={() => setSelectedArticle(null)} 
+              <Button
+                variant="ghost"
+                onClick={() => setSelectedArticle(null)}
                 className="w-fit mb-4"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Overview
+                {t('common.backToOverview')}
               </Button>
               <div className="flex items-center gap-2 mb-2">
-                <Badge variant="secondary">Step {currentArticle?.id} of 6</Badge>
+                <Badge variant="secondary">{t('blueprint.common.stepOfTotal', { step: currentArticle?.id, total: 6 })}</Badge>
                 {completedArticles.includes(currentArticle?.id || 0) && (
-                  <Badge className="bg-green-500">Completed</Badge>
+                  <Badge className="bg-green-500">{t('common.completed')}</Badge>
                 )}
               </div>
               <div className="flex items-start gap-3">
@@ -147,7 +151,7 @@ export default function BlueprintStronghold() {
                   <div className="bg-muted p-4 rounded-lg">
                     <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
                       <BookOpen className="h-5 w-5 text-primary" />
-                      Sanctuary Meaning
+                      {t('blueprint.common.sanctuaryMeaning')}
                     </h3>
                     <p className="text-base">{currentArticle?.sanctuaryMeaning}</p>
                   </div>
@@ -155,7 +159,7 @@ export default function BlueprintStronghold() {
                   <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
                     <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
                       <Shield className="h-5 w-5 text-primary" />
-                      Stronghold Principle
+                      {t('blueprint.stronghold.strongholdPrinciple')}
                     </h3>
                     <p className="text-lg font-semibold text-primary">
                       "{currentArticle?.strongholdPrinciple}"
@@ -163,7 +167,7 @@ export default function BlueprintStronghold() {
                   </div>
 
                   <div>
-                    <h3 className="font-semibold text-lg mb-3 text-primary">Teaching</h3>
+                    <h3 className="font-semibold text-lg mb-3 text-primary">{t('blueprint.common.teaching')}</h3>
                     <div className="prose prose-sm max-w-none">
                       <p className="whitespace-pre-line leading-relaxed">
                         {currentArticle?.detailedTeaching}
@@ -172,7 +176,7 @@ export default function BlueprintStronghold() {
                   </div>
 
                   <div className="bg-yellow-50 dark:bg-yellow-950 p-4 rounded-lg">
-                    <h3 className="font-semibold text-lg mb-3">💭 Reflection Questions</h3>
+                    <h3 className="font-semibold text-lg mb-3">{t('blueprint.common.reflectionQuestions')}</h3>
                     <ul className="space-y-2">
                       {currentArticle?.reflectionQuestions.map((question, i) => (
                         <li key={i} className="text-sm">• {question}</li>
@@ -181,7 +185,7 @@ export default function BlueprintStronghold() {
                   </div>
 
                   <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg">
-                    <h3 className="font-semibold text-lg mb-3">⚡ Action Steps</h3>
+                    <h3 className="font-semibold text-lg mb-3">{t('blueprint.stronghold.actionSteps')}</h3>
                     <ol className="space-y-3">
                       {currentArticle?.actionSteps.map((step, i) => (
                         <li key={i} className="text-sm">
@@ -192,7 +196,7 @@ export default function BlueprintStronghold() {
                   </div>
 
                   <div className="bg-purple-50 dark:bg-purple-950 p-4 rounded-lg">
-                    <h3 className="font-semibold text-lg mb-3">📖 Scripture References</h3>
+                    <h3 className="font-semibold text-lg mb-3">{t('blueprint.common.scriptureReferences')}</h3>
                     <ul className="space-y-1">
                       {currentArticle?.scriptureReferences.map((ref, i) => (
                         <li key={i} className="text-sm">• {ref}</li>
@@ -201,14 +205,14 @@ export default function BlueprintStronghold() {
                   </div>
 
                   <div className="bg-primary/10 p-4 rounded-lg border border-primary/20">
-                    <h3 className="font-semibold text-lg mb-2 text-primary">🙏 Prayer</h3>
+                    <h3 className="font-semibold text-lg mb-2 text-primary">{t('blueprint.common.prayerHeading')}</h3>
                     <p className="italic text-base">{currentArticle?.prayerPrompt}</p>
                   </div>
 
                   <div className="space-y-3">
-                    <h3 className="font-semibold text-lg">📝 Your Notes & Reflections</h3>
+                    <h3 className="font-semibold text-lg">{t('blueprint.common.yourNotesAndReflections')}</h3>
                     <Textarea
-                      placeholder="Write your thoughts, insights, and action commitments here..."
+                      placeholder={t('blueprint.stronghold.notesPlaceholder')}
                       className="min-h-[150px]"
                       value={notes[currentArticle?.id || 0] || ""}
                       onChange={(e) => handleNotesChange(currentArticle?.id || 0, e.target.value)}
@@ -222,13 +226,30 @@ export default function BlueprintStronghold() {
                       onClick={() => handleComplete(currentArticle?.id || 0)}
                     >
                       <CheckCircle2 className="mr-2 h-5 w-5" />
-                      Mark as Complete
+                      {t('common.markAsComplete')}
                     </Button>
                   )}
                 </div>
               </ScrollArea>
             </CardContent>
           </Card>
+
+          {/* Interactive Study Tools */}
+          <BlueprintEnhancedFeatures
+            blueprintType="stronghold"
+            currentArticleId={currentArticle?.id}
+            currentArticleTitle={currentArticle?.name}
+            currentArticleContent={currentArticle?.detailedTeaching}
+            dailyCheckItems={[
+              t('blueprint.stronghold.dailyCheck.readArticle'),
+              t('blueprint.stronghold.dailyCheck.identifiedPattern'),
+              t('blueprint.stronghold.dailyCheck.replacedLie'),
+              t('blueprint.stronghold.dailyCheck.prayedAgainst'),
+              t('blueprint.stronghold.dailyCheck.memorizedScripture'),
+              t('blueprint.stronghold.dailyCheck.sharedVictory')
+            ]}
+          />
+          </>
         )}
       </main>
     </div>

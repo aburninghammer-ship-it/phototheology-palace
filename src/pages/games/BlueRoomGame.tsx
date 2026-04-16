@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trophy, ArrowLeft, Church } from "lucide-react";
+import { Trophy, ArrowLeft, Church, LayoutGrid } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
@@ -56,34 +58,31 @@ type QuizQuestion = {
   correct: string;
 };
 
-export default function BlueRoomGame() {
-  const navigate = useNavigate();
+function shuffleArray<T>(array: T[]): T[] {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+}
+
+// 2D Quiz Game Component
+function QuizGame({ onComplete }: { onComplete: (score: number, total: number) => void }) {
+  const { t } = useTranslation();
   const { toast } = useToast();
-  const { user } = useAuth();
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [scoreSaved, setScoreSaved] = useState(false);
   const [score, setScore] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
   const [revealed, setRevealed] = useState(false);
   const [quizQuestions] = useState<QuizQuestion[]>(() => {
-    // Generate matching questions with shuffled order AND shuffled options
     const questions = sanctuaryItems.map(item => ({
       item: item.name,
       options: shuffleArray([...sanctuaryItems.map(i => i.meaning)]),
       correct: item.meaning
     }));
-    // Shuffle the question order so they're not always in the same sequence
     return shuffleArray(questions);
   });
-
-  function shuffleArray<T>(array: T[]): T[] {
-    const newArray = [...array];
-    for (let i = newArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-    }
-    return newArray;
-  }
 
   const question = quizQuestions[currentQuestion];
   const itemData = sanctuaryItems.find(i => i.name === question.item)!;
@@ -92,8 +91,8 @@ export default function BlueRoomGame() {
   const handleSubmit = () => {
     if (!selectedAnswer) {
       toast({
-        title: "Select an Answer",
-        description: "Choose the meaning of this sanctuary item!",
+        title: t('games.blueRoom.selectAnswer'),
+        description: t('games.blueRoom.chooseMeaning'),
         variant: "destructive",
       });
       return;
@@ -104,13 +103,13 @@ export default function BlueRoomGame() {
     if (isCorrect) {
       setScore(score + 1);
       toast({
-        title: "✓ Correct!",
-        description: "You know the sanctuary blueprint!",
+        title: t('games.blueRoom.correct'),
+        description: t('games.blueRoom.knowBlueprint'),
       });
     } else {
       toast({
-        title: "Not Quite",
-        description: "Study the sanctuary pattern more!",
+        title: t('games.blueRoom.notQuite'),
+        description: t('games.blueRoom.studyMore'),
         variant: "destructive",
       });
     }
@@ -123,65 +122,214 @@ export default function BlueRoomGame() {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer("");
       setRevealed(false);
+    } else {
+      onComplete(score + (selectedAnswer === question.correct ? 1 : 0), quizQuestions.length);
     }
   };
 
-  const isComplete = currentQuestion === quizQuestions.length - 1 && revealed;
+  return (
+    <>
+      <Card className="mb-6">
+        <CardHeader>
+          <div className="flex items-center justify-between mb-2">
+            <Badge variant="secondary">{t('games.blueRoom.floorBadge')}</Badge>
+            <Badge variant="outline">
+              {currentQuestion + 1} / {quizQuestions.length}
+            </Badge>
+          </div>
+          <CardTitle className="text-3xl">{t('games.blueRoom.sanctuaryBlueprint')}</CardTitle>
+          <CardDescription>
+            {t('games.blueRoom.quizDescription')}
+          </CardDescription>
+          <Progress value={progress} className="mt-4" />
+        </CardHeader>
+      </Card>
 
-  // Save score when game completes
-  useEffect(() => {
-    const saveScore = async () => {
-      if (isComplete && user && !scoreSaved) {
-        try {
-          await supabase.from("game_scores").insert({
-            user_id: user.id,
-            game_type: "blue_room",
-            score: score,
-            mode: "solo",
-          });
-          setScoreSaved(true);
-        } catch (error) {
-          console.error("Error saving score:", error);
-        }
+      <Card className="mb-6">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Church className="h-8 w-8 text-blue-500" />
+            <CardTitle className="text-2xl">{question.item}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {!revealed && (
+            <>
+              <p className="text-muted-foreground">
+                {t('games.blueRoom.whatDoesRepresent')}
+              </p>
+
+              <div className="space-y-3">
+                {question.options.map((option, index) => (
+                  <Button
+                    key={index}
+                    variant={selectedAnswer === option ? "default" : "outline"}
+                    className="w-full h-auto py-4 text-left justify-start"
+                    onClick={() => setSelectedAnswer(option)}
+                  >
+                    <span className="mr-3 font-bold">{String.fromCharCode(65 + index)}.</span>
+                    {option}
+                  </Button>
+                ))}
+              </div>
+
+              <Button
+                onClick={handleSubmit}
+                disabled={!selectedAnswer}
+                className="w-full"
+                size="lg"
+              >
+                {t('games.common.submitAnswer')}
+              </Button>
+            </>
+          )}
+
+          {revealed && (
+            <>
+              <div className={`p-4 rounded-lg ${
+                selectedAnswer === question.correct
+                  ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                  : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+              }`}>
+                <h4 className="font-semibold mb-2">
+                  {selectedAnswer === question.correct ? t('games.blueRoom.correct') : t('games.blueRoom.notQuiteResult')}
+                </h4>
+                {selectedAnswer !== question.correct && (
+                  <p className="text-sm mb-2">{t('games.blueRoom.youSelected', { answer: selectedAnswer })}</p>
+                )}
+                <p className="text-sm">{t('games.blueRoom.correctAnswer', { answer: question.correct })}</p>
+              </div>
+
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg space-y-3">
+                <h4 className="font-semibold text-blue-800 dark:text-blue-400">
+                  {t('games.blueRoom.fullExplanation')}
+                </h4>
+                <p className="text-sm">
+                  <strong>{t('games.blueRoom.meaning')}</strong> {itemData.meaning}
+                </p>
+                <p className="text-sm">
+                  <strong>{t('games.blueRoom.reference')}</strong> {itemData.reference}
+                </p>
+                <p className="text-sm">
+                  <strong>{t('games.blueRoom.gospelConnection')}</strong> {itemData.gospel}
+                </p>
+              </div>
+
+              <Button onClick={handleNext} className="w-full" size="lg">
+                {currentQuestion < quizQuestions.length - 1 ? t('games.blueRoom.nextItem') : t('games.common.finish')}
+              </Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="bg-amber-50 dark:bg-amber-900/20">
+        <CardContent className="pt-6">
+          <h4 className="font-semibold mb-2">{t('games.blueRoom.tipTitle')}</h4>
+          <p className="text-sm text-muted-foreground">
+            {t('games.blueRoom.tipDescription')}
+          </p>
+        </CardContent>
+      </Card>
+    </>
+  );
+}
+
+
+// Completion Screen
+function CompletionScreen({
+  score,
+  total,
+  onPlayAgain,
+  onBack
+}: {
+  score: number;
+  total: number;
+  onPlayAgain: () => void;
+  onBack: () => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div className="grid md:grid-cols-2 gap-6">
+      <Card className="text-center">
+        <CardHeader>
+          <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
+          <CardTitle className="text-3xl">{t('games.blueRoom.mastered')}</CardTitle>
+          <CardDescription>
+            {t('games.blueRoom.masteredDescription')}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="text-4xl font-bold text-primary">
+            {score} / {total}
+          </div>
+          <p className="text-muted-foreground">
+            {t('games.blueRoom.quoteHebrews85')}
+          </p>
+          <div className="flex gap-4 justify-center">
+            <Button onClick={onBack}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {t('games.common.backToGames')}
+            </Button>
+            <Button onClick={onPlayAgain} variant="outline">
+              {t('games.common.playAgain')}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+      <GameLeaderboard gameType="blue_room" currentScore={score} />
+    </div>
+  );
+}
+
+export default function BlueRoomGame() {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const [viewMode] = useState<'quiz'>('quiz');
+  const [isComplete, setIsComplete] = useState(false);
+  const [finalScore, setFinalScore] = useState({ score: 0, total: 0 });
+  const [scoreSaved, setScoreSaved] = useState(false);
+
+  const handleComplete = async (score: number, total: number) => {
+    setFinalScore({ score, total });
+    setIsComplete(true);
+
+    // Save score
+    if (user && !scoreSaved) {
+      try {
+        await supabase.from("game_scores").insert({
+          user_id: user.id,
+          game_type: "blue_room",
+          score: score,
+          mode: "solo",
+        });
+        setScoreSaved(true);
+      } catch (error) {
+        console.error("Error saving score:", error);
       }
-    };
-    saveScore();
-  }, [isComplete, user, score, scoreSaved]);
+    }
+  };
+
+  const handlePlayAgain = () => {
+    setIsComplete(false);
+    setFinalScore({ score: 0, total: 0 });
+    setScoreSaved(false);
+    // Force re-render of quiz by changing key
+    window.location.reload();
+  };
 
   if (isComplete) {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
         <main className="container mx-auto px-4 py-8 max-w-6xl">
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card className="text-center">
-              <CardHeader>
-                <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
-                <CardTitle className="text-3xl">Blue Room Mastered!</CardTitle>
-                <CardDescription>
-                  You know the sanctuary blueprint!
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-4xl font-bold text-primary">
-                  {score} / {quizQuestions.length}
-                </div>
-                <p className="text-muted-foreground">
-                  "Make all things according to the pattern" - Hebrews 8:5
-                </p>
-                <div className="flex gap-4 justify-center">
-                  <Button onClick={() => navigate("/games")}>
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Games
-                  </Button>
-                  <Button onClick={() => window.location.reload()} variant="outline">
-                    Play Again
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-            <GameLeaderboard gameType="blue_room" currentScore={score} />
-          </div>
+          <CompletionScreen 
+            score={finalScore.score}
+            total={finalScore.total}
+            onPlayAgain={handlePlayAgain}
+            onBack={() => navigate("/games")}
+          />
         </main>
       </div>
     );
@@ -197,112 +345,12 @@ export default function BlueRoomGame() {
           className="mb-4"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Games
+          {t('games.common.backToGames')}
         </Button>
 
-        <Card className="mb-6">
-          <CardHeader>
-            <div className="flex items-center justify-between mb-2">
-              <Badge variant="secondary">Floor 5 • Blue Room (BL)</Badge>
-              <Badge variant="outline">
-                {currentQuestion + 1} / {quizQuestions.length}
-              </Badge>
-            </div>
-            <CardTitle className="text-3xl">⛪ Sanctuary Blueprint</CardTitle>
-            <CardDescription>
-              Match each sanctuary article to its gospel meaning. The sanctuary is the map of salvation!
-            </CardDescription>
-            <Progress value={progress} className="mt-4" />
-          </CardHeader>
-        </Card>
-
-        <Card className="mb-6">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <Church className="h-8 w-8 text-blue-500" />
-              <CardTitle className="text-2xl">{question.item}</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {!revealed && (
-              <>
-                <p className="text-muted-foreground">
-                  What does this sanctuary article represent in the gospel?
-                </p>
-
-                <div className="space-y-3">
-                  {question.options.map((option, index) => (
-                    <Button
-                      key={index}
-                      variant={selectedAnswer === option ? "default" : "outline"}
-                      className="w-full h-auto py-4 text-left justify-start"
-                      onClick={() => setSelectedAnswer(option)}
-                    >
-                      <span className="mr-3 font-bold">{String.fromCharCode(65 + index)}.</span>
-                      {option}
-                    </Button>
-                  ))}
-                </div>
-
-                <Button
-                  onClick={handleSubmit}
-                  disabled={!selectedAnswer}
-                  className="w-full"
-                  size="lg"
-                >
-                  Submit Answer
-                </Button>
-              </>
-            )}
-
-            {revealed && (
-              <>
-                <div className={`p-4 rounded-lg ${
-                  selectedAnswer === question.correct
-                    ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                    : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
-                }`}>
-                  <h4 className="font-semibold mb-2">
-                    {selectedAnswer === question.correct ? "✓ Correct!" : "✗ Not Quite"}
-                  </h4>
-                  {selectedAnswer !== question.correct && (
-                    <p className="text-sm mb-2">You selected: {selectedAnswer}</p>
-                  )}
-                  <p className="text-sm">Correct answer: {question.correct}</p>
-                </div>
-
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg space-y-3">
-                  <h4 className="font-semibold text-blue-800 dark:text-blue-400">
-                    📖 Full Explanation:
-                  </h4>
-                  <p className="text-sm">
-                    <strong>Meaning:</strong> {itemData.meaning}
-                  </p>
-                  <p className="text-sm">
-                    <strong>Reference:</strong> {itemData.reference}
-                  </p>
-                  <p className="text-sm">
-                    <strong>Gospel Connection:</strong> {itemData.gospel}
-                  </p>
-                </div>
-
-                <Button onClick={handleNext} className="w-full" size="lg">
-                  {currentQuestion < quizQuestions.length - 1 ? "Next Item" : "Finish"}
-                </Button>
-              </>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="bg-amber-50 dark:bg-amber-900/20">
-          <CardContent className="pt-6">
-            <h4 className="font-semibold mb-2">💡 Blue Room Tip:</h4>
-            <p className="text-sm text-muted-foreground">
-              The sanctuary is God's blueprint of redemption. Every article points to Christ and the gospel. Nothing is random — it's all "according to the pattern" (Heb 8:5). Master this room and you'll unlock the visual language of salvation!
-            </p>
-          </CardContent>
-        </Card>
+        <QuizGame onComplete={handleComplete} />
       </main>
+      <FloatingGameChat gameType="blue-room" />
     </div>
   );
 }

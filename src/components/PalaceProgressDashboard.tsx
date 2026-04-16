@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { AudioExplorerBadge } from "@/components/audio/AudioExplorerBadge";
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -8,11 +10,12 @@ import { usePalaceProgress } from "@/hooks/usePalaceProgress";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { palaceFloors } from "@/data/palaceData";
-import { 
-  Building2, 
-  Flame, 
-  CheckCircle2, 
-  Lock, 
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
+import {
+  Building2,
+  Flame,
+  CheckCircle2,
+  Lock,
   ArrowRight,
   GraduationCap,
   BookOpen,
@@ -39,7 +42,7 @@ const roleIcons = {
 const roleRecommendations: Record<string, (completedRooms: Set<string>) => NextRoom[]> = {
   teacher: (completed) => {
     const recs: NextRoom[] = [];
-    
+
     if (!completed.has("1-sr")) {
       recs.push({
         floorNumber: 1,
@@ -50,7 +53,7 @@ const roleRecommendations: Record<string, (completedRooms: Set<string>) => NextR
         reason: "Master storytelling fundamentals—essential for teaching Scripture narratively"
       });
     }
-    
+
     if (completed.has("1-sr") && !completed.has("4-cr")) {
       recs.push({
         floorNumber: 4,
@@ -61,7 +64,7 @@ const roleRecommendations: Record<string, (completedRooms: Set<string>) => NextR
         reason: "Learn to center every lesson on Christ—core of biblical teaching"
       });
     }
-    
+
     if (completed.has("4-cr") && !completed.has("4-drm")) {
       recs.push({
         floorNumber: 4,
@@ -72,13 +75,13 @@ const roleRecommendations: Record<string, (completedRooms: Set<string>) => NextR
         reason: "Unlock multi-dimensional interpretation for richer teaching"
       });
     }
-    
+
     return recs;
   },
-  
+
   student: (completed) => {
     const recs: NextRoom[] = [];
-    
+
     if (!completed.has("1-sr")) {
       recs.push({
         floorNumber: 1,
@@ -89,7 +92,7 @@ const roleRecommendations: Record<string, (completedRooms: Set<string>) => NextR
         reason: "Build your foundation—memorize Bible stories in sequence"
       });
     }
-    
+
     if (completed.has("1-sr") && !completed.has("1-24fps")) {
       recs.push({
         floorNumber: 1,
@@ -100,7 +103,7 @@ const roleRecommendations: Record<string, (completedRooms: Set<string>) => NextR
         reason: "Create visual memory anchors for every chapter"
       });
     }
-    
+
     if (completed.has("1-24fps") && !completed.has("2-or")) {
       recs.push({
         floorNumber: 2,
@@ -111,13 +114,13 @@ const roleRecommendations: Record<string, (completedRooms: Set<string>) => NextR
         reason: "Sharpen your observation skills—see what others miss"
       });
     }
-    
+
     return recs;
   },
-  
+
   personal: (completed) => {
     const recs: NextRoom[] = [];
-    
+
     if (!completed.has("1-sr")) {
       recs.push({
         floorNumber: 1,
@@ -128,7 +131,7 @@ const roleRecommendations: Record<string, (completedRooms: Set<string>) => NextR
         reason: "Start your personal journey—learn Scripture's storyline"
       });
     }
-    
+
     if (completed.has("1-sr") && !completed.has("1-ir")) {
       recs.push({
         floorNumber: 1,
@@ -139,7 +142,7 @@ const roleRecommendations: Record<string, (completedRooms: Set<string>) => NextR
         reason: "Experience Scripture emotionally—step inside the stories"
       });
     }
-    
+
     if (completed.has("1-ir") && !completed.has("3-pf")) {
       recs.push({
         floorNumber: 3,
@@ -150,13 +153,13 @@ const roleRecommendations: Record<string, (completedRooms: Set<string>) => NextR
         reason: "Connect Scripture to your daily life and experiences"
       });
     }
-    
+
     return recs;
   },
-  
+
   church_leader: (completed) => {
     const recs: NextRoom[] = [];
-    
+
     if (!completed.has("1-sr")) {
       recs.push({
         floorNumber: 1,
@@ -167,7 +170,7 @@ const roleRecommendations: Record<string, (completedRooms: Set<string>) => NextR
         reason: "Build storytelling mastery for your congregation"
       });
     }
-    
+
     if (completed.has("1-sr") && !completed.has("4-cr")) {
       recs.push({
         floorNumber: 4,
@@ -178,7 +181,7 @@ const roleRecommendations: Record<string, (completedRooms: Set<string>) => NextR
         reason: "Ensure every sermon centers on Christ"
       });
     }
-    
+
     if (completed.has("4-cr") && !completed.has("5-bl")) {
       recs.push({
         floorNumber: 5,
@@ -189,12 +192,14 @@ const roleRecommendations: Record<string, (completedRooms: Set<string>) => NextR
         reason: "Master the sanctuary framework for teaching salvation"
       });
     }
-    
+
     return recs;
   }
 };
 
 export function PalaceProgressDashboard() {
+  const { t } = useTranslation();
+  const { translatedFloors } = useTranslatedPalaceData();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { completedRooms, totalRooms, progressPercentage, loading: progressLoading } = usePalaceProgress();
@@ -212,43 +217,39 @@ export function PalaceProgressDashboard() {
 
   const loadUserData = async () => {
     if (!user) return;
-    
+
     try {
-      // Fetch user role
       const { data: roleData } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", user.id)
         .maybeSingle();
-      
-      // Fetch profile for streak
+
       const { data: profile } = await supabase
         .from("profiles")
         .select("daily_study_streak, primary_role")
         .eq("id", user.id)
         .single();
-      
-      // Fetch completed rooms
+
       const { data: completed } = await supabase
         .from("room_progress")
         .select("floor_number, room_id")
         .eq("user_id", user.id)
         .not("completed_at", "is", null);
-      
+
       const role = roleData?.role || profile?.primary_role || "personal";
       setUserRole(role);
       setStreak(profile?.daily_study_streak || 0);
-      
+
       const completedSet = new Set(
         completed?.map(r => `${r.floor_number}-${r.room_id}`) || []
       );
       setCompletedRoomSet(completedSet);
-      
-      // Generate recommendations
+
       const getRecommendations = roleRecommendations[role] || roleRecommendations.personal;
       const recs = getRecommendations(completedSet);
       setRecommendations(recs.slice(0, 3));
-      
+
     } catch (error) {
       console.error("Error loading user data:", error);
     } finally {
@@ -264,16 +265,15 @@ export function PalaceProgressDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Progress Overview */}
       <Card variant="glass">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Building2 className="h-5 w-5" />
-                Palace Progress
+                {t('palaceProgress.title')}
               </CardTitle>
-              <CardDescription>Track your journey through the Eight-Floor Palace</CardDescription>
+              <CardDescription>{t('palaceProgress.subtitle')}</CardDescription>
             </div>
             <Badge variant="secondary" className="gap-1.5">
               <RoleIcon className="h-3.5 w-3.5" />
@@ -284,42 +284,43 @@ export function PalaceProgressDashboard() {
         <CardContent className="space-y-4">
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Overall Progress</span>
+              <span className="text-sm font-medium">{t('palaceProgress.overallProgress')}</span>
               <span className="text-sm text-muted-foreground">
                 {completedRooms} / {totalRooms} rooms
               </span>
             </div>
             <Progress value={progressPercentage} className="h-3" />
           </div>
-          
+
           <div className="flex items-center justify-between pt-2 border-t">
             <div className="flex items-center gap-2">
               <Flame className="h-5 w-5 text-orange-500" />
               <div>
                 <div className="text-2xl font-bold">{streak}</div>
-                <div className="text-xs text-muted-foreground">Day Streak</div>
+                <div className="text-xs text-muted-foreground">{t('palaceProgress.dayStreak')}</div>
               </div>
             </div>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => navigate("/palace")}
             >
-              View Full Palace
+              {t('palaceProgress.viewFullPalace')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Recommended Next Steps */}
+      <AudioExplorerBadge />
+
       <Card variant="glass">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ArrowRight className="h-5 w-5" />
-            Recommended Next Steps
+            {t('palaceProgress.recommendedNext')}
           </CardTitle>
           <CardDescription>
-            Based on your {userRole.replace('_', ' ')} role and progress
+            {t('palaceProgress.basedOnRole', { role: userRole.replace('_', ' ') })}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -353,22 +354,21 @@ export function PalaceProgressDashboard() {
           ) : (
             <div className="text-center py-8 text-muted-foreground">
               <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-green-500" />
-              <p className="font-medium">Amazing progress!</p>
-              <p className="text-sm">Continue exploring the palace at your own pace.</p>
+              <p className="font-medium">{t('palaceProgress.amazingProgress')}</p>
+              <p className="text-sm">{t('palaceProgress.continueExploring')}</p>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Floor Progress Breakdown */}
       <Card variant="glass">
         <CardHeader>
-          <CardTitle>Progress by Floor</CardTitle>
-          <CardDescription>See how you're advancing through each level</CardDescription>
+          <CardTitle>{t('palaceProgress.progressByFloor')}</CardTitle>
+          <CardDescription>{t('palaceProgress.advancingDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {palaceFloors.map((floor) => {
+            {translatedFloors.map((floor) => {
               const floorCompletedCount = floor.rooms.filter((room) =>
                 completedRoomSet.has(`${floor.number}-${room.id}`)
               ).length;

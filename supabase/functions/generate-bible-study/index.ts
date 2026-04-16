@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -56,10 +57,20 @@ Generate a comprehensive Bible study series in the following JSON format:
   ]
 }`;
 
-    const userPrompt = `Create a ${sessionCount}-session Bible study series on the topic: "${topic}"
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: `${topic} ${description || ''}`.slice(0, 4000),
+      matchCount: 2,
+    });
+
+    let userPrompt = `Create a ${sessionCount}-session Bible study series on the topic: "${topic}"
 ${description ? `\nAdditional details: ${description}` : ''}
 
 Make each session substantial and engaging. Include specific scripture references, thoughtful discussion questions, and practical applications.`;
+
+    if (ragResult.chunkCount > 0) {
+      userPrompt += ragResult.corpusContext;
+    }
 
     console.log('Generating Bible study with Lovable AI...');
     

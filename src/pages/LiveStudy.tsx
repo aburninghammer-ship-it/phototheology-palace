@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { Video, Users, Plus, Trash2 } from "lucide-react";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 
 const LiveStudy = () => {
+  const { t } = useTranslation();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -45,11 +47,11 @@ const LiveStudy = () => {
       const roomsWithProfiles = await Promise.all(
         roomsData.map(async (room) => {
           const { data: profile } = await supabase
-            .from("profiles")
+            .from("profiles_public_info")
             .select("username")
             .eq("id", room.host_id)
-            .single();
-          
+            .maybeSingle();
+
           return { ...room, profiles: profile || { username: "Unknown" } };
         })
       );
@@ -74,14 +76,14 @@ const LiveStudy = () => {
       if (error) throw error;
 
       toast({
-        title: "Room created!",
-        description: "Your study room is ready.",
+        title: t('liveStudy.roomCreated'),
+        description: t('liveStudy.roomReady'),
       });
 
       navigate(`/live-study/${data.id}`);
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: t('liveStudy.error'),
         description: error.message,
         variant: "destructive",
       });
@@ -100,14 +102,14 @@ const LiveStudy = () => {
       if (error) throw error;
 
       toast({
-        title: "Room deleted",
-        description: "Study room has been removed.",
+        title: t('liveStudy.roomDeleted'),
+        description: t('liveStudy.roomRemoved'),
       });
 
       fetchRooms();
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: t('liveStudy.error'),
         description: error.message,
         variant: "destructive",
       });
@@ -124,20 +126,18 @@ const LiveStudy = () => {
           <div className="flex items-center justify-between">
             <h1 className="text-4xl font-bold flex items-center gap-2">
               <Video className="h-8 w-8 text-blue-500" />
-              Live Study Rooms
+              {t('liveStudy.pageTitle')}
             </h1>
             <Badge variant="outline" className="text-base px-4 py-2">
-              Study Together in Real-Time
+              {t('liveStudy.subtitle')}
             </Badge>
           </div>
 
           <Card className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
             <CardHeader>
-              <CardTitle className="text-2xl">Welcome to Live Study</CardTitle>
+              <CardTitle className="text-2xl">{t('liveStudy.welcomeTitle')}</CardTitle>
               <CardDescription className="text-base leading-relaxed">
-                Create or join study rooms to explore Scripture together. Perfect for Bible studies, prayer groups, or collaborative 
-                learning with friends. Share insights, discuss passages, and grow together in understanding. Host your own room or 
-                join an active community study session!
+                {t('liveStudy.welcomeDescription')}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -146,18 +146,18 @@ const LiveStudy = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Plus className="h-5 w-5" />
-                Create New Room
+                {t('liveStudy.createNewRoom')}
               </CardTitle>
-              <CardDescription>Start a new study session</CardDescription>
+              <CardDescription>{t('liveStudy.startNewSession')}</CardDescription>
             </CardHeader>
             <CardContent className="flex gap-2">
               <Input
-                placeholder="Room name..."
+                placeholder={t('liveStudy.roomNamePlaceholder')}
                 value={roomName}
                 onChange={(e) => setRoomName(e.target.value)}
               />
               <Button onClick={createRoom} disabled={creating}>
-                Create
+                {t('liveStudy.create')}
               </Button>
             </CardContent>
           </Card>
@@ -176,7 +176,7 @@ const LiveStudy = () => {
                 <CardHeader>
                   <CardTitle>{room.name}</CardTitle>
                   <CardDescription>
-                    Host: {room.profiles?.username || "Unknown"}
+                    {t('liveStudy.host', { name: room.profiles?.username || t('liveStudy.unknown') })}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2">
@@ -185,7 +185,7 @@ const LiveStudy = () => {
                     className="w-full"
                   >
                     <Users className="mr-2 h-4 w-4" />
-                    Join Room
+                    {t('liveStudy.joinRoom')}
                   </Button>
                   {room.host_id === user?.id && (
                     <Button
@@ -194,7 +194,7 @@ const LiveStudy = () => {
                       className="w-full"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
-                      Delete Room
+                      {t('liveStudy.deleteRoom')}
                     </Button>
                   )}
                 </CardContent>
@@ -207,18 +207,14 @@ const LiveStudy = () => {
               <CardContent className="space-y-4">
                 <Users className="h-16 w-16 text-muted-foreground mx-auto opacity-30" />
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">No Active Study Rooms</h3>
+                  <h3 className="text-xl font-semibold mb-2">{t('liveStudy.noActiveRooms')}</h3>
                   <p className="text-muted-foreground mb-6">
-                    Be the first to create a study room and invite others to join your Bible study session!
+                    {t('liveStudy.noActiveRoomsDesc')}
                   </p>
                   <div className="max-w-md mx-auto mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                     <p className="text-sm text-left">
-                      <strong>Study Room Features:</strong><br />
-                      • Real-time chat with other participants<br />
-                      • Share verses and insights<br />
-                      • Collaborative Bible exploration<br />
-                      • Public or private rooms<br />
-                      • Up to 10 participants per room
+                      <strong>{t('liveStudy.featuresTitle')}</strong><br />
+                      {t('liveStudy.featuresList')}
                     </p>
                   </div>
                 </div>

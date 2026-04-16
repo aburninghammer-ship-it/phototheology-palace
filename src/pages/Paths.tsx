@@ -1,3 +1,4 @@
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -42,6 +43,7 @@ export default function Paths() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO title="Learning Paths" description="Choose your Phototheology learning path: Visual, Analytical, Devotional, or Warrior. Each path tailors the Palace experience to your learning style." />
       {/* Header */}
       <div className="border-b">
         <div className="max-w-6xl mx-auto px-4 py-4">
@@ -152,7 +154,7 @@ export default function Paths() {
           <p className="text-muted-foreground mb-8">
             {user 
               ? "Choose your path and start your 2-year journey to biblical mastery."
-              : "Start your free trial and choose your path. You'll have 30 days to explore before committing to your 2-year journey."
+              : "Start your free trial and choose your path. You'll have 14 days to explore before committing to your 2-year journey."
             }
           </p>
           <Button 

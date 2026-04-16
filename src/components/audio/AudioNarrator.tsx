@@ -26,7 +26,9 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { OPENAI_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
+import { VoiceQualitySelector } from "./VoiceQualitySelector";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { setupMediaSession, updateMediaSessionPlaybackState, clearMediaSession } from "@/lib/mediaSessionHelper";
 
 interface AudioNarratorProps {
   text: string;
@@ -35,6 +37,7 @@ interface AudioNarratorProps {
   autoPlay?: boolean;
   voice?: VoiceId;
   showVoiceSelector?: boolean;
+  onEnded?: () => void;
 }
 
 export const AudioNarrator = ({ 
@@ -43,7 +46,8 @@ export const AudioNarrator = ({
   className,
   autoPlay = false,
   voice: initialVoice = "onyx",
-  showVoiceSelector = true
+  showVoiceSelector = true,
+  onEnded,
 }: AudioNarratorProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,111 +60,217 @@ export const AudioNarrator = ({
   const [speed, setSpeed] = useState(1.0); // 0.5 = slower/deeper, 1.5 = faster/higher
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const objectUrlRef = useRef<string | null>(null);
   const isMobile = useIsMobile();
+
+  const resetAudioState = () => {
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = null;
+    }
+    setAudioUrl(null);
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.onended = null;
+      audioRef.current.ontimeupdate = null;
+      audioRef.current.onerror = null;
+      audioRef.current = null;
+    }
+
+    setIsPlaying(false);
+    setProgress(0);
+    setDuration(0);
+    notifyTTSStopped();
+  };
 
   useEffect(() => {
     return () => {
-      // Cleanup audio on unmount
+      // Cleanup audio only on unmount
       if (audioRef.current) {
         audioRef.current.pause();
+        audioRef.current.onended = null;
+        audioRef.current.ontimeupdate = null;
+        audioRef.current.onerror = null;
         audioRef.current = null;
       }
-      if (audioUrl) {
-        URL.revokeObjectURL(audioUrl);
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
       }
     };
-  }, [audioUrl]);
+  }, []);
 
   // Reset audio when voice or speed changes
   const handleVoiceChange = (voice: VoiceId) => {
     setSelectedVoice(voice);
     // Clear existing audio so it regenerates with new voice
-    if (audioUrl) {
-      URL.revokeObjectURL(audioUrl);
-      setAudioUrl(null);
-    }
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-    setIsPlaying(false);
-    setProgress(0);
+    resetAudioState();
   };
 
   const handleSpeedChange = (newSpeed: number) => {
     setSpeed(newSpeed);
     // Clear existing audio so it regenerates with new speed
-    if (audioUrl) {
-      URL.revokeObjectURL(audioUrl);
-      setAudioUrl(null);
-    }
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-    setIsPlaying(false);
-    setProgress(0);
+    resetAudioState();
   };
 
+  // Tiny silent MP3 for priming audio element in user gesture context
+  const SILENT_MP3 = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRwBHAAAAAAD/+1AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+
   const generateAudio = async () => {
-    if (audioUrl) {
-      // Already have audio, just play it
-      playAudio();
+    if (audioUrl && audioRef.current) {
+      void playAudio();
       return;
+    }
+
+    // Stop any existing audio BEFORE creating a new one to prevent echo
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.onended = null;
+      audioRef.current.ontimeupdate = null;
+      audioRef.current.onerror = null;
+      audioRef.current = null;
+    }
+
+    // Create and prime audio element SYNCHRONOUSLY in user gesture context
+    const audio = new Audio();
+    audio.preload = "auto";
+    audio.volume = volume / 100;
+    audioRef.current = audio;
+
+    // Prime with silent audio to unlock playback on mobile
+    try {
+      audio.src = SILENT_MP3;
+      await audio.play();
+      audio.pause();
+    } catch {
+      // Best effort - some browsers still allow later play
     }
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("text-to-speech", {
-        body: { text, voice: selectedVoice, speed }
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/text-to-speech`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ text, voice: selectedVoice, speed, returnType: "url" }),
+        }
+      );
 
-      if (error) throw error;
-
-      if (data?.audioContent) {
-        // Convert base64 to blob
-        const audioBlob = base64ToBlob(data.audioContent, "audio/mpeg");
-        const url = URL.createObjectURL(audioBlob);
-        setAudioUrl(url);
-        
-        // Create audio element
-        const audio = new Audio(url);
-        audioRef.current = audio;
-        
-        audio.onloadedmetadata = () => {
-          setDuration(audio.duration);
-        };
-        
-        audio.ontimeupdate = () => {
-          setProgress((audio.currentTime / audio.duration) * 100);
-        };
-        
-        audio.onended = () => {
-          setIsPlaying(false);
-          setProgress(0);
-          notifyTTSStopped();
-        };
-
-        audio.volume = volume / 100;
-        
-        // Auto-play after generation
-        audio.play();
-        setIsPlaying(true);
-        notifyTTSStarted();
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`TTS request failed: ${response.status} - ${errText}`);
       }
+
+      const data = await response.json();
+
+      let url: string;
+      if (data.audioUrl) {
+        // Fetch the audio URL as a blob to avoid CORS/redirect issues on mobile
+        try {
+          const audioResponse = await fetch(data.audioUrl);
+          if (!audioResponse.ok) throw new Error(`Audio fetch failed: ${audioResponse.status}`);
+          const blob = await audioResponse.blob();
+          const blobUrl = URL.createObjectURL(blob);
+          objectUrlRef.current = blobUrl;
+          url = blobUrl;
+        } catch {
+          // Fallback to direct URL if blob fetch fails
+          objectUrlRef.current = null;
+          url = data.audioUrl;
+        }
+      } else if (data.audioContent) {
+        objectUrlRef.current = null;
+        url = `data:audio/mpeg;base64,${data.audioContent}`;
+      } else {
+        throw new Error("No audio data returned");
+      }
+
+      setAudioUrl(url);
+      audio.onloadedmetadata = () => {
+        setDuration(audio.duration);
+      };
+
+      audio.ontimeupdate = () => {
+        setProgress((audio.currentTime / audio.duration) * 100);
+      };
+
+      audio.onended = () => {
+        setIsPlaying(false);
+        setProgress(0);
+        notifyTTSStopped();
+        clearMediaSession();
+        onEnded?.();
+      };
+
+      audio.onerror = (e) => {
+        console.error("Audio playback error:", e);
+        toast.error("Audio failed to load. Try again.");
+        resetAudioState();
+        setIsLoading(false);
+      };
+
+      audio.src = url;
+      audio.load();
+      await audio.play();
+      setIsPlaying(true);
+      notifyTTSStarted();
+
+      // Register with Media Session for lock-screen / background playback
+      setupMediaSession({
+        title: title || 'PT Commentary',
+        artist: 'Phototheology Palace',
+        album: 'Commentary',
+        onPlay: () => {
+          audio.play();
+          setIsPlaying(true);
+          notifyTTSStarted();
+          updateMediaSessionPlaybackState('playing');
+        },
+        onPause: () => {
+          audio.pause();
+          setIsPlaying(false);
+          notifyTTSStopped();
+          updateMediaSessionPlaybackState('paused');
+        },
+        onSeekBackward: () => skip(-15),
+        onSeekForward: () => skip(15),
+      });
+      updateMediaSessionPlaybackState('playing');
     } catch (error) {
       console.error("Error generating audio:", error);
-      toast.error("Failed to generate audio. Please try again.");
+      resetAudioState();
+      const aborted = error instanceof DOMException && error.name === "AbortError";
+      if (!aborted) {
+        toast.error("Failed to generate audio. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const playAudio = () => {
-    if (audioRef.current) {
-      audioRef.current.play();
+  const playAudio = async () => {
+    if (!audioRef.current) return;
+
+    try {
+      await audioRef.current.play();
       setIsPlaying(true);
       notifyTTSStarted();
+    } catch (error) {
+      const notAllowed = error instanceof DOMException && error.name === "NotAllowedError";
+      if (notAllowed) {
+        toast.error("Playback was blocked by your browser. Tap play again.");
+        return;
+      }
+
+      console.error("Error playing audio:", error);
+      resetAudioState();
+      toast.error("Playback failed. Regenerating may be required.");
     }
   };
 
@@ -169,19 +279,20 @@ export const AudioNarrator = ({
       audioRef.current.pause();
       setIsPlaying(false);
       notifyTTSStopped();
+      updateMediaSessionPlaybackState('paused');
     }
   };
 
   const togglePlayPause = () => {
     if (!audioUrl) {
-      generateAudio();
+      void generateAudio();
       return;
     }
-    
+
     if (isPlaying) {
       pauseAudio();
     } else {
-      playAudio();
+      void playAudio();
     }
   };
 
@@ -230,12 +341,15 @@ export const AudioNarrator = ({
       <div className="h-1 bg-gradient-to-r from-primary via-accent to-primary" />
       <CardContent className="p-4 space-y-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          {title && (
-            <div className="flex items-center gap-2 text-sm font-medium">
-              <Headphones className="h-4 w-4 text-primary" />
-              {title}
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {title && (
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Headphones className="h-4 w-4 text-primary" />
+                {title}
+              </div>
+            )}
+            <VoiceQualitySelector compact />
+          </div>
           
           {showVoiceSelector && (
             <div className="flex items-center gap-3 flex-wrap">
@@ -289,7 +403,7 @@ export const AudioNarrator = ({
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => skip(-10)}
+            onClick={() => skip(-15)}
             disabled={!audioUrl || isLoading}
             className="h-8 w-8"
           >
@@ -316,7 +430,7 @@ export const AudioNarrator = ({
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => skip(10)}
+            onClick={() => skip(15)}
             disabled={!audioUrl || isLoading}
             className="h-8 w-8"
           >

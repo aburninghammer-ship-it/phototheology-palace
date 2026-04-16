@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Verse } from "@/types/bible";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, BookOpen, RefreshCw } from "lucide-react";
+import { Sparkles, Loader2, BookOpen, RefreshCw, HelpCircle, Mic, Lightbulb, Copy, Check, Volume2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -16,8 +16,9 @@ import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { VerseHighlightMenu } from "./VerseHighlightMenu";
 import { VerseNoteEditor } from "./VerseNoteEditor";
-import { VerseCopyMenu } from "./VerseCopyMenu";
+import { VerseSermonDialog } from "./VerseSermonDialog";
 import { VerseNote } from "@/hooks/useVerseNotes";
+import { QuickAudioButton } from "@/components/audio";
 import { cn } from "@/lib/utils";
 
 interface HighlightColor {
@@ -45,6 +46,7 @@ interface VerseViewProps {
   onAddNote?: (verse: number, content: string) => Promise<VerseNote | null>;
   onUpdateNote?: (noteId: string, content: string) => void;
   onDeleteNote?: (noteId: string) => void;
+  onAskJeeves?: (verse: number, verseText: string) => void;
 }
 
 // All available principles from the palace
@@ -89,15 +91,15 @@ const generateVersePrinciples = (verseNumber: number): string[] => {
   return shuffled.slice(0, 4);
 };
 
-export const VerseView = ({ 
-  verse, 
-  isSelected, 
-  onSelect, 
-  showPrinciples, 
-  isHighlighted, 
-  isAudioPlaying, 
-  principles, 
-  book, 
+export const VerseView = ({
+  verse,
+  isSelected,
+  onSelect,
+  showPrinciples,
+  isHighlighted,
+  isAudioPlaying,
+  principles,
+  book,
   chapter,
   highlightColor,
   highlightColors = [],
@@ -107,6 +109,7 @@ export const VerseView = ({
   onAddNote,
   onUpdateNote,
   onDeleteNote,
+  onAskJeeves,
 }: VerseViewProps) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPrinciple, setSelectedPrinciple] = useState<string>("");
@@ -117,7 +120,71 @@ export const VerseView = ({
   const [wordAnalysis, setWordAnalysis] = useState<string>("");
   const [wordLoading, setWordLoading] = useState(false);
   const [regenerateTrigger, setRegenerateTrigger] = useState(0);
+  const [sermonDialogOpen, setSermonDialogOpen] = useState(false);
+  const [explainDialogOpen, setExplainDialogOpen] = useState(false);
+  const [verseExplanation, setVerseExplanation] = useState<string>("");
+  const [explainLoading, setExplainLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
   const { toast } = useToast();
+
+  const handleCopyVerse = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const verseRef = book && chapter ? `${book} ${chapter}:${verse.verse}` : `Verse ${verse.verse}`;
+    const textToCopy = `"${verse.text}" - ${verseRef}`;
+
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      setCopied(true);
+      toast({
+        title: "Copied!",
+        description: `${verseRef} copied to clipboard`,
+      });
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      toast({
+        title: "Failed to copy",
+        description: "Please try again",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSermonStarter = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSermonDialogOpen(true);
+  };
+
+  const handleExplainVerse = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setExplainDialogOpen(true);
+    setExplainLoading(true);
+    setVerseExplanation("");
+
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "verse-explanation",
+          book,
+          chapter,
+          verse: verse.verse,
+          verseText: verse.text,
+        },
+      });
+
+      if (error) throw error;
+      setVerseExplanation(data.content);
+    } catch (error: any) {
+      console.error("Verse explanation error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate explanation",
+        variant: "destructive",
+      });
+      setVerseExplanation("Unable to generate explanation at this time.");
+    } finally {
+      setExplainLoading(false);
+    }
+  };
 
   // Generate dynamic principles for this verse (regenerates when regenerateTrigger changes)
   const displayPrinciples = useMemo(
@@ -229,33 +296,42 @@ export const VerseView = ({
   return (
     <>
       <div
+        id={`verse-${verse.verse}`}
         className={cn(
           "group cursor-pointer transition-all duration-300 p-3 rounded-lg",
           isAudioPlaying
             ? "bg-emerald-500/20 border-2 border-emerald-500 shadow-lg ring-2 ring-emerald-500/30 backdrop-blur-md"
+            : highlightColor && !isSelected
+            ? `${getHighlightBgClass()} border-2 border-transparent hover:border-muted`
             : isSelected
             ? "bg-white/10 backdrop-blur-md border border-white/20 shadow-lg"
             : isHighlighted
             ? "bg-accent/20 border-2 border-accent shadow-md animate-pulse-glow"
-            : highlightColor
-            ? `${getHighlightBgClass()} border-2 border-transparent hover:border-muted`
             : "hover:bg-white/5 border-2 border-transparent"
         )}
         onClick={onSelect}
       >
-        <div className="flex gap-3">
-          <div className="flex flex-col items-center gap-1">
-            <span
-              className={cn(
-                "font-serif font-bold text-sm flex-shrink-0 transition-colors",
-                isSelected ? "text-primary" : "text-muted-foreground group-hover:text-primary"
-              )}
-            >
-              {verse.verse}
-            </span>
+        <div className="flex gap-2 sm:gap-3">
+          <span
+            className={cn(
+              "font-serif font-bold text-sm flex-shrink-0 transition-colors pt-0.5",
+              isSelected ? "text-primary" : "text-muted-foreground group-hover:text-primary"
+            )}
+          >
+            {verse.verse}
+          </span>
+          
+          <div className="flex-1 min-w-0">
+            <p className="text-foreground leading-relaxed">
+              {renderVerseText(verse.text)}
+            </p>
             
-            {/* Highlight, Note & Copy buttons */}
-            <div className="flex gap-0.5">
+            {/* Highlight, Note & Ask Jeeves buttons - below text on mobile, inline on desktop */}
+            <div className={cn(
+              "flex flex-wrap gap-0.5 mt-1",
+              !isSelected && "sm:opacity-0 sm:group-hover:opacity-100 transition-opacity",
+              !isSelected && "hidden sm:flex"
+            )} onClick={(e) => e.stopPropagation()}>
               {onHighlight && onRemoveHighlight && (
                 <VerseHighlightMenu
                   verse={verse.verse}
@@ -274,22 +350,60 @@ export const VerseView = ({
                   onDelete={onDeleteNote}
                 />
               )}
-              <VerseCopyMenu
-                reference={`${book} ${chapter}:${verse.verse}`}
-                text={verse.text}
-                book={book}
-                chapter={chapter}
-                verse={verse.verse}
+              <Button
+                variant="ghost"
+                size="sm"
                 className="h-6 w-6 p-0"
-                size="icon"
-              />
+                onClick={handleCopyVerse}
+                title="Copy verse"
+              >
+                {copied ? (
+                  <Check className="h-3 w-3 text-green-500" />
+                ) : (
+                  <Copy className="h-3 w-3 text-blue-500" />
+                )}
+              </Button>
+              <div onClick={(e) => e.stopPropagation()}>
+                <QuickAudioButton
+                  text={`${book || ''} chapter ${chapter || ''}, verse ${verse.verse}. ${verse.text}`}
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 p-0 [&_svg]:h-3 [&_svg]:w-3 [&_svg]:text-emerald-500"
+                />
+              </div>
+              {onAskJeeves && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAskJeeves(verse.verse, verse.text);
+                  }}
+                  title="Ask Jeeves about this verse"
+                >
+                  <HelpCircle className="h-3 w-3 text-purple-500" />
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0"
+                onClick={handleExplainVerse}
+                title="Explain this verse"
+              >
+                <Lightbulb className="h-3 w-3 text-yellow-500" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0"
+                onClick={handleSermonStarter}
+                title="Generate sermon starter from this verse"
+              >
+                <Mic className="h-3 w-3 text-amber-500" />
+              </Button>
             </div>
-          </div>
-          
-          <div className="flex-1">
-            <p className="text-foreground leading-relaxed">
-              {renderVerseText(verse.text)}
-            </p>
             
             {showPrinciples && (
               <div className="flex gap-2 mt-2 flex-wrap items-center">
@@ -369,6 +483,41 @@ export const VerseView = ({
             ) : (
               <div className="prose prose-sm max-w-none p-4">
                 {formatJeevesResponse(explanation)}
+              </div>
+            )}
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+
+      <VerseSermonDialog
+        open={sermonDialogOpen}
+        onOpenChange={setSermonDialogOpen}
+        verseRef={`${book} ${chapter}:${verse.verse}`}
+        verseText={verse.text}
+      />
+
+      {/* Verse Explanation Dialog */}
+      <Dialog open={explainDialogOpen} onOpenChange={setExplainDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lightbulb className="h-5 w-5 text-yellow-500" />
+              <span>Verse Explanation</span>
+            </DialogTitle>
+            <DialogDescription>
+              {book} {chapter}:{verse.verse} - "{verse.text.slice(0, 60)}..."
+            </DialogDescription>
+          </DialogHeader>
+          
+          <ScrollArea className="max-h-[60vh]">
+            {explainLoading ? (
+              <div className="flex flex-col items-center justify-center py-12 gap-3">
+                <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />
+                <p className="text-sm text-muted-foreground">Jeeves is studying this verse...</p>
+              </div>
+            ) : (
+              <div className="prose prose-sm max-w-none p-4">
+                {formatJeevesResponse(verseExplanation)}
               </div>
             )}
           </ScrollArea>

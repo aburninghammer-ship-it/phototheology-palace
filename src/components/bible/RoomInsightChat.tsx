@@ -3,13 +3,160 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Send, Loader2, ChevronDown, ChevronUp, X, Image as ImageIcon, FolderOpen } from "lucide-react";
+import { MessageSquare, Send, Loader2, ChevronDown, ChevronUp, X, Image as ImageIcon, FolderOpen, BookOpen, Quote } from "lucide-react";
 import { ExportToStudyButton } from "@/components/ExportToStudyButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { SaveJeevesResponseButton } from "@/components/jeeves/SaveJeevesResponseButton";
+
+/**
+ * Format classic commentary text into beautiful, readable paragraphs
+ */
+const formatClassicCommentary = (text: string): React.ReactNode => {
+  if (!text) return null;
+
+  // Clean up the text
+  let cleanText = text
+    .replace(/&gt;/g, '>')
+    .replace(/&lt;/g, '<')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Split into sentences while preserving verse references like "John 3:5"
+  const sentencePattern = /(?<=[.!?])\s+(?=[A-Z])|(?<=[.!?])\s+(?=["'])|(?<=[.!?]["'])\s+/g;
+  const sentences = cleanText.split(sentencePattern).filter(s => s.trim());
+
+  // Group sentences into paragraphs (3-4 sentences each for readability)
+  const paragraphs: string[] = [];
+  let currentParagraph: string[] = [];
+
+  sentences.forEach((sentence, idx) => {
+    currentParagraph.push(sentence.trim());
+
+    // Create new paragraph every 3-4 sentences, or at natural breaks
+    const isNaturalBreak = sentence.includes(':') && sentence.length < 50; // Short clauses with colons
+    const sentenceCount = currentParagraph.length;
+
+    if (sentenceCount >= 3 || (sentenceCount >= 2 && isNaturalBreak) || idx === sentences.length - 1) {
+      paragraphs.push(currentParagraph.join(' '));
+      currentParagraph = [];
+    }
+  });
+
+  // If we have remaining sentences, add them
+  if (currentParagraph.length > 0) {
+    paragraphs.push(currentParagraph.join(' '));
+  }
+
+  // Format verse references in text
+  const formatVerseReferences = (text: string): React.ReactNode => {
+    // Match verse references like "John 3:16", "Genesis 1:1-5", "1 Corinthians 13:4"
+    const parts: React.ReactNode[] = [];
+    const versePattern = /((?:[1-3]\s+)?[A-Z][a-z]+(?:\s+[oO]f\s+[A-Z][a-z]+)?)\s+(\d+:\d+(?:-\d+)?)/g;
+    let lastIndex = 0;
+    let match;
+    let keyIdx = 0;
+
+    while ((match = versePattern.exec(text)) !== null) {
+      // Add text before the match
+      if (match.index > lastIndex) {
+        parts.push(text.slice(lastIndex, match.index));
+      }
+
+      // Add styled verse reference
+      parts.push(
+        <span
+          key={`verse-${keyIdx++}`}
+          className="font-semibold text-primary/90 hover:text-primary cursor-pointer transition-colors"
+          title={`${match[1]} ${match[2]}`}
+        >
+          {match[1]} {match[2]}
+        </span>
+      );
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex));
+    }
+
+    return parts.length > 0 ? <>{parts}</> : text;
+  };
+
+  // Format quoted text (text in double quotes)
+  const formatQuotedText = (text: string): React.ReactNode => {
+    const parts: React.ReactNode[] = [];
+    const quotePattern = /"([^"]+)"/g;
+    let lastIndex = 0;
+    let match;
+    let keyIdx = 0;
+
+    while ((match = quotePattern.exec(text)) !== null) {
+      // Add text before the quote
+      if (match.index > lastIndex) {
+        parts.push(formatVerseReferences(text.slice(lastIndex, match.index)));
+      }
+
+      // Add styled quote
+      parts.push(
+        <span
+          key={`quote-${keyIdx++}`}
+          className="italic text-foreground/95"
+        >
+          "{match[1]}"
+        </span>
+      );
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+      parts.push(formatVerseReferences(text.slice(lastIndex)));
+    }
+
+    return parts.length > 0 ? <>{parts}</> : formatVerseReferences(text);
+  };
+
+  return (
+    <div className="classic-commentary space-y-5">
+      {paragraphs.map((paragraph, idx) => {
+        const isFirstParagraph = idx === 0;
+        const firstChar = paragraph.charAt(0);
+        const restOfParagraph = paragraph.slice(1);
+
+        return (
+          <p
+            key={idx}
+            className={`
+              leading-[1.9] text-[15px] text-foreground/90
+              ${isFirstParagraph ? '' : 'text-justify'}
+            `}
+          >
+            {isFirstParagraph ? (
+              <>
+                <span className="float-left text-4xl font-serif font-bold leading-none mr-2 mt-1 text-primary/80 drop-shadow-sm">
+                  {firstChar}
+                </span>
+                {formatQuotedText(restOfParagraph)}
+              </>
+            ) : (
+              formatQuotedText(paragraph)
+            )}
+          </p>
+        );
+      })}
+    </div>
+  );
+};
 
 interface Message {
   role: "user" | "assistant";
@@ -135,16 +282,43 @@ export const RoomInsightChat = ({
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // Check if this is a classic commentary (General Insights from classic commentaries)
+  const isClassicCommentary = roomCode === "GEN" && roomName === "General Insights";
+
   return (
-    <div className="border-l-4 border-primary/30 pl-4 mt-4">
+    <div className={`${isClassicCommentary ? 'border-l-4 border-amber-500/50' : 'border-l-4 border-primary/30'} pl-3 mt-4 min-w-0 overflow-hidden`}>
       <div className="mb-3">
-        <Badge className="gradient-palace text-white text-xs mb-2">
-          {roomCode}
-        </Badge>
-        <h3 className="font-bold text-lg mb-2 text-primary">{roomName}</h3>
-        <div className="text-sm leading-relaxed text-foreground/90">
-          {roomContent}
-        </div>
+        {isClassicCommentary ? (
+          // Beautiful classic commentary header
+          <div className="flex items-center gap-2 mb-4">
+            <div className="p-2 rounded-lg bg-amber-500/10">
+              <BookOpen className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div>
+              <h3 className="font-serif text-lg font-semibold text-foreground">Classic Commentary</h3>
+              <p className="text-xs text-muted-foreground">Historical biblical scholarship</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            <Badge className="gradient-palace text-white text-xs mb-2">
+              {roomCode}
+            </Badge>
+            <h3 className="font-bold text-lg mb-2 text-primary">{roomName}</h3>
+          </>
+        )}
+
+        {/* Content display - use special formatting for classic commentaries */}
+        {isClassicCommentary ? (
+          <div className="bg-gradient-to-br from-amber-50/50 to-orange-50/30 dark:from-amber-950/20 dark:to-orange-950/10 rounded-lg p-4 border border-amber-200/50 dark:border-amber-800/30 shadow-sm break-words overflow-hidden">
+            <Quote className="h-8 w-8 text-amber-400/40 mb-3 -ml-1" />
+            {formatClassicCommentary(roomContent)}
+          </div>
+        ) : (
+          <div className="text-sm leading-relaxed text-foreground/90 break-words overflow-hidden">
+            {formatJeevesResponse(roomContent)}
+          </div>
+        )}
       </div>
 
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>

@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { usePreservePage } from "@/hooks/usePreservePage";
 import { formatDistanceToNow } from "date-fns";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Plus,
   Search,
@@ -15,7 +16,8 @@ import {
   Flame,
   BookMarked,
   PlayCircle,
-  Star
+  Star,
+  Brain
 } from "lucide-react";
 import { GlassBubbles } from "@/components/ui/glass-bubbles";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
@@ -25,6 +27,7 @@ import { StudySortFilter, SortOption } from "@/components/studies/StudySortFilte
 import { StudyStats } from "@/components/studies/StudyStats";
 import { StudyTagsManager } from "@/components/studies/StudyTagsManager";
 import { StudyAnalytics } from "@/components/studies/StudyAnalytics";
+import { SessionLibrary } from "@/components/session/SessionLibrary";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -141,6 +144,7 @@ interface Study {
 
 const MyStudies = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const { setCustomState, getCustomState } = usePreservePage();
@@ -150,6 +154,7 @@ const MyStudies = () => {
   const [searchQuery, setSearchQuery] = useState(() => getCustomState<string>('myStudies_searchQuery') || "");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [studyToDelete, setStudyToDelete] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>(() => searchParams.get('tab') || 'notes');
 
   // Sparks integration
   const {
@@ -169,8 +174,13 @@ const MyStudies = () => {
     debounceMs: 90000
   });
 
-  // Persist search query
+  // Persist search query and sync tab with URL
   useEffect(() => { setCustomState('myStudies_searchQuery', searchQuery); }, [searchQuery, setCustomState]);
+  
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setSearchParams({ tab });
+  };
 
   useEffect(() => {
     if (user && !authLoading) {
@@ -312,21 +322,15 @@ const [sortOption, setSortOption] = useState<SortOption>("updated");
   const allTags = [...new Set(studies.flatMap(s => s.tags))].sort();
 
   const filteredStudies = studies.filter((study) => {
-    const q = searchQuery.trim().toLowerCase();
-    const title = (study.title ?? "").toLowerCase();
-    const content = (study.content ?? "").toLowerCase();
-    const tags = Array.isArray(study.tags) ? study.tags : [];
-
-    const matchesSearch =
-      q.length === 0 ||
-      title.includes(q) ||
-      content.includes(q) ||
-      tags.some((tag) => (tag ?? "").toLowerCase().includes(q));
-
-    const matchesTags =
-      selectedTags.length === 0 ||
-      selectedTags.some((tag) => tags.includes(tag));
-
+    const matchesSearch = 
+      study.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      study.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      study.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    const matchesTags = 
+      selectedTags.length === 0 || 
+      selectedTags.some(tag => study.tags.includes(tag));
+    
     return matchesSearch && matchesTags;
   });
 
@@ -357,7 +361,7 @@ const [sortOption, setSortOption] = useState<SortOption>("updated");
 
       {/* Sparks Container */}
       {sparks.length > 0 && (
-        <div className="fixed top-20 right-4 z-50">
+        <div className="fixed bottom-24 right-4 md:bottom-auto md:top-20 z-50">
           <SparkContainer
             sparks={sparks}
             onOpen={openSpark}
@@ -370,13 +374,13 @@ const [sortOption, setSortOption] = useState<SortOption>("updated");
       )}
 
       {/* Spark Settings */}
-      <div className="fixed bottom-4 right-4 z-40">
+      <div className="fixed bottom-24 md:bottom-4 right-4 z-40">
         <SparkSettings
           preferences={sparkPreferences}
           onUpdate={updateSparkPreferences}
         />
       </div>
-      
+
       <div className="container mx-auto px-4 py-8 pt-24">
         {/* Header - Glass Card */}
         <Card variant="glass" className="mb-8 p-6">
@@ -404,267 +408,254 @@ const [sortOption, setSortOption] = useState<SortOption>("updated");
           </div>
         </Card>
 
-        {/* Search */}
-        <div className="relative mb-8">
-          <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-          <Input
-            placeholder="Search studies by title, content, or tags..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 py-6 text-lg"
-          />
-        </div>
+        {/* Tabs for different content types */}
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+          <TabsList className="mb-6 w-full justify-start">
+            <TabsTrigger value="notes" className="gap-2">
+              <FileText className="h-4 w-4" />
+              Study Notes
+            </TabsTrigger>
+            <TabsTrigger value="sessions" className="gap-2">
+              <Brain className="h-4 w-4" />
+              Study Buddy Sessions
+            </TabsTrigger>
+          </TabsList>
 
-        {loading || authLoading ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Loading your studies...</p>
-          </div>
-        ) : studies.length === 0 ? (
-          <div className="space-y-8">
-            {/* Welcome Card */}
-            <Card className="bg-gradient-to-br from-primary/10 via-accent/5 to-background border-primary/20">
-              <CardHeader className="text-center">
-                <div className="mx-auto w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <BookOpen className="w-10 h-10 text-primary" />
-                </div>
-                <CardTitle className="text-3xl mb-2">Welcome to My Studies</CardTitle>
-                <CardDescription className="text-base max-w-2xl mx-auto">
-                  This is where your Bible studies will live. Each study is a personal space where you can:
-                  explore passages, apply Phototheology principles, save insights, and build your understanding of Scripture.
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            {/* Quick Actions */}
-            <div>
-              <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-                <Sparkles className="w-6 h-6 text-primary" />
-                Quick Start
-              </h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card 
-                  className="cursor-pointer hover:shadow-lg hover:border-primary/50 transition-all group"
-                  onClick={() => handleTemplateSelect({ name: "Verse Analysis", content: VERSE_ANALYSIS_TEMPLATE })}
-                >
-                  <CardHeader>
-                    <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center mb-3 group-hover:bg-blue-500/20 transition-colors">
-                      <BookOpen className="w-6 h-6 text-blue-500" />
-                    </div>
-                    <CardTitle className="text-lg">Study a Verse</CardTitle>
-                    <CardDescription>Deep dive into a single verse with guided questions</CardDescription>
-                  </CardHeader>
-                </Card>
-
-                <Card 
-                  className="cursor-pointer hover:shadow-lg hover:border-primary/50 transition-all group"
-                  onClick={() => handleTemplateSelect({ name: "Chapter Study", content: CHAPTER_STUDY_TEMPLATE })}
-                >
-                  <CardHeader>
-                    <div className="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center mb-3 group-hover:bg-purple-500/20 transition-colors">
-                      <FileText className="w-6 h-6 text-purple-500" />
-                    </div>
-                    <CardTitle className="text-lg">Study a Chapter</CardTitle>
-                    <CardDescription>Comprehensive analysis of an entire chapter</CardDescription>
-                  </CardHeader>
-                </Card>
-
-                <Card 
-                  className="cursor-pointer hover:shadow-lg hover:border-primary/50 transition-all group"
-                  onClick={() => handleTemplateSelect({ name: "Theme Study", content: THEME_STUDY_TEMPLATE })}
-                >
-                  <CardHeader>
-                    <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center mb-3 group-hover:bg-amber-500/20 transition-colors">
-                      <Flame className="w-6 h-6 text-amber-500" />
-                    </div>
-                    <CardTitle className="text-lg">Study a Theme</CardTitle>
-                    <CardDescription>Explore a biblical theme across Scripture</CardDescription>
-                  </CardHeader>
-                </Card>
-
-                <Card 
-                  className="cursor-pointer hover:shadow-lg hover:border-primary/50 transition-all group"
-                  onClick={() => createNewStudy()}
-                >
-                  <CardHeader>
-                    <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center mb-3 group-hover:bg-green-500/20 transition-colors">
-                      <Plus className="w-6 h-6 text-green-500" />
-                    </div>
-                    <CardTitle className="text-lg">Start Blank</CardTitle>
-                    <CardDescription>Create a custom study from scratch</CardDescription>
-                  </CardHeader>
-                </Card>
-              </div>
-            </div>
-
-            {/* Tips Card */}
-            <Card className="bg-muted/30">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BookMarked className="w-5 h-5" />
-                  Why Save Studies?
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <span className="text-primary font-semibold">1</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-1">Build Your Palace</h4>
-                    <p className="text-sm text-muted-foreground">Each study applies Palace Rooms and Phototheology principles to help you memorize and understand Scripture deeply.</p>
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <span className="text-primary font-semibold">2</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-1">Track Your Growth</h4>
-                    <p className="text-sm text-muted-foreground">Review past insights and see how your understanding evolves over time.</p>
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <span className="text-primary font-semibold">3</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-1">Prepare Lessons</h4>
-                    <p className="text-sm text-muted-foreground">Use your studies as sermon seeds, teaching material, or discussion starters.</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Progress Stats */}
-            <StudyStats studies={studies} />
-
-            {/* Analytics */}
-            <StudyAnalytics studies={studies} />
-
-            {/* Continue Where You Left Off - Enhanced */}
-            {mostRecentStudy && (
-              <Card className="bg-gradient-to-r from-primary/10 via-primary/5 to-accent/10 border-primary/30 p-6 mb-2">
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                  <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
-                      <PlayCircle className="w-8 h-8 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold mb-1">Continue Your Study</h2>
-                      <p className="text-lg font-medium text-foreground/90 line-clamp-1">{mostRecentStudy.title}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Last edited {formatDistanceToNow(new Date(mostRecentStudy.updated_at), { addSuffix: true })}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2 w-full md:w-auto">
-                    <Button 
-                      onClick={() => navigate(`/my-studies/${mostRecentStudy.id}`)}
-                      size="lg"
-                      className="gap-2 flex-1 md:flex-none"
-                    >
-                      <PlayCircle className="w-5 h-5" />
-                      Resume Study
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      onClick={() => toggleFavorite(mostRecentStudy.id, mostRecentStudy.is_favorite)}
-                    >
-                      <Star 
-                        className={`w-5 h-5 ${mostRecentStudy.is_favorite ? "fill-amber-500 text-amber-500" : ""}`}
-                      />
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            )}
-
-            {/* Active filter indicator */}
-            {(searchQuery || selectedTags.length > 0) && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/10 border border-primary/20">
-                <Search className="w-4 h-4 text-primary" />
-                <span className="text-sm text-foreground">
-                  Showing {filteredStudies.length} of {studies.length} studies
-                  {searchQuery && <span className="font-medium"> matching "{searchQuery}"</span>}
-                  {selectedTags.length > 0 && <span className="font-medium"> with {selectedTags.length} tag filter{selectedTags.length > 1 ? 's' : ''}</span>}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="ml-auto h-7 text-xs"
-                  onClick={() => {
-                    setSearchQuery("");
-                    setSelectedTags([]);
-                  }}
-                >
-                  Clear all filters
-                </Button>
-              </div>
-            )}
-
-            {/* Sort & Filter Bar */}
-            <div className="flex flex-col sm:flex-row gap-3 justify-between">
-              <StudyTagsManager
-                allTags={allTags}
-                selectedTags={selectedTags}
-                onTagSelect={(tag) => setSelectedTags(prev => [...prev, tag])}
-                onTagDeselect={(tag) => setSelectedTags(prev => prev.filter(t => t !== tag))}
-                onClearFilters={() => setSelectedTags([])}
-              />
-              <StudySortFilter
-                currentSort={sortOption}
-                onSortChange={setSortOption}
-                totalCount={filteredStudies.length}
-                favoriteCount={favoriteCount}
+          {/* Study Notes Tab */}
+          <TabsContent value="notes" className="mt-0">
+            {/* Search */}
+            <div className="relative mb-8">
+              <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+              <Input
+                placeholder="Search studies by title, content, or tags..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 py-6 text-lg"
               />
             </div>
 
-            {/* All Studies Grid */}
-            {sortedStudies.length > 1 && (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {sortedStudies.slice(1).map((study) => (
-                  <StudyPreviewCard
-                    key={study.id}
-                    study={study}
-                    onToggleFavorite={toggleFavorite}
-                    onDelete={(id) => {
-                      setStudyToDelete(id);
-                      setDeleteDialogOpen(true);
-                    }}
-                    onEdit={(id) => navigate(`/my-studies/${id}`)}
+            {loading || authLoading ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">Loading your studies...</p>
+              </div>
+            ) : studies.length === 0 ? (
+              <div className="space-y-8">
+                {/* Welcome Card */}
+                <Card className="bg-gradient-to-br from-primary/10 via-accent/5 to-background border-primary/20">
+                  <CardHeader className="text-center">
+                    <div className="mx-auto w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                      <BookOpen className="w-10 h-10 text-primary" />
+                    </div>
+                    <CardTitle className="text-3xl mb-2">Welcome to My Studies</CardTitle>
+                    <CardDescription className="text-base max-w-2xl mx-auto">
+                      This is where your Bible studies will live. Each study is a personal space where you can:
+                      explore passages, apply Phototheology principles, save insights, and build your understanding of Scripture.
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+
+                {/* Quick Actions */}
+                <div>
+                  <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+                    <Sparkles className="w-6 h-6 text-primary" />
+                    Quick Start
+                  </h2>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <Card 
+                      className="cursor-pointer hover:shadow-lg hover:border-primary/50 transition-all group"
+                      onClick={() => handleTemplateSelect({ name: "Verse Analysis", content: VERSE_ANALYSIS_TEMPLATE })}
+                    >
+                      <CardHeader>
+                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
+                          <BookOpen className="w-6 h-6 text-primary" />
+                        </div>
+                        <CardTitle className="text-lg">Study a Verse</CardTitle>
+                        <CardDescription>Deep dive into a single verse with guided questions</CardDescription>
+                      </CardHeader>
+                    </Card>
+
+                    <Card 
+                      className="cursor-pointer hover:shadow-lg hover:border-primary/50 transition-all group"
+                      onClick={() => handleTemplateSelect({ name: "Chapter Study", content: CHAPTER_STUDY_TEMPLATE })}
+                    >
+                      <CardHeader>
+                        <div className="w-12 h-12 rounded-lg bg-secondary/50 flex items-center justify-center mb-3 group-hover:bg-secondary/70 transition-colors">
+                          <FileText className="w-6 h-6 text-secondary-foreground" />
+                        </div>
+                        <CardTitle className="text-lg">Study a Chapter</CardTitle>
+                        <CardDescription>Comprehensive analysis of an entire chapter</CardDescription>
+                      </CardHeader>
+                    </Card>
+
+                    <Card 
+                      className="cursor-pointer hover:shadow-lg hover:border-primary/50 transition-all group"
+                      onClick={() => handleTemplateSelect({ name: "Theme Study", content: THEME_STUDY_TEMPLATE })}
+                    >
+                      <CardHeader>
+                        <div className="w-12 h-12 rounded-lg bg-accent/50 flex items-center justify-center mb-3 group-hover:bg-accent/70 transition-colors">
+                          <Flame className="w-6 h-6 text-accent-foreground" />
+                        </div>
+                        <CardTitle className="text-lg">Study a Theme</CardTitle>
+                        <CardDescription>Explore a biblical theme across Scripture</CardDescription>
+                      </CardHeader>
+                    </Card>
+
+                    <Card 
+                      className="cursor-pointer hover:shadow-lg hover:border-primary/50 transition-all group"
+                      onClick={() => createNewStudy()}
+                    >
+                      <CardHeader>
+                        <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center mb-3 group-hover:bg-muted/80 transition-colors">
+                          <Plus className="w-6 h-6 text-muted-foreground" />
+                        </div>
+                        <CardTitle className="text-lg">Start Blank</CardTitle>
+                        <CardDescription>Create a custom study from scratch</CardDescription>
+                      </CardHeader>
+                    </Card>
+                  </div>
+                </div>
+
+                {/* Tips Card */}
+                <Card className="bg-muted/30">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BookMarked className="w-5 h-5" />
+                      Why Save Studies?
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex gap-3">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="text-primary font-semibold">1</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold mb-1">Build Your Palace</h4>
+                        <p className="text-sm text-muted-foreground">Each study applies Palace Rooms and Phototheology principles to help you memorize and understand Scripture deeply.</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="text-primary font-semibold">2</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold mb-1">Track Your Growth</h4>
+                        <p className="text-sm text-muted-foreground">Review past insights and see how your understanding evolves over time.</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="text-primary font-semibold">3</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold mb-1">Prepare Lessons</h4>
+                        <p className="text-sm text-muted-foreground">Use your studies as sermon seeds, teaching material, or discussion starters.</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* Progress Stats */}
+                <StudyStats studies={studies} />
+
+                {/* Analytics */}
+                <StudyAnalytics studies={studies} />
+
+                {/* Continue Where You Left Off - Enhanced */}
+                {mostRecentStudy && (
+                  <Card className="bg-gradient-to-r from-primary/10 via-primary/5 to-accent/10 border-primary/30 p-6 mb-2">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                      <div className="flex items-start gap-4">
+                        <div className="w-14 h-14 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
+                          <PlayCircle className="w-8 h-8 text-primary" />
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-bold mb-1">Continue Your Study</h2>
+                          <p className="text-lg font-medium text-foreground/90 line-clamp-1">{mostRecentStudy.title}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Last edited {formatDistanceToNow(new Date(mostRecentStudy.updated_at), { addSuffix: true })}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 w-full md:w-auto">
+                        <Button 
+                          onClick={() => navigate(`/my-studies/${mostRecentStudy.id}`)}
+                          size="lg"
+                          className="gap-2 flex-1 md:flex-none"
+                        >
+                          <PlayCircle className="w-5 h-5" />
+                          Resume Study
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          onClick={() => toggleFavorite(mostRecentStudy.id, mostRecentStudy.is_favorite)}
+                        >
+                          <Star 
+                            className={`w-5 h-5 ${mostRecentStudy.is_favorite ? "fill-amber-500 text-amber-500" : ""}`}
+                          />
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                )}
+
+                {/* Sort & Filter Bar */}
+                <div className="flex flex-col sm:flex-row gap-3 justify-between">
+                  <StudyTagsManager
+                    allTags={allTags}
+                    selectedTags={selectedTags}
+                    onTagSelect={(tag) => setSelectedTags(prev => [...prev, tag])}
+                    onTagDeselect={(tag) => setSelectedTags(prev => prev.filter(t => t !== tag))}
+                    onClearFilters={() => setSelectedTags([])}
                   />
-                ))}
+                  <StudySortFilter
+                    currentSort={sortOption}
+                    onSortChange={setSortOption}
+                    totalCount={filteredStudies.length}
+                    favoriteCount={favoriteCount}
+                  />
+                </div>
+
+                {/* All Studies Grid */}
+                {sortedStudies.length > 1 && (
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {sortedStudies.slice(1).map((study) => (
+                      <StudyPreviewCard
+                        key={study.id}
+                        study={study}
+                        onToggleFavorite={toggleFavorite}
+                        onDelete={(id) => {
+                          setStudyToDelete(id);
+                          setDeleteDialogOpen(true);
+                        }}
+                        onEdit={(id) => navigate(`/my-studies/${id}`)}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {filteredStudies.length === 0 && searchQuery && (
+                  <Card className="text-center py-12">
+                    <CardContent>
+                      <Search className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                      <h3 className="text-2xl font-semibold mb-2">No results found</h3>
+                      <p className="text-muted-foreground">
+                        Try adjusting your search query
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             )}
+          </TabsContent>
 
-            {filteredStudies.length === 0 && (searchQuery || selectedTags.length > 0) && (
-              <Card className="text-center">
-                <CardContent className="py-12">
-                  <Search className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-2xl font-semibold mb-2">No studies found</h3>
-                  <p className="text-muted-foreground">
-                    No studies match your current search or filters.
-                  </p>
-                  <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-2">
-                    {searchQuery && (
-                      <Button variant="outline" onClick={() => setSearchQuery("")}> 
-                        Clear search
-                      </Button>
-                    )}
-                    {selectedTags.length > 0 && (
-                      <Button variant="outline" onClick={() => setSelectedTags([])}>
-                        Clear tag filters
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        )}
+          {/* Study Buddy Sessions Tab */}
+          <TabsContent value="sessions" className="mt-0">
+            <SessionLibrary />
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Delete Confirmation Dialog */}

@@ -15,7 +15,7 @@ const intents = [
     description: "Start with guided reading and simple principles",
     color: "from-blue-500 to-cyan-500",
     path: "/interactive-demo",
-    authPath: "/read-me-the-bible",
+    authPath: "/bible",
   },
   {
     id: "deep-study" as const,
@@ -52,7 +52,8 @@ export function LandingPathFilter() {
     
     // Navigate based on auth state
     if (user) {
-      navigate(intent.authPath);
+      // Go directly to the gatehouse (blue/red choice page) — no multi-step onboarding
+      navigate("/gatehouse");
     } else {
       navigate(intent.path);
     }

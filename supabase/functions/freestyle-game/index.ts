@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getContentBehavioralEngine } from "../_shared/content-behavioral-engine.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { mode, userObjects, userResponse, challengeObjects } = await req.json();
+    const { mode, userObjects, userResponse, challengeObjects, chainHistory, userBuild, chainNumber } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
     if (!LOVABLE_API_KEY) {
@@ -95,6 +96,50 @@ Be creative! Show the user what master-level freestyling looks like.`;
       userPrompt = `The user challenges you to freestyle with these objects: ${JSON.stringify(userObjects)}
 
 Create a powerful, Christ-centered object lesson that connects all of them.`;
+    } else if (mode === "chain_start") {
+      // Jeeves initiates the Build Chain by presenting a story/verse
+      systemPrompt = `You are Jeeves, the Phototheology Build Chain host. You present Bible stories and verses for a collaborative freestyle building exercise.
+
+Your task: Present ONE Bible story or verse as the foundation for a freestyle chain. Choose something rich with symbolic potential.
+
+FORMAT YOUR RESPONSE AS JSON:
+{
+  "reference": "<Book Chapter:Verse or story name>",
+  "text": "<The verse text or a 2-3 sentence vivid summary of the story>",
+  "spark": "<A 1-sentence provocative question or observation to ignite the user's thinking>",
+  "chainNumber": 1
+}
+
+Pick from a wide variety — patriarchs, prophets, psalms, parables, miracles, epistles, Revelation imagery. Make it interesting!`;
+
+      userPrompt = "Present a Bible story or verse to start a new Build Chain freestyle challenge.";
+    } else if (mode === "chain_respond") {
+      // Jeeves evaluates the user's build and presents the next link
+      
+      systemPrompt = `You are Jeeves, the Phototheology Build Chain host. The user is building a freestyle chain — connecting Bible stories and verses into a growing tapestry of meaning.
+
+RULES:
+1. AFFIRM what the user built — highlight the strongest connection they made
+2. Add a "SPARK" — a surprising insight, deeper layer, or Christ-connection they may have missed
+3. Then present the NEXT verse or story that builds on everything so far
+4. The chain should grow in depth and complexity with each round
+5. Keep energy HIGH — use vivid language, celebrate good connections
+6. Be warm and encouraging but push them to go deeper
+
+RESPONSE FORMAT (JSON):
+{
+  "commentary": "<2-3 sentences affirming and commenting on their build>",
+  "spark": "<1-2 sentences adding a deeper insight or Christ-connection they missed>",
+  "sparkEmoji": "<one fitting emoji for the spark>",
+  "nextReference": "<Book Chapter:Verse or next story name>",
+  "nextText": "<The verse text or 2-3 sentence vivid summary>",
+  "nextPrompt": "<A provocative question connecting this new text to everything built so far>",
+  "chainNumber": ${chainNumber || 2},
+  "chainStrength": <1-10 rating of how strong the overall chain is becoming>
+}`;
+
+      const historyContext = chainHistory ? `\n\nCHAIN HISTORY SO FAR:\n${JSON.stringify(chainHistory)}` : "";
+      userPrompt = `The user's latest build on the chain:\n"${userBuild}"${historyContext}\n\nComment on their build, add a spark, then present the next story/verse (chain link #${chainNumber || 2}).`;
     }
 
     console.log(`Freestyle game mode: ${mode}`);
@@ -108,7 +153,7 @@ Create a powerful, Christ-centered object lesson that connects all of them.`;
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          { role: 'system', content: systemPrompt },
+          { role: 'system', content: systemPrompt + "\n\n" + getContentBehavioralEngine() },
           { role: 'user', content: userPrompt }
         ],
         temperature: 0.8,
@@ -128,8 +173,8 @@ Create a powerful, Christ-centered object lesson that connects all of them.`;
       throw new Error('No response from AI');
     }
 
-    // Try to parse JSON from response for generate_challenge and evaluate_freestyle
-    if (mode === "generate_challenge" || mode === "evaluate_freestyle") {
+    // Try to parse JSON from response for structured modes
+    if (mode === "generate_challenge" || mode === "evaluate_freestyle" || mode === "chain_start" || mode === "chain_respond") {
       try {
         // Extract JSON from the response (handle markdown code blocks)
         let jsonStr = content;

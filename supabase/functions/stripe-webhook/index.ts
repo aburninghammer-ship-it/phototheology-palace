@@ -14,6 +14,28 @@ const tierSeats = {
   tier3: 150, // Enterprise tier - custom capacity set during onboarding
 };
 
+// PDF Product configurations for auto-detection
+const PDF_PRODUCTS = {
+  "genesis-6-days": {
+    name: "Genesis in 6 Days",
+    priceId: "price_1SnQAcFGDAd3RU8IRqoiIPsh",
+    productId: "prod_Tkw2inXRI6c6Ow",
+    amount: 900,
+  },
+  "study-suite": {
+    name: "Phototheology Study Suite",
+    priceId: "price_1SnNoGFGDAd3RU8I4ALn4b0N",
+    productId: "prod_TktboSZYb6oAQt",
+    amount: 9700,
+  },
+  "quick-start-guide": {
+    name: "Phototheology Quick-Start Guide",
+    priceId: "price_1SnPPvFGDAd3RU8ID1mGI7TR",
+    productId: "prod_TktbhIk7zIQ28w",
+    amount: 1200,
+  }
+};
+
 // Helper logging function for debugging
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
@@ -85,6 +107,107 @@ serve(async (req) => {
             logStep('Donation notification sent', { email: customerEmail });
           } catch (emailError) {
             logStep('Failed to send donation notification', { error: emailError });
+          }
+          break;
+        }
+
+        // Handle one-time product purchases (like Genesis in 6 Days, Quick-Start Guide, Study Suite)
+        if (session.mode === 'payment' && !session.submit_type) {
+          const productName = metadata.product || 'Product';
+          
+          logStep('Processing one-time product purchase', { 
+            amount: session.amount_total, 
+            email: customerEmail,
+            product: productName,
+            sessionId: session.id
+          });
+
+          // Auto-detect PDF product by price ID, product ID, or amount
+          let detectedProductKey: string | null = metadata.product_id || null;
+          
+          if (!detectedProductKey) {
+            // Fetch line items from Stripe API (they are NOT included in webhook events by default)
+            try {
+              const lineItemsResponse = await stripe.checkout.sessions.listLineItems(session.id, { limit: 5 });
+              const lineItems = lineItemsResponse.data || [];
+              logStep('Fetched line items from Stripe API', { count: lineItems.length });
+              
+              for (const [key, config] of Object.entries(PDF_PRODUCTS)) {
+                for (const item of lineItems) {
+                  if (item.price?.id === config.priceId || item.price?.product === config.productId) {
+                    detectedProductKey = key;
+                    logStep('Detected PDF product from line items', { key, priceId: item.price?.id });
+                    break;
+                  }
+                }
+                if (detectedProductKey) break;
+              }
+            } catch (lineItemsError) {
+              logStep('Failed to fetch line items, falling back to amount detection', { error: String(lineItemsError) });
+            }
+          }
+
+          if (!detectedProductKey) {
+            // Fallback: detect by amount
+            for (const [key, config] of Object.entries(PDF_PRODUCTS)) {
+              if (session.amount_total === config.amount) {
+                detectedProductKey = key;
+                logStep('Detected PDF product from amount', { key, amount: session.amount_total });
+                break;
+              }
+            }
+          }
+
+          // Send admin notification about the purchase
+          try {
+            await supabase.functions.invoke('send-purchase-notification', {
+              body: {
+                userEmail: customerEmail || 'unknown',
+                userName: session.customer_details?.name || 'Customer',
+                amount: session.amount_total || 0,
+                currency: session.currency || 'usd',
+                product: detectedProductKey ? PDF_PRODUCTS[detectedProductKey as keyof typeof PDF_PRODUCTS]?.name || productName : productName,
+                subscriptionTier: 'one-time',
+              }
+            });
+            logStep('Product purchase notification sent', { email: customerEmail });
+          } catch (emailError) {
+            logStep('Failed to send product purchase notification', { error: emailError });
+          }
+
+          // Send the product delivery email to the customer
+          if (customerEmail && detectedProductKey) {
+            try {
+              await supabase.functions.invoke('send-product-email', {
+                body: {
+                  email: customerEmail,
+                  name: session.customer_details?.name || undefined,
+                  product: detectedProductKey
+                }
+              });
+              logStep('Product delivery email sent', { email: customerEmail, product: detectedProductKey });
+
+              // Log the successful email to pdf_email_logs
+              await supabase.from('pdf_email_logs').insert({
+                email: customerEmail,
+                product_key: detectedProductKey,
+                checkout_session_id: session.id,
+                success: true,
+              });
+              logStep('PDF email logged', { sessionId: session.id, product: detectedProductKey });
+            } catch (emailError) {
+              logStep('Failed to send product delivery email', { error: emailError });
+              // Log the failed attempt
+              await supabase.from('pdf_email_logs').insert({
+                email: customerEmail,
+                product_key: detectedProductKey,
+                checkout_session_id: session.id,
+                success: false,
+                error_message: String(emailError),
+              });
+            }
+          } else if (!detectedProductKey) {
+            logStep('No PDF product detected - skipping auto-send', { amount: session.amount_total });
           }
           break;
         }
@@ -217,6 +340,12 @@ serve(async (req) => {
               .single();
 
             if (profile?.email) {
+              // Get billing interval from subscription price
+              let billingInterval = 'month';
+              if (subscription?.items?.data?.[0]?.price?.recurring?.interval) {
+                billingInterval = subscription.items.data[0].price.recurring.interval;
+              }
+
               await supabase.functions.invoke('send-purchase-notification', {
                 body: {
                   userEmail: profile.email,
@@ -225,9 +354,15 @@ serve(async (req) => {
                   currency: session.currency || 'usd',
                   product: `${tier.charAt(0).toUpperCase() + tier.slice(1)} Subscription`,
                   subscriptionTier: tier,
+                  isTrialing: isInTrial,
+                  trialEndsAt: trialEnd?.toISOString() || null,
+                  billingInterval,
+                  stripeCustomerId: customerId,
+                  stripeSubscriptionId: subscription?.id || null,
+                  renewalDate: renewalDate?.toISOString() || null,
                 }
               });
-              logStep('Purchase notification sent', { email: profile.email });
+              logStep('Purchase notification sent', { email: profile.email, tier, isInTrial });
             }
           } catch (emailError) {
             logStep('Failed to send purchase notification', { error: emailError });

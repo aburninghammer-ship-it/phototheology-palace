@@ -4,19 +4,23 @@ import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { 
   Download,
-  X
+  X,
+  Globe
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState, lazy, Suspense } from "react";
 import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { PunchyHero } from "@/components/PunchyHero";
+import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { QuickTestimonialBanner } from "@/components/landing/QuickTestimonialBanner";
 import { LandingPageSkeleton, TestimonialsSkeleton } from "@/components/landing/LandingPageSkeleton";
 import { useSyncEarlyTracking } from "@/hooks/useSyncEarlyTracking";
-import { GiveGemButton } from "@/components/GiveGemButton";
+import { useDisplaySettings } from "@/hooks/useDisplaySettings";
+
 
 // Lazy load heavy below-the-fold components
 const StreamlinedTestimonials = lazy(() => 
@@ -31,7 +35,10 @@ const ExplainerVideo = lazy(() =>
 const InteractiveWalkthrough = lazy(() => 
   import("@/components/InteractiveWalkthrough").then(m => ({ default: m.InteractiveWalkthrough }))
 );
-const TransparencySection = lazy(() => 
+const StudyBibleWalkthrough = lazy(() =>
+  import("@/components/StudyBibleWalkthrough").then(m => ({ default: m.StudyBibleWalkthrough }))
+);
+const TransparencySection = lazy(() =>
   import("@/components/TransparencySection").then(m => ({ default: m.TransparencySection }))
 );
 const FourPathsShowcase = lazy(() => 
@@ -54,13 +61,13 @@ const ExitIntentPopup = lazy(() =>
 
 // Simple section skeleton
 const SectionSkeleton = () => (
-  <div className="py-16 px-4">
+  <div className="py-8 sm:py-16 px-3 sm:px-4">
     <div className="max-w-6xl mx-auto animate-pulse">
-      <div className="h-8 bg-muted rounded w-1/3 mx-auto mb-4" />
-      <div className="h-4 bg-muted rounded w-1/2 mx-auto mb-8" />
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="h-6 sm:h-8 bg-muted rounded w-1/3 mx-auto mb-3 sm:mb-4" />
+      <div className="h-4 bg-muted rounded w-1/2 mx-auto mb-6 sm:mb-8" />
+      <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-48 bg-muted rounded-lg" />
+          <div key={i} className="h-36 sm:h-48 bg-muted rounded-lg" />
         ))}
       </div>
     </div>
@@ -74,6 +81,7 @@ const Index = () => {
   useSyncEarlyTracking();
   const { user } = useAuth();
   const { preferences } = useUserPreferences();
+  const { focusMode } = useDisplaySettings();
   const [showInstallBanner, setShowInstallBanner] = useState(false);
 
   useEffect(() => {
@@ -104,30 +112,30 @@ const Index = () => {
       {/* Deferred analytics - load after paint */}
       <Suspense fallback={null}>
         <SessionTracker />
-        <ExitIntentPopup />
+        {!focusMode && <ExitIntentPopup />}
       </Suspense>
       
-      {/* Install App Banner */}
-      {showInstallBanner && (
+      {/* Install Banner */}
+      {showInstallBanner && !focusMode && (
         <div className="sticky top-16 z-40 bg-gradient-to-r from-primary via-primary/95 to-accent text-primary-foreground shadow-lg border-b border-primary/20">
-          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <Download className="w-5 h-5 flex-shrink-0" />
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-3">
+            <div className="flex items-center justify-between gap-2 sm:gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                <Download className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                 <div className="min-w-0 flex-1">
-                  <p className="font-bold text-sm">📱 Get the App!</p>
-                  <p className="text-xs opacity-90">Install for offline access</p>
+                  <p className="font-bold text-xs sm:text-sm">📱 Install Phototheology</p>
+                  <p className="text-[10px] sm:text-xs opacity-90 hidden sm:block">Access offline anytime</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <PWAInstallButton />
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={dismissBanner}
-                  className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20"
+                  className="h-7 w-7 sm:h-8 sm:w-8 text-primary-foreground hover:bg-primary-foreground/20"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </Button>
               </div>
             </div>
@@ -136,12 +144,8 @@ const Index = () => {
       )}
 
       {/* Quick testimonial banner - immediate social proof */}
-      <QuickTestimonialBanner />
+      {!focusMode && <QuickTestimonialBanner />}
 
-      {/* Give Me A Gem - Prominent CTA */}
-      <div className="flex justify-center py-8 bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/10 border-y border-amber-500/20">
-        <GiveGemButton />
-      </div>
 
       {/* 1. Hero - The 10-second hook - NOT lazy loaded */}
       <PunchyHero />
@@ -160,6 +164,11 @@ const Index = () => {
       <Suspense fallback={<SectionSkeleton />}>
         {/* 3. Interactive Demo - Try it yourself */}
         <InteractiveWalkthrough />
+      </Suspense>
+
+      <Suspense fallback={<SectionSkeleton />}>
+        {/* 3.5. Study Bible Interactive Demo */}
+        <StudyBibleWalkthrough />
       </Suspense>
 
       <Suspense fallback={<SectionSkeleton />}>
@@ -182,12 +191,30 @@ const Index = () => {
         <FinalCTA />
       </Suspense>
 
+      {/* Language Selector for public visitors */}
+      {!focusMode && (
+        <div className="fixed bottom-20 right-3 z-50 md:bottom-6 md:right-4 zen-hideable">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="icon" className="rounded-full shadow-lg bg-background/95 backdrop-blur-sm h-10 w-10">
+                <Globe className="h-5 w-5" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2" align="end" side="top">
+              <LanguageSelector showLabel={false} />
+            </PopoverContent>
+          </Popover>
+        </div>
+      )}
+
       <Footer />
       
       {/* Mobile Sticky CTA Bar - deferred */}
-      <Suspense fallback={null}>
-        <MobileStickyCtaBar />
-      </Suspense>
+      {!focusMode && (
+        <Suspense fallback={null}>
+          <MobileStickyCtaBar />
+        </Suspense>
+      )}
     </div>
   );
 };

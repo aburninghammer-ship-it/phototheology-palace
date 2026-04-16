@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Flame, Calendar, TrendingUp } from "lucide-react";
 import { format, subDays, isToday } from "date-fns";
+import { useTranslation } from 'react-i18next';
 
 interface RoomStreakTrackerProps {
   roomStreak: number;
@@ -17,15 +18,15 @@ export const RoomStreakTracker: React.FC<RoomStreakTrackerProps> = ({
   onPractice,
   isUpdating,
 }) => {
+  const { t } = useTranslation();
   const canPracticeToday = !lastPracticeDate || !isToday(new Date(lastPracticeDate));
-  
-  // Generate last 7 days
+
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const date = subDays(new Date(), 6 - i);
     return {
       date,
       day: format(date, "EEE")[0],
-      practiced: false, // We'd need actual data to determine this
+      practiced: false,
     };
   });
 
@@ -34,14 +35,13 @@ export const RoomStreakTracker: React.FC<RoomStreakTrackerProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Flame className="h-5 w-5" />
-          Room Practice Streak
+          {t('roomStreak.title')}
         </CardTitle>
         <CardDescription>
-          Practice this room daily to build mastery
+          {t('roomStreak.description')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Current Streak */}
         <div className="flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20">
           <div>
             <div className="flex items-center gap-2">
@@ -49,7 +49,7 @@ export const RoomStreakTracker: React.FC<RoomStreakTrackerProps> = ({
               <span className="text-3xl font-bold">{roomStreak}</span>
             </div>
             <p className="text-sm text-muted-foreground mt-1">
-              {roomStreak === 1 ? "day streak" : "days streak"}
+              {roomStreak === 1 ? t('roomStreak.dayStreak') : t('roomStreak.daysStreak')}
             </p>
           </div>
           {canPracticeToday && (
@@ -59,20 +59,19 @@ export const RoomStreakTracker: React.FC<RoomStreakTrackerProps> = ({
               className="gap-2"
             >
               <TrendingUp className="h-4 w-4" />
-              Practice Today
+              {t('roomStreak.practiceToday')}
             </Button>
           )}
           {!canPracticeToday && (
             <Badge variant="default" className="gap-2">
               <Calendar className="h-3 w-3" />
-              Practiced Today!
+              {t('roomStreak.practicedToday')}
             </Badge>
           )}
         </div>
 
-        {/* Visual Calendar (last 7 days) */}
         <div>
-          <h4 className="text-sm font-medium mb-2">Practice History</h4>
+          <h4 className="text-sm font-medium mb-2">{t('roomStreak.practiceHistory')}</h4>
           <div className="grid grid-cols-7 gap-2">
             {last7Days.map((day, index) => (
               <div
@@ -108,15 +107,14 @@ export const RoomStreakTracker: React.FC<RoomStreakTrackerProps> = ({
           </div>
         </div>
 
-        {/* Streak Milestones */}
         <div className="space-y-2">
-          <h4 className="text-sm font-medium">Milestones</h4>
+          <h4 className="text-sm font-medium">{t('roomStreak.milestones')}</h4>
           <div className="space-y-1">
             {[
-              { days: 3, label: "Getting Started", unlocked: roomStreak >= 3 },
-              { days: 7, label: "One Week Warrior", unlocked: roomStreak >= 7 },
-              { days: 14, label: "Two Week Champion", unlocked: roomStreak >= 14 },
-              { days: 30, label: "Monthly Master", unlocked: roomStreak >= 30 },
+              { days: 3, label: t('roomStreak.gettingStarted'), unlocked: roomStreak >= 3 },
+              { days: 7, label: t('roomStreak.oneWeekWarrior'), unlocked: roomStreak >= 7 },
+              { days: 14, label: t('roomStreak.twoWeekChampion'), unlocked: roomStreak >= 14 },
+              { days: 30, label: t('roomStreak.monthlyMaster'), unlocked: roomStreak >= 30 },
             ].map((milestone) => (
               <div
                 key={milestone.days}
@@ -126,7 +124,7 @@ export const RoomStreakTracker: React.FC<RoomStreakTrackerProps> = ({
                   {milestone.label}
                 </span>
                 <Badge variant={milestone.unlocked ? "default" : "outline"}>
-                  {milestone.days} days
+                  {t('roomStreak.days', { count: milestone.days })}
                 </Badge>
               </div>
             ))}
@@ -135,7 +133,7 @@ export const RoomStreakTracker: React.FC<RoomStreakTrackerProps> = ({
 
         {lastPracticeDate && (
           <p className="text-xs text-muted-foreground text-center pt-2 border-t">
-            Last practiced: {format(new Date(lastPracticeDate), "MMM d, yyyy")}
+            {t('roomStreak.lastPracticed', { date: format(new Date(lastPracticeDate), "MMM d, yyyy") })}
           </p>
         )}
       </CardContent>

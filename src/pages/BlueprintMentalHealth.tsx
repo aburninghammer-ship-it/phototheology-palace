@@ -10,6 +10,8 @@ import { MENTAL_HEALTH_ARTICLES, MENTAL_HEALTH_INTRO } from "@/data/blueprintMen
 import { useToast } from "@/hooks/use-toast";
 import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
 import { BlueprintMap } from "@/components/blueprint/BlueprintMap";
+import { BlueprintEnhancedFeatures } from "@/components/blueprint/BlueprintEnhancedFeatures";
+import { useTranslation } from "react-i18next";
 
 const STORAGE_KEY = "mentalhealth_blueprint_progress";
 
@@ -18,9 +20,10 @@ export default function BlueprintMentalHealth() {
   const [notes, setNotes] = useState<Record<number, string>>({});
   const [completedArticles, setCompletedArticles] = useState<number[]>([]);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
-  const currentArticle = selectedArticle 
-    ? MENTAL_HEALTH_ARTICLES.find(a => a.id === selectedArticle) 
+  const currentArticle = selectedArticle
+    ? MENTAL_HEALTH_ARTICLES.find(a => a.id === selectedArticle)
     : null;
 
   useEffect(() => {
@@ -35,7 +38,7 @@ export default function BlueprintMentalHealth() {
   const handleComplete = (articleId: number) => {
     const updated = [...completedArticles, articleId];
     setCompletedArticles(updated);
-    
+
     const data = {
       completed: updated,
       notes: notes
@@ -43,15 +46,15 @@ export default function BlueprintMentalHealth() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 
     toast({
-      title: "Progress saved!",
-      description: `${MENTAL_HEALTH_ARTICLES.find(a => a.id === articleId)?.name} completed`,
+      title: t('common.progressSaved'),
+      description: t('common.articleCompleted', { name: MENTAL_HEALTH_ARTICLES.find(a => a.id === articleId)?.name }),
     });
   };
 
   const handleNotesChange = (articleId: number, value: string) => {
     const updated = { ...notes, [articleId]: value };
     setNotes(updated);
-    
+
     const data = {
       completed: completedArticles,
       notes: updated
@@ -75,14 +78,14 @@ export default function BlueprintMentalHealth() {
               </p>
               <div className="flex justify-center">
                 <EnhancedSocialShare
-                  title="The Sanctuary Blueprint for Mental Health"
-                  content="God's 6-step therapeutic pattern for emotional healing, anxiety, depression, and mental wellness."
+                  title={t('blueprint.mentalHealth.shareTitle')}
+                  content={t('blueprint.mentalHealth.shareContent')}
                   url={window.location.href}
-                  defaultMessage="🧠 Discovered this powerful resource for mental health:\n\nThe Sanctuary Blueprint for Mental Health maps God's 6-step sanctuary pattern to emotional healing—from surrender and self-awareness to boundaries and mercy.\n\nThe mind heals under mercy, not pressure. 💙✨"
-                  buttonText="Share This Resource"
+                  defaultMessage={t('blueprint.mentalHealth.shareDefaultMessage')}
+                  buttonText={t('blueprint.common.shareThisResource')}
                 />
               </div>
-              
+
               {/* Sanctuary Explanation */}
               <div className="max-w-4xl mx-auto bg-muted/30 p-8 rounded-lg border-2 border-primary/30">
                 <div className="prose prose-sm max-w-none dark:prose-invert">
@@ -113,20 +116,21 @@ export default function BlueprintMentalHealth() {
             />
           </>
         ) : (
+          <>
           <Card>
             <CardHeader>
-              <Button 
-                variant="ghost" 
-                onClick={() => setSelectedArticle(null)} 
+              <Button
+                variant="ghost"
+                onClick={() => setSelectedArticle(null)}
                 className="w-fit mb-4"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Overview
+                {t('common.backToOverview')}
               </Button>
               <div className="flex items-center gap-2 mb-2">
-                <Badge variant="secondary">{currentArticle?.week} of 8</Badge>
+                <Badge variant="secondary">{t('blueprint.mentalHealth.weekOfTotal', { week: currentArticle?.week, total: 8 })}</Badge>
                 {completedArticles.includes(currentArticle?.id || 0) && (
-                  <Badge className="bg-green-500">Completed</Badge>
+                  <Badge className="bg-green-500">{t('common.completed')}</Badge>
                 )}
               </div>
               <div className="flex items-start gap-3">
@@ -147,7 +151,7 @@ export default function BlueprintMentalHealth() {
                   <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
                     <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
                       <Brain className="h-5 w-5 text-primary" />
-                      Mental Health Principle
+                      {t('blueprint.mentalHealth.mentalHealthPrinciple')}
                     </h3>
                     <p className="text-lg font-semibold text-primary">
                       "{currentArticle?.mentalHealthPrinciple}"
@@ -156,7 +160,7 @@ export default function BlueprintMentalHealth() {
 
                   {/* Teaching */}
                   <div>
-                    <h3 className="font-semibold text-lg mb-3 text-primary">Teaching</h3>
+                    <h3 className="font-semibold text-lg mb-3 text-primary">{t('blueprint.common.teaching')}</h3>
                     <div className="prose prose-sm max-w-none">
                       <p className="whitespace-pre-line leading-relaxed">
                         {currentArticle?.teaching}
@@ -166,13 +170,13 @@ export default function BlueprintMentalHealth() {
 
                   {/* Biblical Foundation */}
                   <div className="bg-purple-50 dark:bg-purple-950 p-4 rounded-lg">
-                    <h3 className="font-semibold text-lg mb-3">📖 Biblical Foundation</h3>
+                    <h3 className="font-semibold text-lg mb-3">{t('blueprint.mentalHealth.biblicalFoundation')}</h3>
                     <p className="text-sm whitespace-pre-line">{currentArticle?.biblicalFoundation}</p>
                   </div>
 
                   {/* Practical Steps */}
                   <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg">
-                    <h3 className="font-semibold text-lg mb-3">✅ Practical Steps</h3>
+                    <h3 className="font-semibold text-lg mb-3">{t('blueprint.mentalHealth.practicalSteps')}</h3>
                     <ol className="space-y-3">
                       {currentArticle?.practicalSteps.map((step, i) => (
                         <li key={i} className="text-sm">
@@ -184,7 +188,7 @@ export default function BlueprintMentalHealth() {
 
                   {/* Reflection Questions */}
                   <div className="bg-yellow-50 dark:bg-yellow-950 p-4 rounded-lg">
-                    <h3 className="font-semibold text-lg mb-3">💭 Reflection Questions</h3>
+                    <h3 className="font-semibold text-lg mb-3">{t('blueprint.common.reflectionQuestions')}</h3>
                     <ul className="space-y-2">
                       {currentArticle?.reflectionQuestions.map((question, i) => (
                         <li key={i} className="text-sm">• {question}</li>
@@ -194,13 +198,13 @@ export default function BlueprintMentalHealth() {
 
                   {/* Weekly Challenge */}
                   <div className="bg-orange-50 dark:bg-orange-950 p-4 rounded-lg">
-                    <h3 className="font-semibold text-lg mb-2">🎯 Weekly Challenge</h3>
+                    <h3 className="font-semibold text-lg mb-2">{t('blueprint.mentalHealth.weeklyChallenge')}</h3>
                     <p className="text-sm">{currentArticle?.weeklyChallenge}</p>
                   </div>
 
                   {/* Scripture References */}
                   <div className="bg-purple-50 dark:bg-purple-950 p-4 rounded-lg">
-                    <h3 className="font-semibold text-lg mb-3">📖 Scripture References</h3>
+                    <h3 className="font-semibold text-lg mb-3">{t('blueprint.common.scriptureReferences')}</h3>
                     <ul className="space-y-1">
                       {currentArticle?.scriptureReferences.map((ref, i) => (
                         <li key={i} className="text-sm">• {ref}</li>
@@ -210,15 +214,15 @@ export default function BlueprintMentalHealth() {
 
                   {/* Prayer Prompt */}
                   <div className="bg-primary/10 p-4 rounded-lg border border-primary/20">
-                    <h3 className="font-semibold text-lg mb-2 text-primary">🙏 Prayer</h3>
+                    <h3 className="font-semibold text-lg mb-2 text-primary">{t('blueprint.common.prayerHeading')}</h3>
                     <p className="italic text-base">{currentArticle?.prayerPrompt}</p>
                   </div>
 
                   {/* Notes Section */}
                   <div className="space-y-3">
-                    <h3 className="font-semibold text-lg">📝 Your Notes & Progress</h3>
+                    <h3 className="font-semibold text-lg">{t('blueprint.mentalHealth.yourNotesAndProgress')}</h3>
                     <Textarea
-                      placeholder="Write your thoughts, commitments, and insights here..."
+                      placeholder={t('blueprint.mentalHealth.notesPlaceholder')}
                       className="min-h-[150px]"
                       value={notes[currentArticle?.id || 0] || ""}
                       onChange={(e) => handleNotesChange(currentArticle?.id || 0, e.target.value)}
@@ -233,13 +237,30 @@ export default function BlueprintMentalHealth() {
                       onClick={() => handleComplete(currentArticle?.id || 0)}
                     >
                       <CheckCircle2 className="mr-2 h-5 w-5" />
-                      Mark as Complete
+                      {t('common.markAsComplete')}
                     </Button>
                   )}
                 </div>
               </ScrollArea>
             </CardContent>
           </Card>
+
+          {/* Interactive Study Tools */}
+          <BlueprintEnhancedFeatures
+            blueprintType="mentalhealth"
+            currentArticleId={currentArticle?.id}
+            currentArticleTitle={currentArticle?.name}
+            currentArticleContent={currentArticle?.teaching}
+            dailyCheckItems={[
+              t('blueprint.mentalHealth.dailyCheck.readArticle'),
+              t('blueprint.mentalHealth.dailyCheck.copingStrategy'),
+              t('blueprint.mentalHealth.dailyCheck.physicalActivity'),
+              t('blueprint.mentalHealth.dailyCheck.connectedSomeone'),
+              t('blueprint.mentalHealth.dailyCheck.prayedMeditated'),
+              t('blueprint.mentalHealth.dailyCheck.adequateSleep')
+            ]}
+          />
+          </>
         )}
       </main>
     </div>

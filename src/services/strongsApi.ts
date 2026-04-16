@@ -188,15 +188,35 @@ export const getStrongsEntry = async (number: string): Promise<StrongsEntry | nu
   return allData[baseNumber] || allData[number] || null;
 };
 
-// Search Strong's by word
+// Search Strong's by word - exact match on usage/translation
 export const searchStrongs = async (word: string): Promise<StrongsEntry[]> => {
-  const results = Object.values(STRONGS_DATA).filter(entry => 
-    entry.word.toLowerCase().includes(word.toLowerCase()) ||
-    entry.transliteration.toLowerCase().includes(word.toLowerCase()) ||
-    entry.usage.some(u => u.toLowerCase().includes(word.toLowerCase()))
+  const searchWord = word.toLowerCase().trim();
+
+  // First, try to find exact matches in usage (English translations)
+  const exactMatches = Object.values(STRONGS_DATA).filter(entry =>
+    entry.usage.some(u => u.toLowerCase() === searchWord)
   );
-  
-  return results;
+
+  if (exactMatches.length > 0) {
+    return exactMatches;
+  }
+
+  // If no exact matches, try to find words where usage starts with the search word
+  // This catches cases like searching "love" and finding "love", "loved", "loves"
+  const startsWithMatches = Object.values(STRONGS_DATA).filter(entry =>
+    entry.usage.some(u => u.toLowerCase().startsWith(searchWord))
+  );
+
+  if (startsWithMatches.length > 0) {
+    return startsWithMatches;
+  }
+
+  // Finally, check transliteration for exact match (for Greek/Hebrew searches)
+  const transliterationMatches = Object.values(STRONGS_DATA).filter(entry =>
+    entry.transliteration.toLowerCase() === searchWord
+  );
+
+  return transliterationMatches;
 };
 
 // Verse data with Strong's numbers
@@ -1297,6 +1317,149 @@ const ADDITIONAL_STRONGS: Record<string, StrongsEntry> = {
 
 // Merge additional Strong's data
 Object.assign(STRONGS_DATA, ADDITIONAL_STRONGS);
+
+// Concordance entry - a verse where a Strong's word appears
+export interface ConcordanceEntry {
+  book: string;
+  chapter: number;
+  verse: number;
+  text: string;
+  translation: string; // The English word used in this verse
+  highlightWord: string; // The word to highlight
+}
+
+// Get concordance data for a Strong's number - all verses where this word appears
+export const getStrongsConcordance = async (strongsNumber: string, limit: number = 50): Promise<ConcordanceEntry[]> => {
+  // Strip morphological codes and normalize
+  let baseNumber = strongsNumber.split('=')[0];
+  baseNumber = baseNumber.replace(/^([GH])0+/, '$1');
+
+  console.log(`[Concordance] Looking up verses for: ${baseNumber}`);
+
+  try {
+    // Query bible_verses_tokenized for verses containing this Strong's number
+    // The tokens column contains an array of objects with 's' or 'strongs' field
+    const { data, error } = await supabase
+      .from('bible_verses_tokenized')
+      .select('book, chapter, verse_num, text_kjv, tokens')
+      .or(`tokens.cs.{"s":"${baseNumber}"},tokens.cs.{"strongs":"${baseNumber}"}`)
+      .limit(limit);
+
+    if (error) {
+      console.error(`[Concordance] Database error:`, error);
+      // Fall back to hardcoded data
+      return getHardcodedConcordance(baseNumber);
+    }
+
+    if (!data || data.length === 0) {
+      console.log(`[Concordance] No database results, using hardcoded data`);
+      return getHardcodedConcordance(baseNumber);
+    }
+
+    console.log(`[Concordance] Found ${data.length} verses in database`);
+
+    // Process each verse to find the translated word
+    return data.map(verse => {
+      const tokens = verse.tokens as Array<{ t?: string; word?: string; s?: string; strongs?: string }>;
+
+      // Find the token with our Strong's number to get the English translation
+      const matchingToken = tokens.find(t =>
+        (t.s === baseNumber || t.strongs === baseNumber) ||
+        (t.s?.startsWith(baseNumber) || t.strongs?.startsWith(baseNumber))
+      );
+
+      const translation = matchingToken?.t || matchingToken?.word || '';
+
+      return {
+        book: verse.book,
+        chapter: verse.chapter,
+        verse: verse.verse_num,
+        text: verse.text_kjv,
+        translation: translation.replace(/[.,!?;:'"()[\]{}]/g, ''),
+        highlightWord: translation,
+      };
+    });
+  } catch (error) {
+    console.error('[Concordance] Error:', error);
+    return getHardcodedConcordance(baseNumber);
+  }
+};
+
+// Hardcoded concordance data for common Strong's numbers
+const HARDCODED_CONCORDANCE: Record<string, ConcordanceEntry[]> = {
+  "G26": [ // agape - love
+    { book: "John", chapter: 3, verse: 16, text: "For God so loved the world, that he gave his only begotten Son...", translation: "loved", highlightWord: "loved" },
+    { book: "John", chapter: 13, verse: 34, text: "A new commandment I give unto you, That ye love one another...", translation: "love", highlightWord: "love" },
+    { book: "John", chapter: 15, verse: 13, text: "Greater love hath no man than this, that a man lay down his life for his friends.", translation: "love", highlightWord: "love" },
+    { book: "Romans", chapter: 5, verse: 8, text: "But God commendeth his love toward us, in that, while we were yet sinners, Christ died for us.", translation: "love", highlightWord: "love" },
+    { book: "Romans", chapter: 8, verse: 35, text: "Who shall separate us from the love of Christ?", translation: "love", highlightWord: "love" },
+    { book: "Romans", chapter: 8, verse: 39, text: "...shall be able to separate us from the love of God, which is in Christ Jesus our Lord.", translation: "love", highlightWord: "love" },
+    { book: "1 Corinthians", chapter: 13, verse: 4, text: "Charity suffereth long, and is kind; charity envieth not...", translation: "charity", highlightWord: "Charity" },
+    { book: "1 Corinthians", chapter: 13, verse: 13, text: "And now abideth faith, hope, charity, these three; but the greatest of these is charity.", translation: "charity", highlightWord: "charity" },
+    { book: "Galatians", chapter: 5, verse: 22, text: "But the fruit of the Spirit is love, joy, peace...", translation: "love", highlightWord: "love" },
+    { book: "Ephesians", chapter: 3, verse: 19, text: "And to know the love of Christ, which passeth knowledge...", translation: "love", highlightWord: "love" },
+    { book: "1 John", chapter: 4, verse: 8, text: "He that loveth not knoweth not God; for God is love.", translation: "love", highlightWord: "love" },
+    { book: "1 John", chapter: 4, verse: 16, text: "...God is love; and he that dwelleth in love dwelleth in God, and God in him.", translation: "love", highlightWord: "love" },
+  ],
+  "G25": [ // agapao - to love
+    { book: "John", chapter: 3, verse: 16, text: "For God so loved the world, that he gave his only begotten Son...", translation: "loved", highlightWord: "loved" },
+    { book: "John", chapter: 14, verse: 21, text: "He that hath my commandments, and keepeth them, he it is that loveth me...", translation: "loveth", highlightWord: "loveth" },
+    { book: "John", chapter: 21, verse: 15, text: "...Simon, son of Jonas, lovest thou me more than these?", translation: "lovest", highlightWord: "lovest" },
+    { book: "Romans", chapter: 8, verse: 28, text: "...all things work together for good to them that love God...", translation: "love", highlightWord: "love" },
+    { book: "Ephesians", chapter: 5, verse: 25, text: "Husbands, love your wives, even as Christ also loved the church...", translation: "love", highlightWord: "love" },
+  ],
+  "G2316": [ // theos - God
+    { book: "John", chapter: 1, verse: 1, text: "In the beginning was the Word, and the Word was with God, and the Word was God.", translation: "God", highlightWord: "God" },
+    { book: "John", chapter: 3, verse: 16, text: "For God so loved the world, that he gave his only begotten Son...", translation: "God", highlightWord: "God" },
+    { book: "Romans", chapter: 1, verse: 1, text: "Paul, a servant of Jesus Christ, called to be an apostle, separated unto the gospel of God.", translation: "God", highlightWord: "God" },
+    { book: "Romans", chapter: 8, verse: 28, text: "And we know that all things work together for good to them that love God...", translation: "God", highlightWord: "God" },
+    { book: "1 John", chapter: 4, verse: 8, text: "He that loveth not knoweth not God; for God is love.", translation: "God", highlightWord: "God" },
+  ],
+  "G4102": [ // pistis - faith
+    { book: "Romans", chapter: 1, verse: 17, text: "...The just shall live by faith.", translation: "faith", highlightWord: "faith" },
+    { book: "Romans", chapter: 10, verse: 17, text: "So then faith cometh by hearing, and hearing by the word of God.", translation: "faith", highlightWord: "faith" },
+    { book: "Galatians", chapter: 2, verse: 16, text: "...by the faith of Jesus Christ, even we have believed in Jesus Christ...", translation: "faith", highlightWord: "faith" },
+    { book: "Ephesians", chapter: 2, verse: 8, text: "For by grace are ye saved through faith; and that not of yourselves: it is the gift of God.", translation: "faith", highlightWord: "faith" },
+    { book: "Hebrews", chapter: 11, verse: 1, text: "Now faith is the substance of things hoped for, the evidence of things not seen.", translation: "faith", highlightWord: "faith" },
+    { book: "Hebrews", chapter: 11, verse: 6, text: "But without faith it is impossible to please him...", translation: "faith", highlightWord: "faith" },
+    { book: "James", chapter: 2, verse: 17, text: "Even so faith, if it hath not works, is dead, being alone.", translation: "faith", highlightWord: "faith" },
+  ],
+  "G5485": [ // charis - grace
+    { book: "John", chapter: 1, verse: 14, text: "...full of grace and truth.", translation: "grace", highlightWord: "grace" },
+    { book: "John", chapter: 1, verse: 17, text: "...but grace and truth came by Jesus Christ.", translation: "grace", highlightWord: "grace" },
+    { book: "Romans", chapter: 3, verse: 24, text: "Being justified freely by his grace through the redemption that is in Christ Jesus.", translation: "grace", highlightWord: "grace" },
+    { book: "Romans", chapter: 5, verse: 20, text: "...But where sin abounded, grace did much more abound.", translation: "grace", highlightWord: "grace" },
+    { book: "Romans", chapter: 6, verse: 14, text: "...for ye are not under the law, but under grace.", translation: "grace", highlightWord: "grace" },
+    { book: "Ephesians", chapter: 2, verse: 8, text: "For by grace are ye saved through faith...", translation: "grace", highlightWord: "grace" },
+    { book: "Titus", chapter: 2, verse: 11, text: "For the grace of God that bringeth salvation hath appeared to all men.", translation: "grace", highlightWord: "grace" },
+  ],
+  "H430": [ // elohim - God
+    { book: "Genesis", chapter: 1, verse: 1, text: "In the beginning God created the heaven and the earth.", translation: "God", highlightWord: "God" },
+    { book: "Genesis", chapter: 1, verse: 26, text: "And God said, Let us make man in our image, after our likeness...", translation: "God", highlightWord: "God" },
+    { book: "Exodus", chapter: 20, verse: 3, text: "Thou shalt have no other gods before me.", translation: "gods", highlightWord: "gods" },
+    { book: "Deuteronomy", chapter: 6, verse: 4, text: "Hear, O Israel: The LORD our God is one LORD.", translation: "God", highlightWord: "God" },
+    { book: "Psalm", chapter: 23, verse: 1, text: "The LORD is my shepherd; I shall not want.", translation: "LORD", highlightWord: "LORD" },
+  ],
+  "H3068": [ // YHWH - LORD
+    { book: "Genesis", chapter: 2, verse: 4, text: "...in the day that the LORD God made the earth and the heavens.", translation: "LORD", highlightWord: "LORD" },
+    { book: "Exodus", chapter: 3, verse: 14, text: "And God said unto Moses, I AM THAT I AM...", translation: "LORD", highlightWord: "LORD" },
+    { book: "Exodus", chapter: 20, verse: 2, text: "I am the LORD thy God, which have brought thee out of the land of Egypt...", translation: "LORD", highlightWord: "LORD" },
+    { book: "Psalm", chapter: 23, verse: 1, text: "The LORD is my shepherd; I shall not want.", translation: "LORD", highlightWord: "LORD" },
+    { book: "Isaiah", chapter: 40, verse: 31, text: "But they that wait upon the LORD shall renew their strength...", translation: "LORD", highlightWord: "LORD" },
+  ],
+  "G4982": [ // sozo - to save
+    { book: "Matthew", chapter: 1, verse: 21, text: "...for he shall save his people from their sins.", translation: "save", highlightWord: "save" },
+    { book: "John", chapter: 3, verse: 17, text: "...but that the world through him might be saved.", translation: "saved", highlightWord: "saved" },
+    { book: "Acts", chapter: 2, verse: 21, text: "...whosoever shall call on the name of the Lord shall be saved.", translation: "saved", highlightWord: "saved" },
+    { book: "Acts", chapter: 16, verse: 31, text: "Believe on the Lord Jesus Christ, and thou shalt be saved...", translation: "saved", highlightWord: "saved" },
+    { book: "Romans", chapter: 10, verse: 9, text: "...thou shalt be saved.", translation: "saved", highlightWord: "saved" },
+    { book: "Ephesians", chapter: 2, verse: 8, text: "For by grace are ye saved through faith...", translation: "saved", highlightWord: "saved" },
+  ],
+};
+
+const getHardcodedConcordance = (strongsNumber: string): ConcordanceEntry[] => {
+  return HARDCODED_CONCORDANCE[strongsNumber] || [];
+};
 
 // Get verse with Strong's numbers
 export const getVerseWithStrongs = async (book: string, chapter: number, verse: number): Promise<{

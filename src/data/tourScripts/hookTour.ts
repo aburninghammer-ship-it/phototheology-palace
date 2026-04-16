@@ -1,0 +1,45 @@
+import type { TourDefinition } from "./types";
+
+export const HOOK_TOUR: TourDefinition = {
+  id: "palace-hook",
+  title: "The Palace in 3 Minutes",
+  subtitle: "A quick taste of what Phototheology can do",
+  verse: "John 5:39",
+  verseText: "Search the scriptures; for in them ye think ye have eternal life: and they are they which testify of me.",
+  emoji: "⚡",
+  intro: {
+    id: "hook-intro",
+    guide: "reginald",
+    floor: 0,
+    floorName: "Welcome",
+    roomCode: "INTRO",
+    roomName: "Introduction",
+    title: "Something You've Never Seen",
+    script: `Welcome. I'm Reginald, your concierge at the Phototheology Palace — the heart of PhototheologyOS, the operating system for biblical thinking. Powered by AI. Built for biblical intelligence. I'm going to take exactly three minutes to show you something that will change how you read the Bible — permanently. Here's the problem. You've read Psalm 23 a hundred times. "The LORD is my shepherd, I shall not want." You know the words. But be honest — when's the last time those words actually moved you? When's the last time a familiar passage made your heart race with a discovery you'd never seen before? If the Bible has started feeling flat, it's not the Bible's fault. And it's definitely not yours. You were just never given a method for seeing what's really there.`,
+    estimatedSeconds: 35,
+  },
+  segments: [
+    {
+      id: "hook-demo",
+      guide: "reginald",
+      floor: 1,
+      floorName: "Demo",
+      roomCode: "SR",
+      roomName: "The Wow Moment",
+      title: "What You've Been Missing",
+      script: `Let me show you one thing — just one — and then you tell me if you want to see more. Read Psalm 23 with me for a second. It starts with sheep: green pastures, still waters, paths of righteousness. You're a sheep being led by a shepherd. Comfortable. Familiar. But then something happens at verse five that almost nobody catches. "Thou preparest a table before me in the presence of mine enemies. Thou anointest my head with oil. My cup runneth over." Wait. You're not a sheep anymore. Sheep don't sit at tables. Sheep don't get anointed with oil. Sheep don't hold cups. David shifts the metaphor without warning — from sheep in a field to an honored guest at a royal banquet. Why? Because that's the gospel hidden inside six verses. You start as a wandering sheep and end as a guest of honor at the King's table. And it gets deeper. Look at what sits on either side of Psalm 23. Psalm 22 — "My God, my God, why hast thou forsaken me?" — the psalm of the cross, the one Jesus quoted while dying. Psalm 24 — "Lift up your heads, O ye gates, and the King of glory shall come in" — the psalm of the triumphant King. Cross. Comfort. Crown. Three psalms. One Christ. The Shepherd who suffers in Psalm 22 becomes the Shepherd who provides in Psalm 23 becomes the King who reigns in Psalm 24. You've had that in your Bible your entire life. And you probably never saw it — because no one taught you how to look. That's what PhototheologyOS does. It's not new information. It's a new way of seeing. A palace of principles — eight floors, each one training your eyes to catch what casual reading misses.`,
+      estimatedSeconds: 75,
+    },
+  ],
+  outro: {
+    id: "hook-outro",
+    guide: "reginald",
+    floor: 0,
+    floorName: "Welcome",
+    roomCode: "OUTRO",
+    roomName: "Next Step",
+    title: "Ready for More?",
+    script: `That was one psalm, and we barely scratched the surface. In the full Psalm 23 Palace Tour, Jeeves and I walk you through every room in the palace — showing you how each principle reveals something new in those six verses. By the end, Psalm 23 won't just be a comforting poem anymore. It'll be a theological cathedral you built with your own mind. If you're ready, select the Psalm 23 Guided Tour and let's go deeper. Or if you want to understand why PhototheologyOS is an entire operating system for biblical thinking — not just an app — check out the "What Is PhototheologyOS?" tour. You're about to discover that the Bible was never boring — you just needed the right eyes. Welcome to PhototheologyOS Eden. See you inside.`,
+    estimatedSeconds: 30,
+  },
+};

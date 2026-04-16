@@ -51,7 +51,7 @@ export const VerseHighlightMenu = ({
           {colors.map((color) => (
             <button
               key={color.value}
-              onClick={() => onHighlight(verse, color.value)}
+              onClick={(e) => { e.stopPropagation(); onHighlight(verse, color.value); }}
               className={cn(
                 "w-6 h-6 rounded-full transition-all hover:scale-110",
                 color.bg,
@@ -65,7 +65,7 @@ export const VerseHighlightMenu = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onRemove(verse)}
+              onClick={(e) => { e.stopPropagation(); onRemove(verse); }}
               className="h-6 w-6 p-0 ml-1"
             >
               <X className="h-3 w-3" />

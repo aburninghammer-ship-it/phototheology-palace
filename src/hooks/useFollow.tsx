@@ -11,10 +11,17 @@ export const useFollow = (targetUserId: string) => {
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
 
+  // Always fetch public follow counts when we have a target user
+  useEffect(() => {
+    if (targetUserId) {
+      fetchCounts();
+    }
+  }, [targetUserId]);
+
+  // Only check follow status for authenticated users
   useEffect(() => {
     if (user && targetUserId) {
       checkFollowStatus();
-      fetchCounts();
     } else {
       setLoading(false);
     }

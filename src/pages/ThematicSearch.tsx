@@ -170,23 +170,38 @@ const ThematicSearch = () => {
                 <div className="text-sm text-muted-foreground">
                   {query.length}/10 minimum characters
                 </div>
-                <Button 
-                  onClick={handleSearch} 
-                  disabled={loading || query.length < 10}
-                  size="lg"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Searching Bible...
-                    </>
-                  ) : (
-                    <>
+                <div className="flex gap-2">
+                  {results && (
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      onClick={() => {
+                        setQuery("");
+                        setResults(null);
+                      }}
+                    >
                       <Search className="h-4 w-4 mr-2" />
-                      Search Thematically
-                    </>
+                      New Search
+                    </Button>
                   )}
-                </Button>
+                  <Button 
+                    onClick={handleSearch} 
+                    disabled={loading || query.length < 10}
+                    size="lg"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Searching Bible...
+                      </>
+                    ) : (
+                      <>
+                        <Search className="h-4 w-4 mr-2" />
+                        Search Thematically
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
 
               {/* Example Searches */}

@@ -5,6 +5,7 @@ import { X, Clock, Sparkles, ArrowRight, Zap, Star, AlertTriangle } from "lucide
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useChurchMembership } from "@/hooks/useChurchMembership";
 import { supabase } from "@/integrations/supabase/client";
 import { useEventTracking } from "@/hooks/useEventTracking";
 
@@ -29,7 +30,7 @@ function getMessageForTrialAge(info: TrialInfo): MessageConfig | null {
   if (trialAge <= 1) {
     return {
       icon: <Star className="h-5 w-5" />,
-      title: "Welcome to your 14-day trial! 🎉",
+      title: "Welcome to your 7-day trial! 🎉",
       subtitle: "Complete your first win: explore the 24FPS Room and match 7 Genesis images.",
       cta: "Start First Win",
       urgency: "low",
@@ -92,6 +93,7 @@ export function TrialUrgencyMessage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { subscription, loading: subscriptionLoading } = useSubscription();
+  const { isMember: isChurchMember } = useChurchMembership();
   const { trackPaywallHit, trackUpgradeClick } = useEventTracking();
 
   useEffect(() => {
@@ -100,23 +102,52 @@ export function TrialUrgencyMessage() {
         return;
       }
 
-      // Use subscription hook for reliable paid status check
-      if (subscription.hasAccess && subscription.status !== 'trial') {
-        // User has active paid access - don't show trial messages
+      // If user has any form of paid access, don't show trial messages
+      // This respects the Stripe fallback check in useSubscription
+      if (subscription.hasAccess) {
+        setLoading(false);
+        return;
+      }
+
+      // CRITICAL: Double-check subscription status is actually 'trial' 
+      // If status is 'active', 'patron', or user has church access, skip trial messages
+      if (subscription.status === 'active' || subscription.tier === 'patron' || subscription.church.hasChurchAccess) {
         setLoading(false);
         return;
       }
 
       try {
-        // Check profile for trial info
+        // Check profile for trial info AND paid status
         const { data } = await supabase
           .from("profiles")
-          .select("trial_ends_at, created_at, has_lifetime_access")
+          .select("trial_ends_at, created_at, has_lifetime_access, subscription_status, subscription_tier, payment_source, stripe_subscription_id")
           .eq("id", user.id)
           .maybeSingle();
 
-        // Additional check for lifetime access from profile
+        // CRITICAL: Check ALL indicators of paid access from the profile
         if (data?.has_lifetime_access) {
+          console.log('[TrialUrgencyMessage] User has lifetime access, hiding trial message');
+          setLoading(false);
+          return;
+        }
+
+        // Check if user has active subscription status in profile
+        if (data?.subscription_status === 'active' && data?.subscription_tier && data.subscription_tier !== 'free') {
+          console.log('[TrialUrgencyMessage] User has active subscription in profile, hiding trial message');
+          setLoading(false);
+          return;
+        }
+
+        // Check if user has Stripe subscription ID (they've paid)
+        if (data?.stripe_subscription_id) {
+          console.log('[TrialUrgencyMessage] User has Stripe subscription ID, hiding trial message');
+          setLoading(false);
+          return;
+        }
+
+        // Check if user has payment_source that isn't trial/none
+        if (data?.payment_source && !['trial', 'none', ''].includes(data.payment_source)) {
+          console.log('[TrialUrgencyMessage] User has paid payment_source:', data.payment_source);
           setLoading(false);
           return;
         }
@@ -183,7 +214,7 @@ export function TrialUrgencyMessage() {
     sessionStorage.setItem("trial_urgency_dismissed", "true");
   };
 
-  if (loading || !message || dismissed) return null;
+  if (loading || !message || dismissed || isChurchMember) return null;
 
   const urgencyColors = {
     low: "border-primary/30 bg-primary/5",
@@ -208,7 +239,7 @@ export function TrialUrgencyMessage() {
         className="fixed left-4 right-4 md:left-auto md:right-4 md:w-[420px] z-40"
         style={{ top: "calc(var(--app-header-height, 64px) + 0.75rem)" }}
       >
-        <div className={`relative rounded-xl p-4 shadow-lg border backdrop-blur-sm ${urgencyColors[message.urgency]}`}>
+        <div className={`relative rounded-xl p-4 shadow-lg border  ${urgencyColors[message.urgency]}`}>
           <button
             onClick={handleDismiss}
             className="absolute top-2 right-2 p-1.5 rounded-full hover:bg-muted/50 transition-colors"

@@ -62,7 +62,7 @@ export const GUIDED_PATH_STEPS = [
 export const useChangeSpine = (): ChangeSpineStatus => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const { subscription } = useSubscription(); // Use subscription hook for reliable paid status
+  const { subscription, loading: subscriptionLoading } = useSubscription(); // Use subscription hook for reliable paid status
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['change-spine-status', user?.id],
@@ -227,7 +227,7 @@ export const useChangeSpine = (): ChangeSpineStatus => {
     
     isNewUser: newUserStatus,
     
-    isLoading,
+    isLoading: isLoading || subscriptionLoading,
     
     markOrientationComplete,
     advanceGuidedPath,

@@ -41,7 +41,7 @@ export const ChristChapterChallenge = ({ challenge, onSubmit, hasSubmitted }: Ch
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="bg-muted p-4 rounded-lg">
-          <p className="font-semibold mb-2">Today's Chapter:</p>
+          <p className="font-semibold mb-2">Today's Challenge:</p>
           <p className="text-2xl font-bold text-primary">{challenge.ui_config?.chapter}</p>
           <p className="text-sm text-muted-foreground mt-2">{challenge.description}</p>
         </div>

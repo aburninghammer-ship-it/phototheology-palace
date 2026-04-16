@@ -4,8 +4,10 @@ import { PathWeekOutline } from "@/components/path/PathWeekOutline";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function PathWeek() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -19,7 +21,7 @@ export default function PathWeek() {
           className="mb-4"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
+          {t('common.back')}
         </Button>
 
         <PathWeekOutline />

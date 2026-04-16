@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
-import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,7 +7,6 @@ import { ArrowLeft, Target, HelpCircle, BookOpen, AlertCircle, CheckCircle, Trop
 import { SequentialMasteryNotice } from "@/components/palace/SequentialMasteryNotice";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { JeevesAssistant } from "@/components/JeevesAssistant";
 import { useRoomProgress } from "@/hooks/useRoomProgress";
 import { useAuth } from "@/hooks/useAuth";
 import { useRoomUnlock } from "@/hooks/useRoomUnlock";
@@ -34,8 +33,6 @@ import { JuiceRoomDrill } from "@/components/rooms/JuiceRoomDrill";
 import { CyclesRoomDrill } from "@/components/rooms/CyclesRoomDrill";
 import { ThreeHeavensRoomDrill } from "@/components/rooms/ThreeHeavensRoomDrill";
 import DefComRoomDrill from "@/components/rooms/DefComRoomDrill";
-import { SymbolsLibrary } from "@/components/rooms/SymbolsLibrary";
-import { StoryLibrary } from "@/components/rooms/StoryLibrary";
 import { ConcentrationRoomDrill } from "@/components/rooms/ConcentrationRoomDrill";
 import { PatternExplorer } from "@/components/palace/PatternExplorer";
 import { RoomPracticeSpace } from "@/components/RoomPracticeSpace";
@@ -50,12 +47,9 @@ import { XpProgressBar } from "@/components/mastery/XpProgressBar";
 import { RoomMentorChat } from "@/components/mastery/RoomMentorChat";
 import { ReportCardDisplay } from "@/components/mastery/ReportCardDisplay";
 import { useFocusedRoom } from "@/hooks/useFocusedRoom";
-import { TrainingDashboard } from "@/components/mastery/TrainingDashboard";
 import { ContinueTraining } from "@/components/mastery/ContinueTraining";
 import { MilestoneTest } from "@/components/mastery/MilestoneTest";
 import { useRoomCurriculum } from "@/hooks/useRoomCurriculum";
-import { MasteryProgramEnrollment } from "@/components/mastery/MasteryProgramEnrollment";
-import { JeevesMasterProgram } from "@/components/mastery/JeevesMasterProgram";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 import { RoomTour } from "@/components/onboarding/RoomTour";
 import { useRoomTour } from "@/hooks/useRoomTour";
@@ -64,6 +58,36 @@ import { RoomCard } from "@/components/palace/RoomCard";
 import { getCardImage } from "@/data/cardImages";
 import { GenesisGalleryTour } from "@/components/onboarding/GenesisGalleryTour";
 import { use24FPSTour } from "@/hooks/use24FPSTour";
+import { StoryLibrary } from "@/components/story-room/StoryLibrary";
+import { SymbolLibrary } from "@/components/symbol-room/SymbolLibrary";
+import { ParallelsLibrary } from "@/components/parallels-room/ParallelsLibrary";
+import { NatureFreestyleLibrary } from "@/components/nature-freestyle/NatureFreestyleLibrary";
+import { HistoricalFreestyleLibrary } from "@/components/historical-freestyle/HistoricalFreestyleLibrary";
+import { GemsLibrary } from "@/components/gems-room/GemsLibrary";
+import { QALibrary } from "@/components/qa-room/QALibrary";
+import { FeastsLibrary } from "@/components/feasts-room/FeastsLibrary";
+import { MathematicsLibrary } from "@/components/mathematics-room/MathematicsLibrary";
+import { SanctuaryLibrary } from "@/components/sanctuary-room/SanctuaryLibrary";
+import { ProphecyLibrary } from "@/components/prophecy-room/ProphecyLibrary";
+import { ThemesLibrary } from "@/components/themes-room/ThemesLibrary";
+import { PatternsLibrary } from "@/components/patterns-room/PatternsLibrary";
+import { ThreeHeavensLibrary } from "@/components/three-heavens-room/ThreeHeavensLibrary";
+import { Room66Library } from "@/components/room66/Room66Library";
+import { RoomLibrary, LibraryBanner, hasLibrary } from "@/components/room/RoomLibrary";
+import { RoomPracticeTools } from "@/components/palace/RoomPracticeTools";
+import { TranslationLibrary } from "@/components/translation-room/TranslationLibrary";
+import { ImageBibleBrowser } from "@/components/rooms/ImageBibleBrowser";
+import { SavedDrillsList } from "@/components/drills/SavedDrillsList";
+import BibleRenderedGlance from "@/components/rooms/BibleRenderedGlance";
+import BibleRenderedFlashcards from "@/components/rooms/BibleRenderedFlashcards";
+import BibleRenderedSpeedScan from "@/components/rooms/BibleRenderedSpeedScan";
+import BibleRenderedDrill from "@/components/rooms/BibleRenderedDrill";
+
+import { RoomGraphicsDisplay, hasRoomGraphics } from "@/components/room/RoomGraphicsDisplay";
+import { WordPictureTranslator } from "@/components/rooms/WordPictureTranslator";
+import { MobileOrientationTip } from "@/components/MobileOrientationTip";
+import { useTranslation } from 'react-i18next';
+import { roomDescriptions } from "@/data/roomDescriptions";
 
 // Room IDs that have quick start guides
 const QUICK_START_ROOMS = new Set([
@@ -84,53 +108,55 @@ const QUICK_START_ROOMS = new Set([
 ]);
 
 export default function RoomDetail() {
+  const { t } = useTranslation();
+  const { translatedFloors } = useTranslatedPalaceData();
   const { floorNumber, roomId } = useParams();
   const [searchParams] = useSearchParams();
   const pathActivityId = searchParams.get('pathActivityId') || undefined;
   const navigate = useNavigate();
   const { user } = useAuth();
-  const floor = palaceFloors.find(f => f.number === Number(floorNumber));
+  const floor = translatedFloors.find(f => f.number === Number(floorNumber));
   const room = floor?.rooms.find(r => r.id === roomId);
   const [showDrill, setShowDrill] = useState(false);
   const [methodExpanded, setMethodExpanded] = useState(false);
   const [examplesExpanded, setExamplesExpanded] = useState(false);
   const [showOnboardingGuide, setShowOnboardingGuide] = useState(true);
-  const [activeTab, setActiveTab] = useState("learn");
-  
+  const [activeTab, setActiveTab] = useState("practice");
+
   // Scroll to top when room changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [floorNumber, roomId]);
-  
+
   // Check if this is the first room visit after onboarding (now 24FPS Room)
-  const isFirstRoomVisit = Number(floorNumber) === 1 && roomId === "24fps" && 
+  const isFirstRoomVisit = Number(floorNumber) === 1 && roomId === "24fps" &&
     !localStorage.getItem("onboarding_guide_24fps");
-  
+
   // 24FPS Gallery Tour for onboarding
   const { showTour: show24FPSTour, completeTour: complete24FPSTour, skipTour: skip24FPSTour } = use24FPSTour();
-  
+
   // Show Quick Start by default for ALL rooms that have quick starts defined
   const showQuickStart = room && QUICK_START_ROOMS.has(room.id);
-  
-  const { 
-    progress, 
-    loading: progressLoading, 
-    markExerciseComplete, 
-    markRoomComplete 
+
+  const {
+    progress,
+    loading: progressLoading,
+    markExerciseComplete,
+    markRoomComplete
   } = useRoomProgress(Number(floorNumber), roomId || "");
-  
+
   const { isUnlocked, loading: unlockLoading, missingPrerequisites } = useRoomUnlock(
-    Number(floorNumber), 
+    Number(floorNumber),
     roomId || ""
   );
-  
+
   const { mastery, isLoading: masteryLoading, awardXp, isAwarding } = useMastery(roomId || "", Number(floorNumber));
   const { addItem } = useSpacedRepetition();
   const { focusedRoom, isFocused, setFocusedRoom, clearFocusedRoom, isSettingFocus } = useFocusedRoom();
-  
+
   // Room tour for first-time visitors
   const { showTour: showRoomTour, completeTour: completeRoomTour, skipTour: skipRoomTour, resetTour: resetRoomTour } = useRoomTour(roomId || "", Number(floorNumber));
-  
+
   // Training curriculum system
   const {
     curriculum,
@@ -149,10 +175,10 @@ export default function RoomDetail() {
   const drillQuestions = room ? getDrillsByRoom(room.id) : [];
   const drillName = room ? getDrillName(room.id) : "Practice Drill";
   const hasDrills = drillQuestions.length > 0;
-  
+
   // Check if mentor mode is unlocked (Expert or Master level)
   const mentorModeUnlocked = mastery && mastery.mastery_level >= 4;
-  
+
   // Check if this room is the focused room
   const isThisFocused = isFocused(roomId || "", Number(floorNumber));
 
@@ -178,15 +204,16 @@ export default function RoomDetail() {
     }
   };
 
+
   // Don't redirect - let users see why room is locked
 
   if (!floor || !room) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">Room Not Found</h1>
+          <h1 className="text-4xl font-bold mb-4">{t('roomDetail.notFound')}</h1>
           <Link to="/palace">
-            <Button>Return to Palace</Button>
+            <Button>{t('roomDetail.returnToPalace')}</Button>
           </Link>
         </div>
       </div>
@@ -195,7 +222,7 @@ export default function RoomDetail() {
 
   const gradient = [
     "gradient-palace",
-    "gradient-royal", 
+    "gradient-royal",
     "gradient-ocean",
     "gradient-forest",
     "gradient-sunset",
@@ -207,15 +234,13 @@ export default function RoomDetail() {
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <Navigation />
-      {/* Genesis Gallery Tour for 24FPS onboarding */}
       {show24FPSTour && roomId === "24fps" && (
         <GenesisGalleryTour
           onComplete={complete24FPSTour}
           onSkip={skip24FPSTour}
         />
       )}
-      
-      {/* Room Tour for first-time visitors */}
+
       {showRoomTour && room && floor && !show24FPSTour && (
         <RoomTour
           room={room}
@@ -225,8 +250,7 @@ export default function RoomDetail() {
           onSkip={skipRoomTour}
         />
       )}
-      
-      {/* Show onboarding guide for first room visit */}
+
       {isFirstRoomVisit && showOnboardingGuide && room && (
         <OnboardingGuide
           roomId={room.id}
@@ -234,16 +258,15 @@ export default function RoomDetail() {
           onComplete={() => setShowOnboardingGuide(false)}
         />
       )}
-      
+
       <div className="container mx-auto px-4 py-8">
         <Link to={`/palace/floor/${floor.number}`}>
           <Button variant="ghost" className="mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Floor {floor.number}
+            {t('roomDetail.backToFloor', { floorNumber: floor.number })}
           </Button>
         </Link>
 
-        {/* Sequential Mastery Notice - compact version for rooms */}
         <div className="mb-4">
           <SequentialMasteryNotice floorNumber={floor.number} variant="compact" />
         </div>
@@ -252,10 +275,10 @@ export default function RoomDetail() {
           <Alert className="mb-6 border-destructive bg-destructive/20">
             <Lock className="h-5 w-5 text-destructive" />
             <AlertDescription className="text-base">
-              <strong className="text-lg block mb-2">🔒 This Room is Locked</strong>
+              <strong className="text-lg block mb-2">{t('roomDetail.locked')}</strong>
               {missingPrerequisites.length > 0 ? (
                 <>
-                  <p className="mb-2">To unlock this room, you need to complete:</p>
+                  <p className="mb-2">{t('roomDetail.lockMessage')}</p>
                   <ul className="list-disc list-inside mt-2 space-y-1 ml-2">
                     {missingPrerequisites.map((prereq, idx) => (
                       <li key={idx} className="font-medium">{prereq}</li>
@@ -263,13 +286,13 @@ export default function RoomDetail() {
                   </ul>
                 </>
               ) : (
-                <p>Complete the previous floor to unlock this room.</p>
+                <p>{t('roomDetail.completePreviousFloor')}</p>
               )}
               <div className="mt-4">
                 <Link to={`/palace/floor/${floorNumber}`}>
                   <Button variant="outline" size="sm">
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Floor {floorNumber}
+                    {t('roomDetail.backToFloor', { floorNumber })}
                   </Button>
                 </Link>
               </div>
@@ -277,18 +300,16 @@ export default function RoomDetail() {
           </Alert>
         )}
 
-        <div className={`${gradient} rounded-2xl p-10 mb-8 text-white relative overflow-hidden shadow-2xl`}>
-          {/* Animated starfield background */}
-          <div className="absolute inset-0 opacity-20">
+        <div className={`${gradient} rounded-2xl p-5 sm:p-7 md:p-10 mb-6 md:mb-8 text-white relative overflow-hidden shadow-2xl`}>
+          <div className="absolute inset-0 opacity-20 hidden sm:block">
             <div className="absolute top-10 right-20 w-2 h-2 bg-white rounded-full animate-pulse" />
             <div className="absolute top-32 right-40 w-1 h-1 bg-white rounded-full animate-pulse" style={{ animationDelay: "0.5s" }} />
             <div className="absolute top-20 left-32 w-2 h-2 bg-white rounded-full animate-pulse" style={{ animationDelay: "1s" }} />
             <div className="absolute bottom-20 left-20 w-1 h-1 bg-white rounded-full animate-pulse" style={{ animationDelay: "1.5s" }} />
             <div className="absolute bottom-32 right-60 w-2 h-2 bg-white rounded-full animate-pulse" style={{ animationDelay: "2s" }} />
           </div>
-          
-          {/* Giant room emoji */}
-          <div className="absolute -right-10 -top-10 text-[200px] opacity-10 select-none">
+
+          <div className="absolute -right-10 -top-10 text-[200px] opacity-10 select-none hidden md:block">
             {
               {sr: "📖", ir: "👁️", "24fps": "🎬", br: "🗺️", tr: "🎨", gr: "💎",
                or: "🔍", dc: "🧪", st: "🔗", qr: "❓", qa: "💬",
@@ -299,42 +320,23 @@ export default function RoomDetail() {
                frm: "🔥", mr: "🙏", srm: "⚡"}[room.id] || "⭐"
             }
           </div>
-          
+
           <div className="relative z-10">
-            <div className="flex flex-wrap items-center gap-3 mb-6">
-              <Badge variant="outline" className="text-white border-white/70 backdrop-blur-sm bg-white/10 px-4 py-1.5 text-lg font-bold shadow-lg">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-6">
+              <Badge variant="outline" className="text-white border-white/70 backdrop-blur-sm bg-white/10 px-3 py-1 sm:px-4 sm:py-1.5 text-sm sm:text-lg font-bold shadow-lg">
                 {room.tag}
               </Badge>
-              <Badge variant="outline" className="text-white border-white/70 backdrop-blur-sm bg-white/10 px-4 py-1.5">
-                Floor {floor.number}
-              </Badge>
-              {isThisFocused && (
-                <Badge variant="outline" className="text-white border-amber-300 bg-amber-500/30 backdrop-blur-sm px-4 py-1.5 shadow-lg">
-                  <Target className="h-4 w-4 mr-1 animate-pulse" />
-                  🎯 Focus Room
-                </Badge>
-              )}
               {user && progress?.completed_at && (
                 <Badge variant="outline" className="text-white border-green-300 bg-green-500/30 backdrop-blur-sm px-4 py-1.5 shadow-lg">
                   <Trophy className="h-4 w-4 mr-1" />
-                  ✅ Completed
+                  {t('roomDetail.completedBadge')}
                 </Badge>
               )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={resetRoomTour}
-                className="text-white/70 hover:text-white hover:bg-white/10"
-              >
-                <Info className="h-4 w-4 mr-1" />
-                Room Tour
-              </Button>
             </div>
-            
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-4">
-              {/* Show card image if available, otherwise show emoji */}
+
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-3 sm:gap-6 mb-2 sm:mb-4">
               {getCardImage(room.id) ? (
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 hidden sm:block">
                   <RoomCard
                     roomId={room.id}
                     roomName={room.name}
@@ -343,7 +345,7 @@ export default function RoomDetail() {
                   />
                 </div>
               ) : (
-                <span className="text-6xl drop-shadow-2xl flex-shrink-0">
+                <span className="text-4xl sm:text-6xl drop-shadow-2xl flex-shrink-0">
                   {
                     {sr: "📖", ir: "👁️", "24fps": "🎬", br: "🗺️", tr: "🎨", gr: "💎",
                      or: "🔍", dc: "🧪", st: "🔗", qr: "❓", qa: "💬",
@@ -356,14 +358,58 @@ export default function RoomDetail() {
                 </span>
               )}
               <div className="flex-1">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-black drop-shadow-2xl tracking-tight">{room.name}</h1>
-                <p className="text-lg md:text-xl lg:text-2xl leading-relaxed opacity-95 drop-shadow-lg mt-2">{room.purpose}</p>
+                <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-black drop-shadow-2xl tracking-tight">{room.name}</h1>
+                <p className="text-sm sm:text-lg md:text-xl lg:text-2xl leading-relaxed opacity-95 drop-shadow-lg mt-1 sm:mt-2">{room.purpose}</p>
               </div>
             </div>
+
+            {roomDescriptions[room.id] && (
+              <div className="mt-6 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-5 space-y-3">
+                {roomDescriptions[room.id].map((paragraph, idx) => (
+                  <p key={idx} className="text-white/90 leading-relaxed text-sm">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Voice Chat Widget */}
+        {roomDescriptions[room.id] && (
+          <Card className="mb-6 md:mb-8 border-primary/20 bg-primary/5">
+            <CardContent className="pt-4 sm:pt-6 space-y-3">
+              <p className="text-muted-foreground leading-relaxed text-xs sm:text-sm">
+                {roomDescriptions[room.id][0]}
+              </p>
+              {roomDescriptions[room.id].length > 1 && (
+                <>
+                  <div className="hidden md:block space-y-3">
+                    {roomDescriptions[room.id].slice(1).map((paragraph, idx) => (
+                      <p key={idx} className="text-muted-foreground leading-relaxed text-sm">
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+                  <Collapsible className="md:hidden">
+                    <CollapsibleTrigger asChild>
+                      <Button variant="ghost" size="sm" className="text-xs text-primary/70 hover:text-primary p-0 h-auto">
+                        <ChevronDown className="h-3 w-3 mr-1" />
+                        Read more
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-3 pt-2">
+                      {roomDescriptions[room.id].slice(1).map((paragraph, idx) => (
+                        <p key={idx} className="text-muted-foreground leading-relaxed text-xs sm:text-sm">
+                          {paragraph}
+                        </p>
+                      ))}
+                    </CollapsibleContent>
+                  </Collapsible>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        )}
         {user && (
           <VoiceChatWidget
             roomType="palace"
@@ -375,46 +421,59 @@ export default function RoomDetail() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
+            <MobileOrientationTip className="mb-4" />
+
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-4 p-1 bg-muted/50 backdrop-blur-sm">
-                <TabsTrigger value="learn" className="data-[state=active]:shadow-glow transition-all duration-300">
-                  📚 Learn
+                <TabsTrigger value="practice" className="data-[state=active]:shadow-glow transition-all duration-300 text-xs sm:text-sm gap-1">
+                  <Dumbbell className="h-3.5 w-3.5 sm:hidden" />
+                  <span className="hidden sm:inline">{t('roomDetail.practiceTab')}</span>
+                  <span className="sm:hidden">Drill</span>
                 </TabsTrigger>
-                <TabsTrigger value="games" className="data-[state=active]:shadow-glow transition-all duration-300">
-                  🎮 Games
+                <TabsTrigger value="learn" className="data-[state=active]:shadow-glow transition-all duration-300 text-xs sm:text-sm gap-1">
+                  <BookOpen className="h-3.5 w-3.5 sm:hidden" />
+                  <span className="hidden sm:inline">{t('roomDetail.learnTab')}</span>
+                  <span className="sm:hidden">Learn</span>
                 </TabsTrigger>
-                <TabsTrigger value="practice" className="data-[state=active]:shadow-glow transition-all duration-300">
-                  🎯 Practice
+                <TabsTrigger value="games" className="data-[state=active]:shadow-glow transition-all duration-300 text-xs sm:text-sm gap-1">
+                  <Swords className="h-3.5 w-3.5 sm:hidden" />
+                  <span className="hidden sm:inline">{t('roomDetail.gamesTab')}</span>
+                  <span className="sm:hidden">Games</span>
                 </TabsTrigger>
-                <TabsTrigger value="master" className="data-[state=active]:shadow-glow transition-all duration-300">
-                  👑 Master
+                <TabsTrigger value="master" className="data-[state=active]:shadow-glow transition-all duration-300 text-xs sm:text-sm gap-1">
+                  <Crown className="h-3.5 w-3.5 sm:hidden" />
+                  <span className="hidden sm:inline">{t('roomDetail.masterTab')}</span>
+                  <span className="sm:hidden">Master</span>
                 </TabsTrigger>
               </TabsList>
 
-              {/* LEARN TAB */}
               <TabsContent value="learn" className="space-y-6 mt-6">
-                {/* Path-specific exercises - shown first when user has active path */}
                 {user && (
-                  <PathRoomExercises 
-                    roomId={room.id} 
-                    roomName={room.name} 
-                    floorNumber={floor.number} 
+                  <PathRoomExercises
+                    roomId={room.id}
+                    roomName={room.name}
+                    floorNumber={floor.number}
                   />
-                )}
-                
-                {/* LIBRARIES FIRST - Make them the prominent feature */}
-                {/* Story Room - Biblical Story Library */}
-                {room.id === "sr" && (
-                  <StoryLibrary />
-                )}
-
-                {/* Symbols Room - Biblical Symbols Library */}
-                {room.id === "st" && (
-                  <SymbolsLibrary />
                 )}
 
                 {showQuickStart && <ValueProposition roomId={room.id} />}
                 {showQuickStart && <QuickStartGuide roomId={room.id} roomName={room.name} />}
+
+                {hasRoomGraphics(room.id) && (
+                  <RoomGraphicsDisplay roomId={room.id} roomName={room.name} />
+                )}
+
+                {hasLibrary(room.id) && !["sr", "st", "qa", "24fps", "gr", "cycles", "123h", "math", "jr", "dc", "cr", "bl", "pr", "trm", "fe"].includes(room.id) && (
+                  <LibraryBanner
+                    roomId={room.id}
+                    onExplore={() => {
+                      const librarySection = document.querySelector('[data-library-section]');
+                      if (librarySection) {
+                        librarySection.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }}
+                  />
+                )}
 
                 <Card variant="glass" className="relative">
                   <CardHeader className="relative z-10">
@@ -423,7 +482,7 @@ export default function RoomDetail() {
                         <div className="p-3 bg-gradient-palace rounded-xl shadow-lg">
                           <HelpCircle className="h-6 w-6 text-white" />
                         </div>
-                        <CardTitle className="text-2xl font-bold">💡 Core Question</CardTitle>
+                        <CardTitle className="text-2xl font-bold">{t('roomDetail.coreQuestion')}</CardTitle>
                       </div>
                       {user && (
                         <Button
@@ -433,7 +492,7 @@ export default function RoomDetail() {
                           className="gap-2 hover:shadow-glow transition-all"
                         >
                           <Brain className="h-4 w-4" />
-                          Add to Review
+                          {t('roomDetail.addToReview')}
                         </Button>
                       )}
                     </div>
@@ -454,14 +513,14 @@ export default function RoomDetail() {
                             <div className="p-3 bg-gradient-warmth rounded-xl shadow-lg">
                               <Target className="h-6 w-6 text-white" />
                             </div>
-                            <CardTitle className="text-2xl font-bold group-hover:text-accent transition-colors">🎯 Full Methodology</CardTitle>
+                            <CardTitle className="text-2xl font-bold group-hover:text-accent transition-colors">{t('roomDetail.fullMethodology')}</CardTitle>
                           </div>
                           <ChevronDown className={`h-6 w-6 transition-transform duration-300 ${methodExpanded ? 'rotate-180 text-accent' : 'text-muted-foreground'}`} />
                         </div>
                       </CollapsibleTrigger>
                       {!methodExpanded && (
                         <CardDescription className="text-sm ml-16">
-                          ✨ Detailed step-by-step guide (click to expand when ready)
+                          {t('roomDetail.detailedGuide')}
                         </CardDescription>
                       )}
                     </CardHeader>
@@ -484,14 +543,14 @@ export default function RoomDetail() {
                             <div className="p-3 bg-gradient-ocean rounded-xl shadow-lg">
                               <BookOpen className="h-6 w-6 text-white" />
                             </div>
-                            <CardTitle className="text-2xl font-bold group-hover:text-secondary transition-colors">📚 Examples</CardTitle>
+                            <CardTitle className="text-2xl font-bold group-hover:text-secondary transition-colors">{t('roomDetail.examples')}</CardTitle>
                           </div>
                           <ChevronDown className={`h-6 w-6 transition-transform duration-300 ${examplesExpanded ? 'rotate-180 text-secondary' : 'text-muted-foreground'}`} />
                         </div>
                       </CollapsibleTrigger>
                       {!examplesExpanded && (
                         <CardDescription className="text-sm ml-16">
-                          🌟 Real examples to guide your practice (click to expand)
+                          {t('roomDetail.examplesDesc')}
                         </CardDescription>
                       )}
                     </CardHeader>
@@ -510,35 +569,45 @@ export default function RoomDetail() {
                   </Card>
                 </Collapsible>
 
-                {/* Symbols Library is now shown at the top as a prominent feature */}
+                {room.id === "sr" && (
+                  <RoomLibrary roomId="sr">
+                    <StoryLibrary />
+                  </RoomLibrary>
+                )}
+
+                {room.id === "tr" && (
+                  <WordPictureTranslator />
+                )}
+
+
+                {room.id === "st" && (
+                  <RoomLibrary roomId="st">
+                    <SymbolLibrary />
+                  </RoomLibrary>
+                )}
+
+                {room.id === "qa" && (
+                  <RoomLibrary roomId="qa">
+                    <QALibrary />
+                  </RoomLibrary>
+                )}
 
                 {room.id === "24fps" && (
                   <>
-                    {/* Complete 24FPS Bible Browser - All 50 Sets */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <span className="text-2xl">🎬</span>
-                          24FPS Bible Sets
-                        </CardTitle>
-                        <CardDescription>
-                          All 50 memorization sets covering every chapter of the Bible. Click a set to explore its chapters.
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <Bible24FPSBrowser />
-                      </CardContent>
-                    </Card>
-                    
-                    {/* Exodus 1-24 Memorization Drill */}
+                    <RoomLibrary roomId="24fps">
+                      <Bible24FPSBrowser />
+                    </RoomLibrary>
+
+                    <ImageBibleBrowser />
+
                     <Card>
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                           <span className="text-2xl">📖</span>
-                          Exodus 1-24: Deliverance
+                          {t('roomDetail.exodusTitle')}
                         </CardTitle>
                         <CardDescription>
-                          Master the Exodus chapters with symbol-based memorization. Theme: God delivers His people.
+                          {t('roomDetail.exodusDesc')}
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -549,106 +618,158 @@ export default function RoomDetail() {
                 )}
 
                 {room.id === "gr" && (
-                  <>
-                    <GemGenerator 
-                      floorNumber={floor.number} 
-                      roomId={room.id} 
-                      onGemSaved={() => {
-                        // Trigger refresh of gems list
-                        const event = new CustomEvent('gems-updated');
-                        window.dispatchEvent(event);
-                      }}
-                    />
-                    <UserGemsList floorNumber={floor.number} roomId={room.id} />
-                    <SermonTitlesList />
-                  </>
+                  <RoomLibrary roomId="gr">
+                    <div className="space-y-6">
+                      <GemsLibrary />
+                      <GemGenerator
+                        floorNumber={floor.number}
+                        roomId={room.id}
+                        onGemSaved={() => {
+                          const event = new CustomEvent('gems-updated');
+                          window.dispatchEvent(event);
+                        }}
+                      />
+                      <UserGemsList floorNumber={floor.number} roomId={room.id} />
+                      <SermonTitlesList />
+                    </div>
+                  </RoomLibrary>
                 )}
 
-                {/* Freestyle Game for Floor 3 rooms (except BF which has its own) */}
+                {room.id === "nf" && (
+                  <RoomLibrary roomId="nf">
+                    <NatureFreestyleLibrary />
+                  </RoomLibrary>
+                )}
+
+                {room.id === "hf" && (
+                  <RoomLibrary roomId="hf">
+                    <HistoricalFreestyleLibrary />
+                  </RoomLibrary>
+                )}
+
                 {["nf", "pf", "hf", "lr"].includes(room.id) && (
                   <FreestyleGame roomId={room.id} roomName={room.name} />
                 )}
-                
-                {/* Bible Freestyle Game - specialized for BF room */}
+
                 {room.id === "bf" && (
                   <BibleFreestyleGame roomId={room.id} roomName={room.name} />
                 )}
 
                 {room.id === "cec" && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Your Christ-in-Every-Chapter Findings</CardTitle>
-                      <CardDescription>
-                        Record Christ's presence in each chapter: His name, His action, and NT crosslinks
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <ChristChapterFindings />
-                    </CardContent>
-                  </Card>
+                  <RoomLibrary roomId="cec">
+                    <ChristChapterFindings />
+                  </RoomLibrary>
                 )}
 
-                {/* Speed Room Drill - The core exercise for SRm */}
                 {room.id === "srm" && (
                   <SpeedRoomDrill onComplete={(score) => {
                     toast.success(`Speed Drill complete! Average: ${score}/100`);
                   }} />
                 )}
 
-                {/* Mathematics Room Drill - Time Prophecy Training */}
                 {room.id === "math" && (
-                  <MathematicsRoomDrill onComplete={(score) => {
-                    toast.success(`Mathematics Drill complete! Average: ${score}/100`);
-                  }} />
+                  <RoomLibrary roomId="math">
+                    <MathematicsRoomDrill onComplete={(score) => {
+                      toast.success(`Mathematics Drill complete! Average: ${score}/100`);
+                    }} />
+                  </RoomLibrary>
                 )}
 
-                {/* Juice Room Drill - Meaning Extraction Training */}
                 {room.id === "jr" && (
                   <JuiceRoomDrill />
                 )}
 
-                {/* 8-Cycle Room Drill - Covenant Discernment Training */}
                 {room.id === "cycles" && (
-                  <CyclesRoomDrill />
+                  <RoomLibrary roomId="cycles">
+                    <CyclesRoomDrill />
+                  </RoomLibrary>
                 )}
 
-                {/* Three Heavens Room Drill - Prophetic Horizon Discernment */}
                 {room.id === "123h" && (
-                  <ThreeHeavensRoomDrill />
+                  <RoomLibrary roomId="123h">
+                    <ThreeHeavensLibrary />
+                  </RoomLibrary>
                 )}
 
-                {/* Def-Com Room - Word Study & Commentary Tools */}
+                {room.id === "p||" && (
+                  <RoomLibrary roomId="p||">
+                    <ParallelsLibrary />
+                  </RoomLibrary>
+                )}
+
+                {room.id === "fe" && (
+                  <RoomLibrary roomId="fe">
+                    <FeastsLibrary />
+                  </RoomLibrary>
+                )}
+
+                {room.id === "bl" && (
+                  <RoomLibrary roomId="bl">
+                    <SanctuaryLibrary />
+                  </RoomLibrary>
+                )}
+
+                {room.id === "pr" && (
+                  <RoomLibrary roomId="pr">
+                    <ProphecyLibrary />
+                  </RoomLibrary>
+                )}
+
+                {room.id === "trm" && (
+                  <RoomLibrary roomId="trm">
+                    <ThemesLibrary />
+                  </RoomLibrary>
+                )}
+
+                {room.id === "prm" && (
+                  <RoomLibrary roomId="prm">
+                    <PatternsLibrary />
+                  </RoomLibrary>
+                )}
+
+                {room.id === "r66" && (
+                  <RoomLibrary roomId="r66">
+                    <Room66Library />
+                  </RoomLibrary>
+                )}
+
+                {room.id === "math" && (
+                  <RoomLibrary roomId="math">
+                    <MathematicsLibrary />
+                  </RoomLibrary>
+                )}
+
                 {room.id === "dc" && (
                   <DefComRoomDrill />
                 )}
 
-                {/* Concentration Room - Christ-Centered Training */}
                 {room.id === "cr" && (
                   <ConcentrationRoomDrill />
                 )}
 
+                {/* Practice Tools - linked platform features */}
+                <Separator className="my-6" />
+                <RoomPracticeTools roomId={room.id} />
               </TabsContent>
 
-              {/* GAMES TAB */}
               <TabsContent value="games" className="space-y-6 mt-6">
                 <div className="text-center mb-6">
-                  <h2 className="text-2xl font-bold mb-2">🎮 {room.name} Games</h2>
+                  <h2 className="text-2xl font-bold mb-2">{t('roomDetail.roomGames', { roomName: room.name })}</h2>
                   <p className="text-muted-foreground">
-                    Practice {room.name} principles through interactive challenges and earn XP!
+                    {t('roomDetail.roomGamesDesc', { roomName: room.name })}
                   </p>
                 </div>
-                
+
                 <RoomGames roomId={room.id} roomName={room.name} />
-                
-                {/* Freestyle Game also shown in Games tab for Floor 3 rooms (except BF) */}
+
                 {["nf", "pf", "hf", "lr"].includes(room.id) && (
                   <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        ⚡ Freestyle Challenge
+                        {t('roomDetail.freestyleChallenge')}
                       </CardTitle>
                       <CardDescription>
-                        Real-time freestyle practice with Jeeves
+                        {t('roomDetail.freestyleDesc')}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -656,21 +777,19 @@ export default function RoomDetail() {
                     </CardContent>
                   </Card>
                 )}
-                
-                {/* Verse Genetics Arena for BF room in Games tab - includes PvP and vs Jeeves */}
+
                 {room.id === "bf" && (
                   <VerseGeneticsArena roomId={room.id} roomName={room.name} />
                 )}
-                
-                {/* Speed Room Drill in Games tab */}
+
                 {room.id === "srm" && (
                   <Card className="border-2 border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-orange-500/5">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        ⚡ Speed Drill Challenge
+                        {t('roomDetail.speedDrill')}
                       </CardTitle>
                       <CardDescription>
-                        Timed PT principle application - build reflexive thinking
+                        {t('roomDetail.speedDrillDesc')}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -679,15 +798,14 @@ export default function RoomDetail() {
                   </Card>
                 )}
 
-                {/* Mathematics Room Drill in Games tab */}
                 {room.id === "math" && (
                   <Card className="border-2 border-purple-500/20 bg-gradient-to-br from-purple-500/5 to-indigo-500/5">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        🔢 Time Prophecy Challenge
+                        {t('roomDetail.timeProphecy')}
                       </CardTitle>
                       <CardDescription>
-                        Master the 6 prophetic time structures through timed drills
+                        {t('roomDetail.timeProphecyDesc')}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -696,15 +814,14 @@ export default function RoomDetail() {
                   </Card>
                 )}
 
-                {/* Juice Room Drill in Games tab */}
                 {room.id === "jr" && (
                   <Card className="border-2 border-orange-500/20 bg-gradient-to-br from-orange-500/5 to-amber-500/5">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        🧃 Juice Extraction Challenge
+                        {t('roomDetail.juiceExtraction')}
                       </CardTitle>
                       <CardDescription>
-                        Extract maximum meaning with minimum waste — verse, chapter, or book level
+                        {t('roomDetail.juiceExtractionDesc')}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -713,15 +830,14 @@ export default function RoomDetail() {
                   </Card>
                 )}
 
-                {/* 8-Cycle Room Drill in Games tab */}
                 {room.id === "cycles" && (
                   <Card className="border-2 border-indigo-500/20 bg-gradient-to-br from-indigo-500/5 to-purple-500/5">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        🔁 Covenant Cycle Challenge
+                        {t('roomDetail.covenantCycle')}
                       </CardTitle>
                       <CardDescription>
-                        Locate any text within the 8 covenant cycles of redemption
+                        {t('roomDetail.covenantCycleDesc')}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -730,15 +846,14 @@ export default function RoomDetail() {
                   </Card>
                 )}
 
-                {/* Concentration Room Drill in Games tab */}
                 {room.id === "cr" && (
                   <Card className="border-2 border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-indigo-500/5">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        👁️ Find-the-Christ Challenge
+                        {t('roomDetail.findChrist')}
                       </CardTitle>
                       <CardDescription>
-                        Train your eyes to see Christ hidden in every passage
+                        {t('roomDetail.findChristDesc')}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -747,15 +862,14 @@ export default function RoomDetail() {
                   </Card>
                 )}
 
-                {/* Three Heavens Room Drill in Games tab */}
                 {room.id === "123h" && (
                   <Card className="border-2 border-purple-500/20 bg-gradient-to-br from-purple-500/5 to-blue-500/5">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        🌌 Prophetic Horizon Challenge
+                        {t('roomDetail.propheticHorizon')}
                       </CardTitle>
                       <CardDescription>
-                        Discern which heaven(s) a prophecy addresses — 1H, 2H, or 3H
+                        {t('roomDetail.propheticHorizonDesc')}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -765,427 +879,183 @@ export default function RoomDetail() {
                 )}
               </TabsContent>
 
-              {/* PRACTICE TAB */}
               <TabsContent value="practice" className="space-y-6 mt-6">
-                {/* Libraries in Practice tab too for quick reference */}
-                {room.id === "sr" && (
-                  <StoryLibrary />
-                )}
-                {room.id === "st" && (
-                  <SymbolsLibrary />
+                <div className="text-center mb-6 p-4 bg-gradient-to-br from-primary/5 to-accent/5 rounded-xl border border-primary/20">
+                  <h2 className="text-2xl font-bold mb-2">{t('roomDetail.personalPractice')}</h2>
+                  <p className="text-muted-foreground max-w-2xl mx-auto">
+                    {t('roomDetail.personalPracticeDesc', { roomName: room.name })}
+                  </p>
+                </div>
+
+                {room.id === "br" && (
+                  <Tabs defaultValue="glance" className="space-y-4">
+                    <TabsList className="grid w-full grid-cols-4">
+                      <TabsTrigger value="glance" className="flex items-center gap-1 text-xs sm:text-sm">
+                        <span className="hidden sm:inline">At-a-Glance</span>
+                        <span className="sm:hidden">Glance</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="flashcards" className="flex items-center gap-1 text-xs sm:text-sm">
+                        <span className="hidden sm:inline">Flashcards</span>
+                        <span className="sm:hidden">Cards</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="speed" className="flex items-center gap-1 text-xs sm:text-sm">
+                        <span className="hidden sm:inline">Speed Scan</span>
+                        <span className="sm:hidden">Speed</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="drill" className="flex items-center gap-1 text-xs sm:text-sm">
+                        <span className="hidden sm:inline">Quiz Drill</span>
+                        <span className="sm:hidden">Quiz</span>
+                      </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="glance"><BibleRenderedGlance /></TabsContent>
+                    <TabsContent value="flashcards"><BibleRenderedFlashcards /></TabsContent>
+                    <TabsContent value="speed"><BibleRenderedSpeedScan /></TabsContent>
+                    <TabsContent value="drill"><BibleRenderedDrill /></TabsContent>
+                  </Tabs>
                 )}
 
-                <RoomPracticeSpace
-                  floorNumber={floor.number}
-                  roomId={room.id}
-                  roomName={room.name}
-                  roomPrinciple={room.purpose}
-                />
-              </TabsContent>
+                {room.id === "tr" && <TranslationLibrary />}
 
-              {/* MASTER THIS ROOM TAB */}
-              <TabsContent value="master" className="space-y-6 mt-6">
-                {/* Mastery Program Enrollment - Only show if enrolled (progress has been made) */}
-                {mastery && (mastery.xp_current > 0 || mastery.mastery_level > 1) && (
-                  <MasteryProgramEnrollment
-                    roomName={room.name}
-                    roomTag={room.tag}
+                {room.id === "24fps" && (
+                  <ImageBibleBrowser />
+                )}
+
+                {room.id !== "br" && room.id !== "24fps" && (
+                  <RoomPracticeSpace
                     floorNumber={floor.number}
-                    totalActivities={curriculum?.activities?.length || 0}
-                    completedActivities={((curriculumProgress?.completed_activities as string[]) || []).length}
-                    masteryLevel={mastery?.mastery_level || 1}
-                    onBeginMastery={() => {
-                      // Scroll to training dashboard
-                      const trainingSection = document.getElementById('training-dashboard');
-                      trainingSection?.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    isEnrolled={true}
-                  />
-                )}
-
-                {/* Mastery System Explanation */}
-                <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Trophy className="h-5 w-5 text-primary" />
-                      Understanding Room Mastery
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-sm text-muted-foreground">
-                      Mastery transforms casual Bible study into permanent understanding. By mastering a room, you build neural pathways that make Scripture stick—not just today, but for life.
-                    </p>
-
-                    <div className="space-y-3">
-                      <h4 className="font-semibold text-sm">The Five Mastery Levels:</h4>
-                      
-                      <div className="space-y-2">
-                        <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-500/10 border-2 border-slate-500/30 hover:border-slate-500/50 transition-all hover:shadow-lg">
-                          <div className="text-2xl">⚪</div>
-                          <div className="flex-1">
-                            <div className="font-bold text-base">Level 1: Novice <span className="text-slate-500">(Gray Badge)</span></div>
-                            <div className="text-sm text-muted-foreground">Starting point. Begin exploring the room's principles.</div>
-                            <div className="text-sm font-bold mt-2 text-slate-600">→ Reach 100 XP to advance ⬆️</div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start gap-3 p-3 rounded-xl bg-blue-500/10 border-2 border-blue-500/30 hover:border-blue-500/50 transition-all hover:shadow-lg">
-                          <div className="text-2xl">🔵</div>
-                          <div className="flex-1">
-                            <div className="font-bold text-base">Level 2: Apprentice <span className="text-blue-500">(Blue Badge)</span></div>
-                            <div className="text-sm text-muted-foreground">Building familiarity. You're making connections.</div>
-                            <div className="text-sm font-bold mt-2 text-blue-600">→ Reach 250 XP to advance ⬆️</div>
-                          </div>
-                        </div>
-
-
-                        <div className="flex items-start gap-3 p-3 rounded-xl bg-purple-500/10 border-2 border-purple-500/30 hover:border-purple-500/50 transition-all hover:shadow-lg">
-                          <div className="text-2xl">🟣</div>
-                          <div className="flex-1">
-                            <div className="font-bold text-base">Level 3: Practitioner <span className="text-purple-500">(Purple Badge)</span></div>
-                            <div className="text-sm text-muted-foreground">Confident application. You can teach this room's principles.</div>
-                            <div className="text-sm font-bold mt-2 text-purple-600">→ Reach 500 XP to advance ⬆️</div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start gap-3 p-3 rounded-xl bg-amber-500/10 border-2 border-amber-500/40 hover:border-amber-500/60 transition-all hover:shadow-glow">
-                          <div className="text-2xl">🟡</div>
-                          <div className="flex-1">
-                            <div className="font-bold text-base">Level 4: Expert <span className="text-amber-500">(Gold Badge)</span></div>
-                            <div className="text-sm text-muted-foreground">Deep understanding. 🤖 Mentor Mode unlocked for personalized AI guidance.</div>
-                            <div className="text-sm font-bold mt-2 text-amber-600">→ Reach 1,000 XP to advance ⬆️</div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-r from-amber-500/20 via-yellow-300/20 to-amber-500/20 border-2 border-amber-400/50 hover:border-amber-400/70 transition-all hover:shadow-mega-glow animate-pulse-glow">
-                          <div className="text-3xl animate-pulse">✨</div>
-                          <div className="flex-1">
-                            <div className="font-black text-lg bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 bg-clip-text text-transparent">Level 5: Master (Golden Badge)</div>
-                            <div className="text-sm text-muted-foreground font-medium">Complete mastery. This room's patterns are permanently encoded in your mind. 🧠⚡</div>
-                            <div className="text-sm font-black mt-2 bg-gradient-to-r from-amber-500 to-yellow-400 bg-clip-text text-transparent">🏆 Maximum Level Reached</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    <div className="space-y-3">
-                      <h4 className="font-semibold text-sm">Mastering Multiple Rooms: Global Master Titles</h4>
-                      <p className="text-xs text-muted-foreground">
-                        As you master multiple rooms, you gain global ranks that represent your depth of understanding across the Palace.
-                      </p>
-                      
-                      <div className="space-y-3">
-                        <div className="flex items-start gap-3 p-3 rounded-xl bg-blue-500/10 border-2 border-blue-500/30 hover:shadow-glow transition-all">
-                          <div className="text-2xl">🔵</div>
-                          <div className="flex-1">
-                            <div className="font-bold text-base text-blue-600">BLUE MASTER — 1–3 Rooms 🏆</div>
-                            <div className="text-xs text-muted-foreground mt-0.5">
-                              <strong>Requirements:</strong> None beyond room mastery<br />
-                              <strong>Reward:</strong> Blue Master title
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start gap-3 p-3 rounded-xl bg-red-500/10 border-2 border-red-500/30 hover:shadow-glow transition-all">
-                          <div className="text-2xl">🔴</div>
-                          <div className="flex-1">
-                            <div className="font-bold text-base text-red-600">RED MASTER — 4–9 Rooms 🔥</div>
-                            <div className="text-xs text-muted-foreground mt-0.5">
-                              <strong>Requirements:</strong> 7-day streak<br />
-                              <strong>Reward:</strong> Red Challenges
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start gap-3 p-3 rounded-xl bg-yellow-500/10 border-2 border-yellow-500/30 hover:shadow-glow transition-all">
-                          <div className="text-2xl">🟡</div>
-                          <div className="flex-1">
-                            <div className="font-bold text-base text-yellow-600">GOLD MASTER — 10–18 Rooms ⭐</div>
-                            <div className="text-xs text-muted-foreground mt-0.5">
-                              <strong>Requirements:</strong> 14-day streak<br />
-                              <strong>Reward:</strong> Advanced chain tools
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start gap-3 p-3 rounded-xl bg-purple-500/10 border-2 border-purple-500/30 hover:shadow-glow transition-all">
-                          <div className="text-2xl">🟣</div>
-                          <div className="flex-1">
-                            <div className="font-bold text-base text-purple-600">PURPLE MASTER — 19–27 Rooms 💜</div>
-                            <div className="text-xs text-muted-foreground mt-0.5">
-                              <strong>Requirements:</strong> 21-day streak<br />
-                              <strong>Reward:</strong> Create-your-own drills
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-100 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 hover:shadow-glow transition-all">
-                          <div className="text-2xl">⚪</div>
-                          <div className="flex-1">
-                            <div className="font-bold text-base">WHITE MASTER — 28–37 Rooms 🤍</div>
-                            <div className="text-xs text-muted-foreground mt-0.5">
-                              <strong>Requirements:</strong> 30-day streak<br />
-                              <strong>Reward:</strong> Temple Mode + prophecy maps
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-gray-900 via-black to-gray-900 border-2 border-gray-700 hover:shadow-mega-glow transition-all">
-                          <div className="text-3xl animate-pulse">⚫</div>
-                          <div className="flex-1">
-                            <div className="font-black text-lg text-white">BLACK MASTER — 38 ROOMS 👑</div>
-                            <div className="text-xs text-gray-300 mt-1 italic">The Phototheology equivalent of a spiritual black belt.</div>
-                            <div className="text-xs text-gray-200 mt-2 space-y-1">
-                              <div><strong>Final Requirements:</strong></div>
-                              <ul className="list-disc list-inside space-y-0.5 ml-2">
-                                <li>38 rooms mastered at Level 5</li>
-                                <li>Final Master Exam</li>
-                                <li>12-verse chain creation</li>
-                                <li>Teach-the-Palace test</li>
-                                <li>3 prophetic integration exercises</li>
-                                <li>60-day global streak</li>
-                              </ul>
-                              <div className="mt-2"><strong>Rewards:</strong></div>
-                              <ul className="list-disc list-inside space-y-0.5 ml-2">
-                                <li>Black Master Title</li>
-                                <li>Black Palace Mode</li>
-                                <li>Shadow Chains (advanced mode)</li>
-                                <li>Prophetic Lattice Engine</li>
-                                <li>Mentor privileges in the app</li>
-                                <li>Access to the 8th-floor Revelation Chamber</li>
-                              </ul>
-                              <div className="mt-2 text-amber-300 font-semibold">
-                                Only the most disciplined, consistent, and skilled users will ever reach this tier.
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-sm">How to Earn XP:</h4>
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div className="flex items-center gap-2">
-                          <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                          <span>Complete drills: <strong>25 XP</strong></span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="h-1.5 w-1.5 rounded-full bg-accent" />
-                          <span>Finish exercises: <strong>15 XP</strong></span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-                          <span>Perfect score: <strong>+50 XP</strong></span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="h-1.5 w-1.5 rounded-full bg-green-500" />
-                          <span>Speed bonus: <strong>+10 XP</strong></span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="text-xs text-muted-foreground pt-2 border-t">
-                      <strong>Pro tip:</strong> Mastering a room contributes to your Global Palace Title. Master more rooms to unlock higher titles and recognition in the community.
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Jeeves Master Program - Show for new users or users who haven't started this room yet */}
-                {(!mastery || (mastery.mastery_level === 1 && mastery.xp_current === 0)) && (
-                  <JeevesMasterProgram 
+                    roomId={room.id}
                     roomName={room.name}
                     roomPrinciple={room.purpose}
-                    onStartProgram={() => {
-                      // Switch to practice tab and scroll to training
-                      setActiveTab("practice");
-                      setTimeout(() => {
-                        const trainingSection = document.getElementById('training-dashboard');
-                        trainingSection?.scrollIntoView({ behavior: 'smooth' });
-                      }, 100);
-                    }}
                   />
                 )}
 
-                {/* Mastery Overview - Show for users who have started and made progress */}
-                {mastery && (mastery.mastery_level > 1 || mastery.xp_current > 0) && (
-                  <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Trophy className="h-5 w-5 text-primary" />
-                        Your Mastery Progress
-                      </CardTitle>
-                      <CardDescription>
-                        Track your journey to mastering this room
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <MasteryBadge level={mastery.mastery_level} size="lg" />
-                        <div className="text-right">
-                          <div className="text-2xl font-bold">
-                            {mastery.total_drills_completed + mastery.total_exercises_completed}
-                          </div>
-                          <div className="text-sm text-muted-foreground">Total Activities</div>
-                        </div>
-                      </div>
+                {/* Saved Drill Results for this room */}
+                <SavedDrillsList roomId={room.id} limit={20} />
+              </TabsContent>
 
+              <TabsContent value="master" className="space-y-6 mt-6">
+                {/* Current Progress - always visible */}
+                <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-4 mb-4">
+                      <MasteryBadge level={mastery?.mastery_level || 1} size="lg" />
+                      <div className="flex-1">
+                        <h2 className="text-xl font-bold">{room.name}</h2>
+                        <p className="text-sm text-muted-foreground">
+                          {mastery && mastery.xp_current > 0
+                            ? `${mastery.total_drills_completed + mastery.total_exercises_completed} activities completed`
+                            : "Start practicing to build mastery"}
+                        </p>
+                      </div>
+                      {mastery && mastery.xp_current > 0 && (
+                        <div className="text-right">
+                          <div className="grid grid-cols-3 gap-3 text-center">
+                            <div>
+                              <div className="text-lg font-bold text-primary">{mastery.total_drills_completed}</div>
+                              <div className="text-[10px] text-muted-foreground">{t('roomDetail.drills')}</div>
+                            </div>
+                            <div>
+                              <div className="text-lg font-bold text-accent">{mastery.total_exercises_completed}</div>
+                              <div className="text-[10px] text-muted-foreground">{t('roomDetail.exercises')}</div>
+                            </div>
+                            <div>
+                              <div className="text-lg font-bold text-amber-500">{mastery.perfect_scores_count}</div>
+                              <div className="text-[10px] text-muted-foreground">{t('roomDetail.perfect')}</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {mastery && mastery.xp_current > 0 && (
                       <XpProgressBar
                         currentXp={mastery.xp_current}
                         xpRequired={mastery.xp_required}
                         level={mastery.mastery_level}
-                        className="mt-4"
                       />
-
-                      <Separator />
-
-                      <div className="grid grid-cols-3 gap-4 text-center">
-                        <div>
-                          <div className="text-2xl font-bold text-primary">
-                            {mastery.total_drills_completed}
-                          </div>
-                          <div className="text-xs text-muted-foreground">Drills</div>
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-accent">
-                            {mastery.total_exercises_completed}
-                          </div>
-                          <div className="text-xs text-muted-foreground">Exercises</div>
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-amber-500">
-                            {mastery.perfect_scores_count}
-                          </div>
-                          <div className="text-xs text-muted-foreground">Perfect</div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Continue Training - Show next activity */}
-                {mastery && !(mastery.mastery_level === 1 && mastery.xp_current === 0) && !showMilestoneTest && (
-                  <ContinueTraining
-                    nextActivity={nextActivity}
-                    roomName={room.name}
-                    onContinue={() => {
-                      if (nextActivity?.type === "milestone_test") {
-                        const testLevel = curriculum.milestoneTests.find(
-                          (t) => t.activityId === nextActivity.id
-                        )?.level;
-                        if (testLevel) {
-                          setCurrentTestLevel(testLevel);
-                          setShowMilestoneTest(true);
-                        }
-                      } else {
-                        // Switch to practice tab
-                        const practiceTab = document.querySelector('[value="practice"]') as HTMLElement;
-                        practiceTab?.click();
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }
-                    }}
-                  />
-                )}
-
-                {/* Milestone Test View */}
-                {showMilestoneTest && currentTestLevel && (
-                  <MilestoneTest
-                    level={currentTestLevel}
-                    activityId={nextActivity?.id || ""}
-                    roomName={room.name}
-                    onPass={(activityId) => {
-                      passMilestoneTest({ testLevel: currentTestLevel, activityId });
-                      setShowMilestoneTest(false);
-                      setCurrentTestLevel(null);
-                    }}
-                    onCancel={() => {
-                      setShowMilestoneTest(false);
-                      setCurrentTestLevel(null);
-                    }}
-                  />
-                )}
-
-                {/* Training Dashboard - Full activity list */}
-                {mastery && !(mastery.mastery_level === 1 && mastery.xp_current === 0) && !showMilestoneTest && (
-                  <div id="training-dashboard">
-                    <TrainingDashboard
-                      roomName={room.name}
-                      curriculum={curriculum}
-                      completedActivities={(curriculumProgress?.completed_activities as string[]) || []}
-                      currentLevel={mastery.mastery_level}
-                      onActivityClick={(activity) => {
-                        if (activity.type === "milestone_test") {
-                          const testLevel = curriculum.milestoneTests.find(
-                            (t) => t.activityId === activity.id
-                          )?.level;
-                          if (testLevel) {
-                            setCurrentTestLevel(testLevel);
-                            setShowMilestoneTest(true);
-                          }
-                        } else {
-                          // Switch to practice tab for other activities
-                          const practiceTab = document.querySelector('[value="practice"]') as HTMLElement;
-                          practiceTab?.click();
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }
-                      }}
-                    />
-                  </div>
-                )}
-
-                {/* Focus Room Control */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Target className="h-5 w-5 text-primary" />
-                      Focus Room
-                    </CardTitle>
-                    <CardDescription>
-                      {isThisFocused 
-                        ? "This is your current focus room. Work on this until you master it!" 
-                        : focusedRoom?.focused_room_id 
-                        ? "You're currently focused on another room. Want to switch focus here?" 
-                        : "Set this as your focus room to track your primary mastery goal"}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button
-                      onClick={handleSetFocus}
-                      disabled={isSettingFocus}
-                      variant={isThisFocused ? "outline" : "default"}
-                      className="w-full"
-                    >
-                      <Target className="h-4 w-4 mr-2" />
-                      {isThisFocused ? "Clear Focus" : "Set as Focus Room"}
-                    </Button>
+                    )}
                   </CardContent>
                 </Card>
 
-                {/* Quick Practice Section */}
+                {/* What to do next */}
+                {(!mastery || (mastery.mastery_level === 1 && mastery.xp_current === 0)) ? (
+                  <Card className="border border-primary/30">
+                    <CardContent className="pt-6 text-center space-y-4">
+                      <div className="text-4xl">🎯</div>
+                      <h3 className="text-lg font-bold">Begin Your Mastery Journey</h3>
+                      <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                        Practice drills, complete exercises, and study with the {room.name} principle to earn XP and level up.
+                      </p>
+                      <Button
+                        onClick={() => setActiveTab("practice")}
+                        className="gap-2"
+                      >
+                        <Dumbbell className="h-4 w-4" />
+                        Start Practicing
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <>
+                    {!showMilestoneTest && (
+                      <ContinueTraining
+                        nextActivity={nextActivity}
+                        roomName={room.name}
+                        onContinue={() => {
+                          if (nextActivity?.type === "milestone_test") {
+                            const testLevel = curriculum.milestoneTests.find(
+                              (t) => t.activityId === nextActivity.id
+                            )?.level;
+                            if (testLevel) {
+                              setCurrentTestLevel(testLevel);
+                              setShowMilestoneTest(true);
+                            }
+                          } else {
+                            setActiveTab("practice");
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }
+                        }}
+                      />
+                    )}
+
+                    {showMilestoneTest && currentTestLevel && (
+                      <MilestoneTest
+                        level={currentTestLevel}
+                        activityId={nextActivity?.id || ""}
+                        roomName={room.name}
+                        onPass={(activityId) => {
+                          passMilestoneTest({ testLevel: currentTestLevel, activityId });
+                          setShowMilestoneTest(false);
+                          setCurrentTestLevel(null);
+                        }}
+                        onCancel={() => {
+                          setShowMilestoneTest(false);
+                          setCurrentTestLevel(null);
+                        }}
+                      />
+                    )}
+                  </>
+                )}
+
+                {/* Quick Practice Drill */}
                 {hasDrills && (
                   <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Dumbbell className="h-5 w-5 text-accent" />
-                        Quick Practice Drill
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <Dumbbell className="h-4 w-4 text-accent" />
+                        {t('roomDetail.quickPracticeDrill')}
                       </CardTitle>
-                      <CardDescription>
-                        Test your mastery with {drillName}
-                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <Button
                         onClick={() => setShowDrill(!showDrill)}
                         variant={showDrill ? "secondary" : "default"}
                         className="w-full mb-4"
+                        size="sm"
                       >
-                        {showDrill ? "Hide Drill" : "Start Practice"}
+                        {showDrill ? t('roomDetail.hideDrill') : t('roomDetail.startPractice')}
                       </Button>
-                      
+
                       {showDrill && (
                         <PracticeDrill
                           floorNumber={floor.number}
@@ -1194,7 +1064,7 @@ export default function RoomDetail() {
                           drillType={drillName}
                           questions={drillQuestions}
                           curriculumActivityId={nextActivity?.id}
-                          onCurriculumComplete={(activityId, xpEarned) => 
+                          onCurriculumComplete={(activityId, xpEarned) =>
                             completeActivity({ activityId, xpEarned })
                           }
                           pathActivityId={pathActivityId}
@@ -1204,17 +1074,28 @@ export default function RoomDetail() {
                   </Card>
                 )}
 
-                {/* Mentor Mode - Unlocked at Expert (Level 4+) */}
+                {/* Focus Room - compact */}
+                <div className="flex gap-3">
+                  <Button
+                    onClick={handleSetFocus}
+                    disabled={isSettingFocus}
+                    variant={isThisFocused ? "outline" : "secondary"}
+                    size="sm"
+                    className="gap-2"
+                  >
+                    <Target className="h-4 w-4" />
+                    {isThisFocused ? t('roomDetail.clearFocus') : t('roomDetail.setAsFocus')}
+                  </Button>
+                </div>
+
+                {/* Mentor Chat - unlocked at Expert level */}
                 {mentorModeUnlocked && mastery && (
-                  <Card className="border-2 border-amber-500/30 bg-gradient-to-br from-amber-500/5 to-orange-500/5">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Crown className="h-5 w-5 text-amber-500" />
-                        Mentor Mode Unlocked!
+                  <Card className="border border-amber-500/30">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <Crown className="h-4 w-4 text-amber-500" />
+                        {t('roomDetail.mentorUnlocked')}
                       </CardTitle>
-                      <CardDescription>
-                        You've reached Expert level. Get personalized guidance from your AI mentor.
-                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <RoomMentorChat
@@ -1226,16 +1107,13 @@ export default function RoomDetail() {
                   </Card>
                 )}
 
-                {/* Report Card Link */}
+                {/* Report Card */}
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <FileText className="h-5 w-5 text-primary" />
-                      Mastery Report Card
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <FileText className="h-4 w-4 text-primary" />
+                      {t('roomDetail.masteryReportCard')}
                     </CardTitle>
-                    <CardDescription>
-                      View detailed analysis of your progress
-                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ReportCardDisplay
@@ -1245,11 +1123,61 @@ export default function RoomDetail() {
                     />
                   </CardContent>
                 </Card>
+
+                {/* Mastery Levels Guide - collapsible */}
+                <Collapsible>
+                  <Card className="border-border/50">
+                    <CardHeader className="pb-3">
+                      <CollapsibleTrigger asChild>
+                        <div className="flex items-center justify-between cursor-pointer group">
+                          <CardTitle className="flex items-center gap-2 text-base group-hover:text-primary transition-colors">
+                            <Info className="h-4 w-4" />
+                            How Mastery Levels Work
+                          </CardTitle>
+                          <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-all" />
+                        </div>
+                      </CollapsibleTrigger>
+                    </CardHeader>
+                    <CollapsibleContent>
+                      <CardContent className="pt-0 space-y-3">
+                        <div className="grid gap-2">
+                          {[
+                            { icon: "⚪", label: t('roomDetail.level1Title'), desc: t('roomDetail.level1Desc'), xp: t('roomDetail.level1XP') },
+                            { icon: "🔵", label: t('roomDetail.level2Title'), desc: t('roomDetail.level2Desc'), xp: t('roomDetail.level2XP') },
+                            { icon: "🟣", label: t('roomDetail.level3Title'), desc: t('roomDetail.level3Desc'), xp: t('roomDetail.level3XP') },
+                            { icon: "🟡", label: t('roomDetail.level4Title'), desc: t('roomDetail.level4Desc'), xp: t('roomDetail.level4XP') },
+                            { icon: "✨", label: t('roomDetail.level5Title'), desc: t('roomDetail.level5Desc'), xp: t('roomDetail.maxLevel') },
+                          ].map((level, i) => (
+                            <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-muted/30 text-sm">
+                              <span className="text-lg">{level.icon}</span>
+                              <div className="flex-1">
+                                <span className="font-semibold">{level.label}</span>
+                                <span className="text-muted-foreground ml-2 text-xs">— {level.desc}</span>
+                              </div>
+                              <span className="text-xs text-muted-foreground">{level.xp}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <Separator />
+
+                        <div className="text-xs text-muted-foreground space-y-1">
+                          <p className="font-semibold">{t('roomDetail.howToEarnXP')}</p>
+                          <div className="grid grid-cols-2 gap-1">
+                            <span>• {t('roomDetail.drillXP')}</span>
+                            <span>• {t('roomDetail.exerciseXP')}</span>
+                            <span>• {t('roomDetail.perfectXP')}</span>
+                            <span>• {t('roomDetail.speedXP')}</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </CollapsibleContent>
+                  </Card>
+                </Collapsible>
               </TabsContent>
             </Tabs>
           </div>
 
-          {/* SIDEBAR */}
           <div className="lg:col-span-1">
             {isUnlocked ? (
               <div className="space-y-4">
@@ -1258,98 +1186,98 @@ export default function RoomDetail() {
                     <CardHeader>
                       <div className="flex items-center gap-2">
                         <BookOpen className="h-5 w-5 text-primary" />
-                        <CardTitle>Room Code Reference</CardTitle>
+                        <CardTitle>{t('roomDetail.roomCodeReference')}</CardTitle>
                       </div>
                       <CardDescription>
-                        Quick reference for all Palace room abbreviations
+                        {t('roomDetail.quickReference')}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-6">
                         <div>
-                          <h4 className="font-semibold text-sm mb-2 text-primary">Floor 1 - Furnishing</h4>
+                          <h4 className="font-semibold text-sm mb-2 text-primary">{t('roomDetail.floor1Name')}</h4>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                            <div><Badge variant="outline" className="mr-2">SR</Badge>Story Room</div>
-                            <div><Badge variant="outline" className="mr-2">IR</Badge>Imagination Room</div>
-                            <div><Badge variant="outline" className="mr-2">24</Badge>24FPS Room</div>
-                            <div><Badge variant="outline" className="mr-2">BR</Badge>Bible Rendered</div>
-                            <div><Badge variant="outline" className="mr-2">TR</Badge>Translation Room</div>
-                            <div><Badge variant="outline" className="mr-2">GR</Badge>Gems Room</div>
+                            <div><Badge variant="outline" className="mr-2">SR</Badge>{t('roomDetail.storyRoom')}</div>
+                            <div><Badge variant="outline" className="mr-2">IR</Badge>{t('roomDetail.imaginationRoom')}</div>
+                            <div><Badge variant="outline" className="mr-2">24</Badge>{t('roomDetail.twentyFourFPSRoom')}</div>
+                            <div><Badge variant="outline" className="mr-2">BR</Badge>{t('roomDetail.bibleRendered')}</div>
+                            <div><Badge variant="outline" className="mr-2">TR</Badge>{t('roomDetail.translationRoom')}</div>
+                            <div><Badge variant="outline" className="mr-2">GR</Badge>{t('roomDetail.gemsRoom')}</div>
                           </div>
                         </div>
-                        
+
                         <div>
-                          <h4 className="font-semibold text-sm mb-2 text-primary">Floor 2 - Investigation</h4>
+                          <h4 className="font-semibold text-sm mb-2 text-primary">{t('roomDetail.floor2Name')}</h4>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                            <div><Badge variant="outline" className="mr-2">OR</Badge>Observation Room</div>
-                            <div><Badge variant="outline" className="mr-2">DC</Badge>Def-Com Room</div>
-                            <div><Badge variant="outline" className="mr-2">ST</Badge>Symbols/Types Room</div>
-                            <div><Badge variant="outline" className="mr-2">QR</Badge>Questions Room</div>
-                            <div><Badge variant="outline" className="mr-2">QA</Badge>Q&A Chains</div>
+                            <div><Badge variant="outline" className="mr-2">OR</Badge>{t('roomDetail.observationRoom')}</div>
+                            <div><Badge variant="outline" className="mr-2">DC</Badge>{t('roomDetail.defComRoom')}</div>
+                            <div><Badge variant="outline" className="mr-2">ST</Badge>{t('roomDetail.symbolsTypesRoom')}</div>
+                            <div><Badge variant="outline" className="mr-2">QR</Badge>{t('roomDetail.questionsRoom')}</div>
+                            <div><Badge variant="outline" className="mr-2">QA</Badge>{t('roomDetail.qaChains')}</div>
                           </div>
                         </div>
-                        
+
                         <div>
-                          <h4 className="font-semibold text-sm mb-2 text-primary">Floor 3 - Freestyle</h4>
+                          <h4 className="font-semibold text-sm mb-2 text-primary">{t('roomDetail.floor3Name')}</h4>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                            <div><Badge variant="outline" className="mr-2">NF</Badge>Nature Freestyle</div>
-                            <div><Badge variant="outline" className="mr-2">PF</Badge>Personal Freestyle</div>
-                            <div><Badge variant="outline" className="mr-2">BF</Badge>Bible Freestyle</div>
-                            <div><Badge variant="outline" className="mr-2">HF</Badge>History Freestyle</div>
-                            <div><Badge variant="outline" className="mr-2">LR</Badge>Listening Room</div>
+                            <div><Badge variant="outline" className="mr-2">NF</Badge>{t('roomDetail.natureFreestyle')}</div>
+                            <div><Badge variant="outline" className="mr-2">PF</Badge>{t('roomDetail.personalFreestyle')}</div>
+                            <div><Badge variant="outline" className="mr-2">BF</Badge>{t('roomDetail.bibleFreestyle')}</div>
+                            <div><Badge variant="outline" className="mr-2">HF</Badge>{t('roomDetail.historyFreestyle')}</div>
+                            <div><Badge variant="outline" className="mr-2">LR</Badge>{t('roomDetail.listeningRoom')}</div>
                           </div>
                         </div>
-                        
+
                         <div>
-                          <h4 className="font-semibold text-sm mb-2 text-primary">Floor 4 - Next Level</h4>
+                          <h4 className="font-semibold text-sm mb-2 text-primary">{t('roomDetail.floor4Name')}</h4>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                            <div><Badge variant="outline" className="mr-2">CR</Badge>Concentration Room</div>
-                            <div><Badge variant="outline" className="mr-2">DR</Badge>Dimensions Room</div>
-                            <div><Badge variant="outline" className="mr-2">C6</Badge>Connect 6</div>
-                            <div><Badge variant="outline" className="mr-2">TRm</Badge>Theme Room</div>
-                            <div><Badge variant="outline" className="mr-2">TZ</Badge>Time Zone Room</div>
-                            <div><Badge variant="outline" className="mr-2">PRm</Badge>Patterns Room</div>
-                            <div><Badge variant="outline" className="mr-2">P‖</Badge>Parallels Room</div>
-                            <div><Badge variant="outline" className="mr-2">FRt</Badge>Fruit Room</div>
-                            <div><Badge variant="outline" className="mr-2">CEC</Badge>Christ in Every Chapter</div>
-                            <div><Badge variant="outline" className="mr-2">R66</Badge>Room 66</div>
+                            <div><Badge variant="outline" className="mr-2">CR</Badge>{t('roomDetail.concentrationRoom')}</div>
+                            <div><Badge variant="outline" className="mr-2">DR</Badge>{t('roomDetail.dimensionsRoom')}</div>
+                            <div><Badge variant="outline" className="mr-2">C6</Badge>{t('roomDetail.connect6')}</div>
+                            <div><Badge variant="outline" className="mr-2">TRm</Badge>{t('roomDetail.themeRoom')}</div>
+                            <div><Badge variant="outline" className="mr-2">TZ</Badge>{t('roomDetail.timeZoneRoom')}</div>
+                            <div><Badge variant="outline" className="mr-2">PRm</Badge>{t('roomDetail.patternsRoom')}</div>
+                            <div><Badge variant="outline" className="mr-2">P‖</Badge>{t('roomDetail.parallelsRoom')}</div>
+                            <div><Badge variant="outline" className="mr-2">FRt</Badge>{t('roomDetail.fruitRoom')}</div>
+                            <div><Badge variant="outline" className="mr-2">CEC</Badge>{t('roomDetail.christInEveryChapter')}</div>
+                            <div><Badge variant="outline" className="mr-2">R66</Badge>{t('roomDetail.room66')}</div>
                           </div>
                         </div>
-                        
+
                         <div>
-                          <h4 className="font-semibold text-sm mb-2 text-primary">Floor 5 - Vision</h4>
+                          <h4 className="font-semibold text-sm mb-2 text-primary">{t('roomDetail.floor5Name')}</h4>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                            <div><Badge variant="outline" className="mr-2">BL</Badge>Blue Room (Sanctuary)</div>
-                            <div><Badge variant="outline" className="mr-2">PR</Badge>Prophecy Room</div>
-                            <div><Badge variant="outline" className="mr-2">3A</Badge>Three Angels' Room</div>
-                            <div><Badge variant="outline" className="mr-2">FE</Badge>Feasts Room</div>
+                            <div><Badge variant="outline" className="mr-2">BL</Badge>{t('roomDetail.blueRoomSanctuary')}</div>
+                            <div><Badge variant="outline" className="mr-2">PR</Badge>{t('roomDetail.prophecyRoom')}</div>
+                            <div><Badge variant="outline" className="mr-2">3A</Badge>{t('roomDetail.threeAngelsRoom')}</div>
+                            <div><Badge variant="outline" className="mr-2">FE</Badge>{t('roomDetail.feastsRoom')}</div>
                           </div>
                         </div>
-                        
+
                         <div>
-                          <h4 className="font-semibold text-sm mb-2 text-primary">Floor 6 - Three Heavens & Cycles</h4>
+                          <h4 className="font-semibold text-sm mb-2 text-primary">{t('roomDetail.floor6Name')}</h4>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                            <div><Badge variant="outline" className="mr-2">@Ad</Badge>Adamic Cycle</div>
-                            <div><Badge variant="outline" className="mr-2">@No</Badge>Noahic Cycle</div>
-                            <div><Badge variant="outline" className="mr-2">@Ab</Badge>Abrahamic Cycle</div>
-                            <div><Badge variant="outline" className="mr-2">@Mo</Badge>Mosaic Cycle</div>
-                            <div><Badge variant="outline" className="mr-2">@Cy</Badge>Cyrusic Cycle</div>
-                            <div><Badge variant="outline" className="mr-2">@CyC</Badge>Cyrus-Christ Cycle</div>
-                            <div><Badge variant="outline" className="mr-2">@Sp</Badge>Holy Spirit Cycle</div>
-                            <div><Badge variant="outline" className="mr-2">@Re</Badge>Remnant Cycle</div>
-                            <div><Badge variant="outline" className="mr-2">1H</Badge>First Heaven (DoL¹/NE¹)</div>
-                            <div><Badge variant="outline" className="mr-2">2H</Badge>Second Heaven (DoL²/NE²)</div>
-                            <div><Badge variant="outline" className="mr-2">3H</Badge>Third Heaven (DoL³/NE³)</div>
-                            <div><Badge variant="outline" className="mr-2">JR</Badge>Juice Room</div>
+                            <div><Badge variant="outline" className="mr-2">@Ad</Badge>{t('roomDetail.adamicCycle')}</div>
+                            <div><Badge variant="outline" className="mr-2">@No</Badge>{t('roomDetail.noahicCycle')}</div>
+                            <div><Badge variant="outline" className="mr-2">@Ab</Badge>{t('roomDetail.abrahamicCycle')}</div>
+                            <div><Badge variant="outline" className="mr-2">@Mo</Badge>{t('roomDetail.mosaicCycle')}</div>
+                            <div><Badge variant="outline" className="mr-2">@Cy</Badge>{t('roomDetail.cyrusickCycle')}</div>
+                            <div><Badge variant="outline" className="mr-2">@CyC</Badge>{t('roomDetail.cyrusChristCycle')}</div>
+                            <div><Badge variant="outline" className="mr-2">@Sp</Badge>{t('roomDetail.holySpiritCycle')}</div>
+                            <div><Badge variant="outline" className="mr-2">@Re</Badge>{t('roomDetail.remnantCycle')}</div>
+                            <div><Badge variant="outline" className="mr-2">1H</Badge>{t('roomDetail.firstHeaven')}</div>
+                            <div><Badge variant="outline" className="mr-2">2H</Badge>{t('roomDetail.secondHeaven')}</div>
+                            <div><Badge variant="outline" className="mr-2">3H</Badge>{t('roomDetail.thirdHeaven')}</div>
+                            <div><Badge variant="outline" className="mr-2">JR</Badge>{t('roomDetail.juiceRoom')}</div>
                           </div>
                         </div>
-                        
+
                         <div>
-                          <h4 className="font-semibold text-sm mb-2 text-primary">Floor 7 - Spiritual & Emotional</h4>
+                          <h4 className="font-semibold text-sm mb-2 text-primary">{t('roomDetail.floor7Name')}</h4>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                            <div><Badge variant="outline" className="mr-2">FRm</Badge>Fire Room</div>
-                            <div><Badge variant="outline" className="mr-2">MR</Badge>Meditation Room</div>
-                            <div><Badge variant="outline" className="mr-2">SRm</Badge>Speed Room</div>
+                            <div><Badge variant="outline" className="mr-2">FRm</Badge>{t('roomDetail.fireRoom')}</div>
+                            <div><Badge variant="outline" className="mr-2">MR</Badge>{t('roomDetail.meditationRoom')}</div>
+                            <div><Badge variant="outline" className="mr-2">SRm</Badge>{t('roomDetail.speedRoom')}</div>
                           </div>
                         </div>
                       </div>
@@ -1361,7 +1289,7 @@ export default function RoomDetail() {
                   <CardHeader>
                     <div className="flex items-center gap-2">
                       <AlertCircle className="h-5 w-5 text-destructive" />
-                      <CardTitle>Pitfalls to Avoid</CardTitle>
+                      <CardTitle>{t('roomDetail.pitfalls')}</CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -1380,19 +1308,19 @@ export default function RoomDetail() {
                   <CardHeader>
                     <div className="flex items-center gap-2">
                       <CheckCircle className="h-5 w-5 text-primary" />
-                      <CardTitle>Deliverable</CardTitle>
+                      <CardTitle>{t('roomDetail.deliverable')}</CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <p className="font-medium mb-4">{room.deliverable}</p>
                     {user && !progress?.completed_at && (
-                      <Button 
+                      <Button
                         onClick={markRoomComplete}
                         disabled={progressLoading}
                         className="w-full"
                       >
                         <CheckCircle className="mr-2 h-4 w-4" />
-                        Mark Room Complete
+                        {t('roomDetail.markComplete')}
                       </Button>
                     )}
                   </CardContent>
@@ -1401,39 +1329,38 @@ export default function RoomDetail() {
                 {user && progress && (
                   <Card>
                     <CardHeader>
-                      <CardTitle>Your Progress</CardTitle>
+                      <CardTitle>{t('roomDetail.yourProgress')}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Exercises Completed:</span>
+                        <span className="text-muted-foreground">{t('roomDetail.exercisesCompleted')}</span>
                         <span className="font-medium">{progress.exercises_completed.length}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Drill Attempts:</span>
+                        <span className="text-muted-foreground">{t('roomDetail.drillAttempts')}</span>
                         <span className="font-medium">{progress.drill_attempts}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Best Score:</span>
+                        <span className="text-muted-foreground">{t('roomDetail.bestScore')}</span>
                         <span className="font-medium">{progress.best_drill_score}</span>
                       </div>
                     </CardContent>
                   </Card>
                 )}
 
-                {/* Mastery Progress Card Sidebar */}
                 {mastery && (
                   <Card className="border-2 border-primary/20">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Trophy className="h-5 w-5 text-primary" />
-                        Room Mastery
+                        {t('roomDetail.roomMastery')}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="flex items-center justify-between">
                         <MasteryBadge level={mastery.mastery_level} />
                         <span className="text-sm text-muted-foreground">
-                          {mastery.total_drills_completed + mastery.total_exercises_completed} activities
+                          {t('roomDetail.activitiesCount', { count: mastery.total_drills_completed + mastery.total_exercises_completed })}
                         </span>
                       </div>
                       <XpProgressBar
@@ -1445,7 +1372,6 @@ export default function RoomDetail() {
                   </Card>
                 )}
 
-                {/* Mentor Mode - Unlocked at Expert (Level 4+) */}
                 {mentorModeUnlocked && mastery && (
                   <RoomMentorChat
                     roomId={room.id}
@@ -1459,10 +1385,10 @@ export default function RoomDetail() {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Dumbbell className="h-5 w-5 text-accent" />
-                        Practice Drill
+                        {t('roomDetail.practiceDrill')}
                       </CardTitle>
                       <CardDescription>
-                        Test your knowledge with {drillName}
+                        {t('roomDetail.testKnowledge', { drillName })}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -1471,28 +1397,19 @@ export default function RoomDetail() {
                         variant={showDrill ? "secondary" : "default"}
                         className="w-full"
                       >
-                        {showDrill ? "Hide Drill" : "Start Practice"}
+                        {showDrill ? t('roomDetail.hideDrill') : t('roomDetail.startPractice')}
                       </Button>
                     </CardContent>
                   </Card>
                 )}
-                
-                {showDrill && hasDrills ? (
+
+                {showDrill && hasDrills && (
                   <PracticeDrill
                     floorNumber={floor.number}
                     roomId={room.id}
                     roomName={room.name}
                     drillType={drillName}
                     questions={drillQuestions}
-                  />
-                ) : !mentorModeUnlocked && (
-                  <JeevesAssistant
-                    roomTag={room.tag}
-                    roomName={room.name}
-                    principle={room.purpose}
-                    floorNumber={floor.number}
-                    roomId={room.id}
-                    onExerciseComplete={markExerciseComplete}
                   />
                 )}
               </div>
@@ -1501,10 +1418,10 @@ export default function RoomDetail() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Lock className="h-5 w-5" />
-                    Room Locked
+                    {t('roomDetail.roomLocked')}
                   </CardTitle>
                   <CardDescription>
-                    Complete the prerequisite rooms to unlock this content.
+                    {t('roomDetail.completePrerequisite')}
                   </CardDescription>
                 </CardHeader>
               </Card>

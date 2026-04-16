@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { useMastery } from "@/hooks/useMastery";
 import { useDrills } from "@/hooks/useDrills";
 import { calculateXpReward } from "@/utils/masteryCalculations";
@@ -30,6 +31,8 @@ interface GradeResult {
 const TrainingDrills = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation();
+  const { translatedFloors } = useTranslatedPalaceData();
   const [selectedFloor, setSelectedFloor] = useState<string>("floor-1");
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
   const [drills, setDrills] = useState<any[]>([]);
@@ -134,7 +137,7 @@ const TrainingDrills = () => {
   const generateDrillsForRoom = async (roomTag: string, forceRegenerate = false) => {
     setGenerating(true);
     
-    const room = palaceFloors
+    const room = translatedFloors
       .flatMap(f => f.rooms)
       .find(r => r.tag === roomTag);
 
@@ -188,30 +191,30 @@ const TrainingDrills = () => {
           }
           
           toast({
-            title: "Drills Generated!",
-            description: `10 training drills created for ${room.name}`,
+            title: t('training.drillsGenerated'),
+            description: t('training.drillsCreatedFor', { roomName: room.name }),
           });
         } else {
           console.error('Error inserting drills:', insertError);
           toast({
-            title: "Error",
-            description: "Failed to save generated drills",
+            title: t('common.error'),
+            description: t('training.failedToSaveDrills'),
             variant: "destructive",
           });
         }
       } else {
         console.error('Invalid drill data:', data);
         toast({
-          title: "Error",
-          description: "Failed to generate drills - invalid response",
+          title: t('common.error'),
+          description: t('training.failedToGenerateDrillsInvalid'),
           variant: "destructive",
         });
       }
     } catch (error) {
       console.error('Error generating drills:', error);
       toast({
-        title: "Error",
-        description: "Failed to generate drills",
+        title: t('common.error'),
+        description: t('training.failedToGenerateDrills'),
         variant: "destructive",
       });
     } finally {
@@ -229,8 +232,8 @@ const TrainingDrills = () => {
   const submitDrill = async () => {
     if (!response.trim()) {
       toast({
-        title: "Enter a response",
-        description: "Please provide your answer before submitting",
+        title: t('training.enterResponse'),
+        description: t('training.provideAnswer'),
         variant: "destructive",
       });
       return;
@@ -328,15 +331,15 @@ const TrainingDrills = () => {
       setCompletions(new Set([...completions, activeDrill.id]));
 
       toast({
-        title: `Score: ${grade.score}/10`,
-        description: isPerfect ? "Perfect score! Outstanding work!" : grade.mastery_insight,
+        title: t('training.scoreResult', { score: grade.score }),
+        description: isPerfect ? t('training.perfectScore') : grade.mastery_insight,
       });
 
     } catch (error) {
       console.error('Error grading drill:', error);
       toast({
-        title: "Error",
-        description: "Failed to grade your response. Please try again.",
+        title: t('common.error'),
+        description: t('training.failedToGrade'),
         variant: "destructive",
       });
     } finally {
@@ -359,14 +362,14 @@ const TrainingDrills = () => {
       setActiveDrill(null);
       setGradeResult(null);
       toast({
-        title: "All Drills Complete!",
-        description: "You've finished all drills in this room. Try refreshing for new challenges!",
+        title: t('training.allDrillsComplete'),
+        description: t('training.allDrillsCompleteDesc'),
       });
     }
   };
 
   const getRoomByTag = (tag: string) => {
-    return palaceFloors.flatMap(f => f.rooms).find(r => r.tag === tag);
+    return translatedFloors.flatMap(f => f.rooms).find(r => r.tag === tag);
   };
 
   const getScoreColor = (score: number) => {
@@ -403,26 +406,25 @@ const TrainingDrills = () => {
                 <Dumbbell className="h-12 w-12 text-primary" />
               </div>
               <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-foreground via-primary to-amber-500 bg-clip-text text-transparent">
-                Palace Training Drills
+                {t('training.title')}
               </h1>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Master every room with AI-generated drills. Jeeves grades every answer 
-                and tracks your progress toward mastery.
+                {t('training.subtitle')}
               </p>
               
               {/* Quick Stats */}
               <div className="flex flex-wrap justify-center gap-4 pt-4">
                 <div className="glass-card px-4 py-2 rounded-full flex items-center gap-2">
                   <Target className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium">{palaceFloors.reduce((acc, f) => acc + f.rooms.length, 0) * 10} Total Drills</span>
+                  <span className="text-sm font-medium">{t('training.totalDrills', { count: translatedFloors.reduce((acc, f) => acc + f.rooms.length, 0) * 10 })}</span>
                 </div>
                 <div className="glass-card px-4 py-2 rounded-full flex items-center gap-2">
                   <Trophy className="h-4 w-4 text-amber-500" />
-                  <span className="text-sm font-medium">{completions.size} Completed</span>
+                  <span className="text-sm font-medium">{t('training.completed', { count: completions.size })}</span>
                 </div>
                 <div className="glass-card px-4 py-2 rounded-full flex items-center gap-2">
                   <Star className="h-4 w-4 text-yellow-500" />
-                  <span className="text-sm font-medium">XP Rewards</span>
+                  <span className="text-sm font-medium">{t('training.xpRewards')}</span>
                 </div>
               </div>
             </div>
@@ -439,12 +441,12 @@ const TrainingDrills = () => {
                       <Timer className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Time Elapsed</p>
+                      <p className="text-sm text-muted-foreground">{t('training.timeElapsed')}</p>
                       <p className="text-2xl font-mono font-bold text-primary">{formatTime(elapsedTime)}</p>
                     </div>
                   </div>
                   <Badge variant="secondary" className="text-lg px-4 py-2">
-                    Drill #{activeDrill.drill_number}
+                    {t('training.drillNumber', { number: activeDrill.drill_number })}
                   </Badge>
                 </div>
               </div>
@@ -470,7 +472,7 @@ const TrainingDrills = () => {
                             <Award className={`h-8 w-8 ${getScoreColor(gradeResult.score)}`} />
                           </div>
                           <div>
-                            <p className="text-sm text-muted-foreground">Your Score</p>
+                            <p className="text-sm text-muted-foreground">{t('training.yourScore')}</p>
                             <p className={`text-4xl font-bold ${getScoreColor(gradeResult.score)}`}>
                               {gradeResult.score}/10
                             </p>
@@ -479,7 +481,7 @@ const TrainingDrills = () => {
                         {gradeResult.score === 10 && (
                           <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/20">
                             <Sparkles className="h-5 w-5 text-green-500" />
-                            <span className="font-semibold text-green-500">Perfect!</span>
+                            <span className="font-semibold text-green-500">{t('training.perfect')}</span>
                           </div>
                         )}
                       </div>
@@ -490,7 +492,7 @@ const TrainingDrills = () => {
                       <div className="flex items-start gap-3 mb-4">
                         <MessageSquare className="h-5 w-5 text-primary mt-1" />
                         <div>
-                          <h3 className="font-semibold text-primary mb-2">Jeeves' Feedback</h3>
+                          <h3 className="font-semibold text-primary mb-2">{t('training.jeevesFeedback')}</h3>
                           <p className="text-foreground leading-relaxed">{gradeResult.feedback}</p>
                         </div>
                       </div>
@@ -502,7 +504,7 @@ const TrainingDrills = () => {
                         <div className="glass-card p-4 rounded-xl border border-green-500/30 bg-green-500/5">
                           <h4 className="font-semibold text-green-500 mb-3 flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4" />
-                            Strengths
+                            {t('training.strengths')}
                           </h4>
                           <ul className="space-y-2">
                             {gradeResult.strengths.map((strength, i) => (
@@ -518,7 +520,7 @@ const TrainingDrills = () => {
                         <div className="glass-card p-4 rounded-xl border border-amber-500/30 bg-amber-500/5">
                           <h4 className="font-semibold text-amber-500 mb-3 flex items-center gap-2">
                             <TrendingUp className="h-4 w-4" />
-                            Areas to Grow
+                            {t('training.areasToGrow')}
                           </h4>
                           <ul className="space-y-2">
                             {gradeResult.improvements.map((improvement, i) => (
@@ -543,7 +545,7 @@ const TrainingDrills = () => {
                     {/* Your Answer (collapsed) */}
                     <details className="glass-card rounded-xl border border-border/30">
                       <summary className="p-4 cursor-pointer font-medium text-muted-foreground hover:text-foreground">
-                        View Your Answer
+                        {t('training.viewYourAnswer')}
                       </summary>
                       <div className="px-4 pb-4">
                         <p className="text-sm whitespace-pre-wrap bg-muted/30 p-4 rounded-lg">{response}</p>
@@ -558,7 +560,7 @@ const TrainingDrills = () => {
                         size="lg"
                       >
                         <Dumbbell className="mr-2 h-5 w-5" />
-                        Next Drill
+                        {t('training.nextDrill')}
                       </Button>
                       <Button
                         onClick={() => setActiveDrill(null)}
@@ -566,7 +568,7 @@ const TrainingDrills = () => {
                         size="lg"
                         className="h-12"
                       >
-                        Back to List
+                        {t('training.backToList')}
                       </Button>
                     </div>
                   </div>
@@ -576,12 +578,12 @@ const TrainingDrills = () => {
                     <div className="space-y-3">
                       <label className="text-sm font-semibold flex items-center gap-2">
                         <Clock className="h-4 w-4" />
-                        Your Response
+                        {t('training.yourResponse')}
                       </label>
                       <Textarea
                         value={response}
                         onChange={(e) => setResponse(e.target.value)}
-                        placeholder="Type your answer here... Take your time and think through your response."
+                        placeholder={t('training.answerPlaceholder')}
                         rows={8}
                         disabled={loading || grading}
                         className="glass-card bg-background/50 border-border/50 text-base"
@@ -598,12 +600,12 @@ const TrainingDrills = () => {
                         {grading ? (
                           <>
                             <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                            Jeeves is Grading...
+                            {t('training.jeevesGrading')}
                           </>
                         ) : (
                           <>
                             <CheckCircle2 className="mr-2 h-5 w-5" />
-                            Submit for Grading
+                            {t('training.submitForGrading')}
                           </>
                         )}
                       </Button>
@@ -614,7 +616,7 @@ const TrainingDrills = () => {
                         size="lg"
                         className="h-12"
                       >
-                        Cancel
+                        {t('common.cancel')}
                       </Button>
                     </div>
                   </>
@@ -629,14 +631,14 @@ const TrainingDrills = () => {
                   <div className="flex items-center gap-4">
                     <Button variant="ghost" onClick={handleBackToRooms} className="gap-2">
                       <ArrowLeft className="h-4 w-4" />
-                      Back
+                      {t('common.back')}
                     </Button>
                     <div>
                       <h2 className="text-2xl font-bold flex items-center gap-2">
                         {getRoomByTag(selectedRoom)?.name}
                         <Badge variant="outline">{selectedRoom}</Badge>
                       </h2>
-                      <p className="text-muted-foreground">Complete drills and earn XP toward mastery</p>
+                      <p className="text-muted-foreground">{t('training.completeDrillsEarnXP')}</p>
                     </div>
                   </div>
                   {drills.length > 0 && !generating && (
@@ -647,7 +649,7 @@ const TrainingDrills = () => {
                       className="gap-2"
                     >
                       <RefreshCw className="h-4 w-4" />
-                      Get Fresh Drills
+                      {t('training.getFreshDrills')}
                     </Button>
                   )}
                 </div>
@@ -656,8 +658,8 @@ const TrainingDrills = () => {
                 {drills.length > 0 && (
                   <div className="mt-6 space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Room Progress</span>
-                      <span className="font-medium">{completedCount}/{drills.length} completed</span>
+                      <span className="text-muted-foreground">{t('training.roomProgress')}</span>
+                      <span className="font-medium">{t('training.completedOf', { completed: completedCount, total: drills.length })}</span>
                     </div>
                     <Progress value={progressPercent} className="h-2" />
                   </div>
@@ -669,24 +671,24 @@ const TrainingDrills = () => {
                   <div className="inline-flex items-center justify-center p-4 rounded-2xl bg-primary/20 mb-4">
                     <Loader2 className="h-12 w-12 animate-spin text-primary" />
                   </div>
-                  <p className="text-xl font-semibold">Generating Training Drills...</p>
-                  <p className="text-muted-foreground mt-2">Creating 10 unique exercises for this room</p>
+                  <p className="text-xl font-semibold">{t('training.generatingDrills')}</p>
+                  <p className="text-muted-foreground mt-2">{t('training.creating10Exercises')}</p>
                 </div>
               ) : drills.length === 0 ? (
                 <div className="glass-card backdrop-blur-xl bg-background/80 border border-border/50 rounded-2xl p-12 text-center">
                   <Target className="h-16 w-16 mx-auto mb-4 text-muted-foreground/50" />
-                  <p className="text-xl font-semibold mb-2">No drills available yet</p>
-                  <p className="text-muted-foreground mb-6">Generate fresh drills to start training</p>
+                  <p className="text-xl font-semibold mb-2">{t('training.noDrillsYet')}</p>
+                  <p className="text-muted-foreground mb-6">{t('training.generateToStart')}</p>
                   <Button onClick={() => generateDrillsForRoom(selectedRoom)} size="lg" className="gap-2">
                     <Dumbbell className="h-5 w-5" />
-                    Generate Drills
+                    {t('training.generateDrills')}
                   </Button>
                 </div>
               ) : (
                 <div className="grid md:grid-cols-2 gap-4">
                   {drills.map((drill, index) => {
                     const isCompleted = completions.has(drill.id);
-                    const difficulty = index < 3 ? "Beginner" : index < 7 ? "Intermediate" : "Advanced";
+                    const difficulty = index < 3 ? t('training.beginner') : index < 7 ? t('training.intermediate') : t('training.advanced');
                     const difficultyColor = index < 3 ? "text-green-500" : index < 7 ? "text-amber-500" : "text-red-500";
                     
                     return (
@@ -718,7 +720,7 @@ const TrainingDrills = () => {
                             variant={isCompleted ? "outline" : "default"}
                           >
                             <Timer className="h-4 w-4" />
-                            {isCompleted ? "Practice Again" : "Start Drill"}
+                            {isCompleted ? t('training.practiceAgain') : t('training.startDrill')}
                           </Button>
                         </div>
                       </div>
@@ -733,20 +735,20 @@ const TrainingDrills = () => {
               <div className="glass-card backdrop-blur-xl bg-background/80 border border-border/50 rounded-2xl p-4 mb-6">
                 <ScrollArea className="w-full">
                   <TabsList className="inline-flex w-full md:w-auto bg-muted/50">
-                    {palaceFloors.map((floor) => (
-                      <TabsTrigger 
-                        key={floor.number} 
-                        value={`floor-${floor.number}`} 
+                    {translatedFloors.map((floor) => (
+                      <TabsTrigger
+                        key={floor.number}
+                        value={`floor-${floor.number}`}
                         className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                       >
-                        Floor {floor.number}
+                        {t('training.floor', { number: floor.number })}
                       </TabsTrigger>
                     ))}
                   </TabsList>
                 </ScrollArea>
               </div>
 
-              {palaceFloors.map((floor) => (
+              {translatedFloors.map((floor) => (
                 <TabsContent key={floor.number} value={`floor-${floor.number}`} className="space-y-6">
                   <div className="glass-card backdrop-blur-xl bg-background/80 border border-border/50 rounded-2xl p-6">
                     <h2 className="text-2xl font-bold mb-2">{floor.name}</h2>
@@ -769,10 +771,10 @@ const TrainingDrills = () => {
                             {room.purpose.substring(0, 100)}...
                           </p>
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-muted-foreground">10 drills • XP rewards</span>
+                            <span className="text-xs text-muted-foreground">{t('training.drillsAndXP')}</span>
                             <Button size="sm" variant="ghost" className="gap-1 group-hover:bg-primary/10">
                               <Dumbbell className="h-3 w-3" />
-                              Train
+                              {t('training.train')}
                             </Button>
                           </div>
                         </div>

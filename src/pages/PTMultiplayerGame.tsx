@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -147,6 +148,7 @@ const PTMultiplayerGame = () => {
   const { gameId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   
   const [game, setGame] = useState<Game | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
@@ -166,7 +168,8 @@ const PTMultiplayerGame = () => {
   useEffect(() => {
     if (!gameId) return;
     fetchGameData();
-    subscribeToUpdates();
+    const cleanup = subscribeToUpdates();
+    return cleanup;
   }, [gameId]);
 
   const fetchGameData = async () => {
@@ -177,6 +180,18 @@ const PTMultiplayerGame = () => {
       supabase.from('pt_multiplayer_players').select('*').eq('game_id', gameId).order('joined_at'),
       supabase.from('pt_multiplayer_moves').select('*').eq('game_id', gameId).order('created_at', { ascending: false }).limit(20)
     ]);
+
+    if (gameRes.error) {
+      console.error('[PTMultiplayer] Error fetching game:', gameRes.error);
+      setLoading(false);
+      return;
+    }
+    if (playersRes.error) {
+      console.error('[PTMultiplayer] Error fetching players:', playersRes.error);
+    }
+    if (movesRes.error) {
+      console.error('[PTMultiplayer] Error fetching moves:', movesRes.error);
+    }
 
     if (gameRes.data) setGame(gameRes.data);
     if (playersRes.data) setPlayers(playersRes.data);
@@ -272,8 +287,8 @@ const PTMultiplayerGame = () => {
       if (error) {
         console.error('[PTMultiplayer] Error starting game via function:', error);
         toast({
-          title: 'Error starting game',
-          description: error.message || 'Failed to start this game.',
+          title: t('multiplayer.errorStartingGame'),
+          description: error.message || t('multiplayer.failedToStartGame'),
           variant: 'destructive',
         });
         return;
@@ -296,23 +311,29 @@ const PTMultiplayerGame = () => {
     } catch (error: any) {
       console.error('[PTMultiplayer] Error in auto-start:', error);
       toast({
-        title: 'Error starting game',
-        description: error.message || 'Unexpected error while starting the game.',
+        title: t('multiplayer.errorStartingGame'),
+        description: error.message || t('multiplayer.unexpectedError'),
         variant: 'destructive',
       });
     }
   };
 
   const subscribeToUpdates = () => {
+    if (!gameId) return () => {};
+
     const channel = supabase
       .channel(`pt-game-${gameId}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'pt_multiplayer_games', filter: `id=eq.${gameId}` }, 
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'pt_multiplayer_games', filter: `id=eq.${gameId}` },
         () => fetchGameData())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'pt_multiplayer_players', filter: `game_id=eq.${gameId}` }, 
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'pt_multiplayer_players', filter: `game_id=eq.${gameId}` },
         () => fetchGameData())
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pt_multiplayer_moves', filter: `game_id=eq.${gameId}` }, 
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pt_multiplayer_moves', filter: `game_id=eq.${gameId}` },
         () => fetchGameData())
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR') {
+          console.error('[PTMultiplayer] Realtime subscription error for game', gameId);
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);
@@ -332,17 +353,17 @@ const PTMultiplayerGame = () => {
   };
   const handlePlayCard = async () => {
     if (!selectedCardType || !cardValue || !explanation || !currentPlayer || !game) {
-      toast({ title: "Missing information", description: "Please fill all fields", variant: "destructive" });
+      toast({ title: t('multiplayer.missingInformation'), description: t('multiplayer.fillAllFields'), variant: "destructive" });
       return;
     }
 
     if (game.current_turn_player_id && game.current_turn_player_id !== currentPlayer.id) {
-      toast({ title: "Not your turn", variant: "destructive" });
+      toast({ title: t('multiplayer.notYourTurn'), variant: "destructive" });
       return;
     }
 
     if (currentPlayer.skip_next_turn) {
-      toast({ title: "Turn skipped", description: "You must skip this turn due to 3 consecutive rejections", variant: "destructive" });
+      toast({ title: t('multiplayer.turnSkipped'), description: t('multiplayer.turnSkippedDescription'), variant: "destructive" });
       await supabase.from('pt_multiplayer_players').update({ skip_next_turn: false }).eq('id', currentPlayer.id);
       return;
     }
@@ -378,15 +399,17 @@ const PTMultiplayerGame = () => {
       setExplanation("");
 
       // Move to next player if approved or rejected
-      if (verdict === 'approved' || verdict === 'rejected') {
+      if ((verdict === 'approved' || verdict === 'rejected') && currentPlayer && game && players.length > 0) {
         const currentIndex = players.findIndex(p => p.id === currentPlayer.id);
         const nextIndex = (currentIndex + 1) % players.length;
         const nextPlayer = players[nextIndex];
-        
-        await supabase
-          .from('pt_multiplayer_games')
-          .update({ current_turn_player_id: nextPlayer.id })
-          .eq('id', game.id);
+
+        if (nextPlayer) {
+          await supabase
+            .from('pt_multiplayer_games')
+            .update({ current_turn_player_id: nextPlayer.id })
+            .eq('id', game.id);
+        }
       }
 
     } catch (error: any) {
@@ -437,13 +460,13 @@ const PTMultiplayerGame = () => {
           : prev
       );
       
-      toast({ title: "🎴 Jeeves has dealt the cards! Game started!" });
+      toast({ title: t('multiplayer.jeevesDealtCards') });
     } catch (error: any) {
       console.error("Error starting game:", error);
-      toast({ 
-        title: "Error starting game", 
-        description: error.message || "Something went wrong", 
-        variant: "destructive" 
+      toast({
+        title: t('multiplayer.errorStartingGame'),
+        description: error.message || t('multiplayer.somethingWentWrong'),
+        variant: "destructive"
       });
     }
   };
@@ -460,8 +483,8 @@ const PTMultiplayerGame = () => {
     return (
       <div className="container mx-auto py-8">
         <Card className="p-6">
-          <p>Game not found</p>
-          <Button onClick={() => navigate('/card-deck')} className="mt-4">Back to Deck</Button>
+          <p>{t('multiplayer.gameNotFound')}</p>
+          <Button onClick={() => navigate('/card-deck')} className="mt-4">{t('multiplayer.backToDeck')}</Button>
         </Card>
       </div>
     );
@@ -476,10 +499,10 @@ const PTMultiplayerGame = () => {
         {/* Header */}
         <div className="mb-6 text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <h1 className="text-4xl font-bold text-white">PT Multiplayer</h1>
+            <h1 className="text-4xl font-bold text-white">{t('multiplayer.ptMultiplayer')}</h1>
             {isVsJeevesMode && <Bot className="w-8 h-8 text-purple-400" />}
           </div>
-          <p className="text-purple-200">Study Topic: <span className="font-semibold">{game.study_topic}</span></p>
+          <p className="text-purple-200">{t('multiplayer.studyTopic')}: <span className="font-semibold">{game.study_topic}</span></p>
           <Badge variant={game.status === 'active' ? 'default' : 'secondary'} className="mt-2">
             {game.status.toUpperCase()}
           </Badge>
@@ -533,8 +556,8 @@ const PTMultiplayerGame = () => {
               {game.status === 'waiting' && (
                 <div className="text-center py-12">
                   <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-purple-400" />
-                  <h2 className="text-2xl font-bold text-white">Setting up the game...</h2>
-                  <p className="text-purple-200 mt-2">Jeeves is dealing the cards</p>
+                  <h2 className="text-2xl font-bold text-white">{t('multiplayer.settingUpGame')}</h2>
+                  <p className="text-purple-200 mt-2">{t('multiplayer.jeevesDealing')}</p>
                   <Button
                     onClick={handleManualStartGame}
                     disabled={startingGame}
@@ -543,10 +566,10 @@ const PTMultiplayerGame = () => {
                     {startingGame ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Starting...
+                        {t('multiplayer.starting')}
                       </>
                     ) : (
-                      'Start game now'
+                      t('multiplayer.startGameNow')
                     )}
                   </Button>
                 </div>
@@ -556,7 +579,7 @@ const PTMultiplayerGame = () => {
                 <div>
                   <div className="mb-6 text-center">
                     <h3 className="text-2xl font-bold text-white mb-2">
-                      {isMyTurn ? "🎯 Your Turn!" : `⏳ ${players.find(p => p.id === game.current_turn_player_id)?.display_name}'s turn...`}
+                      {isMyTurn ? t('multiplayer.yourTurn') : t('multiplayer.playerTurn', { name: players.find(p => p.id === game.current_turn_player_id)?.display_name })}
                     </h3>
                   </div>
 
@@ -626,20 +649,20 @@ const PTMultiplayerGame = () => {
               {game.status === 'completed' && (
                 <div className="text-center py-12">
                   <Trophy className="w-16 h-16 mx-auto mb-4 text-yellow-400" />
-                  <h2 className="text-3xl font-bold mb-4 text-white">Game Complete!</h2>
+                  <h2 className="text-3xl font-bold mb-4 text-white">{t('multiplayer.gameComplete')}</h2>
                   {players.sort((a, b) => a.cards_remaining - a.cards_remaining || b.score - a.score)[0] && (
                     <div>
-                      <p className="text-xl mb-2 text-purple-200">Winner:</p>
+                      <p className="text-xl mb-2 text-purple-200">{t('multiplayer.winner')}:</p>
                       <p className="text-2xl font-bold text-yellow-400">
                         {players.sort((a, b) => a.cards_remaining - a.cards_remaining || b.score - a.score)[0].display_name}
                       </p>
                       <p className="text-purple-200 mt-2">
-                        Score: {players[0].score} points
+                        {t('multiplayer.scorePoints', { score: players[0].score })}
                       </p>
                     </div>
                   )}
                   <Button onClick={() => navigate('/card-deck')} className="mt-6">
-                    Back to Deck
+                    {t('multiplayer.backToDeck')}
                   </Button>
                 </div>
               )}
@@ -670,7 +693,7 @@ const PTMultiplayerGame = () => {
                 {/* Show player's cards */}
                 {myCards.length > 0 && (
                   <div className="mb-4">
-                    <label className="block text-sm font-medium mb-2 text-white">Your Cards (Principles)</label>
+                    <label className="block text-sm font-medium mb-2 text-white">{t('multiplayer.yourCards')}</label>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                       {myCards.map((card) => (
                         <motion.div
@@ -704,7 +727,7 @@ const PTMultiplayerGame = () => {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium mb-2 text-white">
-                        Card Value (Select from your cards above or type)
+                        {t('multiplayer.cardValueLabel')}
                       </label>
                       <input
                         type="text"
@@ -717,7 +740,7 @@ const PTMultiplayerGame = () => {
 
                     <div>
                       <label className="block text-sm font-medium mb-2 text-white">
-                        Explain Your Play (How does this advance the study?)
+                        {t('multiplayer.explainPlayLabel')}
                       </label>
                       <Textarea
                         value={explanation}
@@ -737,12 +760,12 @@ const PTMultiplayerGame = () => {
                       {submitting ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Jeeves is judging...
+                          {t('multiplayer.jeevesJudging')}
                         </>
                       ) : (
                         <>
                           <Sparkles className="w-4 h-4 mr-2" />
-                          Submit to Jeeves
+                          {t('multiplayer.submitToJeeves')}
                         </>
                       )}
                     </Button>

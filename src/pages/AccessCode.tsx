@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import { Loader2, Gift, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function AccessCode() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -36,8 +38,8 @@ export default function AccessCode() {
   const handleRedeem = async () => {
     if (!code.trim()) {
       toast({
-        title: "Error",
-        description: "Please enter an access code",
+        title: t('common.error'),
+        description: t('access.errorEnterCode'),
         variant: "destructive",
       });
       return;
@@ -52,8 +54,8 @@ export default function AccessCode() {
       if (error) {
         console.error('RPC Error:', error);
         toast({
-          title: "Error",
-          description: error.message || "Failed to redeem access code",
+          title: t('common.error'),
+          description: error.message || t('access.errorRedeemFailed'),
           variant: "destructive",
         });
         return;
@@ -64,22 +66,22 @@ export default function AccessCode() {
       
       if (result && result.success) {
         toast({
-          title: "Success!",
-          description: result.message || "Access granted!",
+          title: t('common.success'),
+          description: result.message || t('access.accessGranted'),
         });
         setTimeout(() => navigate('/'), 2000);
       } else {
         toast({
-          title: "Error",
-          description: result?.error || "Failed to redeem code",
+          title: t('common.error'),
+          description: result?.error || t('access.errorRedeemFailed'),
           variant: "destructive",
         });
       }
     } catch (error) {
       console.error('Error redeeming code:', error);
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to redeem access code",
+        title: t('common.error'),
+        description: error instanceof Error ? error.message : t('access.errorRedeemFailed'),
         variant: "destructive",
       });
     } finally {
@@ -96,9 +98,9 @@ export default function AccessCode() {
             <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
               <Gift className="h-6 w-6 text-primary" />
             </div>
-            <CardTitle>Redeem Access Code</CardTitle>
+            <CardTitle>{t('access.redeemAccessCode')}</CardTitle>
             <CardDescription>
-              Enter your special access code to unlock lifetime premium access
+              {t('access.redeemDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -106,13 +108,13 @@ export default function AccessCode() {
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  You must be logged in to redeem an access code.{" "}
+                  {t('access.mustBeLoggedIn')}{" "}
                   <Button
                     variant="link"
                     className="p-0 h-auto"
                     onClick={() => navigate('/auth')}
                   >
-                    Sign in here
+                    {t('access.signInHere')}
                   </Button>
                 </AlertDescription>
               </Alert>
@@ -120,7 +122,7 @@ export default function AccessCode() {
             
             <div className="space-y-2">
               <Input
-                placeholder="Enter access code (e.g., PT-XXXXXXXX)"
+                placeholder={t('access.codePlaceholder')}
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 disabled={loading || isAuthenticated === false}
@@ -132,7 +134,7 @@ export default function AccessCode() {
               className="w-full"
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Redeem Code
+              {t('access.redeemCode')}
             </Button>
           </CardContent>
         </Card>

@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,6 +33,7 @@ const CHALLENGE_VERSES = [
 
 export default function TimeZoneInvasion() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [verse, setVerse] = useState("");
   const [selectedZones, setSelectedZones] = useState<string[]>([]);
@@ -77,11 +80,11 @@ export default function TimeZoneInvasion() {
 
   const handleSubmit = async () => {
     if (selectedZones.length !== 2) {
-      toast.error("Select exactly 2 time zones");
+      toast.error(t('games.timeZoneInvasion.errorSelectZones'));
       return;
     }
     if (!explanation.trim()) {
-      toast.error("Explain your zone choices");
+      toast.error(t('games.timeZoneInvasion.errorExplainZones'));
       return;
     }
 
@@ -104,25 +107,25 @@ export default function TimeZoneInvasion() {
       if (quality === "excellent") {
         const newScore = score + 2;
         setScore(newScore);
-        toast.success(`Excellent framing! +2 points. ${feedback}`);
+        toast.success(t('games.timeZoneInvasion.excellentFraming', { feedback }));
         if (newScore >= targetScore) {
           setGameWon(true);
         }
       } else if (quality === "good") {
         const newScore = score + 1;
         setScore(newScore);
-        toast.success(`Good explanation! +1 point. ${feedback}`);
+        toast.success(t('games.timeZoneInvasion.goodExplanation', { feedback }));
         if (newScore >= targetScore) {
           setGameWon(true);
         }
       } else {
-        toast.error(`Needs work: ${feedback}`);
+        toast.error(t('games.timeZoneInvasion.needsWork', { feedback }));
       }
 
       startRound();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to validate");
+      toast.error(t('games.common.errorValidation'));
     } finally {
       setIsSubmitting(false);
     }
@@ -137,18 +140,18 @@ export default function TimeZoneInvasion() {
             <Card className="bg-black/40 border-cyan-500/50 text-center">
               <CardHeader>
                 <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
-                <CardTitle className="text-3xl text-cyan-300">Time Zone Master!</CardTitle>
+                <CardTitle className="text-3xl text-cyan-300">{t('games.timeZoneInvasion.master')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="text-4xl font-bold text-cyan-400">{score} Points</div>
-                <p className="text-cyan-200/80">You've mastered prophetic time framing!</p>
+                <div className="text-4xl font-bold text-cyan-400">{t('games.common.pointsValue', { points: score })}</div>
+                <p className="text-cyan-200/80">{t('games.timeZoneInvasion.masterMessage')}</p>
                 <div className="flex gap-4 justify-center">
                   <Button onClick={() => navigate("/games")}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Games
+                    {t('games.common.backToGames')}
                   </Button>
                   <Button onClick={() => window.location.reload()} variant="outline">
-                    Play Again
+                    {t('games.common.playAgain')}
                   </Button>
                 </div>
               </CardContent>
@@ -166,15 +169,15 @@ export default function TimeZoneInvasion() {
         <Card className="max-w-md bg-black/40 border-cyan-500/50">
           <CardHeader>
             <CardTitle className="text-center text-3xl text-cyan-300">
-              🌍 TIME ZONE INVASION
+              {t('games.timeZoneInvasion.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-cyan-100/80">
-              Frame Bible verses across Heaven/Earth and Past/Present/Future
+              {t('games.timeZoneInvasion.description')}
             </p>
             <Button onClick={startRound} className="w-full">
-              Start Challenge
+              {t('games.timeZoneInvasion.startChallenge')}
             </Button>
           </CardContent>
         </Card>
@@ -188,21 +191,21 @@ export default function TimeZoneInvasion() {
         <div className="flex justify-between items-center mb-8">
           <Button variant="ghost" onClick={() => navigate("/games")} className="text-white">
             <ArrowLeft className="mr-2" />
-            Back
+            {t('common.back')}
           </Button>
           <h1 className="text-4xl font-bold text-cyan-400" style={{ fontFamily: "'Cinzel', serif" }}>
-            🌍 TIME ZONE INVASION
+            {t('games.timeZoneInvasion.title')}
           </h1>
           <div className="text-right">
             <div className="text-cyan-400 text-3xl font-bold">{score}</div>
-            <div className="text-cyan-200/60 text-sm">POINTS</div>
+            <div className="text-cyan-200/60 text-sm">{t('games.common.points')}</div>
           </div>
         </div>
 
         <div className="max-w-4xl mx-auto space-y-6">
           <Card className="bg-black/40 border-cyan-500/50">
             <CardHeader>
-              <CardTitle className="text-cyan-300">Challenge Verse</CardTitle>
+              <CardTitle className="text-cyan-300">{t('games.timeZoneInvasion.challengeVerse')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl text-cyan-100 font-serif text-center py-4">
@@ -213,7 +216,7 @@ export default function TimeZoneInvasion() {
 
           <Card className="bg-black/40 border-cyan-500/50">
             <CardHeader>
-              <CardTitle className="text-cyan-300">Select 2 Time Zones</CardTitle>
+              <CardTitle className="text-cyan-300">{t('games.timeZoneInvasion.selectZones')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -238,27 +241,28 @@ export default function TimeZoneInvasion() {
 
           <Card className="bg-black/40 border-cyan-500/50">
             <CardHeader>
-              <CardTitle className="text-cyan-300">Defend Your Zones</CardTitle>
+              <CardTitle className="text-cyan-300">{t('games.timeZoneInvasion.defendZones')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <Textarea
                 value={explanation}
                 onChange={(e) => setExplanation(e.target.value)}
-                placeholder="Explain why your 2 zones apply to this verse..."
+                placeholder={t('games.timeZoneInvasion.explanationPlaceholder')}
                 className="bg-black/60 border-cyan-500/30 text-white min-h-32"
               />
               <div className="flex gap-2">
                 <Button onClick={handleSubmit} disabled={isSubmitting} className="flex-1">
-                  {isSubmitting ? "Validating..." : "Submit Defense"}
+                  {isSubmitting ? t('games.common.validating') : t('games.timeZoneInvasion.submitDefense')}
                 </Button>
                 <Button onClick={startRound} variant="outline">
-                  New Verse
+                  {t('games.timeZoneInvasion.newVerse')}
                 </Button>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
+      <FloatingGameChat gameType="time-zone-invasion" />
     </div>
   );
 }

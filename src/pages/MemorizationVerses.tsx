@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,7 @@ interface MemorizationVerse {
 const MemorizationVerses = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [verses, setVerses] = useState<MemorizationVerse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,8 +75,8 @@ const MemorizationVerses = () => {
     } catch (error) {
       console.error("Error loading verses:", error);
       toast({
-        title: "Error loading verses",
-        description: "Please try again later",
+        title: t('memory.memorization.errorLoadingVerses'),
+        description: t('common.tryAgainLater'),
         variant: "destructive",
       });
     } finally {
@@ -85,8 +87,8 @@ const MemorizationVerses = () => {
   const fetchVerseFromAPI = async () => {
     if (!selectedBook || !selectedChapter || !selectedVerse) {
       toast({
-        title: "Missing information",
-        description: "Please select book, chapter, and verse",
+        title: t('memory.memorization.missingInfo'),
+        description: t('memory.memorization.selectBookChapterVerse'),
         variant: "destructive",
       });
       return;
@@ -95,26 +97,26 @@ const MemorizationVerses = () => {
     setFetchingVerse(true);
     try {
       const chapterData = await fetchChapter(
-        selectedBook, 
-        parseInt(selectedChapter), 
+        selectedBook,
+        parseInt(selectedChapter),
         selectedTranslation as Translation
       );
       const foundVerse = chapterData.verses.find(v => v.verse === parseInt(selectedVerse));
-      
+
       if (foundVerse) {
         setVerseText(foundVerse.text);
       } else {
         toast({
-          title: "Verse not found",
-          description: "Could not find the specified verse",
+          title: t('memory.memorization.verseNotFound'),
+          description: t('memory.memorization.couldNotFindVerse'),
           variant: "destructive",
         });
       }
     } catch (error) {
       console.error("Error fetching verse:", error);
       toast({
-        title: "Error fetching verse",
-        description: "Please try again",
+        title: t('memory.memorization.errorFetchingVerse'),
+        description: t('common.tryAgain'),
         variant: "destructive",
       });
     } finally {
@@ -125,8 +127,8 @@ const MemorizationVerses = () => {
   const addVerse = async () => {
     if (!user || !selectedBook || !selectedChapter || !selectedVerse || !verseText) {
       toast({
-        title: "Missing information",
-        description: "Please fill in all required fields",
+        title: t('memory.memorization.missingInfo'),
+        description: t('memory.memorization.fillRequiredFields'),
         variant: "destructive",
       });
       return;
@@ -150,8 +152,8 @@ const MemorizationVerses = () => {
       if (error) throw error;
 
       toast({
-        title: "Verse added!",
-        description: `${reference} added to your memorization list`,
+        title: t('memory.memorization.verseAdded'),
+        description: t('memory.memorization.verseAddedDesc', { reference }),
       });
 
       setIsAddDialogOpen(false);
@@ -160,8 +162,8 @@ const MemorizationVerses = () => {
     } catch (error) {
       console.error("Error adding verse:", error);
       toast({
-        title: "Error adding verse",
-        description: "Please try again",
+        title: t('memory.memorization.errorAddingVerse'),
+        description: t('common.tryAgain'),
         variant: "destructive",
       });
     }
@@ -177,16 +179,16 @@ const MemorizationVerses = () => {
       if (error) throw error;
 
       toast({
-        title: "Verse removed",
-        description: "Verse removed from your memorization list",
+        title: t('memory.memorization.verseRemovedTitle'),
+        description: t('memory.memorization.verseRemovedDesc'),
       });
 
       loadVerses();
     } catch (error) {
       console.error("Error deleting verse:", error);
       toast({
-        title: "Error removing verse",
-        description: "Please try again",
+        title: t('memory.memorization.errorRemovingVerse'),
+        description: t('common.tryAgain'),
         variant: "destructive",
       });
     }
@@ -227,16 +229,16 @@ const MemorizationVerses = () => {
       if (error) throw error;
       
       toast({
-        title: "Schedule updated",
-        description: `Next review in ${intervalDays} days`,
+        title: t('memory.memorization.scheduleUpdated'),
+        description: t('memory.memorization.nextReviewIn', { days: intervalDays }),
       });
-      
+
       loadVerses();
     } catch (error) {
       console.error("Error updating schedule:", error);
       toast({
-        title: "Error",
-        description: "Failed to update review schedule",
+        title: t('common.error'),
+        description: t('memory.memorization.failedToUpdateSchedule'),
         variant: "destructive",
       });
     }
@@ -252,33 +254,33 @@ const MemorizationVerses = () => {
         <div className="container mx-auto max-w-6xl">
           <div className="mb-8">
             <h1 className="font-serif text-4xl md:text-5xl font-bold mb-2 bg-gradient-palace bg-clip-text text-transparent">
-              My Memorization Verses
+              {t('memory.memorization.title')}
             </h1>
             <p className="text-lg text-muted-foreground">
-              Build your collection of verses to memorize and practice
+              {t('memory.memorization.subtitle')}
             </p>
           </div>
 
           <div className="mb-6 flex justify-between items-center">
             <Badge variant="secondary" className="text-lg px-4 py-2">
-              {verses.length} {verses.length === 1 ? 'verse' : 'verses'} saved
+              {t('memory.memorization.versesSaved', { count: verses.length })}
             </Badge>
             
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="gradient-palace">
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Verse
+                  {t('memory.memorization.addVerse')}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
-                  <DialogTitle>Add Verse to Memorization List</DialogTitle>
+                  <DialogTitle>{t('memory.memorization.addVerseDialogTitle')}</DialogTitle>
                 </DialogHeader>
                 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Bible Translation</Label>
+                    <Label>{t('memory.memorization.bibleTranslation')}</Label>
                     <Select value={selectedTranslation} onValueChange={setSelectedTranslation}>
                       <SelectTrigger className="w-full">
                         <SelectValue />
@@ -295,7 +297,7 @@ const MemorizationVerses = () => {
 
                   <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <Label>Book</Label>
+                      <Label>{t('memory.memorization.book')}</Label>
                       <Popover open={bookSearchOpen} onOpenChange={setBookSearchOpen}>
                         <PopoverTrigger asChild>
                           <Button
@@ -304,15 +306,15 @@ const MemorizationVerses = () => {
                             aria-expanded={bookSearchOpen}
                             className="w-full justify-between"
                           >
-                            {selectedBook || "Select book"}
+                            {selectedBook || t('memory.memorization.selectBook')}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-[200px] p-0 bg-card border-border z-50">
                           <Command>
-                            <CommandInput placeholder="Search books..." />
+                            <CommandInput placeholder={t('memory.memorization.searchBooks')} />
                             <CommandList>
-                              <CommandEmpty>No book found.</CommandEmpty>
+                              <CommandEmpty>{t('memory.memorization.noBookFound')}</CommandEmpty>
                               <CommandGroup>
                                 {BIBLE_BOOKS.map((book) => (
                                   <CommandItem
@@ -340,7 +342,7 @@ const MemorizationVerses = () => {
                     </div>
                     
                     <div className="space-y-2">
-                      <Label>Chapter</Label>
+                      <Label>{t('memory.memorization.chapter')}</Label>
                       <Input
                         type="number"
                         placeholder="1"
@@ -351,7 +353,7 @@ const MemorizationVerses = () => {
                     </div>
                     
                     <div className="space-y-2">
-                      <Label>Verse</Label>
+                      <Label>{t('memory.memorization.verse')}</Label>
                       <Input
                         type="number"
                         placeholder="1"
@@ -369,13 +371,13 @@ const MemorizationVerses = () => {
                     disabled={fetchingVerse}
                   >
                     <Search className="h-4 w-4 mr-2" />
-                    {fetchingVerse ? "Fetching..." : "Fetch Verse Text"}
+                    {fetchingVerse ? t('memory.memorization.fetching') : t('memory.memorization.fetchVerseText')}
                   </Button>
 
                   <div className="space-y-2">
-                    <Label>Verse Text</Label>
+                    <Label>{t('memory.memorization.verseText')}</Label>
                     <Textarea
-                      placeholder="Verse text will appear here..."
+                      placeholder={t('memory.memorization.verseTextPlaceholder')}
                       value={verseText}
                       onChange={(e) => setVerseText(e.target.value)}
                       rows={4}
@@ -383,9 +385,9 @@ const MemorizationVerses = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Notes (optional)</Label>
+                    <Label>{t('memory.memorization.notesOptional')}</Label>
                     <Textarea
-                      placeholder="Add personal notes about this verse..."
+                      placeholder={t('memory.memorization.notesPlaceholder')}
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       rows={3}
@@ -394,10 +396,10 @@ const MemorizationVerses = () => {
 
                   <div className="flex gap-2 justify-end">
                     <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                      Cancel
+                      {t('common.cancel')}
                     </Button>
                     <Button onClick={addVerse} className="gradient-palace">
-                      Add to List
+                      {t('memory.memorization.addToList')}
                     </Button>
                   </div>
                 </div>
@@ -407,18 +409,18 @@ const MemorizationVerses = () => {
 
           {loading ? (
             <Card className="p-12 text-center">
-              <p className="text-muted-foreground">Loading verses...</p>
+              <p className="text-muted-foreground">{t('memory.memorization.loadingVerses')}</p>
             </Card>
           ) : verses.length === 0 ? (
             <Card className="p-12 text-center">
               <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-lg font-medium mb-2">No verses yet</p>
+              <p className="text-lg font-medium mb-2">{t('memory.memorization.noVersesYet')}</p>
               <p className="text-muted-foreground mb-6">
-                Start building your memorization collection by adding verses
+                {t('memory.memorization.startBuilding')}
               </p>
               <Button onClick={() => setIsAddDialogOpen(true)} className="gradient-palace">
                 <Plus className="h-4 w-4 mr-2" />
-                Add Your First Verse
+                {t('memory.memorization.addFirstVerse')}
               </Button>
             </Card>
           ) : (
@@ -434,10 +436,10 @@ const MemorizationVerses = () => {
                         <div className="flex gap-2 mt-2">
                           <Badge variant="outline">
                             <Star className="h-3 w-3 mr-1" />
-                            Level {verse.mastery_level}
+                            {t('memory.memorization.level', { level: verse.mastery_level })}
                           </Badge>
                           <Badge variant="secondary">
-                            Reviewed {verse.review_count}x
+                            {t('memory.memorization.reviewed', { count: verse.review_count })}
                           </Badge>
                         </div>
                       </div>
@@ -460,7 +462,7 @@ const MemorizationVerses = () => {
                           onClick={() => toggleFirstLetter(verse.id)}
                           className="text-xs"
                         >
-                          {showFirstLetterOnly[verse.id] ? "Show Full" : "First Letters"}
+                          {showFirstLetterOnly[verse.id] ? t('memory.memorization.showFull') : t('memory.memorization.firstLetters')}
                         </Button>
                       </div>
                       <p className="text-sm leading-relaxed">
@@ -472,7 +474,7 @@ const MemorizationVerses = () => {
                     </div>
                     
                     <div className="mb-3">
-                      <Label className="text-xs mb-1 block">Review Schedule</Label>
+                      <Label className="text-xs mb-1 block">{t('memory.memorization.reviewSchedule')}</Label>
                       <Select
                         value={reviewInterval.toString()}
                         onValueChange={(value) => {
@@ -482,14 +484,14 @@ const MemorizationVerses = () => {
                         }}
                       >
                         <SelectTrigger className="w-full h-8 text-xs">
-                          <SelectValue placeholder="Review frequency" />
+                          <SelectValue placeholder={t('memory.memorization.reviewFrequency')} />
                         </SelectTrigger>
                         <SelectContent className="bg-card border-border z-50">
-                          <SelectItem value="1">Daily</SelectItem>
-                          <SelectItem value="3">Every 3 days</SelectItem>
-                          <SelectItem value="7">Weekly</SelectItem>
-                          <SelectItem value="14">Every 2 weeks</SelectItem>
-                          <SelectItem value="30">Monthly</SelectItem>
+                          <SelectItem value="1">{t('memory.memorization.daily')}</SelectItem>
+                          <SelectItem value="3">{t('memory.memorization.every3Days')}</SelectItem>
+                          <SelectItem value="7">{t('memory.memorization.weekly')}</SelectItem>
+                          <SelectItem value="14">{t('memory.memorization.every2Weeks')}</SelectItem>
+                          <SelectItem value="30">{t('memory.memorization.monthly')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -511,16 +513,16 @@ const MemorizationVerses = () => {
             <Card className="mt-6 p-6 bg-primary/5 border-primary/20">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-semibold mb-1">Ready to practice?</h3>
+                  <h3 className="font-semibold mb-1">{t('memory.memorization.readyToPractice')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    You have {verses.length} verses ready for the Verse Match game!
+                    {t('memory.memorization.versesReadyForMatch', { count: verses.length })}
                   </p>
                 </div>
                 <Button 
                   onClick={() => navigate('/games/verse_match/custom')}
                   className="gradient-palace"
                 >
-                  Play Verse Match
+                  {t('memory.memorization.playVerseMatch')}
                 </Button>
               </div>
             </Card>

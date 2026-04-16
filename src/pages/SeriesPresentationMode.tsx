@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +21,7 @@ import {
 import { QuickAudioButton } from "@/components/audio";
 
 export default function SeriesPresentationMode() {
+  const { t } = useTranslation();
   const { seriesId } = useParams();
   const navigate = useNavigate();
   const [series, setSeries] = useState<any>(null);
@@ -73,7 +75,7 @@ export default function SeriesPresentationMode() {
       setLessons(lessonData || []);
     } catch (error) {
       console.error('Error loading series:', error);
-      toast.error('Failed to load series');
+      toast.error(t('series.errorLoadSeries'));
     } finally {
       setLoading(false);
     }
@@ -114,7 +116,7 @@ export default function SeriesPresentationMode() {
       {
         type: 'title',
         content: {
-          title: `Lesson ${currentLesson.lesson_number}`,
+          title: t('series.lessonNumber', { number: currentLesson.lesson_number }),
           subtitle: currentLesson.title,
           passages: currentLesson.key_passages
         }
@@ -123,7 +125,7 @@ export default function SeriesPresentationMode() {
       {
         type: 'big-idea',
         content: {
-          title: 'Big Idea',
+          title: t('series.bigIdea'),
           text: currentLesson.big_idea
         }
       }
@@ -134,7 +136,7 @@ export default function SeriesPresentationMode() {
       slides.push({
         type: 'points',
         content: {
-          title: 'Core Points',
+          title: t('series.corePoints'),
           points: currentLesson.core_points
         }
       });
@@ -145,7 +147,7 @@ export default function SeriesPresentationMode() {
       slides.push({
         type: 'christ',
         content: {
-          title: 'Christ Emphasis',
+          title: t('series.christEmphasis'),
           text: currentLesson.christ_emphasis
         }
       });
@@ -156,7 +158,7 @@ export default function SeriesPresentationMode() {
       slides.push({
         type: 'questions',
         content: {
-          title: 'Discussion Questions',
+          title: t('series.discussionQuestions'),
           questions: currentLesson.discussion_questions
         }
       });
@@ -167,7 +169,7 @@ export default function SeriesPresentationMode() {
       slides.push({
         type: 'activity',
         content: {
-          title: 'Palace Activity',
+          title: t('series.palaceActivity'),
           text: currentLesson.palace_activity
         }
       });
@@ -178,7 +180,7 @@ export default function SeriesPresentationMode() {
       slides.push({
         type: 'challenge',
         content: {
-          title: 'Take-Home Challenge',
+          title: t('series.takeHomeChallenge'),
           text: currentLesson.take_home_challenge
         }
       });
@@ -221,9 +223,9 @@ export default function SeriesPresentationMode() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Card className="max-w-md">
           <CardContent className="pt-6 text-center">
-            <p className="text-muted-foreground mb-4">No lessons found for this series</p>
+            <p className="text-muted-foreground mb-4">{t('series.noLessonsFound')}</p>
             <Button onClick={() => navigate(`/series/${seriesId}`)}>
-              Back to Series
+              {t('series.backToSeries')}
             </Button>
           </CardContent>
         </Card>
@@ -336,17 +338,17 @@ export default function SeriesPresentationMode() {
       <div className="flex items-center justify-between p-4 border-b">
         <Button variant="ghost" onClick={() => navigate(`/series/${seriesId}`)}>
           <X className="h-5 w-5 mr-2" />
-          Exit
+          {t('common.exit')}
         </Button>
         <div className="flex items-center gap-2">
           <Badge variant="secondary">
             {series.title}
           </Badge>
           <Badge variant="outline">
-            Lesson {currentLessonIndex + 1} of {lessons.length}
+            {t('series.lessonOf', { current: currentLessonIndex + 1, total: lessons.length })}
           </Badge>
           <Badge variant="outline">
-            Slide {currentSlide + 1} of {slides.length}
+            {t('series.slideOf', { current: currentSlide + 1, total: slides.length })}
           </Badge>
         </div>
         <Button variant="ghost" size="icon" onClick={toggleFullscreen}>
@@ -369,7 +371,7 @@ export default function SeriesPresentationMode() {
           disabled={currentSlide === 0 && currentLessonIndex === 0}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Previous
+          {t('common.previous')}
         </Button>
 
         <div className="flex items-center gap-2">
@@ -388,7 +390,7 @@ export default function SeriesPresentationMode() {
           onClick={nextSlide}
           disabled={currentSlide === slides.length - 1 && currentLessonIndex === lessons.length - 1}
         >
-          Next
+          {t('common.next')}
           <ArrowRight className="h-4 w-4 ml-2" />
         </Button>
       </div>

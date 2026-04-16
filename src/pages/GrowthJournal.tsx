@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ interface JournalEntry {
 }
 
 const GrowthJournal = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
@@ -76,49 +78,49 @@ const GrowthJournal = () => {
       <div className="space-y-2 text-sm">
         {data.dimension && (
           <div>
-            <span className="font-semibold">Dimension: </span>
+            <span className="font-semibold">{t('growthJournal.dimension')}: </span>
             <span className="text-muted-foreground">{data.dimension.toUpperCase()}</span>
           </div>
         )}
         {data.answer && (
           <div>
-            <span className="font-semibold">Answer: </span>
+            <span className="font-semibold">{t('growthJournal.answer')}: </span>
             <p className="text-muted-foreground mt-1">{data.answer}</p>
           </div>
         )}
         {data.connected_verse && (
           <div>
-            <span className="font-semibold">Connected Verse: </span>
+            <span className="font-semibold">{t('growthJournal.connectedVerse')}: </span>
             <p className="text-muted-foreground mt-1">{data.connected_verse}</p>
           </div>
         )}
         {data.explanation && (
           <div>
-            <span className="font-semibold">Explanation: </span>
+            <span className="font-semibold">{t('growthJournal.explanation')}: </span>
             <p className="text-muted-foreground mt-1">{data.explanation}</p>
           </div>
         )}
         {data.furniture && (
           <div>
-            <span className="font-semibold">Sanctuary Furniture: </span>
+            <span className="font-semibold">{t('growthJournal.sanctuaryFurniture')}: </span>
             <span className="text-muted-foreground">{data.furniture}</span>
           </div>
         )}
         {data.christ_reflection && (
           <div>
-            <span className="font-semibold">Christ Reflection: </span>
+            <span className="font-semibold">{t('growthJournal.christReflection')}: </span>
             <p className="text-muted-foreground mt-1">{data.christ_reflection}</p>
           </div>
         )}
         {data.action_today && (
           <div>
-            <span className="font-semibold">Action Today: </span>
+            <span className="font-semibold">{t('growthJournal.actionToday')}: </span>
             <p className="text-muted-foreground mt-1">{data.action_today}</p>
           </div>
         )}
         {data.growth_needed && (
           <div>
-            <span className="font-semibold">Growth Area: </span>
+            <span className="font-semibold">{t('growthJournal.growthArea')}: </span>
             <p className="text-muted-foreground mt-1">{data.growth_needed}</p>
           </div>
         )}
@@ -140,7 +142,7 @@ const GrowthJournal = () => {
               </Button>
               <h1 className="text-4xl font-bold flex items-center gap-2">
                 <BookOpen className="h-8 w-8 text-primary" />
-                Growth Journal
+                {t('growthJournal.pageTitle')}
               </h1>
             </div>
           </div>
@@ -150,7 +152,7 @@ const GrowthJournal = () => {
               <CardContent className="pt-6">
                 <div className="text-center">
                   <p className="text-3xl font-bold text-primary">{stats.total}</p>
-                  <p className="text-sm text-muted-foreground mt-1">Total Entries</p>
+                  <p className="text-sm text-muted-foreground mt-1">{t('growthJournal.totalEntries')}</p>
                 </div>
               </CardContent>
             </Card>
@@ -158,7 +160,7 @@ const GrowthJournal = () => {
               <CardContent className="pt-6">
                 <div className="text-center">
                   <p className="text-3xl font-bold">{stats.quick}</p>
-                  <p className="text-sm text-muted-foreground mt-1">Quick Challenges</p>
+                  <p className="text-sm text-muted-foreground mt-1">{t('growthJournal.quickChallenges')}</p>
                 </div>
               </CardContent>
             </Card>
@@ -166,7 +168,7 @@ const GrowthJournal = () => {
               <CardContent className="pt-6">
                 <div className="text-center">
                   <p className="text-3xl font-bold">{stats.core}</p>
-                  <p className="text-sm text-muted-foreground mt-1">Core Challenges</p>
+                  <p className="text-sm text-muted-foreground mt-1">{t('growthJournal.coreChallenges')}</p>
                 </div>
               </CardContent>
             </Card>
@@ -174,7 +176,7 @@ const GrowthJournal = () => {
               <CardContent className="pt-6">
                 <div className="text-center">
                   <p className="text-3xl font-bold">{Math.floor(stats.totalTime / 60)}</p>
-                  <p className="text-sm text-muted-foreground mt-1">Minutes Studying</p>
+                  <p className="text-sm text-muted-foreground mt-1">{t('growthJournal.minutesStudying')}</p>
                 </div>
               </CardContent>
             </Card>
@@ -182,25 +184,23 @@ const GrowthJournal = () => {
 
           <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 rounded-lg border border-primary/20">
             <p className="text-sm">
-              <span className="font-semibold">Your Growth Journal</span> is your testimony and training record. 
-              Every entry shows you're building Phototheology reflexes. This is discipleship evidence and content fuel 
-              for sharing insights with others.
+              {t('growthJournal.journalDescription')}
             </p>
           </div>
 
           <Tabs defaultValue="all" value={filter} onValueChange={setFilter}>
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="all">All ({stats.total})</TabsTrigger>
-              <TabsTrigger value="Quick">Quick ({stats.quick})</TabsTrigger>
-              <TabsTrigger value="Core">Core ({stats.core})</TabsTrigger>
-              <TabsTrigger value="Advance">Advance ({stats.advance})</TabsTrigger>
+              <TabsTrigger value="all">{t('growthJournal.tabAll', { count: stats.total })}</TabsTrigger>
+              <TabsTrigger value="Quick">{t('growthJournal.tabQuick', { count: stats.quick })}</TabsTrigger>
+              <TabsTrigger value="Core">{t('growthJournal.tabCore', { count: stats.core })}</TabsTrigger>
+              <TabsTrigger value="Advance">{t('growthJournal.tabAdvance', { count: stats.advance })}</TabsTrigger>
             </TabsList>
 
             <TabsContent value={filter} className="space-y-4 mt-6">
               {loading ? (
                 <Card>
                   <CardContent className="py-12 text-center">
-                    <p className="text-muted-foreground">Loading your journal...</p>
+                    <p className="text-muted-foreground">{t('growthJournal.loadingJournal')}</p>
                   </CardContent>
                 </Card>
               ) : filteredEntries.length === 0 ? (
@@ -208,13 +208,13 @@ const GrowthJournal = () => {
                   <CardContent className="py-12 text-center">
                     <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                     <p className="text-muted-foreground mb-4">
-                      {filter === "all" 
-                        ? "Your journal is empty. Complete your first daily challenge to begin!"
-                        : `No ${filter} challenges completed yet.`
+                      {filter === "all"
+                        ? t('growthJournal.emptyJournal')
+                        : t('growthJournal.noChallengesForFilter', { filter })
                       }
                     </p>
                     <Button onClick={() => navigate("/daily-challenges")}>
-                      Start a Challenge
+                      {t('growthJournal.startChallenge')}
                     </Button>
                   </CardContent>
                 </Card>

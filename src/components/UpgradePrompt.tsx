@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Crown, Lock, Sparkles, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEventTracking } from "@/hooks/useEventTracking";
+import { useChurchMembership } from "@/hooks/useChurchMembership";
 
 interface UpgradePromptProps {
   feature: string;
@@ -23,11 +24,17 @@ export const UpgradePrompt = ({
 }: UpgradePromptProps) => {
   const navigate = useNavigate();
   const { trackPaywallHit, trackUpgradeClick } = useEventTracking();
+  const { isMember: isChurchMember } = useChurchMembership();
 
   // Track paywall hit on mount
   useEffect(() => {
-    trackPaywallHit(feature, `upgrade_prompt_${variant}`);
-  }, [feature, variant, trackPaywallHit]);
+    if (!isChurchMember) {
+      trackPaywallHit(feature, `upgrade_prompt_${variant}`);
+    }
+  }, [feature, variant, trackPaywallHit, isChurchMember]);
+
+  // CRITICAL: Never show upgrade prompts to church members
+  if (isChurchMember) return null;
 
   const handleUpgrade = () => {
     trackUpgradeClick(`upgrade_prompt_${variant}`, feature);
@@ -102,7 +109,7 @@ export const UpgradePrompt = ({
           {showTrialOption && (
             <Badge variant="secondary" className="mx-auto gap-1">
               <Sparkles className="h-3 w-3" />
-              14-day free trial available
+              7-day free trial available
             </Badge>
           )}
         </div>

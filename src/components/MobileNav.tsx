@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -14,6 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 export const MobileNav = () => {
   const { user, signOut } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <Sheet>
@@ -41,243 +43,237 @@ export const MobileNav = () => {
               <Link to="/">
                 <Button variant="default" className="w-full justify-start gradient-palace" size="sm">
                   <Home className="h-4 w-4 mr-2" />
-                  Back to Home
+                  {t('nav.backToHome')}
                 </Button>
               </Link>
               
               <Separator className="my-2" />
-              <div className="text-xs font-semibold text-muted-foreground px-2 py-1 uppercase tracking-wide">Quick Links</div>
+              <div className="text-xs font-semibold text-muted-foreground px-2 py-1 uppercase tracking-wide">{t('nav.quickLinks')}</div>
               
               <Link to="/app-tour">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
                   <BookOpen className="h-4 w-4 mr-2" />
-                  App Tour
+                  {t('nav.appTour')}
                 </Button>
               </Link>
               <Link to="/palace">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
                   <Building2 className="h-4 w-4 mr-2" />
-                  The Palace
+                  {t('nav.thePalace')}
                 </Button>
               </Link>
               
               <Separator className="my-2" />
-              <div className="text-xs font-semibold text-muted-foreground px-2 py-1">Bible Tools</div>
+              <div className="text-xs font-semibold text-muted-foreground px-2 py-1">{t('nav.bibleTools')}</div>
               
               <Link to="/bible/John/3">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  📖 Phototheology Bible
+                  📖 {t('nav.phototheologyBible')}
                 </Button>
               </Link>
               <Link to="/palace">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  🏰 The Palace
+                  🏰 {t('nav.thePalace')}
                 </Button>
               </Link>
-              <Link to="/bible-rendered-room">
+              <Link to="/palace/floor/1/room/br">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  📚 Bible Rendered
+                  📚 {t('nav.bibleRendered')}
                 </Button>
               </Link>
-              <Link to="/palace/floor/1/room/gr">
+              <Link to="/give-me-a-gem">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  💎 Produce a Gem
+                  💎 {t('nav.giveGem')}
                 </Button>
               </Link>
               <Link to="/verse-memory-hall">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  🧠 Verse Memory Hall
+                  🧠 {t('nav.verseMemoryHall')}
                 </Button>
               </Link>
               <Link to="/bible-image-library">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  🎨 Image Library
+                  🎨 {t('nav.imageLibrary')}
                 </Button>
               </Link>
               <Link to="/my-studies">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  📝 My Studies
+                  📝 {t('study.myStudies')}
                 </Button>
               </Link>
               <Link to="/public-image-library">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  🌐 Public Gallery
+                  🌐 {t('nav.publicGallery')}
                 </Button>
               </Link>
               <Link to="/quarterly-study">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  📅 Lesson Study
+                  📅 {t('nav.lessonStudy')}
                 </Button>
               </Link>
-              <Link to="/bible-study-leader">
-                <Button variant="ghost" className="w-full justify-start" size="sm">
-                  👥 Lead a Bible Study
-                </Button>
-              </Link>
-              
               <Separator className="my-2" />
-              <div className="text-xs font-semibold text-muted-foreground px-2 py-1">Research Tools</div>
+              <div className="text-xs font-semibold text-muted-foreground px-2 py-1">{t('nav.researchTools')}</div>
               
               <Link to="/research-mode">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  🔬 Research Mode
+                  🔬 {t('nav.researchMode')}
                 </Button>
               </Link>
               <Link to="/prophecy-watch">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  👁️ Prophecy Watch
+                  👁️ {t('nav.prophecyWatch')}
                 </Button>
               </Link>
               <Link to="/culture-controversy">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  🌍 Culture & Controversy
+                  🌍 {t('nav.cultureControversy')}
                 </Button>
               </Link>
               
               <Separator className="my-2" />
-              <div className="text-xs font-semibold text-muted-foreground px-2 py-1">Games</div>
+              <div className="text-xs font-semibold text-muted-foreground px-2 py-1">{t('nav.games')}</div>
               
               <Link to="/games">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  🎮 Palace Games
+                  🎮 {t('nav.palaceGames')}
                 </Button>
               </Link>
               <Link to="/kids-games">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  👶 Kids Games
+                  👶 {t('nav.kidsGames')}
                 </Button>
               </Link>
               
               <Separator className="my-2" />
-              <div className="text-xs font-semibold text-muted-foreground px-2 py-1">GPTs</div>
+              <div className="text-xs font-semibold text-muted-foreground px-2 py-1">{t('nav.gpts')}</div>
               
               <Link to="/phototheologygpt">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  🤖 Phototheology GPT
+                  🤖 {t('nav.phototheologyGpt')}
                 </Button>
               </Link>
               <Link to="/branch-study">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  🌳 BranchStudy
+                  🌳 {t('nav.branchStudy')}
                 </Button>
               </Link>
               <Link to="/apologetics-gpt">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  🛡️ Apologetics GPT
+                  🛡️ {t('nav.apologeticsGpt')}
                 </Button>
               </Link>
               <Link to="/daniel-revelation-gpt">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  📜 Daniel & Revelation GPT
+                  📜 {t('nav.danielRevelationGpt')}
                 </Button>
               </Link>
               <Link to="/kidgpt">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  👶 Kid GPT
+                  👶 {t('nav.kidGpt')}
                 </Button>
               </Link>
               
               <Separator className="my-2" />
-              <div className="text-xs font-semibold text-muted-foreground px-2 py-1">Spiritual Training</div>
+              <div className="text-xs font-semibold text-muted-foreground px-2 py-1">{t('nav.spiritualTraining')}</div>
               
               <Link to="/spiritual-training">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  ⚔️ Spiritual Training
+                  ⚔️ {t('nav.spiritualTraining')}
                 </Button>
               </Link>
               <Link to="/power-of-the-lamb">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  🔥 Power of the Lamb
+                  🔥 {t('nav.powerOfLamb')}
                 </Button>
               </Link>
               
               <Separator className="my-2" />
-              <div className="text-xs font-semibold text-muted-foreground px-2 py-1">Courses</div>
+              <div className="text-xs font-semibold text-muted-foreground px-2 py-1">{t('nav.courses')}</div>
               
               <Link to="/courses">
                 <Button variant="default" className="w-full justify-start mb-2" size="sm">
-                  📚 View All Courses
+                  📚 {t('nav.viewAllCourses')}
                 </Button>
               </Link>
               
               <Link to="/blueprint-course">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  Blueprint Course
+                  {t('nav.blueprintCourse')}
                 </Button>
               </Link>
               <Link to="/daniel-course">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  Daniel Course
+                  {t('nav.danielCourse')}
                 </Button>
               </Link>
               <Link to="/phototheology-course">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  Phototheology Course
+                  {t('nav.phototheologyCourse')}
                 </Button>
               </Link>
               <Link to="/revelation-course">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  Revelation Course
+                  {t('nav.revelationCourse')}
                 </Button>
               </Link>
               <Link to="/revelation-course/kids">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  📚 Revelation for Kids
+                  📚 {t('nav.revelationForKids')}
                 </Button>
               </Link>
               
               <Separator className="my-2" />
-              <div className="text-xs font-semibold text-muted-foreground px-2 py-1">Community</div>
+              <div className="text-xs font-semibold text-muted-foreground px-2 py-1">{t('nav.community')}</div>
               
               <Link to="/escape-room">
                 <Button variant="ghost" className="w-full justify-start font-semibold text-primary" size="sm">
                   <Clock className="h-4 w-4 mr-2" />
-                  🚨 Escape Rooms
+                  🚨 {t('nav.escapeRooms')}
                 </Button>
               </Link>
               <Link to="/daily-challenges">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  📅 Daily Challenges
+                  📅 {t('challenges.dailyChallenge')}
                 </Button>
               </Link>
               <Link to="/treasure-hunt">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  🏆 Treasure Hunt (24hr)
+                  🏆 {t('nav.treasureHunt')}
                 </Button>
               </Link>
               <Link to="/equations-challenge">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  🧮 Equations Challenge
+                  🧮 {t('nav.equationsChallenge')}
                 </Button>
               </Link>
               <Link to="/live-study">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  📺 Live Study
+                  📺 {t('nav.liveStudy')}
                 </Button>
               </Link>
               <Link to="/community">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  💬 Community Chat
+                  💬 {t('nav.communityChat')}
                 </Button>
               </Link>
               <Link to="/leaderboard">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  🏅 Leaderboard
+                  🏅 {t('challenges.leaderboard')}
                 </Button>
               </Link>
               <Link to="/achievements">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  🎖️ Achievements
+                  🎖️ {t('nav.achievements')}
                 </Button>
               </Link>
               <Link to="/feedback">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  💡 Feedback
+                  💡 {t('nav.feedback')}
                 </Button>
               </Link>
               <Link to="/critics-analysis">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  🎥 Critics Analysis
+                  🎥 {t('nav.criticsAnalysis')}
                 </Button>
               </Link>
               
@@ -286,25 +282,25 @@ export const MobileNav = () => {
               <Link to="/profile">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
                   <User className="h-4 w-4 mr-2" />
-                  My Profile
+                  {t('nav.myProfile')}
                 </Button>
               </Link>
               <Link to="/pricing">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
                   <CreditCard className="h-4 w-4 mr-2" />
-                  Pricing & Plans
+                  {t('nav.pricingPlans')}
                 </Button>
               </Link>
               <Link to="/referrals">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
                   <Gift className="h-4 w-4 mr-2" />
-                  Referrals
+                  {t('nav.referrals')}
                 </Button>
               </Link>
               <Link to="/app-update-ideas">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
                   <Sparkles className="h-4 w-4 mr-2" />
-                  💡 Submit Ideas
+                  💡 {t('nav.submitIdeas')}
                 </Button>
               </Link>
               
@@ -317,31 +313,31 @@ export const MobileNav = () => {
                 onClick={signOut}
               >
                 <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
+                {t('nav.signOut')}
               </Button>
             </>
           ) : (
             <>
               <div className="text-center mb-4">
-                <h3 className="font-serif text-lg font-semibold mb-2 text-foreground">Get Started</h3>
-                <p className="text-sm text-muted-foreground mb-4">Begin your Phototheology journey</p>
+                <h3 className="font-serif text-lg font-semibold mb-2 text-foreground">{t('nav.getStarted')}</h3>
+                <p className="text-sm text-muted-foreground mb-4">{t('nav.beginJourney')}</p>
               </div>
               
               <Link to="/app-tour">
                 <Button variant="outline" className="w-full border-2 border-palace-blue text-palace-blue font-semibold">
                   <BookOpen className="h-4 w-4 mr-2" />
-                  Take a Tour First
+                  {t('nav.takeTourFirst')}
                 </Button>
               </Link>
               <Link to="/auth">
                 <Button className="w-full gradient-palace">
                   <Sparkles className="h-4 w-4 mr-2" />
-                  Get Started Free
+                  {t('nav.getStartedFree')}
                 </Button>
               </Link>
               <Link to="/pricing">
                 <Button variant="outline" className="w-full">
-                  View Pricing
+                  {t('nav.viewPricing')}
                 </Button>
               </Link>
             </>

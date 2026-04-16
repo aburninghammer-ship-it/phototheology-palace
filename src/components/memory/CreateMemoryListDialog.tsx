@@ -18,6 +18,7 @@ interface CreateMemoryListDialogProps {
 
 const BIBLE_VERSIONS = [
   { value: "kjv", label: "King James Version (KJV)" },
+  { value: "nkjv", label: "New King James Version (NKJV)" },
   { value: "niv", label: "New International Version (NIV)" },
   { value: "esv", label: "English Standard Version (ESV)" },
   { value: "nlt", label: "New Living Translation (NLT)" },

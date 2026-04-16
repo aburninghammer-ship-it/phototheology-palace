@@ -4,14 +4,16 @@ import { useAuth } from "./useAuth";
 
 export const usePalaceProgress = () => {
   const { user } = useAuth();
-  const [completedRooms, setCompletedRooms] = useState(0);
+  const [completedRoomsCount, setCompletedRoomsCount] = useState(0);
+  const [completedRoomIds, setCompletedRoomIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
       loadProgress();
     } else {
-      setCompletedRooms(0);
+      setCompletedRoomsCount(0);
+      setCompletedRoomIds([]);
       setLoading(false);
     }
   }, [user]);
@@ -23,25 +25,28 @@ export const usePalaceProgress = () => {
     try {
       const { data, error } = await supabase
         .from("room_progress")
-        .select("id")
+        .select("room_id")
         .eq("user_id", user.id)
         .not("completed_at", "is", null);
 
       if (error) throw error;
-      setCompletedRooms(data?.length || 0);
+      setCompletedRoomsCount(data?.length || 0);
+      setCompletedRoomIds(data?.map(r => r.room_id) || []);
     } catch (error) {
       console.error("Error loading palace progress:", error);
-      setCompletedRooms(0);
+      setCompletedRoomsCount(0);
+      setCompletedRoomIds([]);
     } finally {
       setLoading(false);
     }
   };
 
   const totalRooms = 38;
-  const progressPercentage = Math.round((completedRooms / totalRooms) * 100);
+  const progressPercentage = Math.round((completedRoomsCount / totalRooms) * 100);
 
   return { 
-    completedRooms, 
+    completedRooms: completedRoomsCount,
+    completedRoomIds,
     totalRooms, 
     progressPercentage, 
     loading,

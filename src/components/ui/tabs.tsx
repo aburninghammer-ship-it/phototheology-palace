@@ -15,31 +15,47 @@ const TabsList = React.forwardRef<
   const [showLeftArrow, setShowLeftArrow] = React.useState(false);
   const [showRightArrow, setShowRightArrow] = React.useState(false);
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+  const rafRef = React.useRef<number | null>(null);
 
   const checkScroll = React.useCallback(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
+    // Cancel any pending RAF to avoid stacking updates
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+    }
     
-    setShowLeftArrow(container.scrollLeft > 0);
-    setShowRightArrow(
-      container.scrollLeft < container.scrollWidth - container.clientWidth - 1
-    );
+    rafRef.current = requestAnimationFrame(() => {
+      const container = scrollContainerRef.current;
+      if (!container) return;
+      
+      const canScrollLeft = container.scrollLeft > 1;
+      const canScrollRight = container.scrollLeft < container.scrollWidth - container.clientWidth - 1;
+      
+      setShowLeftArrow(prev => prev !== canScrollLeft ? canScrollLeft : prev);
+      setShowRightArrow(prev => prev !== canScrollRight ? canScrollRight : prev);
+    });
   }, []);
 
   React.useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
+    // Initial check
     checkScroll();
     
-    const resizeObserver = new ResizeObserver(checkScroll);
+    // Use passive listeners for better scroll performance
+    const handleScroll = () => checkScroll();
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Check on resize with ResizeObserver
+    const resizeObserver = new ResizeObserver(() => checkScroll());
     resizeObserver.observe(container);
-
-    container.addEventListener('scroll', checkScroll);
     
     return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
       resizeObserver.disconnect();
-      container.removeEventListener('scroll', checkScroll);
+      container.removeEventListener('scroll', handleScroll);
     };
   }, [checkScroll]);
 
@@ -74,13 +90,13 @@ const TabsList = React.forwardRef<
       
       <div 
         ref={scrollContainerRef} 
-        className="overflow-x-auto flex-1 min-w-0 scrollbar-hide touch-pan-x"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        className="overflow-x-auto flex-1 min-w-0 scrollbar-hide touch-pan-x overscroll-x-contain"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
       >
         <TabsPrimitive.List
           ref={ref}
           className={cn(
-            "inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
+            "inline-flex h-auto items-center gap-1 rounded-lg bg-muted/40 p-1.5 text-muted-foreground w-max min-w-full",
             className,
           )}
           {...props}
@@ -120,7 +136,12 @@ const TabsTrigger = React.forwardRef<
     <TabsPrimitive.Trigger
       ref={ref}
       className={cn(
-        "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-semibold ring-offset-background transition-all",
+        "data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md",
+        "data-[state=inactive]:bg-muted/60 data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:bg-muted",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        "disabled:pointer-events-none disabled:opacity-50",
+        "flex-shrink-0 min-h-[44px] touch-manipulation",
         className,
       )}
       onClick={handleClick}

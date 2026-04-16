@@ -10,7 +10,7 @@ interface ChurchAccess {
 }
 
 interface SubscriptionStatus {
-  status: 'none' | 'trial' | 'active' | 'cancelled' | 'expired';
+  status: 'none' | 'trial' | 'active' | 'cancelled' | 'expired' | 'pending';
   tier: 'free' | 'essential' | 'premium' | 'student' | 'patron' | null;
   isStudent: boolean;
   trialEndsAt: string | null;
@@ -46,10 +46,10 @@ export function useSubscription() {
     }
 
     try {
-      // First check profile for lifetime access
+      // First check profile for lifetime access OR active Patreon subscription
       const { data: profile } = await supabase
         .from('profiles')
-        .select('has_lifetime_access, subscription_status, subscription_tier')
+        .select('has_lifetime_access, subscription_status, subscription_tier, payment_source')
         .eq('id', user.id)
         .single();
 
@@ -58,6 +58,28 @@ export function useSubscription() {
         setSubscription({
           status: 'active',
           tier: 'premium',
+          isStudent: false,
+          trialEndsAt: null,
+          studentExpiresAt: null,
+          promotionalExpiresAt: null,
+          hasAccess: true,
+          church: {
+            hasChurchAccess: false,
+            churchId: null,
+            churchTier: null,
+            churchRole: null,
+          },
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Check if user has active Patreon subscription (stored in profiles, not user_subscriptions)
+      if (profile?.payment_source === 'patreon' && profile?.subscription_status === 'active') {
+        console.log('[useSubscription] Active Patreon subscription found in profile');
+        setSubscription({
+          status: 'active',
+          tier: (profile.subscription_tier as SubscriptionStatus['tier']) || 'premium',
           isStudent: false,
           trialEndsAt: null,
           studentExpiresAt: null,
@@ -83,7 +105,22 @@ export function useSubscription() {
         _user_id: user.id
       }).single();
 
-      const hasChurchAccess = churchAccess?.has_access || false;
+      let hasChurchAccess = churchAccess?.has_access || false;
+
+      // Belt-and-suspenders: if RPC says no church access, check preapproved list by email
+      if (!hasChurchAccess && user.email) {
+        const { data: preapproved } = await supabase
+          .from('church_preapproved_members')
+          .select('church_id')
+          .eq('email', user.email.toLowerCase())
+          .limit(1)
+          .maybeSingle();
+
+        if (preapproved) {
+          console.log('[useSubscription] Email found in church_preapproved_members — granting access');
+          hasChurchAccess = true;
+        }
+      }
 
       let hasAccessFromDb = false;
       let tierFromDb: SubscriptionStatus['tier'] = 'free';
@@ -100,11 +137,17 @@ export function useSubscription() {
 
       // If database shows active subscription or church access, use that
       if (hasAccessFromDb || hasChurchAccess) {
+        // Church members should ALWAYS show as 'active'/'premium' regardless of
+        // ANY stale trial/expired status in user_subscriptions or profiles.
+        // Church access is the highest priority override.
+        const effectiveStatus = hasChurchAccess ? 'active' : statusFromDb;
+        const effectiveTier = hasChurchAccess ? 'premium' : tierFromDb;
+
         setSubscription({
-          status: statusFromDb,
-          tier: tierFromDb,
-          isStudent: tierFromDb === 'student',
-          trialEndsAt: trialEndsAtFromDb,
+          status: effectiveStatus,
+          tier: effectiveTier,
+          isStudent: effectiveTier === 'student',
+          trialEndsAt: hasChurchAccess ? null : trialEndsAtFromDb,
           studentExpiresAt: null,
           promotionalExpiresAt: null,
           hasAccess: true,
@@ -150,6 +193,64 @@ export function useSubscription() {
       } catch (stripeCheckError) {
         console.error('[useSubscription] Stripe check failed:', stripeCheckError);
         // Continue with database result if Stripe check fails
+      }
+
+      // FALLBACK 2: Check Patreon connections directly for users who may have connected but profile wasn't updated
+      try {
+        console.log('[useSubscription] Checking Patreon connections directly...');
+        const { data: patreonConnection, error: patreonError } = await supabase
+          .from('patreon_connections')
+          .select('is_active_patron, entitled_cents, patreon_name')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        // Minimum pledge: $15/month = 1500 cents
+        const MINIMUM_PLEDGE_CENTS = 1500;
+        if (!patreonError && patreonConnection?.is_active_patron && patreonConnection.entitled_cents >= MINIMUM_PLEDGE_CENTS) {
+          console.log('[useSubscription] Active Patreon found in connections!', patreonConnection);
+
+          // Update user_subscriptions table (where subscription data now lives)
+          await supabase
+            .from('user_subscriptions')
+            .upsert({
+              user_id: user.id,
+              subscription_tier: 'premium',
+              subscription_status: 'active',
+              payment_source: 'patreon',
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'user_id' });
+
+          // Also update profiles table for backwards compatibility
+          await supabase
+            .from('profiles')
+            .update({
+              subscription_status: 'active',
+              subscription_tier: 'premium',
+              payment_source: 'patreon',
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', user.id);
+
+          setSubscription({
+            status: 'active',
+            tier: 'premium',
+            isStudent: false,
+            trialEndsAt: null,
+            studentExpiresAt: null,
+            promotionalExpiresAt: null,
+            hasAccess: true,
+            church: {
+              hasChurchAccess: false,
+              churchId: null,
+              churchTier: null,
+              churchRole: null,
+            },
+          });
+          setLoading(false);
+          return;
+        }
+      } catch (patreonCheckError) {
+        console.error('[useSubscription] Patreon check failed:', patreonCheckError);
       }
 
       // No subscription found anywhere

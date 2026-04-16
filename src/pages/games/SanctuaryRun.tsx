@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Flame, Droplets, Utensils, Lamp, Wind, Crown, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useAuth } from "@/hooks/useAuth";
 import { GameLeaderboard } from "@/components/GameLeaderboard";
 
@@ -21,6 +23,7 @@ const SANCTUARY_ITEMS = [
 
 export default function SanctuaryRun() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [currentItems, setCurrentItems] = useState<typeof SANCTUARY_ITEMS>([]);
   const [narrative, setNarrative] = useState("");
@@ -56,7 +59,7 @@ export default function SanctuaryRun() {
 
   const handleSubmit = async () => {
     if (!narrative.trim()) {
-      toast.error("Write your gospel narrative first");
+      toast.error(t('games.sanctuaryRun.errorWriteNarrative'));
       return;
     }
 
@@ -78,19 +81,19 @@ export default function SanctuaryRun() {
       if (isCoherent) {
         const newScore = score + points;
         setScore(newScore);
-        toast.success(`Coherent gospel flow! +${points} points`);
+        toast.success(t('games.sanctuaryRun.coherentFlow', { points }));
         if (newScore >= targetScore) {
           setGameWon(true);
-          toast.success("🏆 You've mastered the Sanctuary Run!");
+          toast.success(t('games.sanctuaryRun.youMastered'));
         } else {
           startRound();
         }
       } else {
-        toast.error(`Narrative needs work: ${feedback}`);
+        toast.error(t('games.sanctuaryRun.narrativeNeedsWork', { feedback }));
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to validate narrative");
+      toast.error(t('games.common.errorValidation'));
     } finally {
       setIsSubmitting(false);
     }
@@ -105,18 +108,18 @@ export default function SanctuaryRun() {
             <Card className="bg-black/40 border-purple-500/50 text-center">
               <CardHeader>
                 <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
-                <CardTitle className="text-3xl text-purple-300">Sanctuary Run Complete!</CardTitle>
+                <CardTitle className="text-3xl text-purple-300">{t('games.sanctuaryRun.complete')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="text-4xl font-bold text-purple-400">{score} Rounds Won</div>
-                <p className="text-purple-200/80">You've mastered narrating the gospel through the sanctuary!</p>
+                <div className="text-4xl font-bold text-purple-400">{t('games.sanctuaryRun.roundsWonValue', { rounds: score })}</div>
+                <p className="text-purple-200/80">{t('games.sanctuaryRun.completeMessage')}</p>
                 <div className="flex gap-4 justify-center">
                   <Button onClick={() => navigate("/games")}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Games
+                    {t('games.common.backToGames')}
                   </Button>
                   <Button onClick={() => window.location.reload()} variant="outline">
-                    Play Again
+                    {t('games.common.playAgain')}
                   </Button>
                 </div>
               </CardContent>
@@ -134,15 +137,15 @@ export default function SanctuaryRun() {
         <Card className="max-w-md bg-black/40 border-purple-500/50">
           <CardHeader>
             <CardTitle className="text-center text-3xl text-purple-300">
-              ⛪ SANCTUARY RUN
+              {t('games.sanctuaryRun.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-purple-100/80">
-              Narrate the salvation journey using 3 random sanctuary items in order.
+              {t('games.sanctuaryRun.description')}
             </p>
             <Button onClick={startRound} className="w-full">
-              Start Round
+              {t('games.sanctuaryRun.startRound')}
             </Button>
           </CardContent>
         </Card>
@@ -157,21 +160,21 @@ export default function SanctuaryRun() {
         <div className="flex justify-between items-center mb-8">
           <Button variant="ghost" onClick={() => navigate("/games")} className="text-white">
             <ArrowLeft className="mr-2" />
-            Back
+            {t('common.back')}
           </Button>
           <h1 className="text-4xl font-bold text-purple-400" style={{ fontFamily: "'Cinzel', serif" }}>
-            ⛪ SANCTUARY RUN
+            {t('games.sanctuaryRun.title')}
           </h1>
           <div className="text-right">
             <div className="text-purple-400 text-3xl font-bold">{score}</div>
-            <div className="text-purple-200/60 text-sm">ROUNDS WON</div>
+            <div className="text-purple-200/60 text-sm">{t('games.sanctuaryRun.roundsWon')}</div>
           </div>
         </div>
 
         <div className="max-w-3xl mx-auto space-y-6">
           <Card className="bg-black/40 border-purple-500/50">
             <CardHeader>
-              <CardTitle className="text-purple-300">Your Sanctuary Path</CardTitle>
+              <CardTitle className="text-purple-300">{t('games.sanctuaryRun.sanctuaryPath')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex justify-center items-center gap-4">
@@ -198,27 +201,28 @@ export default function SanctuaryRun() {
 
           <Card className="bg-black/40 border-purple-500/50">
             <CardHeader>
-              <CardTitle className="text-purple-300">Tell the Gospel Story</CardTitle>
+              <CardTitle className="text-purple-300">{t('games.sanctuaryRun.tellGospelStory')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <Textarea
                 value={narrative}
                 onChange={(e) => setNarrative(e.target.value)}
-                placeholder="Narrate the salvation journey using these 3 items IN ORDER. Include at least 1 Bible verse per item..."
+                placeholder={t('games.sanctuaryRun.narrativePlaceholder')}
                 className="bg-black/60 border-purple-500/30 text-white min-h-48"
               />
               <div className="flex gap-2">
                 <Button onClick={handleSubmit} disabled={isSubmitting} className="flex-1">
-                  {isSubmitting ? "Validating..." : "Submit Narrative"}
+                  {isSubmitting ? t('games.common.validating') : t('games.sanctuaryRun.submitNarrative')}
                 </Button>
                 <Button onClick={startRound} variant="outline">
-                  New Round
+                  {t('games.sanctuaryRun.newRound')}
                 </Button>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
+      <FloatingGameChat gameType="sanctuary-run" />
     </div>
   );
 }

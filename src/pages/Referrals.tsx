@@ -190,7 +190,7 @@ export default function Referrals() {
                       </div>
                       <div>
                         <h3 className="font-semibold">Friend Gets</h3>
-                        <p className="text-sm text-muted-foreground">14-day free trial</p>
+                        <p className="text-sm text-muted-foreground">7-day free trial</p>
                       </div>
                     </div>
                   </CardContent>
@@ -277,7 +277,7 @@ export default function Referrals() {
                   <div>
                     <h3 className="font-semibold mb-1">They Sign Up</h3>
                     <p className="text-sm text-muted-foreground">
-                      When someone signs up using your link, they get a 14-day free trial
+                      When someone signs up using your link, they get a 7-day free trial
                     </p>
                   </div>
                 </li>

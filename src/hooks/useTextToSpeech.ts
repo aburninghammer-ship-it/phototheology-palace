@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { buildCacheKey, getCachedAudio, setCachedAudio } from '@/lib/ttsAudioCache';
 import { getGlobalMusicVolume, subscribeToMusicVolume } from '@/hooks/useMusicVolumeControl';
 
 // TTS Providers
@@ -16,7 +17,6 @@ export const TTS_PROVIDERS = [
 export const OPENAI_VOICES = [
   { id: 'alloy', name: 'Alloy', description: 'Neutral and balanced voice' },
   { id: 'ash', name: 'Ash', description: 'Warm and conversational' },
-  { id: 'ballad', name: 'Ballad', description: 'Soft and melodic storyteller' },
   { id: 'coral', name: 'Coral', description: 'Clear and professional' },
   { id: 'echo', name: 'Echo', description: 'Clear and articulate male voice' },
   { id: 'fable', name: 'Fable', description: 'Warm British male voice' },
@@ -24,7 +24,6 @@ export const OPENAI_VOICES = [
   { id: 'onyx', name: 'Onyx', description: 'Deep and authoritative male voice' },
   { id: 'sage', name: 'Sage', description: 'Wise and thoughtful' },
   { id: 'shimmer', name: 'Shimmer', description: 'Soft and gentle female voice' },
-  { id: 'verse', name: 'Verse', description: 'Expressive and dynamic' },
 ] as const;
 
 // ElevenLabs voices
@@ -229,43 +228,71 @@ export function useTextToSpeech(options: UseTextToSpeechOptions = {}) {
     onStartRef.current?.();
 
     const provider = opts.provider || selectedProvider;
-    const voice = opts.voice || selectedVoice;
+
+    const requestedVoice = String(opts.voice || selectedVoice);
+    const voice = (provider === 'openai' && (requestedVoice === 'ballad' || requestedVoice === 'verse'))
+      ? (requestedVoice === 'ballad' ? 'sage' : 'fable')
+      : requestedVoice;
 
     try {
-      const { data, error } = await supabase.functions.invoke('text-to-speech', {
-        body: { 
-          text: text.trim(),
-          voice,
-          provider,
-          speed: opts.speed || speed,
-          book: opts.book,
-          chapter: opts.chapter,
-          verse: opts.verse,
-          useCache: opts.useCache !== false
-        }
-      });
-
-      if (error) {
-        throw new Error(error.message || 'Failed to generate speech');
-      }
+      const clientCacheKey = await buildCacheKey(text.trim(), voice, provider);
+      const cachedBlob = await getCachedAudio(clientCacheKey);
 
       let audioUrl: string;
       let isBlobUrl = false;
 
-      if (data?.audioUrl) {
-        audioUrl = data.audioUrl;
-        setWasCached(data.cached === true);
-        console.log(`[TTS] Using ${data.cached ? 'cached' : 'newly cached'} audio from ${provider}`);
-      } else if (data?.audioContent) {
-        const audioBlob = new Blob(
-          [Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0))],
-          { type: 'audio/mpeg' }
-        );
-        audioUrl = URL.createObjectURL(audioBlob);
+      if (cachedBlob) {
+        audioUrl = URL.createObjectURL(cachedBlob);
         isBlobUrl = true;
-        setWasCached(false);
+        setWasCached(true);
+        console.log('[TTS] Client cache hit, no edge function call');
       } else {
-        throw new Error('No audio content received');
+        const { data, error } = await supabase.functions.invoke('text-to-speech', {
+          body: { 
+            text: text.trim(),
+            voice,
+            provider,
+            speed: opts.speed || speed,
+            book: opts.book,
+            chapter: opts.chapter,
+            verse: opts.verse,
+            useCache: opts.useCache !== false
+          }
+        });
+
+        if (error) {
+          throw new Error(error.message || 'Failed to generate speech');
+        }
+
+        if (data?.audioUrl) {
+          // Fetch blob for caching
+          try {
+            const resp = await fetch(data.audioUrl);
+            if (resp.ok) {
+              const blob = await resp.blob();
+              setCachedAudio(clientCacheKey, blob);
+              audioUrl = URL.createObjectURL(blob);
+              isBlobUrl = true;
+            } else {
+              audioUrl = data.audioUrl;
+            }
+          } catch {
+            audioUrl = data.audioUrl;
+          }
+          setWasCached(data.cached === true);
+          console.log(`[TTS] Using ${data.cached ? 'cached' : 'newly cached'} audio from ${provider}`);
+        } else if (data?.audioContent) {
+          const audioBlob = new Blob(
+            [Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0))],
+            { type: 'audio/mpeg' }
+          );
+          setCachedAudio(clientCacheKey, audioBlob);
+          audioUrl = URL.createObjectURL(audioBlob);
+          isBlobUrl = true;
+          setWasCached(false);
+        } else {
+          throw new Error('No audio content received');
+        }
       }
 
       if (!audioRef.current) {

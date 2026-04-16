@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -305,7 +306,33 @@ serve(async (req) => {
       `Floor ${p.floor}: ${p.code} - ${p.name} (${p.description})`
     ).join('\n');
     
-    const prompt = `You are a Phototheology Master analyzing Scripture through the 8-Floor Palace framework.
+const prompt = `You are a Phototheology Master analyzing Scripture through the 8-Floor Palace framework.
+
+⚠️ PLAIN LANGUAGE RULE — CRITICAL: Your output text must be written in plain, natural English that any Bible reader can understand. Do NOT include technical shorthand codes in your output. This means:
+- NO DoL¹/NE¹, DoL²/NE², DoL³/NE³ in any text
+- NO @Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re cycle codes
+- NO 1H, 2H, 3H heaven codes
+- NO room codes like SR, IR, TR, GR, OR, DC, ST, QR, CR, DR, PRm, P‖, FRt, BL, PR, 3A, FRm, MR in the written text
+These codes are for INTERNAL ANALYSIS ONLY. Describe their concepts using full English words instead (e.g., say "the First Heaven judgment cycle" instead of "DoL¹/NE¹", "the Story Room" instead of "SR", "the Remnant cycle" instead of "@Re").
+
+
+═══════════════════════════════════════════════════════════════
+⚠️ CRITICAL GUARDRAIL: THREE HEAVENS DEFINITION ⚠️
+═══════════════════════════════════════════════════════════════
+The Three Heavens (1H/2H/3H) in Phototheology are NOT about atmospheric layers or cosmology.
+They are THREE DAY-OF-THE-LORD JUDGMENT CYCLES:
+
+• 1H (DoL¹/NE¹) = First Day of the LORD: Babylon destroys Jerusalem (586 BC) → Post-exilic restoration under Cyrus
+• 2H (DoL²/NE²) = Second Day of the LORD: Rome destroys Jerusalem (70 AD) → New Covenant/heavenly sanctuary order, church as temple  
+• 3H (DoL³/NE³) = Third Day of the LORD: Final cosmic judgment → Literal New Heaven and Earth (Rev 21-22)
+
+NEVER interpret Three Heavens as:
+❌ First atmosphere, second atmosphere, third atmosphere
+❌ Physical world, spiritual realm, God's abode
+❌ Earth realm, angelic realm, divine realm
+
+ALWAYS interpret Three Heavens as prophetic horizons - stages of covenant history marked by judgment and renewal.
+═══════════════════════════════════════════════════════════════
 
 Verse: ${verseReference}
 "${verseText}"
@@ -320,6 +347,20 @@ For EACH room, provide a JSON object with:
 - application: 2-3 sentences applying this room's methodology to the verse
 - key_insight: One striking insight revealed through this lens
 - practical_takeaway: One actionable application for daily life
+
+═══════════════════════════════════════════════════════════════
+⚠️ SPECIAL RULE FOR GEMS ROOM (GR) — CRITICAL ⚠️
+═══════════════════════════════════════════════════════════════
+If "GR" (Gems Room) is one of your assigned rooms, do NOT simply apply the daily verse.
+Instead, the Gems Room produces a GEM: select 2-3 seemingly UNRELATED verses from different books of the Bible (NOT the daily verse itself) and reveal a powerful, unexpected connection between them — a hidden thread that ties them together and points to Christ.
+
+For the GR entry:
+- "application": State the 2-3 verses you chose (with full references), then explain the hidden connection that unites them into a single striking insight.
+- "key_insight": The gem itself — the surprising theological thread revealed.
+- "practical_takeaway": How this hidden connection deepens the believer's understanding or walk with Christ.
+
+The gem must feel like a discovery — not an obvious cross-reference. Think: verses from different genres, eras, and contexts that share a buried link only visible through careful study.
+═══════════════════════════════════════════════════════════════
 
 Also identify the verse_genre using Connect-6: Gospel, Law, History, Poetry, Prophecy, or Epistle.
 
@@ -338,6 +379,14 @@ Return ONLY valid JSON in this format:
   ]
 }`;
 
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: 'daily verse Phototheology insight',
+      matchCount: 2,
+      supabaseClient: supabase,
+    });
+    const ragSection = ragResult.chunkCount > 0 ? ragResult.corpusContext : '';
+
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -347,7 +396,7 @@ Return ONLY valid JSON in this format:
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          { role: 'system', content: 'You are a Phototheology Master. Return ONLY valid JSON, no markdown or extra text.' },
+          { role: 'system', content: 'You are a Phototheology Master. Return ONLY valid JSON, no markdown or extra text.' + ragSection },
           { role: 'user', content: prompt }
         ],
       }),

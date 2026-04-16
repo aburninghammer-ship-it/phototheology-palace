@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +14,7 @@ import { toast } from "sonner";
 export default function FirstLetterGame() {
   const { listId } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [verses, setVerses] = useState<any[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userInput, setUserInput] = useState("");
@@ -33,7 +36,7 @@ export default function FirstLetterGame() {
       .order("order_index");
 
     if (error) {
-      toast.error("Failed to load verses");
+      toast.error(t('games.firstLetterGame.errorLoadVerses'));
       navigate("/memory");
       return;
     }
@@ -89,7 +92,7 @@ export default function FirstLetterGame() {
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center">
         <Card>
           <CardContent className="pt-6">
-            <p>Loading verses...</p>
+            <p>{t('games.firstLetterGame.loadingVerses')}</p>
           </CardContent>
         </Card>
       </div>
@@ -104,7 +107,7 @@ export default function FirstLetterGame() {
         <div className="container mx-auto max-w-2xl">
           <Card>
             <CardHeader>
-              <CardTitle className="text-center">🎉 Complete!</CardTitle>
+              <CardTitle className="text-center">{t('games.firstLetterGame.complete')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="text-center">
@@ -112,17 +115,17 @@ export default function FirstLetterGame() {
                   {percentage}%
                 </div>
                 <p className="text-lg text-muted-foreground">
-                  {score} out of {verses.length} correct
+                  {t('games.firstLetterGame.scoreResult', { score, total: verses.length })}
                 </p>
               </div>
 
               <div className="flex gap-4">
                 <Button onClick={() => navigate("/memory")} variant="outline" className="flex-1">
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Lists
+                  {t('games.firstLetterGame.backToLists')}
                 </Button>
                 <Button onClick={() => window.location.reload()} className="flex-1">
-                  Play Again
+                  {t('games.common.playAgain')}
                 </Button>
               </div>
             </CardContent>
@@ -143,7 +146,7 @@ export default function FirstLetterGame() {
         <div className="mb-6 flex items-center justify-between">
           <Button variant="ghost" onClick={() => navigate("/memory")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            {t('common.back')}
           </Button>
           <div className="text-sm font-medium">
             {currentIndex + 1} / {verses.length}
@@ -154,7 +157,7 @@ export default function FirstLetterGame() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-center">First Letter Challenge</CardTitle>
+            <CardTitle className="text-center">{t('games.firstLetterGame.title')}</CardTitle>
             <p className="text-center text-sm text-muted-foreground">
               {currentVerse.verse_reference}
             </p>
@@ -169,7 +172,7 @@ export default function FirstLetterGame() {
             {hint && (
               <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-lg">
                 <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                  Hint: {hint}
+                  {t('games.firstLetterGame.hintLabel', { hint })}
                 </p>
               </div>
             )}
@@ -179,7 +182,7 @@ export default function FirstLetterGame() {
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !showResult && checkAnswer()}
-                placeholder="Type the full verse..."
+                placeholder={t('games.firstLetterGame.inputPlaceholder')}
                 disabled={showResult}
                 className="text-lg"
               />
@@ -199,7 +202,7 @@ export default function FirstLetterGame() {
                     <p className={`font-medium mb-1 ${
                       isCorrect ? "text-green-600" : "text-red-600"
                     }`}>
-                      {isCorrect ? "Correct!" : "Not quite"}
+                      {isCorrect ? t('games.firstLetterGame.correct') : t('games.firstLetterGame.notQuite')}
                     </p>
                     {!isCorrect && (
                       <p className="text-sm text-muted-foreground">
@@ -218,24 +221,25 @@ export default function FirstLetterGame() {
                   className="flex-1"
                 >
                   <Lightbulb className="mr-2 h-4 w-4" />
-                  Hint
+                  {t('games.firstLetterGame.hint')}
                 </Button>
                 <Button
                   onClick={checkAnswer}
                   disabled={!userInput.trim() || showResult}
                   className="flex-1"
                 >
-                  Check Answer
+                  {t('games.firstLetterGame.checkAnswer')}
                 </Button>
               </div>
             </div>
 
             <div className="text-center text-sm text-muted-foreground">
-              Score: {score} / {currentIndex + (showResult ? 1 : 0)}
+              {t('games.common.scoreValue', { score })}{' '}/{' '}{currentIndex + (showResult ? 1 : 0)}
             </div>
           </CardContent>
         </Card>
       </div>
+      <FloatingGameChat gameType="first-letter" />
     </div>
   );
 }

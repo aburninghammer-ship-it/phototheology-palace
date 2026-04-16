@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import { JeevesVerseSuggestions } from "@/components/memory/JeevesVerseSuggestio
 export default function MemoryListEditor() {
   const { listId } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [list, setList] = useState<any>(null);
@@ -44,7 +46,7 @@ export default function MemoryListEditor() {
       setIsTemplate(data.is_template || false);
     } catch (error) {
       console.error("Error fetching list:", error);
-      toast.error("Failed to load list");
+      toast.error(t('memory.listEditor.failedToLoadList'));
       navigate("/memory");
     } finally {
       setLoading(false);
@@ -82,7 +84,7 @@ export default function MemoryListEditor() {
 
       if (error) throw error;
 
-      toast.success("Verse added! Generating PT analysis...");
+      toast.success(t('memory.listEditor.verseAddedGenerating'));
       
       // Generate PT analysis in the background
       supabase.functions
@@ -114,7 +116,7 @@ export default function MemoryListEditor() {
       fetchVerses();
     } catch (error) {
       console.error("Error adding verse:", error);
-      toast.error("Failed to add verse");
+      toast.error(t('memory.listEditor.failedToAddVerse'));
     }
   };
 
@@ -126,11 +128,11 @@ export default function MemoryListEditor() {
         .eq("id", verseId);
 
       if (error) throw error;
-      toast.success("Verse removed");
+      toast.success(t('memory.listEditor.verseRemoved'));
       fetchVerses();
     } catch (error) {
       console.error("Error deleting verse:", error);
-      toast.error("Failed to remove verse");
+      toast.error(t('memory.listEditor.failedToRemoveVerse'));
     }
   };
 
@@ -144,13 +146,13 @@ export default function MemoryListEditor() {
       if (error) throw error;
       setIsTemplate(!isTemplate);
       toast.success(
-        !isTemplate 
-          ? "List marked as template - now visible to all users!" 
-          : "List unmarked as template"
+        !isTemplate
+          ? t('memory.listEditor.markedAsTemplate')
+          : t('memory.listEditor.unmarkedAsTemplate')
       );
     } catch (error) {
       console.error("Error updating template status:", error);
-      toast.error("Failed to update template status");
+      toast.error(t('memory.listEditor.failedToUpdateTemplate'));
     }
   };
 
@@ -182,7 +184,7 @@ export default function MemoryListEditor() {
       setVerses(newVerses);
     } catch (error) {
       console.error("Error reordering:", error);
-      toast.error("Failed to reorder verses");
+      toast.error(t('memory.listEditor.failedToReorder'));
     }
   };
 
@@ -198,7 +200,7 @@ export default function MemoryListEditor() {
           className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Memory
+          {t('memory.game.backToMemory')}
         </Button>
 
         <div className="space-y-6">
@@ -207,14 +209,14 @@ export default function MemoryListEditor() {
             <CardHeader>
               <CardTitle>{list?.title}</CardTitle>
               <CardDescription>
-                {list?.description || "No description"}
+                {list?.description || t('memory.listEditor.noDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span>Target: {list?.target_verse_count} verses</span>
+                <span>{t('memory.listEditor.target', { count: list?.target_verse_count })}</span>
                 <span>•</span>
-                <span>Current: {verses.length} verses</span>
+                <span>{t('memory.listEditor.current', { count: verses.length })}</span>
                 <span>•</span>
                 <span>{list?.bible_version.toUpperCase()}</span>
               </div>
@@ -223,9 +225,9 @@ export default function MemoryListEditor() {
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-primary" />
                   <div>
-                    <p className="font-semibold text-sm">Mark as Template</p>
+                    <p className="font-semibold text-sm">{t('memory.listEditor.markAsTemplate')}</p>
                     <p className="text-xs text-muted-foreground">
-                      Make this list available as a curated template for all users
+                      {t('memory.listEditor.markAsTemplateDesc')}
                     </p>
                   </div>
                 </div>
@@ -244,18 +246,18 @@ export default function MemoryListEditor() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Verses</CardTitle>
+                <CardTitle>{t('memory.listEditor.verses')}</CardTitle>
                 <Button onClick={() => setShowVerseInsert(true)} size="sm" className="gap-2">
                   <Plus className="h-4 w-4" />
-                  Add Verse
+                  {t('memory.listEditor.addVerse')}
                 </Button>
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
               {verses.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
-                  <p>No verses added yet</p>
-                  <p className="text-sm mt-2">Add verses to start creating your memory list</p>
+                  <p>{t('memory.listEditor.noVersesYet')}</p>
+                  <p className="text-sm mt-2">{t('memory.listEditor.addVersesToStart')}</p>
                 </div>
               ) : (
                 verses.map((verse, index) => (

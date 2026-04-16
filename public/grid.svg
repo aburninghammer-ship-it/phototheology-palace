@@ -1,0 +1,9 @@
+<!-- Simple SVG grid pattern used as a hero background texture -->
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" fill="none">
+  <defs>
+    <pattern id="pt-grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M 24 0 L 0 0 0 24" stroke="rgba(255,255,255,0.35)" stroke-width="1" />
+    </pattern>
+  </defs>
+  <rect width="240" height="240" fill="url(#pt-grid)" />
+</svg>

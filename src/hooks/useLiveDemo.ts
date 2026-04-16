@@ -194,6 +194,25 @@ export function useLiveDemo() {
       if (error) throw error;
 
       setActiveSession(data as LiveDemoSession);
+
+      // Notify all users except host via notifications table
+      const { data: allProfiles } = await supabase
+        .from('profiles')
+        .select('id')
+        .neq('id', user.id);
+
+      if (allProfiles && allProfiles.length > 0) {
+        const notifications = allProfiles.map(p => ({
+          user_id: p.id,
+          type: 'live_session',
+          title: '🔴 Live Now!',
+          message: `"${title}" is live. Tap to join!`,
+          link: '/live-demo',
+          is_read: false,
+        }));
+        await supabase.from('notifications').insert(notifications);
+      }
+
       toast({ title: "You're live!", description: "Subscribers are being notified." });
       
       return data.id;

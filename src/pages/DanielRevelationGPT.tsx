@@ -3,8 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { Sparkles, Scroll, Crown, MessageSquare, BookOpen, Search } from "lucide-react";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 const DanielRevelationGPT = () => {
+  const { t } = useTranslation();
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://studio.pickaxe.co/api/embed/bundle.js';
@@ -30,66 +32,66 @@ const DanielRevelationGPT = () => {
             <div className="flex items-center justify-center gap-3">
               <Crown className="h-10 w-10 text-primary" />
               <h1 className="text-5xl font-bold text-primary">
-                Daniel & Revelation GPT
+                {t('gpt.danielRevelation.title')}
               </h1>
               <HowItWorksDialog
-                title="How to Use Daniel & Revelation GPT"
+                title={t('gpt.danielRevelation.howToUseTitle')}
                 steps={[
                   {
-                    title: "AI-Powered Prophecy Assistant",
-                    description: "This specialized AI assistant is trained specifically on the books of Daniel and Revelation to help you understand prophecy, symbolism, and timelines.",
+                    title: t('gpt.danielRevelation.steps.aiAssistant.title'),
+                    description: t('gpt.danielRevelation.steps.aiAssistant.description'),
                     highlights: [
-                      "Prophecy-focused AI",
-                      "Understands symbolism",
-                      "Explains timelines"
+                      t('gpt.danielRevelation.steps.aiAssistant.highlights.0'),
+                      t('gpt.danielRevelation.steps.aiAssistant.highlights.1'),
+                      t('gpt.danielRevelation.steps.aiAssistant.highlights.2')
                     ],
                     icon: Sparkles,
                   },
                   {
-                    title: "Ask Questions",
-                    description: "Type any question about Daniel or Revelation in the chat interface. Ask about beasts, numbers, prophecies, or connections between the two books.",
+                    title: t('gpt.danielRevelation.steps.askQuestions.title'),
+                    description: t('gpt.danielRevelation.steps.askQuestions.description'),
                     highlights: [
-                      "Ask anything about prophecy",
-                      "Explore symbols and beasts",
-                      "Understand time prophecies"
+                      t('gpt.danielRevelation.steps.askQuestions.highlights.0'),
+                      t('gpt.danielRevelation.steps.askQuestions.highlights.1'),
+                      t('gpt.danielRevelation.steps.askQuestions.highlights.2')
                     ],
                     icon: MessageSquare,
                   },
                   {
-                    title: "Explore Topics",
-                    description: "Ask about specific topics like '70 weeks prophecy', 'four beasts', 'seals and trumpets', or 'the three angels messages'.",
+                    title: t('gpt.danielRevelation.steps.exploreTopics.title'),
+                    description: t('gpt.danielRevelation.steps.exploreTopics.description'),
                     highlights: [
-                      "Prophecy timelines",
-                      "Symbol interpretations",
-                      "Historical fulfillment"
+                      t('gpt.danielRevelation.steps.exploreTopics.highlights.0'),
+                      t('gpt.danielRevelation.steps.exploreTopics.highlights.1'),
+                      t('gpt.danielRevelation.steps.exploreTopics.highlights.2')
                     ],
                     icon: BookOpen,
                   },
                   {
-                    title: "Deep Dive",
-                    description: "Follow up with detailed questions to explore connections, parallel passages, and Phototheology applications.",
+                    title: t('gpt.danielRevelation.steps.deepDive.title'),
+                    description: t('gpt.danielRevelation.steps.deepDive.description'),
                     highlights: [
-                      "Ask follow-up questions",
-                      "Connect Daniel & Revelation",
-                      "Apply PT principles"
+                      t('gpt.danielRevelation.steps.deepDive.highlights.0'),
+                      t('gpt.danielRevelation.steps.deepDive.highlights.1'),
+                      t('gpt.danielRevelation.steps.deepDive.highlights.2')
                     ],
                     icon: Search,
                   },
                 ]}
               />
             </div>
-            <p className="text-xl text-muted-foreground">AI-Powered Prophecy Study Assistant</p>
+            <p className="text-xl text-muted-foreground">{t('gpt.danielRevelation.subtitle')}</p>
             <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
               <Sparkles className="h-4 w-4" />
-              <span>Unlock the mysteries of biblical prophecy with AI guidance</span>
+              <span>{t('gpt.danielRevelation.tagline')}</span>
             </div>
           </div>
 
           <Card className="border-2 border-primary/20">
             <CardHeader className="bg-gradient-to-r from-purple-500/10 to-blue-500/10">
-              <CardTitle className="text-2xl">Chat with Daniel & Revelation GPT</CardTitle>
+              <CardTitle className="text-2xl">{t('gpt.danielRevelation.chatTitle')}</CardTitle>
               <CardDescription className="text-base">
-                Explore the prophetic books of Daniel and Revelation. Ask questions about prophecy, symbolism, historical fulfillment, and end-time events from a historicist perspective.
+                {t('gpt.danielRevelation.chatDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6">

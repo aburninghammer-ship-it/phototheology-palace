@@ -16,17 +16,18 @@ export function SubscriptionRenewal() {
     setManagingBilling(true);
     try {
       const { data, error } = await supabase.functions.invoke('customer-portal');
-      
+
       if (error) throw error;
-      
+
       if (data?.url) {
-        window.open(data.url, '_blank');
+        window.location.href = data.url;
       } else {
         throw new Error('No portal URL returned');
       }
     } catch (error) {
       console.error('Error opening customer portal:', error);
-      toast.error('Failed to open billing portal. Please try again.');
+      toast.error('Could not open billing portal. Redirecting to plans page...');
+      window.location.href = '/pricing';
     } finally {
       setManagingBilling(false);
     }
@@ -163,7 +164,7 @@ export function SubscriptionRenewal() {
 
         {/* Action Buttons */}
         <div className="space-y-2">
-          {!isStudent && subscription.status === 'active' && (
+          {!isStudent && (subscription.status === 'active' || subscription.status === 'trial') && (
             <>
               <Button
                 variant="outline"
@@ -179,12 +180,12 @@ export function SubscriptionRenewal() {
                 ) : (
                   <>
                     <CreditCard className="h-4 w-4 mr-2" />
-                    Manage Billing
+                    Manage Subscription & Billing
                   </>
                 )}
               </Button>
               <p className="text-xs text-muted-foreground text-center">
-                Update payment method, view invoices, or cancel subscription
+                Change plan, update payment method, view invoices, or cancel subscription
               </p>
             </>
           )}

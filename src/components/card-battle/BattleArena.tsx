@@ -396,8 +396,9 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
         });
         await loadPlayers();
         await loadMoves();
-        
-        // In user vs jeeves, user must manually trigger Jeeves' turn - no auto-play
+
+        // Switch to Jeeves' turn after user plays successfully
+        setIsUserTurn(false);
       }
 
     } catch (error: any) {
@@ -458,8 +459,9 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
         setShowJudgmentFeedback(false);
         await loadPlayers();
         await loadMoves();
-        
-        // User must manually trigger Jeeves' turn - no auto-play
+
+        // Switch to Jeeves' turn after user's challenge is upheld
+        setIsUserTurn(false);
       } else {
         toast({
           title: '❌ Challenge Denied',
@@ -500,16 +502,10 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
   };
 
   const handleJeevesPlay = async (jeevesId: string) => {
-    console.log(`🤖 ${jeevesId} Play button clicked!`);
-    console.log('Players:', players);
-
     // Find the specific Jeeves player
     const jeevesPlayer = players.find(p => p.player_id === jeevesId);
-
-    console.log('Selected Jeeves player:', jeevesPlayer);
     
     if (!jeevesPlayer) {
-      console.log('❌ Jeeves player not found');
       toast({
         title: "Error",
         description: "No Jeeves player available in this battle",
@@ -519,7 +515,6 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
     }
     
     if (jeevesPlayer.cards_in_hand.length === 0) {
-      console.log('❌ Jeeves has no cards left');
       toast({
         title: "Game Over",
         description: `${jeevesPlayer.display_name} has no cards left to play!`,
@@ -527,7 +522,6 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
       return;
     }
 
-    console.log(`✅ ${jeevesPlayer.display_name} starting to play...`);
     toast({
       title: `${jeevesPlayer.display_name} is Thinking...`,
       description: "Selecting a card and preparing a response...",
@@ -539,10 +533,7 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
       const randomCard = jeevesPlayer.cards_in_hand[
         Math.floor(Math.random() * jeevesPlayer.cards_in_hand.length)
       ];
-      console.log('🎴 Jeeves selected card:', randomCard);
-
       // Generate a quality response from Jeeves using AI
-      console.log('🤖 Generating Jeeves response via AI...');
       
       // Determine opponent name
       const opponentPlayer = players.find(p => p.player_id !== jeevesPlayer.player_id);
@@ -564,9 +555,6 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
       }
 
       const randomResponse = aiData.response;
-      console.log('📝 Jeeves response:', randomResponse);
-
-      console.log('🎯 Calling judge-card-battle edge function...');
       const { data, error } = await supabase.functions.invoke('judge-card-battle', {
         body: {
           battleId: battle.id,
@@ -583,8 +571,6 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
         throw error;
       }
 
-      console.log('✅ Judgment received:', data);
-
       await loadPlayers();
       await loadMoves();
 
@@ -593,12 +579,16 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
           title: `🤖 ${jeevesPlayer.display_name} Played Successfully!`,
           description: `Card: ${randomCard} | Points: ${data.judgment.totalPoints}`,
         });
+        // Switch back to user's turn after Jeeves plays successfully
+        setIsUserTurn(true);
       } else {
         toast({
           title: `🤖 ${jeevesPlayer.display_name}'s Move Rejected`,
           description: `Card: ${randomCard} was rejected!`,
           variant: "destructive",
         });
+        // Even if Jeeves' move was rejected, switch to user's turn
+        setIsUserTurn(true);
       }
     } catch (error: any) {
       console.error('❌ Error with Jeeves play:', error);
@@ -607,8 +597,9 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
         description: error.message || "Failed to process Jeeves' turn",
         variant: "destructive",
       });
+      // Even on error, switch back to user's turn so they're not stuck
+      setIsUserTurn(true);
     } finally {
-      console.log('✅ Jeeves turn complete');
       setIsSubmitting(false);
     }
   };

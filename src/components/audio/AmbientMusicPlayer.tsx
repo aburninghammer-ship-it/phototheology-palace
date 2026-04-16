@@ -4,12 +4,12 @@ import { Slider } from "@/components/ui/slider";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { 
-  Music, 
-  Play, 
-  Pause, 
-  Volume2, 
-  VolumeX, 
+import {
+  Music,
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
   SkipForward,
   Settings,
   X,
@@ -22,7 +22,10 @@ import {
   Loader2,
   ChevronDown,
   Smartphone,
-  ListMusic
+  ListMusic,
+  GripVertical,
+  ArrowUp,
+  ArrowDown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -39,13 +42,14 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// Note: useUserMusic removed - all music is either preset (public) or local (private to device)
+import { useUserMusic } from "@/hooks/useUserMusic";
 import { useLocalMusic } from "@/hooks/useLocalMusic";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAudioDucking } from "@/hooks/useAudioDucking";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { subscribeToMusicVolume } from "@/hooks/useMusicVolumeControl";
+import { subscribeToMusicRequests, getAutoMusicEnabled } from "@/hooks/useCommentaryMusicSync";
 
 // Study Music Playlist - 10 tracks for Bible study and meditation
 const AMBIENT_TRACKS: Array<{
@@ -136,6 +140,14 @@ const AMBIENT_TRACKS: Array<{
     mood: "contemplative, ambient, eternal",
     url: "/audio/eternal-echoes.mp3",
   },
+  {
+    id: "moon-of-the-still-waters",
+    name: "Moon Of The Still Waters",
+    description: "Calm lunar meditation soundscape",
+    category: "study-music",
+    mood: "calm, meditative, serene",
+    url: "/music/Moon_Of_The_Still_Waters.mp3",
+  },
 ];
 
 interface AmbientMusicPlayerProps {
@@ -156,11 +168,15 @@ export function AmbientMusicPlayer({
   const gainNodeRef = useRef<GainNode | null>(null);
   const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
   const { user } = useAuth();
-  // Removed cloud userTracks - only preset (public) and local (private) tracks
+  const { userTracks } = useUserMusic();
   const { localTracks, uploading: localUploading, uploadLocalMusic, removeLocalTrack, toggleFavorite: toggleLocalFavorite } = useLocalMusic();
   const isMobile = useIsMobile();
   
   const [isPlaying, setIsPlaying] = useState(false);
+  const isPlayingRef = useRef(false);
+  const userPausedRef = useRef(false); // Track intentional user pauses to prevent auto-resume fighting
+  // Keep ref in sync for use in event handlers (avoids stale closures)
+  useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
   const [volume, setVolume] = useState(() => {
     const saved = localStorage.getItem("pt-music-volume-pct");
     if (saved) {
@@ -201,11 +217,21 @@ export function AmbientMusicPlayer({
     }
     return new Set(AMBIENT_TRACKS.map(t => t.id));
   });
+  const [trackOrder, setTrackOrder] = useState<string[]>(() => {
+    const saved = localStorage.getItem("pt-ambient-track-order");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return AMBIENT_TRACKS.map(t => t.id);
+      }
+    }
+    return AMBIENT_TRACKS.map(t => t.id);
+  });
   const [showPlaylist, setShowPlaylist] = useState(false);
 
   // Audio ducking - reduce volume when TTS is playing
   const handleDuckChange = useCallback((ducked: boolean, duckRatio: number) => {
-    console.log(`[AmbientMusic] Duck event: ducked=${ducked}, ratio=${duckRatio}`);
     setDuckMultiplier(duckRatio);
   }, []);
 
@@ -227,7 +253,7 @@ export function AmbientMusicPlayer({
       try {
         await ctx.resume();
       } catch (err) {
-        console.warn("[AmbientMusic] Failed to resume AudioContext:", err);
+        // Failed to resume AudioContext
       }
     }
 
@@ -253,7 +279,6 @@ export function AmbientMusicPlayer({
       audioRef.current.volume = effectiveVolume;
     }
     
-    console.log(`[AmbientMusic] Volume: base=${volume}, duck=${duckMultiplier}, effective=${effectiveVolume}`);
   }, [volume, isMuted, duckMultiplier]);
 
   // Track failed URLs to avoid retrying them
@@ -272,9 +297,22 @@ export function AmbientMusicPlayer({
     return isAudioFile || isCdnUrl;
   }, []);
 
-  // Combine preset tracks and local tracks only (no cloud user tracks - those are private)
+  // Combine preset tracks, cloud study music, and local device tracks
   const allTracks = useMemo(() => [
     ...AMBIENT_TRACKS.map(t => ({ ...t, isUser: false, isLocal: false })),
+    ...userTracks.map(t => ({
+      id: t.id,
+      name: t.name,
+      description: t.description || t.mood || "Your uploaded study music",
+      url: t.file_url,
+      category: t.category || "custom",
+      floor: 0,
+      mood: t.mood || "custom",
+      bpm: 60,
+      isUser: true,
+      isLocal: false,
+      userTrackData: t,
+    })),
     ...localTracks.map(t => ({
       id: t.id,
       name: t.name,
@@ -288,7 +326,40 @@ export function AmbientMusicPlayer({
       isLocal: true,
       localTrackData: t
     }))
-  ], [localTracks]);
+  ], [userTracks, localTracks]);
+
+  useEffect(() => {
+    setSelectedTracks((prev) => {
+      const next = new Set(prev);
+      let changed = false;
+
+      for (const track of allTracks) {
+        if (!next.has(track.id)) {
+          next.add(track.id);
+          changed = true;
+        }
+      }
+
+      if (changed) {
+        localStorage.setItem("pt-ambient-selected-tracks", JSON.stringify([...next]));
+      }
+
+      return changed ? next : prev;
+    });
+
+    setTrackOrder((prev) => {
+      const existing = new Set(prev);
+      const missing = allTracks
+        .map((track) => track.id)
+        .filter((id) => !existing.has(id));
+
+      if (missing.length === 0) return prev;
+
+      const next = [...prev, ...missing];
+      localStorage.setItem("pt-ambient-track-order", JSON.stringify(next));
+      return next;
+    });
+  }, [allTracks]);
 
   const currentTrack = useMemo(() => 
     allTracks.find(t => t.id === currentTrackId) || allTracks[0],
@@ -299,42 +370,49 @@ export function AmbientMusicPlayer({
   const playbackStateRef = useRef<{
     allTracks: typeof allTracks;
     selectedTracks: Set<string>;
+    trackOrder: string[];
     currentTrackId: string;
     shuffleMode: boolean;
     loopMode: "none" | "one" | "all";
   }>({
     allTracks,
     selectedTracks,
+    trackOrder,
     currentTrackId,
     shuffleMode,
     loopMode
   });
-  
+
   // Keep ref updated with latest values
   useEffect(() => {
     playbackStateRef.current = {
       allTracks,
       selectedTracks,
+      trackOrder,
       currentTrackId,
       shuffleMode,
       loopMode
     };
-  }, [allTracks, selectedTracks, currentTrackId, shuffleMode, loopMode]);
+  }, [allTracks, selectedTracks, trackOrder, currentTrackId, shuffleMode, loopMode]);
 
   // Function to play next track - extracted for reuse
   const playNextTrackFromState = useCallback(() => {
     const state = playbackStateRef.current;
-    console.log('[AmbientMusic] Playing next track, loopMode:', state.loopMode, 'currentTrackId:', state.currentTrackId);
-    
-    const playableTracks = state.allTracks.filter(t => state.selectedTracks.has(t.id));
+    // Get playable tracks in custom order
+    const selectedList = state.allTracks.filter(t => state.selectedTracks.has(t.id));
+    const playableTracks = selectedList.sort((a, b) => {
+      const aIdx = state.trackOrder.indexOf(a.id);
+      const bIdx = state.trackOrder.indexOf(b.id);
+      const aOrder = aIdx === -1 ? Infinity : aIdx;
+      const bOrder = bIdx === -1 ? Infinity : bIdx;
+      return aOrder - bOrder;
+    });
+
     if (playableTracks.length === 0) {
-      console.log('[AmbientMusic] No playable tracks');
       setIsPlaying(false);
       return;
     }
-    
-    console.log('[AmbientMusic] Playable tracks:', playableTracks.map(t => t.id));
-    
+
     let nextTrackToPlay;
     if (state.shuffleMode) {
       const otherTracks = playableTracks.filter(t => t.id !== state.currentTrackId);
@@ -349,12 +427,9 @@ export function AmbientMusicPlayer({
       const currentIndex = playableTracks.findIndex(t => t.id === state.currentTrackId);
       const nextIndex = (currentIndex + 1) % playableTracks.length;
       nextTrackToPlay = playableTracks[nextIndex];
-      console.log('[AmbientMusic] Sequential next: currentIdx=', currentIndex, 'nextIdx=', nextIndex, 'track=', nextTrackToPlay?.name);
     }
     
     if (nextTrackToPlay && audioRef.current) {
-      console.log('[AmbientMusic] Auto-playing next track:', nextTrackToPlay.name, nextTrackToPlay.url);
-      
       // CRITICAL: Update the ref SYNCHRONOUSLY before React state update
       // This prevents race conditions where onended fires before ref is updated
       playbackStateRef.current = {
@@ -366,24 +441,41 @@ export function AmbientMusicPlayer({
       setCurrentTrackId(nextTrackToPlay.id);
       
       const audio = audioRef.current;
-      audio.src = nextTrackToPlay.url;
-      audio.load();
       
-      // Play after a short delay to ensure src is set
-      setTimeout(() => {
-        if (audioRef.current) {
-          audioRef.current.play()
-            .then(() => {
-              console.log('[AmbientMusic] Next track started successfully:', nextTrackToPlay.name);
-              setIsPlaying(true);
-            })
-            .catch((err) => {
-              console.error('[AmbientMusic] Failed to play next track:', err);
-              // Try again with next track after a delay
-              setTimeout(() => playNextTrackFromState(), 500);
-            });
-        }
-      }, 150);
+      // For same-track replay (single track in "all" mode), reset currentTime
+      // instead of just setting src, to ensure proper restart
+      const isSameTrack = audio.src.endsWith(nextTrackToPlay.url) || audio.src === nextTrackToPlay.url;
+      
+      if (isSameTrack) {
+        // Same track - just restart from beginning
+        audio.currentTime = 0;
+        audio.play()
+          .then(() => {
+            setIsPlaying(true);
+          })
+          .catch((err) => {
+            console.error('[AmbientMusic] Failed to restart track:', err);
+          });
+      } else {
+        // Different track - load new source
+        audio.src = nextTrackToPlay.url;
+        audio.load();
+        
+        // Play after a short delay to ensure src is set
+        setTimeout(() => {
+          if (audioRef.current) {
+            audioRef.current.play()
+              .then(() => {
+                setIsPlaying(true);
+              })
+              .catch((err) => {
+                console.error('[AmbientMusic] Failed to play next track:', err);
+                // Try again with next track after a delay
+                setTimeout(() => playNextTrackFromState(), 500);
+              });
+          }
+        }, 150);
+      }
     }
   }, []);
 
@@ -396,17 +488,34 @@ export function AmbientMusicPlayer({
       // Handle track ended - use ref for latest state to avoid stale closures
       audioRef.current.onended = () => {
         const state = playbackStateRef.current;
-        console.log('[AmbientMusic] Track ended, loopMode:', state.loopMode, 'audio.loop:', audioRef.current?.loop);
-        
         // If loop is set on the audio element (loopMode === "one"), it will auto-repeat
         // We only need to handle "all" and "none" modes here
         if (state.loopMode === "all") {
           playNextTrackFromState();
         } else if (state.loopMode === "none") {
-          console.log('[AmbientMusic] Loop mode none, stopping');
           setIsPlaying(false);
         }
         // loopMode === "one" is handled by audio.loop = true (browser handles it)
+      };
+      
+      // Handle unexpected pauses (browser/system interruptions)
+      // This fires when the browser pauses audio due to resource competition,
+      // tab switching, or mobile OS audio session changes
+      audioRef.current.onpause = () => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        
+        // Only try to resume if we think we should still be playing
+        // and the track hasn't naturally ended
+        if (isPlayingRef.current && !userPausedRef.current && !audio.ended && audio.currentTime > 0) {
+          // Small delay to avoid fighting with the browser
+          setTimeout(() => {
+            if (audioRef.current && isPlayingRef.current && !userPausedRef.current && audioRef.current.paused && !audioRef.current.ended) {
+              audioRef.current.play().catch(() => {
+              });
+            }
+          }, 300);
+        }
       };
       
       // Handle errors
@@ -425,13 +534,12 @@ export function AmbientMusicPlayer({
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.onended = null;
+        audioRef.current.onpause = null;
         audioRef.current.onerror = null;
         audioRef.current = null;
       }
       if (audioContextRef.current) {
-        audioContextRef.current.close().catch(err => {
-          console.warn('[AmbientMusic] Error closing AudioContext:', err);
-        });
+        audioContextRef.current.close().catch(() => {});
         audioContextRef.current = null;
         gainNodeRef.current = null;
         sourceNodeRef.current = null;
@@ -439,11 +547,52 @@ export function AmbientMusicPlayer({
     };
   }, [playNextTrackFromState]); // Include the callback dependency
 
+  // Keep music playing when app goes to background (mobile)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!audioRef.current) return;
+
+      if (document.hidden && isPlaying && !userPausedRef.current) {
+        // App went to background - try to keep music playing
+        if (audioRef.current.paused) {
+          audioRef.current.play().catch(() => {});
+        }
+      } else if (!document.hidden && isPlaying && !userPausedRef.current) {
+        // App came back to foreground - ensure music is still playing
+        if (audioRef.current.paused) {
+          audioRef.current.play().catch(() => {});
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isPlaying]);
+
+  // Keep-alive interval for background playback
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const keepAlive = () => {
+      if (audioRef.current && isPlaying && !userPausedRef.current && audioRef.current.paused) {
+        audioRef.current.play().catch(() => {});
+      }
+    };
+
+    const interval = setInterval(keepAlive, 2000);
+    return () => clearInterval(interval);
+  }, [isPlaying]);
+
   // Update audio source when track changes - only reset src if URL actually changed
   useEffect(() => {
     if (audioRef.current && currentTrack) {
-      // Only change src if it's actually different to prevent restart
-      if (audioRef.current.src !== currentTrack.url) {
+      // Compare using resolved URLs to prevent unnecessary reloads
+      // audioRef.current.src is always absolute, currentTrack.url may be relative
+      const currentSrc = audioRef.current.src;
+      const trackUrl = currentTrack.url;
+      const isSameSrc = currentSrc.endsWith(trackUrl) || currentSrc === trackUrl;
+      
+      if (!isSameSrc) {
         const wasPlaying = isPlaying;
         audioRef.current.src = currentTrack.url;
         audioRef.current.volume = isMuted ? 0 : volume * duckMultiplier;
@@ -486,13 +635,27 @@ export function AmbientMusicPlayer({
         isInitialMount.current = false;
         return;
       }
-      // Convert from 0-100 scale to 0-1.0 (no cap, full range)
-      const normalizedVolume = Math.min(newVolume, 100) / 100;
-      console.log('[AmbientMusic] Global volume update:', newVolume, '-> normalized:', normalizedVolume);
+      // Convert from 0-100 scale to 0-0.5 (capped to match slider max)
+      const normalizedVolume = Math.min(newVolume, 50) / 100;
       setVolume(normalizedVolume);
     });
     return unsubscribe;
   }, []);
+
+  // Listen for commentary music requests — only acts when user has explicitly enabled auto-music
+  useEffect(() => {
+    const unsubscribe = subscribeToMusicRequests((action) => {
+      if (action === 'start' && !isPlaying && audioRef.current && getAutoMusicEnabled()) {
+        setIsEnabled(true);
+        audioRef.current.play().then(() => {
+          setIsPlaying(true);
+        }).catch((err) => {
+          // Could not auto-start music for commentary
+        });
+      }
+    });
+    return unsubscribe;
+  }, [isPlaying]);
 
   // Update loop setting - only update the loop property, onended is set once at init
   useEffect(() => {
@@ -517,6 +680,7 @@ export function AmbientMusicPlayer({
     }
 
     if (isPlaying) {
+      userPausedRef.current = true;
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
@@ -525,7 +689,6 @@ export function AmbientMusicPlayer({
         
         // Check if current track URL is valid and not previously failed
         if (!isValidAudioUrl(currentTrack.url) || failedUrlsRef.current.has(currentTrack.url)) {
-          console.log("[Music] Skipping invalid/failed URL:", currentTrack.url);
           findNextWorkingTrack();
           return;
         }
@@ -557,9 +720,8 @@ export function AmbientMusicPlayer({
           audioRef.current.volume = effectiveVolume;
         }
         
-        console.log("Attempting to play:", currentTrack.url);
+        userPausedRef.current = false;
         await audioRef.current.play();
-        console.log("Audio playing successfully");
         setIsPlaying(true);
         retryCountRef.current = 0; // Reset retry count on success
         
@@ -572,10 +734,12 @@ export function AmbientMusicPlayer({
           });
           
           navigator.mediaSession.setActionHandler('play', () => {
+            userPausedRef.current = false;
             audioRef.current?.play();
             setIsPlaying(true);
           });
           navigator.mediaSession.setActionHandler('pause', () => {
+            userPausedRef.current = true;
             audioRef.current?.pause();
             setIsPlaying(false);
           });
@@ -628,7 +792,6 @@ export function AmbientMusicPlayer({
     
     const currentIndex = playableTracks.findIndex(t => t.id === currentTrackId);
     const nextIndex = (currentIndex + 1) % playableTracks.length;
-    console.log("[Music] Trying next working track:", playableTracks[nextIndex].name);
     setCurrentTrackId(playableTracks[nextIndex].id);
   }, [allTracks, selectedTracks, currentTrackId, isValidAudioUrl]);
 
@@ -643,29 +806,42 @@ export function AmbientMusicPlayer({
     }
   };
 
+  // Get ordered tracks (only selected ones, in user-defined order)
+  const orderedPlayableTracks = useMemo(() => {
+    // First, get all tracks that are selected
+    const selected = allTracks.filter(t => selectedTracks.has(t.id));
+    // Sort by trackOrder, putting tracks not in order at the end
+    return selected.sort((a, b) => {
+      const aIdx = trackOrder.indexOf(a.id);
+      const bIdx = trackOrder.indexOf(b.id);
+      // If not in order, put at end
+      const aOrder = aIdx === -1 ? Infinity : aIdx;
+      const bOrder = bIdx === -1 ? Infinity : bIdx;
+      return aOrder - bOrder;
+    });
+  }, [allTracks, selectedTracks, trackOrder]);
+
   const nextTrack = useCallback(() => {
-    // Filter to only selected tracks
-    const playableTracks = allTracks.filter(t => selectedTracks.has(t.id));
-    if (playableTracks.length === 0) return;
-    
+    // Use orderedPlayableTracks for custom order
+    if (orderedPlayableTracks.length === 0) return;
+
     let nextTrackToPlay;
     if (shuffleMode) {
       // Random track (different from current)
-      const otherTracks = playableTracks.filter(t => t.id !== currentTrackId);
+      const otherTracks = orderedPlayableTracks.filter(t => t.id !== currentTrackId);
       if (otherTracks.length > 0) {
         const randomIndex = Math.floor(Math.random() * otherTracks.length);
         nextTrackToPlay = otherTracks[randomIndex];
       } else {
-        nextTrackToPlay = playableTracks[0];
+        nextTrackToPlay = orderedPlayableTracks[0];
       }
     } else {
-      const currentIndex = playableTracks.findIndex(t => t.id === currentTrackId);
-      const nextIndex = (currentIndex + 1) % playableTracks.length;
-      nextTrackToPlay = playableTracks[nextIndex];
+      const currentIndex = orderedPlayableTracks.findIndex(t => t.id === currentTrackId);
+      const nextIndex = (currentIndex + 1) % orderedPlayableTracks.length;
+      nextTrackToPlay = orderedPlayableTracks[nextIndex];
     }
-    
+
     if (nextTrackToPlay && audioRef.current) {
-      console.log('[AmbientMusic] Skipping to track:', nextTrackToPlay.name);
       // Directly set src and play to avoid state timing issues
       audioRef.current.src = nextTrackToPlay.url;
       const wasPlaying = isPlaying;
@@ -674,7 +850,7 @@ export function AmbientMusicPlayer({
       }
       setCurrentTrackId(nextTrackToPlay.id);
     }
-  }, [allTracks, selectedTracks, currentTrackId, shuffleMode, isPlaying]);
+  }, [orderedPlayableTracks, currentTrackId, shuffleMode, isPlaying]);
 
   const toggleShuffle = () => {
     setShuffleMode(prev => {
@@ -700,9 +876,32 @@ export function AmbientMusicPlayer({
     });
   };
 
+  // Move track up in the playlist order
+  const moveTrackUp = (trackId: string) => {
+    setTrackOrder(prev => {
+      const idx = prev.indexOf(trackId);
+      if (idx <= 0) return prev;
+      const newOrder = [...prev];
+      [newOrder[idx - 1], newOrder[idx]] = [newOrder[idx], newOrder[idx - 1]];
+      localStorage.setItem("pt-ambient-track-order", JSON.stringify(newOrder));
+      return newOrder;
+    });
+  };
+
+  // Move track down in the playlist order
+  const moveTrackDown = (trackId: string) => {
+    setTrackOrder(prev => {
+      const idx = prev.indexOf(trackId);
+      if (idx < 0 || idx >= prev.length - 1) return prev;
+      const newOrder = [...prev];
+      [newOrder[idx], newOrder[idx + 1]] = [newOrder[idx + 1], newOrder[idx]];
+      localStorage.setItem("pt-ambient-track-order", JSON.stringify(newOrder));
+      return newOrder;
+    });
+  };
+
   const handleVolumeChange = useCallback((value: number[]) => {
     const newVolume = value[0];
-    console.log('[AmbientMusic] handleVolumeChange called:', newVolume);
     setVolume(newVolume);
     if (newVolume > 0 && isMuted) {
       setIsMuted(false);
@@ -711,7 +910,6 @@ export function AmbientMusicPlayer({
     const effectiveVolume = newVolume * duckMultiplier;
     if (audioRef.current) {
       audioRef.current.volume = effectiveVolume;
-      console.log('[AmbientMusic] Volume set:', effectiveVolume);
     }
   }, [isMuted, duckMultiplier]);
 
@@ -725,8 +923,6 @@ export function AmbientMusicPlayer({
     };
     const newVolume = presetValues[preset];
     const effectiveVolume = newVolume * duckMultiplier;
-    console.log('[AmbientMusic] setVolumePreset:', preset, newVolume, 'effective:', effectiveVolume);
-    
     // Apply volume directly to audio element
     if (audioRef.current) {
       audioRef.current.volume = effectiveVolume;
@@ -784,17 +980,21 @@ export function AmbientMusicPlayer({
       <Popover open={showControls} onOpenChange={setShowControls}>
         <PopoverTrigger asChild>
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
             className={cn(
-              "relative",
-              isPlaying && "text-primary",
+              "relative h-11 w-11 rounded-full border-2 border-primary/50 bg-primary/15 hover:bg-primary/25 text-primary shadow-lg shadow-primary/25 transition-all duration-300",
+              isPlaying && "border-primary bg-primary/25 shadow-xl shadow-primary/40 ring-2 ring-primary/30 ring-offset-2 ring-offset-background",
+              !isPlaying && "animate-[pulse_3s_ease-in-out_infinite]",
               className
             )}
           >
-            <Music className="h-5 w-5" />
+            <Music className="h-6 w-6" />
             {isPlaying && (
-              <span className="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full animate-pulse" />
+              <span className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full animate-ping" />
+            )}
+            {!isPlaying && (
+              <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 bg-primary/70 rounded-full" />
             )}
           </Button>
         </PopoverTrigger>
@@ -865,8 +1065,21 @@ export function AmbientMusicPlayer({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="max-h-60">
-                {localTracks.length > 0 && (
+                {(userTracks.length > 0 || localTracks.length > 0) && (
                   <>
+                    {userTracks.length > 0 && (
+                      <>
+                        <div className="px-2 py-1 text-xs font-medium text-muted-foreground">☁️ Your Uploaded Study Music</div>
+                        {allTracks.filter(t => t.isUser).map(track => (
+                          <SelectItem key={track.id} value={track.id}>
+                            <div className="flex items-center gap-2">
+                              <Music className="h-3 w-3 text-primary" />
+                              <span>{track.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </>
+                    )}
                     <div className="px-2 py-1 text-xs font-medium text-muted-foreground">🔒 Your Private Music</div>
                     {allTracks.filter(t => t.isLocal).map(track => (
                       <SelectItem key={track.id} value={track.id}>
@@ -911,7 +1124,7 @@ export function AmbientMusicPlayer({
               {showPlaylist && (
                 <div className="space-y-1 max-h-48 overflow-y-auto border-t pt-2">
                   <div className="flex items-center justify-between px-1 pb-1">
-                    <span className="text-xs text-muted-foreground">Select songs to include:</span>
+                    <span className="text-xs text-muted-foreground">Select & reorder songs:</span>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -925,31 +1138,65 @@ export function AmbientMusicPlayer({
                       Select All
                     </Button>
                   </div>
-                  {localTracks.length > 0 && (
+                  {/* Show tracks in custom order with reorder controls */}
+                  {orderedPlayableTracks.length > 0 && (
+                    <div className="text-xs font-medium text-primary px-1 flex items-center gap-1">
+                      <ListMusic className="h-3 w-3" />
+                      Your Playlist Order ({orderedPlayableTracks.length} songs)
+                    </div>
+                  )}
+                  {orderedPlayableTracks.map((track, idx) => (
+                    <div key={track.id} className="flex items-center gap-1 px-1 py-1 hover:bg-muted/50 rounded group">
+                      <GripVertical className="h-3 w-3 text-muted-foreground" />
+                      <Checkbox
+                        checked={selectedTracks.has(track.id)}
+                        onCheckedChange={() => toggleTrackSelection(track.id)}
+                      />
+                      {track.isLocal && <Heart className="h-3 w-3 text-primary" />}
+                      <span className={cn(
+                        "text-xs truncate flex-1",
+                        currentTrackId === track.id && "text-primary font-medium"
+                      )}>
+                        {track.name}
+                      </span>
+                      <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5"
+                          onClick={(e) => { e.stopPropagation(); moveTrackUp(track.id); }}
+                          disabled={idx === 0}
+                        >
+                          <ArrowUp className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5"
+                          onClick={(e) => { e.stopPropagation(); moveTrackDown(track.id); }}
+                          disabled={idx === orderedPlayableTracks.length - 1}
+                        >
+                          <ArrowDown className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  {/* Unselected tracks */}
+                  {allTracks.filter(t => !selectedTracks.has(t.id)).length > 0 && (
                     <>
-                      <div className="text-xs font-medium text-primary px-1">🔒 Your Private Music</div>
-                      {allTracks.filter(t => t.isLocal).map(track => (
-                        <label key={track.id} className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted/50 rounded cursor-pointer">
+                      <div className="text-xs font-medium text-muted-foreground px-1 pt-2 border-t mt-2">Available to Add</div>
+                      {allTracks.filter(t => !selectedTracks.has(t.id)).map(track => (
+                        <label key={track.id} className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted/50 rounded cursor-pointer opacity-60">
                           <Checkbox
-                            checked={selectedTracks.has(track.id)}
+                            checked={false}
                             onCheckedChange={() => toggleTrackSelection(track.id)}
                           />
-                          <Heart className="h-3 w-3 text-primary" />
+                          {track.isLocal && <Heart className="h-3 w-3 text-primary" />}
                           <span className="text-xs truncate flex-1">{track.name}</span>
                         </label>
                       ))}
                     </>
                   )}
-                  <div className="text-xs font-medium text-muted-foreground px-1 pt-1">Preset Tracks</div>
-                  {AMBIENT_TRACKS.map(track => (
-                    <label key={track.id} className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted/50 rounded cursor-pointer">
-                      <Checkbox
-                        checked={selectedTracks.has(track.id)}
-                        onCheckedChange={() => toggleTrackSelection(track.id)}
-                      />
-                      <span className="text-xs truncate flex-1">{track.name}</span>
-                    </label>
-                  ))}
                 </div>
               )}
             </div>
@@ -1191,7 +1438,7 @@ export function AmbientMusicPlayer({
                     ))}
                   </SelectContent>
                 </Select>
-                
+
 
                 {/* Playlist Selection */}
                 <div className="border rounded-md p-2 bg-muted/30">
@@ -1226,6 +1473,21 @@ export function AmbientMusicPlayer({
                           Select All
                         </Button>
                       </div>
+                      {userTracks.length > 0 && (
+                        <>
+                          <div className="text-xs font-medium text-primary px-1">☁️ Your Uploaded Study Music</div>
+                          {allTracks.filter(t => t.isUser).map(track => (
+                            <label key={track.id} className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted/50 rounded cursor-pointer">
+                              <Checkbox
+                                checked={selectedTracks.has(track.id)}
+                                onCheckedChange={() => toggleTrackSelection(track.id)}
+                              />
+                              <Music className="h-3 w-3 text-primary" />
+                              <span className="text-xs truncate flex-1">{track.name}</span>
+                            </label>
+                          ))}
+                        </>
+                      )}
                       {localTracks.length > 0 && (
                         <>
                           <div className="text-xs font-medium text-primary px-1">🔒 Your Private Music</div>
@@ -1285,7 +1547,7 @@ export function AmbientMusicPlayer({
                   </div>
                 </div>
 
-                {/* Mobile Volume Control - Preset Buttons */}
+                {/* Mobile Volume Control - Slider + Presets */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-medium flex items-center gap-2">
@@ -1296,12 +1558,33 @@ export function AmbientMusicPlayer({
                       {Math.round(volume * 100)}%
                     </span>
                   </div>
+                  <Slider
+                    value={[volume]}
+                    min={0}
+                    max={0.5}
+                    step={0.01}
+                    onValueChange={(value) => {
+                      const newVolume = value[0];
+                      setVolume(newVolume);
+                      if (newVolume > 0 && isMuted) setIsMuted(false);
+                      if (newVolume === 0) setIsMuted(true);
+                      const effectiveVolume = newVolume * duckMultiplier;
+                      if (gainNodeRef.current) {
+                        gainNodeRef.current.gain.value = effectiveVolume;
+                      } else if (audioRef.current) {
+                        audioRef.current.volume = effectiveVolume;
+                      }
+                      localStorage.setItem("pt-music-volume-pct", Math.round(newVolume * 100).toString());
+                    }}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    className="w-full touch-manipulation [&_[role=slider]]:h-6 [&_[role=slider]]:w-6"
+                  />
                   <div className="flex items-center gap-1">
                     <Button
                       variant={getCurrentPreset() === 'off' ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setVolumePreset('off')}
-                      className="h-8 flex-1 text-xs"
+                      className="h-7 flex-1 text-xs"
                     >
                       <VolumeX className="h-3 w-3 mr-1" />
                       Off
@@ -1310,7 +1593,7 @@ export function AmbientMusicPlayer({
                       variant={getCurrentPreset() === 'low' ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setVolumePreset('low')}
-                      className="h-8 flex-1 text-xs"
+                      className="h-7 flex-1 text-xs"
                     >
                       5%
                     </Button>
@@ -1318,7 +1601,7 @@ export function AmbientMusicPlayer({
                       variant={getCurrentPreset() === 'med' ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setVolumePreset('med')}
-                      className="h-8 flex-1 text-xs"
+                      className="h-7 flex-1 text-xs"
                     >
                       15%
                     </Button>
@@ -1326,7 +1609,7 @@ export function AmbientMusicPlayer({
                       variant={getCurrentPreset() === 'high' ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setVolumePreset('high')}
-                      className="h-8 flex-1 text-xs"
+                      className="h-7 flex-1 text-xs"
                     >
                       30%
                     </Button>

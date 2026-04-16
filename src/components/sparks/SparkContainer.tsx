@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { SparkIcon } from './SparkIcon';
 import { SparkCard } from './SparkCard';
 import { SparkExploreFlow } from './SparkExploreFlow';
+import { DraggableSparkOverlay } from './DraggableSparkOverlay';
 import { cn } from '@/lib/utils';
 import type { Spark } from '@/hooks/useSparks';
 interface SparkContainerProps {
@@ -11,8 +12,10 @@ interface SparkContainerProps {
   onSave: (sparkId: string) => void;
   onDismiss: (sparkId: string) => void;
   onExplore: (sparkId: string) => Promise<Spark | undefined>;
+  onAddToNotes?: (text: string) => void;
   position?: 'margin' | 'inline' | 'floating';
   className?: string;
+  maxDisplay?: number; // 0 or undefined = show all sparks
 }
 
 export function SparkContainer({
@@ -21,8 +24,10 @@ export function SparkContainer({
   onSave,
   onDismiss,
   onExplore,
+  onAddToNotes,
   position = 'floating',
-  className
+  className,
+  maxDisplay
 }: SparkContainerProps) {
   const [openSparkId, setOpenSparkId] = useState<string | null>(null);
   const [exploringSparkId, setExploringSparkId] = useState<string | null>(null);
@@ -62,46 +67,55 @@ export function SparkContainer({
 
   return (
     <div className={cn("relative", className)}>
-      {/* Spark Icons */}
-      <div className="flex gap-1.5">
+      {/* Spark Icons - extra padding to prevent glow clipping at edges */}
+      <div className="flex gap-5 flex-wrap items-center p-2 -m-2">
         <AnimatePresence>
-          {sparks.slice(0, 3).map((spark, index) => (
+          {(maxDisplay && maxDisplay > 0 ? sparks.slice(0, maxDisplay) : sparks).map((spark, index) => (
             <motion.div
               key={spark.id}
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0 }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: Math.min(index * 0.1, 0.5) }}
             >
               <SparkIcon
                 type={spark.spark_type}
                 pulse={!spark.opened_at}
                 onClick={() => handleIconClick(spark.id)}
                 size="md"
+                colorVariant={spark.spark_type === 'connection' ? 0 : spark.spark_type === 'pattern' ? 1 : 2}
               />
             </motion.div>
           ))}
         </AnimatePresence>
-        
-        {sparks.length > 3 && (
+
+        {maxDisplay && maxDisplay > 0 && sparks.length > maxDisplay && (
           <span className="text-xs text-muted-foreground self-center ml-1">
-            +{sparks.length - 3}
+            +{sparks.length - maxDisplay}
           </span>
         )}
       </div>
 
-      {/* Open Spark Card - Mobile optimized positioning */}
+      {/* Open Spark Card - Draggable overlay */}
       {openSpark && (
-        <div className="fixed inset-x-0 bottom-0 z-50 p-4 md:absolute md:inset-auto md:right-0 md:top-full md:mt-2 md:p-0">
-          <div className="md:hidden fixed inset-0 bg-background/60 backdrop-blur-sm -z-10" onClick={handleClose} />
-          <SparkCard
-            spark={openSpark}
-            onClose={handleClose}
-            onExplore={() => handleExplore(openSpark.id)}
-            onSave={() => handleSave(openSpark.id)}
-            onDismiss={() => handleDismiss(openSpark.id)}
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-background/60 backdrop-blur-sm z-[9998]" 
+            onClick={handleClose} 
           />
-        </div>
+          {/* Card - draggable container */}
+          <DraggableSparkOverlay onClose={handleClose}>
+            <SparkCard
+              spark={openSpark}
+              onClose={handleClose}
+              onExplore={() => handleExplore(openSpark.id)}
+              onSave={() => handleSave(openSpark.id)}
+              onDismiss={() => handleDismiss(openSpark.id)}
+              onAddToNotes={onAddToNotes}
+            />
+          </DraggableSparkOverlay>
+        </>
       )}
 
       {/* Explore Flow */}

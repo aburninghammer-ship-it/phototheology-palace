@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function StudentVerification() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -24,8 +26,8 @@ export default function StudentVerification() {
     
     if (!eduEmail.toLowerCase().endsWith('.edu')) {
       toast({
-        title: "Invalid Email",
-        description: "Please enter a valid .edu email address",
+        title: t('access.invalidEmail'),
+        description: t('access.enterValidEduEmail'),
         variant: "destructive",
       });
       return;
@@ -42,7 +44,7 @@ export default function StudentVerification() {
       if (data.success) {
         setVerified(true);
         toast({
-          title: "Verified!",
+          title: t('access.verified'),
           description: data.message,
         });
         
@@ -54,7 +56,7 @@ export default function StudentVerification() {
       }
     } catch (error: any) {
       toast({
-        title: "Verification Failed",
+        title: t('access.verificationFailed'),
         description: error.message,
         variant: "destructive",
       });
@@ -73,25 +75,25 @@ export default function StudentVerification() {
           <div className="text-center">
             <h1 className="text-4xl font-bold flex items-center justify-center gap-2 mb-2">
               <GraduationCap className="h-8 w-8 text-primary" />
-              Student Verification
+              {t('access.studentVerification')}
             </h1>
             <p className="text-muted-foreground">
-              Students get free access for 1 year!
+              {t('access.studentFreeAccess')}
             </p>
           </div>
 
           {!verified ? (
             <Card>
               <CardHeader>
-                <CardTitle>Verify Your Student Status</CardTitle>
+                <CardTitle>{t('access.verifyStudentStatus')}</CardTitle>
                 <CardDescription>
-                  Enter your .edu email address to get free access to all Premium features
+                  {t('access.verifyStudentDescription')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleVerify} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="edu-email">Educational Email (.edu)</Label>
+                    <Label htmlFor="edu-email">{t('access.educationalEmail')}</Label>
                     <Input
                       id="edu-email"
                       type="email"
@@ -102,18 +104,18 @@ export default function StudentVerification() {
                       disabled={loading}
                     />
                     <p className="text-xs text-muted-foreground">
-                      Must be a valid .edu email address
+                      {t('access.mustBeEduEmail')}
                     </p>
                   </div>
 
                   <Alert>
                     <AlertDescription>
-                      <strong>What you'll get:</strong>
+                      <strong>{t('access.whatYouGet')}:</strong>
                       <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
-                        <li>Full Premium access for 1 year</li>
-                        <li>All AI Study GPTs</li>
-                        <li>Unlimited games and courses</li>
-                        <li>Renewal required annually with .edu verification</li>
+                        <li>{t('access.benefitPremiumAccess')}</li>
+                        <li>{t('access.benefitAiStudy')}</li>
+                        <li>{t('access.benefitUnlimitedGames')}</li>
+                        <li>{t('access.benefitAnnualRenewal')}</li>
                       </ul>
                     </AlertDescription>
                   </Alert>
@@ -126,10 +128,10 @@ export default function StudentVerification() {
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Verifying...
+                        {t('access.verifying')}
                       </>
                     ) : (
-                      "Verify Student Status"
+                      t('access.verifyStudentStatus')
                     )}
                   </Button>
                 </form>
@@ -140,9 +142,9 @@ export default function StudentVerification() {
               <CardContent className="pt-6">
                 <div className="text-center space-y-4">
                   <CheckCircle className="h-16 w-16 text-green-500 mx-auto" />
-                  <h2 className="text-2xl font-bold">Verified!</h2>
+                  <h2 className="text-2xl font-bold">{t('access.verified')}</h2>
                   <p className="text-muted-foreground">
-                    You now have free Premium access for 1 year. Redirecting...
+                    {t('access.verifiedDescription')}
                   </p>
                 </div>
               </CardContent>

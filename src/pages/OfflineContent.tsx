@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { getAudioCacheSize, clearAudioCache, getCachedMusicTracks } from "@/services/offlineAudioCache";
 import { getCommentaryCacheStats, clearCommentaryCache } from "@/services/offlineCommentaryCache";
+import { OfflineDownloadManager } from "@/components/offline/OfflineDownloadManager";
 
 interface CacheStats {
   totalSize: number;
@@ -40,6 +42,7 @@ interface CacheStats {
 }
 
 export default function OfflineContent() {
+  const { t } = useTranslation();
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [cacheStats, setCacheStats] = useState<CacheStats>({
     totalSize: 0,
@@ -114,17 +117,17 @@ export default function OfflineContent() {
 
       // List offline-capable features
       const offlineFeatures = [
-        'Bible Reader (cached chapters)',
-        'Read Me The Bible (offline voice)',
-        'Commentary (when cached)',
-        'Background Music (when cached)',
-        'Palace Structure & Room Details',
-        'Flashcards (saved sets)',
-        'Growth Journal (entries)',
-        'Achievements & Progress',
-        'User Profile',
-        'Training Drills (practice modes)',
-        'Offline Games'
+        t('offline.features.bibleReader'),
+        t('offline.features.readMeBible'),
+        t('offline.features.commentary'),
+        t('offline.features.backgroundMusic'),
+        t('offline.features.palaceStructure'),
+        t('offline.features.flashcards'),
+        t('offline.features.growthJournal'),
+        t('offline.features.achievements'),
+        t('offline.features.userProfile'),
+        t('offline.features.trainingDrills'),
+        t('offline.features.offlineGames')
       ];
 
       // Get audio cache stats
@@ -148,8 +151,8 @@ export default function OfflineContent() {
     } catch (error) {
       console.error('Error analyzing cache:', error);
       toast({
-        title: "Cache Analysis Failed",
-        description: "Could not analyze offline content.",
+        title: t('offline.cacheAnalysisFailed'),
+        description: t('offline.couldNotAnalyze'),
         variant: "destructive"
       });
     } finally {
@@ -188,16 +191,16 @@ export default function OfflineContent() {
       clearCommentaryCache();
 
       toast({
-        title: "Cache Cleared",
-        description: "All offline content has been removed.",
+        title: t('offline.cacheCleared'),
+        description: t('offline.allContentRemoved'),
       });
 
       analyzeCacheContent();
     } catch (error) {
       console.error('Error clearing cache:', error);
       toast({
-        title: "Clear Failed",
-        description: "Could not clear offline content.",
+        title: t('offline.clearFailed'),
+        description: t('offline.couldNotClear'),
         variant: "destructive"
       });
     }
@@ -227,10 +230,10 @@ export default function OfflineContent() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Offline Content
+                {t('offline.title')}
               </h1>
               <p className="text-muted-foreground mt-2">
-                Manage your cached content and offline features
+                {t('offline.description')}
               </p>
             </div>
             
@@ -242,12 +245,12 @@ export default function OfflineContent() {
                 {isOnline ? (
                   <>
                     <Wifi className="w-4 h-4 mr-2" />
-                    Online
+                    {t('offline.online')}
                   </>
                 ) : (
                   <>
                     <WifiOff className="w-4 h-4 mr-2" />
-                    Offline
+                    {t('offline.offline')}
                   </>
                 )}
               </Badge>
@@ -265,42 +268,42 @@ export default function OfflineContent() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <HardDrive className="w-5 h-5 text-primary" />
-                Storage Usage
+                {t('offline.storageUsage')}
               </CardTitle>
               <CardDescription>
-                Total cached content: {formatBytes(cacheStats.totalSize)}
+                {t('offline.totalCachedContent', { size: formatBytes(cacheStats.totalSize) })}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Progress value={storagePercent} className="h-3 mb-2" />
               <div className="flex justify-between text-sm text-muted-foreground">
-                <span>{formatBytes(cacheStats.totalSize)} used</span>
-                <span>~5 MB available</span>
+                <span>{t('offline.used', { size: formatBytes(cacheStats.totalSize) })}</span>
+                <span>{t('offline.available')}</span>
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                 <div className="text-center p-4 bg-primary/5 rounded-lg border border-primary/10">
                   <Book className="w-6 h-6 mx-auto mb-2 text-primary" />
                   <div className="text-2xl font-bold">{cacheStats.bibleChapters.length}</div>
-                  <div className="text-xs text-muted-foreground">Bible Chapters</div>
+                  <div className="text-xs text-muted-foreground">{t('offline.bibleChapters')}</div>
                 </div>
-                
+
                 <div className="text-center p-4 bg-accent/5 rounded-lg border border-accent/10">
                   <GraduationCap className="w-6 h-6 mx-auto mb-2 text-accent" />
                   <div className="text-2xl font-bold">{cacheStats.courses.length}</div>
-                  <div className="text-xs text-muted-foreground">Courses</div>
+                  <div className="text-xs text-muted-foreground">{t('offline.courses')}</div>
                 </div>
-                
+
                 <div className="text-center p-4 bg-amber-500/10 rounded-lg border border-amber-500/20">
                   <Music className="w-6 h-6 mx-auto mb-2 text-amber-500" />
                   <div className="text-2xl font-bold">{cacheStats.cachedMusicTracks}</div>
-                  <div className="text-xs text-muted-foreground">Music Tracks</div>
+                  <div className="text-xs text-muted-foreground">{t('offline.musicTracks')}</div>
                 </div>
-                
+
                 <div className="text-center p-4 bg-muted/50 rounded-lg border border-border">
                   <Gamepad2 className="w-6 h-6 mx-auto mb-2 text-foreground" />
                   <div className="text-2xl font-bold">{cacheStats.offlineFeatures.length}</div>
-                  <div className="text-xs text-muted-foreground">Features</div>
+                  <div className="text-xs text-muted-foreground">{t('offline.featuresLabel')}</div>
                 </div>
               </div>
               
@@ -309,11 +312,11 @@ export default function OfflineContent() {
                 <div className="mt-4 p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
                   <div className="flex items-center gap-2 mb-2">
                     <Volume2 className="w-4 h-4 text-amber-500" />
-                    <span className="text-sm font-medium">Offline Audio</span>
+                    <span className="text-sm font-medium">{t('offline.offlineAudio')}</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-                    <div>Music: {formatBytes(cacheStats.audioCacheSize.music)}</div>
-                    <div>TTS: {formatBytes(cacheStats.audioCacheSize.tts)}</div>
+                    <div>{t('offline.musicLabel')}: {formatBytes(cacheStats.audioCacheSize.music)}</div>
+                    <div>{t('offline.ttsLabel')}: {formatBytes(cacheStats.audioCacheSize.tts)}</div>
                   </div>
                 </div>
               )}
@@ -325,10 +328,20 @@ export default function OfflineContent() {
                 className="mt-6 w-full"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
-                Clear All Cache
+                {t('offline.clearAllCache')}
               </Button>
             </CardContent>
           </Card>
+        </motion.div>
+
+        {/* Download Manager */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="mb-6"
+        >
+          <OfflineDownloadManager />
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-6">
@@ -342,24 +355,24 @@ export default function OfflineContent() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-primary" />
-                  Cached Bible Chapters
+                  {t('offline.cachedBibleChapters')}
                 </CardTitle>
                 <CardDescription>
-                  {cacheStats.bibleChapters.length} chapters available offline
+                  {t('offline.chaptersAvailableOffline', { count: cacheStats.bibleChapters.length })}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ScrollArea className="h-[300px]">
                   {loading ? (
                     <div className="text-center text-muted-foreground py-8">
-                      Loading cache data...
+                      {t('offline.loadingCacheData')}
                     </div>
                   ) : cacheStats.bibleChapters.length === 0 ? (
                     <div className="text-center text-muted-foreground py-8">
                       <Book className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                      <p>No cached chapters yet</p>
+                      <p>{t('offline.noCachedChapters')}</p>
                       <p className="text-sm mt-2">
-                        Visit chapters while online to cache them
+                        {t('offline.visitChaptersToCache')}
                       </p>
                     </div>
                   ) : (
@@ -395,10 +408,10 @@ export default function OfflineContent() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="w-5 h-5 text-accent" />
-                  Offline Features
+                  {t('offline.offlineFeatures')}
                 </CardTitle>
                 <CardDescription>
-                  Features available without internet
+                  {t('offline.featuresAvailableWithout')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -423,10 +436,10 @@ export default function OfflineContent() {
                     <WifiOff className="w-5 h-5 text-amber-600 flex-shrink-0" />
                     <div>
                       <h4 className="font-semibold text-sm text-amber-900 dark:text-amber-100">
-                        Limited While Offline
+                        {t('offline.limitedWhileOffline')}
                       </h4>
                       <p className="text-xs text-amber-800 dark:text-amber-200 mt-1">
-                        Some features like GPT assistants, live study, and community require internet connection.
+                        {t('offline.limitedDescription')}
                       </p>
                     </div>
                   </div>
@@ -445,25 +458,25 @@ export default function OfflineContent() {
         >
           <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
             <CardHeader>
-              <CardTitle className="text-lg">💡 Offline Usage Tips</CardTitle>
+              <CardTitle className="text-lg">{t('offline.usageTipsTitle')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
                 <p>
-                  <strong>Auto-caching:</strong> Bible chapters you visit are automatically cached for offline access.
+                  <strong>{t('offline.tips.autoCachingTitle')}:</strong> {t('offline.tips.autoCachingDescription')}
                 </p>
               </div>
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
                 <p>
-                  <strong>Progress sync:</strong> Your progress syncs automatically when you're back online.
+                  <strong>{t('offline.tips.progressSyncTitle')}:</strong> {t('offline.tips.progressSyncDescription')}
                 </p>
               </div>
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
                 <p>
-                  <strong>Clear cache:</strong> If running low on storage, clear cache to free up space.
+                  <strong>{t('offline.tips.clearCacheTitle')}:</strong> {t('offline.tips.clearCacheDescription')}
                 </p>
               </div>
             </CardContent>

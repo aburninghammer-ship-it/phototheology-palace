@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Eye, EyeOff, Check, Home } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Check, Home, Box } from "lucide-react";
 import { toast } from "sonner";
 
 export default function MemoryPalacePractice() {
+  const { t } = useTranslation();
   const { listId } = useParams();
   const navigate = useNavigate();
   const [locations, setLocations] = useState<any[]>([]);
@@ -34,13 +37,13 @@ export default function MemoryPalacePractice() {
       .order("order_index");
 
     if (error) {
-      toast.error("Failed to load memory palace");
+      toast.error(t('games.memoryPalace.failedToLoad'));
       navigate("/memory");
       return;
     }
 
     if (!data || data.length === 0) {
-      toast.error("No memory palace found. Build one first!");
+      toast.error(t('games.memoryPalace.noPalaceFound'));
       navigate(`/memory/palace-builder/${listId}`);
       return;
     }
@@ -69,7 +72,7 @@ export default function MemoryPalacePractice() {
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center">
         <Card>
           <CardContent className="pt-6">
-            <p>Loading your memory palace...</p>
+            <p>{t('games.memoryPalace.loading')}</p>
           </CardContent>
         </Card>
       </div>
@@ -82,22 +85,22 @@ export default function MemoryPalacePractice() {
         <div className="container mx-auto max-w-2xl">
           <Card>
             <CardHeader>
-              <CardTitle className="text-center">🏛️ Palace Walk Complete!</CardTitle>
+              <CardTitle className="text-center">{t('games.memoryPalace.walkComplete')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="text-center">
                 <p className="text-lg text-muted-foreground mb-6">
-                  You've walked through all {locations.length} locations in your memory palace.
+                  {t('games.memoryPalace.walkedThrough', { count: locations.length })}
                 </p>
               </div>
 
               <div className="flex gap-4">
                 <Button onClick={() => navigate("/memory")} variant="outline" className="flex-1">
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Lists
+                  {t('games.memoryPalace.backToLists')}
                 </Button>
                 <Button onClick={() => window.location.reload()} className="flex-1">
-                  Practice Again
+                  {t('games.memoryPalace.practiceAgain')}
                 </Button>
               </div>
             </CardContent>
@@ -116,10 +119,12 @@ export default function MemoryPalacePractice() {
         <div className="mb-6 flex items-center justify-between">
           <Button variant="ghost" onClick={() => navigate("/memory")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            {t('common.back')}
           </Button>
-          <div className="text-sm font-medium">
-            {currentIndex + 1} / {locations.length}
+          <div className="flex items-center gap-4">
+            <div className="text-sm font-medium">
+              {currentIndex + 1} / {locations.length}
+            </div>
           </div>
         </div>
 
@@ -127,23 +132,23 @@ export default function MemoryPalacePractice() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Home className="h-5 w-5 text-primary" />
-              <CardTitle>Walk Through Your Palace</CardTitle>
+              <CardTitle>{t('games.memoryPalace.walkThroughPalace')}</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="bg-gradient-to-br from-primary/10 to-purple-500/10 p-6 rounded-lg space-y-3">
-              <p className="text-sm font-medium text-muted-foreground">Location:</p>
+              <p className="text-sm font-medium text-muted-foreground">{t('games.memoryPalace.location')}:</p>
               <p className="text-xl font-semibold">{current.location_name}</p>
             </div>
 
             <div className="bg-muted/50 p-6 rounded-lg space-y-3">
-              <p className="text-sm font-medium text-muted-foreground">Your Visualization:</p>
+              <p className="text-sm font-medium text-muted-foreground">{t('games.memoryPalace.yourVisualization')}:</p>
               <p className="text-sm">{current.visualization}</p>
             </div>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">The Verse:</p>
+                <p className="text-sm font-medium">{t('games.memoryPalace.theVerse')}:</p>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -152,12 +157,12 @@ export default function MemoryPalacePractice() {
                   {showVerse ? (
                     <>
                       <EyeOff className="mr-2 h-4 w-4" />
-                      Hide
+                      {t('games.memoryPalace.hide')}
                     </>
                   ) : (
                     <>
                       <Eye className="mr-2 h-4 w-4" />
-                      Reveal
+                      {t('games.memoryPalace.reveal')}
                     </>
                   )}
                 </Button>
@@ -171,7 +176,7 @@ export default function MemoryPalacePractice() {
               ) : (
                 <div className="bg-muted/30 p-6 rounded-lg border-2 border-dashed border-muted-foreground/20">
                   <p className="text-center text-sm text-muted-foreground">
-                    Try to recall the verse from your visualization, then reveal to check
+                    {t('games.memoryPalace.recallHint')}
                   </p>
                 </div>
               )}
@@ -184,19 +189,20 @@ export default function MemoryPalacePractice() {
                 variant="outline"
                 className="flex-1"
               >
-                Previous
+                {t('games.memoryPalace.previous')}
               </Button>
               <Button
                 onClick={handleNext}
                 className="flex-1"
               >
-                {currentIndex < locations.length - 1 ? "Next Location" : "Complete"}
+                {currentIndex < locations.length - 1 ? t('games.memoryPalace.nextLocation') : t('games.memoryPalace.complete')}
                 {currentIndex === locations.length - 1 && <Check className="ml-2 h-4 w-4" />}
               </Button>
             </div>
           </CardContent>
         </Card>
       </div>
+      <FloatingGameChat gameType="memory-palace-practice" />
     </div>
   );
 }

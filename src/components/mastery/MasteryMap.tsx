@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button";
 import { useAllRoomMasteries } from "@/hooks/useMastery";
 import { MasteryBadge } from "./MasteryBadge";
 import { Map as MapIcon, TrendingUp, Lock, Target, ArrowRight } from "lucide-react";
-import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { useNavigate } from "react-router-dom";
 
 export const MasteryMap = () => {
   const { data: masteries, isLoading } = useAllRoomMasteries();
+  const { translatedFloors } = useTranslatedPalaceData();
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -23,7 +24,7 @@ export const MasteryMap = () => {
   // Calculate suggested path based on strengths
   const getSuggestedRooms = () => {
     // Suggest rooms with level 0 or 1 that connect to mastered areas
-    const noviceRooms = palaceFloors
+    const noviceRooms = translatedFloors
       .flatMap(floor => floor.rooms.map(r => ({ ...r, floorNumber: floor.number })))
       .filter(room => {
         const level = roomProgressMap[room.id] || 0;
@@ -50,7 +51,7 @@ export const MasteryMap = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {palaceFloors.map((floor) => (
+            {translatedFloors.map((floor) => (
               <div key={floor.number} className="space-y-3">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   Floor {floor.number}: {floor.name}

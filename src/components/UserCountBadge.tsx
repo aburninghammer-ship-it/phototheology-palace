@@ -1,69 +1,70 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Target } from "lucide-react";
+import { Users, Clock } from "lucide-react";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
 
-function getGoalMessage(count: number): string | null {
-  if (count < 100) return "Help us reach 100!";
-  if (count < 500) return "Help us reach 500!";
-  if (count < 1000) return "Help us reach 1,000!";
-  if (count < 5000) return "Help us reach 5,000!";
-  if (count < 10000) return "Help us reach 10,000!";
-  return null;
-}
-
 export function UserCountBadge() {
-  const [userCount, setUserCount] = useState<number | null>(null);
+  const { t } = useTranslation();
+  const [activeCount, setActiveCount] = useState<number | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const { width, height } = useWindowSize();
 
   useEffect(() => {
-    const fetchUserCount = async () => {
-      const { data, error } = await supabase.rpc("get_active_user_count");
-      
+    const fetchActiveInLastHour = async () => {
+      // Get users who have been active in the last hour
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+
+      const { count, error } = await supabase
+        .from("profiles")
+        .select("id", { count: "exact", head: true })
+        .gte("last_seen", oneHourAgo);
+
       if (error) {
-        console.error("Error fetching user count:", error);
-        setUserCount(0);
+        console.error("Error fetching active user count:", error);
+        setActiveCount(0);
         return;
       }
-      
-      setUserCount(data || 0);
+
+      setActiveCount(count || 0);
     };
 
-    fetchUserCount();
+    fetchActiveInLastHour();
 
-    // Subscribe to real-time INSERT events on profiles table
+    // Refresh count every 30 seconds
+    const interval = setInterval(fetchActiveInLastHour, 30000);
+
+    // Subscribe to real-time updates on profiles table
     const channel = supabase
-      .channel('user-count-updates')
+      .channel('active-users-hourly')
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
+          event: '*',
           schema: 'public',
           table: 'profiles'
         },
         (payload) => {
-          console.log('New user signed up:', payload);
-          // Trigger confetti celebration for any new signup
-          setShowConfetti(true);
-          setTimeout(() => setShowConfetti(false), 5000);
-          // Refresh the count from the database to get accurate number
-          supabase.rpc("get_active_user_count").then(({ data }) => {
-            if (data !== null) setUserCount(data);
-          });
+          // Check if this is a new user signup
+          if (payload.eventType === 'INSERT') {
+            console.log('New user signed up:', payload);
+            setShowConfetti(true);
+            setTimeout(() => setShowConfetti(false), 5000);
+          }
+          // Refresh the count
+          fetchActiveInLastHour();
         }
       )
       .subscribe();
 
     return () => {
+      clearInterval(interval);
       supabase.removeChannel(channel);
     };
   }, []);
 
-  if (userCount === null) return null;
-
-  const goalMessage = getGoalMessage(userCount);
+  if (activeCount === null) return null;
 
   return (
     <>
@@ -84,19 +85,14 @@ export function UserCountBadge() {
           </div>
           <div className="flex flex-col items-start">
             <span className="text-2xl font-bold text-primary tabular-nums">
-              {userCount.toLocaleString()}
+              {activeCount.toLocaleString()}
             </span>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Users & Counting
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              {t('userCount.activeThisHour')}
             </span>
           </div>
         </div>
-        {goalMessage && (
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Target className="w-4 h-4 text-accent" />
-            <span>{goalMessage}</span>
-          </div>
-        )}
       </div>
     </>
   );

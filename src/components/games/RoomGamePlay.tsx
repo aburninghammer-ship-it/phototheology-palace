@@ -1,15 +1,136 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Trophy, Star, Lightbulb, CheckCircle, XCircle, Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, Trophy, Star, Lightbulb, CheckCircle, XCircle, Loader2, Sparkles, RotateCcw, Flame, HelpCircle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useMastery } from "@/hooks/useMastery";
 import { Navigation } from "@/components/Navigation";
+
+// Story sequence data for multiple choice games
+interface StoryQuiz {
+  story: string;
+  sequence: string[];
+  correct: string[];
+  book: string;
+  characters?: string[];
+  category?: string;
+}
+
+const storySequenceQuizzes: StoryQuiz[] = [
+  { story: "Joseph's Journey", sequence: ["Coat of Many Colors", "Thrown in Pit", "Sold to Caravan", "Prison", "Pharaoh's Palace"], correct: ["Coat of Many Colors", "Thrown in Pit", "Sold to Caravan", "Prison", "Pharaoh's Palace"], book: "Genesis 37-50", category: "Patriarchs" },
+  { story: "David and Goliath", sequence: ["Sling in Motion", "Stone in Flight", "Giant Falling", "Sword Raised"], correct: ["Sling in Motion", "Stone in Flight", "Giant Falling", "Sword Raised"], book: "1 Samuel 17", category: "Kings" },
+  { story: "Daniel's Trial", sequence: ["Refuses King's Table", "Fiery Furnace", "Lions' Den", "Vision of Beasts"], correct: ["Refuses King's Table", "Fiery Furnace", "Lions' Den", "Vision of Beasts"], book: "Daniel 1-7", category: "Prophets" },
+  { story: "Exodus Journey", sequence: ["Burning Bush", "Ten Plagues", "Red Sea Crossing", "Mount Sinai", "Golden Calf", "Tabernacle Built"], correct: ["Burning Bush", "Ten Plagues", "Red Sea Crossing", "Mount Sinai", "Golden Calf", "Tabernacle Built"], book: "Exodus 3-40", category: "Exodus" },
+  { story: "Christ's Passion", sequence: ["Last Supper", "Gethsemane", "Trial", "Crucifixion", "Burial", "Resurrection"], correct: ["Last Supper", "Gethsemane", "Trial", "Crucifixion", "Burial", "Resurrection"], book: "Matthew 26-28", category: "Gospels" },
+  { story: "Creation Week", sequence: ["Light Created", "Firmament Divides Waters", "Dry Land and Plants", "Sun Moon and Stars", "Fish and Birds", "Animals and Man", "God Rested"], correct: ["Light Created", "Firmament Divides Waters", "Dry Land and Plants", "Sun Moon and Stars", "Fish and Birds", "Animals and Man", "God Rested"], book: "Genesis 1-2", category: "Primeval" },
+  { story: "The Fall of Man", sequence: ["Serpent Questions Eve", "Fruit Eaten", "Eyes Opened", "Hiding from God", "Curses Pronounced", "Expelled from Garden"], correct: ["Serpent Questions Eve", "Fruit Eaten", "Eyes Opened", "Hiding from God", "Curses Pronounced", "Expelled from Garden"], book: "Genesis 3", category: "Primeval" },
+  { story: "Noah's Flood", sequence: ["Ark Construction", "Animals Enter", "Rain Begins", "Flood Covers Earth", "Raven Sent Out", "Dove Returns with Olive", "Rainbow Covenant"], correct: ["Ark Construction", "Animals Enter", "Rain Begins", "Flood Covers Earth", "Raven Sent Out", "Dove Returns with Olive", "Rainbow Covenant"], book: "Genesis 6-9", category: "Primeval" },
+  { story: "Abraham's Call", sequence: ["Called to Leave Ur", "Arrives in Canaan", "Famine Drives to Egypt", "Returns Wealthy", "Separates from Lot", "Promised Countless Descendants"], correct: ["Called to Leave Ur", "Arrives in Canaan", "Famine Drives to Egypt", "Returns Wealthy", "Separates from Lot", "Promised Countless Descendants"], book: "Genesis 12-13", category: "Patriarchs" },
+  { story: "The Binding of Isaac", sequence: ["God Tests Abraham", "Three Day Journey", "Isaac Carries Wood", "Asks About the Lamb", "Bound on Altar", "Ram Caught in Thicket"], correct: ["God Tests Abraham", "Three Day Journey", "Isaac Carries Wood", "Asks About the Lamb", "Bound on Altar", "Ram Caught in Thicket"], book: "Genesis 22", category: "Patriarchs" },
+  { story: "Elijah on Mount Carmel", sequence: ["Challenge Issued to Baal Prophets", "Baal Prophets Dance and Cut", "Elijah Mocks Baal", "Altar Drenched with Water", "Fire Falls from Heaven", "Prophets of Baal Slain"], correct: ["Challenge Issued to Baal Prophets", "Baal Prophets Dance and Cut", "Elijah Mocks Baal", "Altar Drenched with Water", "Fire Falls from Heaven", "Prophets of Baal Slain"], book: "1 Kings 18", category: "Prophets" },
+  { story: "Ruth's Loyalty", sequence: ["Naomi Loses Husband and Sons", "Ruth Refuses to Leave", "Gleans in Boaz's Field", "Lies at Boaz's Feet", "Boaz Redeems at Gate", "Ruth Bears Obed"], correct: ["Naomi Loses Husband and Sons", "Ruth Refuses to Leave", "Gleans in Boaz's Field", "Lies at Boaz's Feet", "Boaz Redeems at Gate", "Ruth Bears Obed"], book: "Ruth 1-4", category: "Historical" },
+  { story: "Jonah and the Great Fish", sequence: ["Called to Go to Nineveh", "Flees on Ship to Tarshish", "Storm Threatens to Sink Ship", "Thrown Overboard", "Swallowed by Great Fish", "Vomited onto Dry Land"], correct: ["Called to Go to Nineveh", "Flees on Ship to Tarshish", "Storm Threatens to Sink Ship", "Thrown Overboard", "Swallowed by Great Fish", "Vomited onto Dry Land"], book: "Jonah 1-2", category: "Prophets" },
+  { story: "The Good Samaritan", sequence: ["Man Travels to Jericho", "Robbers Beat and Leave Half Dead", "Priest Passes By", "Levite Passes By", "Samaritan Binds Wounds", "Pays Innkeeper to Care"], correct: ["Man Travels to Jericho", "Robbers Beat and Leave Half Dead", "Priest Passes By", "Levite Passes By", "Samaritan Binds Wounds", "Pays Innkeeper to Care"], book: "Luke 10:25-37", category: "Gospels" },
+  { story: "Prodigal Son", sequence: ["Younger Son Asks for Inheritance", "Squanders Wealth in Far Country", "Famine Comes", "Feeds Pigs and Envies Pods", "Returns Home Repentant", "Father Throws Great Feast"], correct: ["Younger Son Asks for Inheritance", "Squanders Wealth in Far Country", "Famine Comes", "Feeds Pigs and Envies Pods", "Returns Home Repentant", "Father Throws Great Feast"], book: "Luke 15:11-32", category: "Gospels" },
+  { story: "Paul's Conversion", sequence: ["Saul Persecutes Church", "Bright Light on Damascus Road", "Voice Asks Why Persecuting", "Blinded for Three Days", "Ananias Restores Sight", "Baptized and Preaches Christ"], correct: ["Saul Persecutes Church", "Bright Light on Damascus Road", "Voice Asks Why Persecuting", "Blinded for Three Days", "Ananias Restores Sight", "Baptized and Preaches Christ"], book: "Acts 9:1-19", category: "Acts" },
+  { story: "Pentecost", sequence: ["Disciples Gathered in Upper Room", "Sound Like Rushing Wind", "Tongues of Fire Appear", "Speak in Other Languages", "Crowd Amazed and Perplexed", "Peter Preaches 3000 Saved"], correct: ["Disciples Gathered in Upper Room", "Sound Like Rushing Wind", "Tongues of Fire Appear", "Speak in Other Languages", "Crowd Amazed and Perplexed", "Peter Preaches 3000 Saved"], book: "Acts 2:1-41", category: "Acts" },
+  { story: "Walls of Jericho", sequence: ["Spies Hidden by Rahab", "March Around City Once Daily", "Seven Times on Seventh Day", "Priests Blow Trumpets", "People Shout", "Walls Fall Flat"], correct: ["Spies Hidden by Rahab", "March Around City Once Daily", "Seven Times on Seventh Day", "Priests Blow Trumpets", "People Shout", "Walls Fall Flat"], book: "Joshua 6", category: "Conquest" },
+  { story: "Jesus Feeds 5000", sequence: ["Crowds Follow Jesus", "Disciples Want to Send Away", "Boy Has Five Loaves Two Fish", "Jesus Blesses and Breaks", "All Eat and Are Satisfied", "Twelve Baskets Left Over"], correct: ["Crowds Follow Jesus", "Disciples Want to Send Away", "Boy Has Five Loaves Two Fish", "Jesus Blesses and Breaks", "All Eat and Are Satisfied", "Twelve Baskets Left Over"], book: "John 6:1-14", category: "Gospels" },
+  { story: "Raising of Lazarus", sequence: ["Lazarus Falls Sick", "Jesus Delays Two Days", "Lazarus Dies and Is Buried", "Jesus Weeps at Tomb", "Stone Rolled Away", "Lazarus Comes Out Bound"], correct: ["Lazarus Falls Sick", "Jesus Delays Two Days", "Lazarus Dies and Is Buried", "Jesus Weeps at Tomb", "Stone Rolled Away", "Lazarus Comes Out Bound"], book: "John 11:1-44", category: "Gospels" },
+];
+
+// Shuffle array helper
+const shuffleArray = <T,>(array: T[]): T[] => {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+};
+
+// Games that should use interactive multiple choice mode
+const interactiveGameTypes = ["story_sequence", "genesis_chapters", "story_beats", "story_match", "narrative_chain"];
+
+// Genesis chapter data for HighRise game
+const genesisChapters: { chapter: number; event: string; options: string[] }[] = [
+  { chapter: 1, event: "Creation of the world in 6 days", options: ["Creation of the world in 6 days", "Noah builds the ark", "Abraham's call", "Jacob's ladder"] },
+  { chapter: 3, event: "The Fall of Man - serpent deceives Eve", options: ["The Fall of Man - serpent deceives Eve", "Cain kills Abel", "Tower of Babel", "Flood begins"] },
+  { chapter: 6, event: "God instructs Noah to build the ark", options: ["God instructs Noah to build the ark", "Abraham sacrifices Isaac", "Joseph sold into slavery", "Jacob wrestles angel"] },
+  { chapter: 11, event: "Tower of Babel - languages confused", options: ["Tower of Babel - languages confused", "Call of Abraham", "Birth of Isaac", "Jacob's deception"] },
+  { chapter: 12, event: "Call of Abram to leave Ur", options: ["Call of Abram to leave Ur", "Destruction of Sodom", "Birth of Jacob and Esau", "Joseph's dreams"] },
+  { chapter: 15, event: "Covenant of the pieces with Abram", options: ["Covenant of the pieces with Abram", "Hagar and Ishmael", "Destruction of Sodom", "Sacrifice of Isaac"] },
+  { chapter: 19, event: "Destruction of Sodom and Gomorrah", options: ["Destruction of Sodom and Gomorrah", "Binding of Isaac", "Jacob steals blessing", "Joseph interprets dreams"] },
+  { chapter: 22, event: "Abraham offers Isaac on Mount Moriah", options: ["Abraham offers Isaac on Mount Moriah", "Jacob's ladder", "Joseph sold to Egypt", "Creation week"] },
+  { chapter: 27, event: "Jacob steals Esau's blessing", options: ["Jacob steals Esau's blessing", "Joseph's coat of colors", "Abraham's death", "Tower of Babel"] },
+  { chapter: 28, event: "Jacob's ladder at Bethel", options: ["Jacob's ladder at Bethel", "Joseph in prison", "Binding of Isaac", "Noah's ark"] },
+  { chapter: 32, event: "Jacob wrestles with the angel", options: ["Jacob wrestles with the angel", "Joseph interprets Pharaoh's dreams", "Abraham buys burial cave", "Flood waters recede"] },
+  { chapter: 37, event: "Joseph's dreams and coat of colors", options: ["Joseph's dreams and coat of colors", "Jacob's ladder", "Abraham's covenant", "Tower of Babel"] },
+  { chapter: 39, event: "Joseph resists Potiphar's wife", options: ["Joseph resists Potiphar's wife", "Joseph interprets butler's dream", "Jacob blessed by Isaac", "Noah plants vineyard"] },
+  { chapter: 41, event: "Joseph interprets Pharaoh's dreams", options: ["Joseph interprets Pharaoh's dreams", "Joseph reveals himself to brothers", "Jacob wrestles angel", "Abraham tested"] },
+  { chapter: 45, event: "Joseph reveals himself to brothers", options: ["Joseph reveals himself to brothers", "Jacob blesses 12 sons", "Joseph in prison", "Abraham's death"] },
+  { chapter: 50, event: "Death of Joseph in Egypt", options: ["Death of Joseph in Egypt", "Jacob enters Egypt", "Joseph sold by brothers", "Abraham buried"] },
+];
+
+// Story beats data
+const storyBeatQuizzes: { story: string; beats: { type: string; description: string }[]; book: string }[] = [
+  {
+    story: "David and Goliath",
+    beats: [
+      { type: "Setup", description: "Israel faces Philistines; Goliath challenges daily" },
+      { type: "Catalyst", description: "Young David arrives with supplies for brothers" },
+      { type: "Rising Action", description: "David volunteers despite skepticism" },
+      { type: "Midpoint", description: "David refuses armor, chooses 5 smooth stones" },
+      { type: "Crisis", description: "Goliath mocks the young shepherd" },
+      { type: "Climax", description: "Stone from sling strikes Goliath's forehead" },
+      { type: "Resolution", description: "Philistines flee; Israel victorious" }
+    ],
+    book: "1 Samuel 17"
+  },
+  {
+    story: "Jonah",
+    beats: [
+      { type: "Setup", description: "God calls Jonah to preach to Nineveh" },
+      { type: "Catalyst", description: "Jonah flees on ship to Tarshish" },
+      { type: "Rising Action", description: "Violent storm endangers all aboard" },
+      { type: "Midpoint", description: "Jonah thrown overboard, swallowed by fish" },
+      { type: "Crisis", description: "Three days in fish's belly" },
+      { type: "Climax", description: "Vomited onto dry land, obeys God" },
+      { type: "Resolution", description: "Nineveh repents; city spared" }
+    ],
+    book: "Jonah 1-4"
+  },
+  {
+    story: "The Prodigal Son",
+    beats: [
+      { type: "Setup", description: "Younger son demands inheritance early" },
+      { type: "Catalyst", description: "Leaves home for distant country" },
+      { type: "Rising Action", description: "Squanders wealth in wild living" },
+      { type: "Midpoint", description: "Famine hits; feeds pigs, starving" },
+      { type: "Crisis", description: "Realizes servants live better than him" },
+      { type: "Climax", description: "Returns home; father runs to embrace" },
+      { type: "Resolution", description: "Feast thrown; son restored" }
+    ],
+    book: "Luke 15:11-32"
+  },
+];
+
+// Story identification data
+const storyIdentification: { scenes: string[]; story: string; book: string; options: string[] }[] = [
+  { scenes: ["A young man thrown into a pit", "Sold to merchants for silver", "False accusation by master's wife"], story: "Joseph in Egypt", book: "Genesis 37-39", options: ["Joseph in Egypt", "Daniel in Babylon", "Moses in Egypt", "David on the run"] },
+  { scenes: ["Water turned to blood", "Darkness covers the land", "Firstborn struck down"], story: "The Ten Plagues", book: "Exodus 7-12", options: ["The Ten Plagues", "Elijah's drought", "Joshua's conquest", "The Flood"] },
+  { scenes: ["Walking on dry ground through the sea", "Pillar of fire by night", "Manna from heaven"], story: "The Exodus", book: "Exodus 14-16", options: ["The Exodus", "Elijah's journey", "Joshua at Jordan", "Noah's voyage"] },
+  { scenes: ["A burning bush that doesn't consume", "Staff becomes serpent", "Hand turns leprous then healed"], story: "Moses' Calling", book: "Exodus 3-4", options: ["Moses' Calling", "Elijah at Horeb", "Isaiah's vision", "Ezekiel's calling"] },
+  { scenes: ["Trumpets sounding", "Marching around walls seven times", "Walls fall flat"], story: "Battle of Jericho", book: "Joshua 6", options: ["Battle of Jericho", "Gideon's battle", "David vs Goliath", "Jehoshaphat's victory"] },
+  { scenes: ["Hair cut while sleeping", "Eyes gouged out", "Pillars pushed apart"], story: "Samson's End", book: "Judges 16", options: ["Samson's End", "David's shame", "Solomon's folly", "Absalom's death"] },
+  { scenes: ["Ravens bring food", "Widow's oil multiplied", "Fire falls from heaven"], story: "Elijah's Ministry", book: "1 Kings 17-18", options: ["Elijah's Ministry", "Elisha's miracles", "Moses at Sinai", "Samuel's calling"] },
+  { scenes: ["Water from rock", "Bronze serpent on pole", "Ground opens up"], story: "Wilderness Wanderings", book: "Numbers 20-21", options: ["Wilderness Wanderings", "Exodus journey", "Joshua's conquest", "Judges cycle"] },
+];
 
 interface GameConfig {
   id: string;
@@ -628,8 +749,189 @@ export function RoomGamePlay() {
   const [totalScore, setTotalScore] = useState(0);
   const [roundsPlayed, setRoundsPlayed] = useState(0);
 
+  // Interactive game state
+  const [interactiveMode, setInteractiveMode] = useState(false);
+  const [currentQuiz, setCurrentQuiz] = useState<StoryQuiz | null>(null);
+  const [userSequence, setUserSequence] = useState<string[]>([]);
+  const [availableScenes, setAvailableScenes] = useState<string[]>([]);
+  const [streak, setStreak] = useState(0);
+  const [showHint, setShowHint] = useState(false);
+  const [hintsUsed, setHintsUsed] = useState(0);
+  const [quizIndex, setQuizIndex] = useState(0);
+  const [completedQuizIds, setCompletedQuizIds] = useState<Set<number>>(new Set());
+
+  // Genesis game state
+  const [genesisQuestionIndex, setGenesisQuestionIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<string>("");
+
+  // Story identification state
+  const [identificationQuizIndex, setIdentificationQuizIndex] = useState(0);
+
   const game = gameId ? gameConfigs[gameId] : null;
   const { awardXp } = useMastery(game?.roomId || "", 1);
+
+  // Check if this game should use interactive mode
+  const isInteractive = game && interactiveGameTypes.includes(game.gameType);
+
+  // Initialize interactive game
+  const startInteractiveGame = useCallback(() => {
+    if (!game) return;
+    setInteractiveMode(true);
+    setTotalScore(0);
+    setRoundsPlayed(0);
+    setStreak(0);
+    setHintsUsed(0);
+    setShowHint(false);
+    setResult(null);
+
+    if (game.gameType === "story_sequence") {
+      // Pick a random story quiz
+      const availableQuizzes = storySequenceQuizzes.filter((_, idx) => !completedQuizIds.has(idx));
+      if (availableQuizzes.length === 0) {
+        setCompletedQuizIds(new Set());
+        setCurrentQuiz(storySequenceQuizzes[0]);
+        setAvailableScenes(shuffleArray([...storySequenceQuizzes[0].sequence]));
+      } else {
+        const randomQuiz = availableQuizzes[Math.floor(Math.random() * availableQuizzes.length)];
+        setCurrentQuiz(randomQuiz);
+        setAvailableScenes(shuffleArray([...randomQuiz.sequence]));
+      }
+      setUserSequence([]);
+    } else if (game.gameType === "genesis_chapters") {
+      setGenesisQuestionIndex(0);
+      setSelectedAnswer("");
+    } else if (game.gameType === "story_match") {
+      setIdentificationQuizIndex(0);
+      setSelectedAnswer("");
+    } else if (game.gameType === "story_beats") {
+      const randomBeatQuiz = storyBeatQuizzes[Math.floor(Math.random() * storyBeatQuizzes.length)];
+      setCurrentQuiz({
+        story: randomBeatQuiz.story,
+        sequence: randomBeatQuiz.beats.map(b => b.description),
+        correct: randomBeatQuiz.beats.map(b => b.description),
+        book: randomBeatQuiz.book
+      });
+      setAvailableScenes(shuffleArray(randomBeatQuiz.beats.map(b => `${b.type}: ${b.description}`)));
+      setUserSequence([]);
+    }
+  }, [game, completedQuizIds]);
+
+  // Handle scene click for sequence games
+  const handleSceneClick = (scene: string) => {
+    setUserSequence([...userSequence, scene]);
+    setAvailableScenes(availableScenes.filter(s => s !== scene));
+  };
+
+  const handleRemoveScene = (index: number) => {
+    const scene = userSequence[index];
+    setAvailableScenes([...availableScenes, scene]);
+    setUserSequence(userSequence.filter((_, i) => i !== index));
+  };
+
+  // Check sequence answer
+  const checkSequenceAnswer = () => {
+    if (!currentQuiz) return;
+
+    const isCorrect = JSON.stringify(userSequence) === JSON.stringify(currentQuiz.correct);
+    const basePoints = game?.xpReward || 25;
+    const streakBonus = streak * 5;
+    const hintPenalty = hintsUsed * 10;
+    const pointsEarned = Math.max(10, isCorrect ? basePoints + streakBonus - hintPenalty : Math.floor(basePoints / 4));
+
+    if (isCorrect) {
+      setStreak(prev => prev + 1);
+      setTotalScore(prev => prev + pointsEarned);
+      setResult({ valid: true, feedback: `Perfect! You got the sequence right! The story is from ${currentQuiz.book}.`, score: pointsEarned });
+      toast.success(`Correct! +${pointsEarned} XP • Streak: ${streak + 1}`);
+
+      // Mark as completed
+      const quizIdx = storySequenceQuizzes.findIndex(q => q.story === currentQuiz.story);
+      if (quizIdx >= 0) setCompletedQuizIds(prev => new Set([...prev, quizIdx]));
+    } else {
+      setStreak(0);
+      setTotalScore(prev => prev + pointsEarned);
+      setResult({
+        valid: false,
+        feedback: `Not quite! The correct order was: ${currentQuiz.correct.join(" → ")}`,
+        score: pointsEarned
+      });
+      toast.error("Not quite right. Keep practicing!");
+    }
+
+    setRoundsPlayed(prev => prev + 1);
+    awardXp({ xpAmount: pointsEarned, exerciseCompleted: isCorrect });
+  };
+
+  // Check multiple choice answer
+  const checkMCAnswer = (correctAnswer: string) => {
+    const isCorrect = selectedAnswer === correctAnswer;
+    const basePoints = game?.xpReward || 25;
+    const pointsEarned = isCorrect ? basePoints + (streak * 5) : Math.floor(basePoints / 4);
+
+    if (isCorrect) {
+      setStreak(prev => prev + 1);
+      setTotalScore(prev => prev + pointsEarned);
+      toast.success(`Correct! +${pointsEarned} XP`);
+    } else {
+      setStreak(0);
+      setTotalScore(prev => prev + Math.floor(basePoints / 4));
+      toast.error(`Incorrect. The answer was: ${correctAnswer}`);
+    }
+
+    setRoundsPlayed(prev => prev + 1);
+    awardXp({ xpAmount: pointsEarned, exerciseCompleted: isCorrect });
+    return isCorrect;
+  };
+
+  // Next question for Genesis game
+  const nextGenesisQuestion = () => {
+    if (genesisQuestionIndex < genesisChapters.length - 1) {
+      setGenesisQuestionIndex(prev => prev + 1);
+      setSelectedAnswer("");
+    } else {
+      setResult({ valid: true, feedback: `Game complete! You scored ${totalScore} XP across ${roundsPlayed} questions.`, score: totalScore });
+    }
+  };
+
+  // Next question for identification game
+  const nextIdentificationQuestion = () => {
+    if (identificationQuizIndex < storyIdentification.length - 1) {
+      setIdentificationQuizIndex(prev => prev + 1);
+      setSelectedAnswer("");
+    } else {
+      setResult({ valid: true, feedback: `Game complete! You scored ${totalScore} XP across ${roundsPlayed} questions.`, score: totalScore });
+    }
+  };
+
+  // Use hint
+  const useHint = () => {
+    if (!currentQuiz) return;
+    setShowHint(true);
+    setHintsUsed(prev => prev + 1);
+    toast.info(`Hint: The story starts with "${currentQuiz.correct[0]}"`);
+  };
+
+  // Reset for next round
+  const nextRound = () => {
+    setResult(null);
+    setShowHint(false);
+
+    if (game?.gameType === "story_sequence" || game?.gameType === "story_beats") {
+      const availableQuizzes = storySequenceQuizzes.filter((_, idx) => !completedQuizIds.has(idx));
+      if (availableQuizzes.length === 0) {
+        setCompletedQuizIds(new Set());
+      }
+      const quizList = availableQuizzes.length > 0 ? availableQuizzes : storySequenceQuizzes;
+      const randomQuiz = quizList[Math.floor(Math.random() * quizList.length)];
+      setCurrentQuiz(randomQuiz);
+      setAvailableScenes(shuffleArray([...randomQuiz.sequence]));
+      setUserSequence([]);
+    } else if (game?.gameType === "genesis_chapters") {
+      nextGenesisQuestion();
+    } else if (game?.gameType === "story_match") {
+      nextIdentificationQuestion();
+    }
+  };
 
   if (!game) {
     return (
@@ -756,67 +1058,287 @@ export function RoomGamePlay() {
             </Card>
           )}
 
-          {/* Instructions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Lightbulb className="h-5 w-5 text-yellow-500" />
-                Instructions
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">{game.instructions}</p>
-            </CardContent>
-          </Card>
+          {/* Interactive Score/Streak Display */}
+          {isInteractive && interactiveMode && (
+            <Card className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/20">
+              <CardContent className="py-4">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <Star className="h-5 w-5 text-amber-500" />
+                      <span className="font-bold text-lg">{totalScore} XP</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Flame className={`h-5 w-5 ${streak > 0 ? "text-orange-500" : "text-gray-400"}`} />
+                      <span className="text-sm">Streak: {streak}</span>
+                    </div>
+                  </div>
+                  <span className="text-sm text-muted-foreground">Round {roundsPlayed + 1}</span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-          {/* Input Area */}
-          {!result ? (
+          {/* Interactive Game UI */}
+          {isInteractive && !interactiveMode && !result && (
             <Card>
               <CardHeader>
-                <CardTitle>Your Response</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Ready to Play?
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Verse/Passage Reference (optional)
-                  </label>
-                  <Input
-                    value={verseReference}
-                    onChange={(e) => setVerseReference(e.target.value)}
-                    placeholder="e.g., Genesis 1:1-5 or John 3:16"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Your Answer
-                  </label>
-                  <Textarea
-                    value={userInput}
-                    onChange={(e) => setUserInput(e.target.value)}
-                    placeholder="Type your response here..."
-                    className="min-h-[200px]"
-                  />
-                </div>
-                <Button 
-                  onClick={handleSubmit} 
-                  disabled={isSubmitting || !userInput.trim()}
-                  className="w-full"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Validating...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="mr-2 h-4 w-4" />
-                      Submit Answer
-                    </>
-                  )}
+                <p className="text-muted-foreground">{game.instructions}</p>
+                <Button onClick={startInteractiveGame} size="lg" className="w-full">
+                  <Sparkles className="mr-2 h-5 w-5" />
+                  Start Game
                 </Button>
               </CardContent>
             </Card>
-          ) : (
+          )}
+
+          {/* Story Sequence Game */}
+          {isInteractive && interactiveMode && game.gameType === "story_sequence" && currentQuiz && !result && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl">{currentQuiz.story}</CardTitle>
+                <CardDescription>Arrange the scenes in the correct order</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* User's sequence */}
+                <div>
+                  <h3 className="font-semibold mb-3">Your Story Sequence:</h3>
+                  <div className="min-h-[100px] p-4 border-2 border-dashed rounded-lg bg-muted/50">
+                    {userSequence.length === 0 ? (
+                      <p className="text-muted-foreground text-center py-6">
+                        Click scenes below to build your story sequence
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {userSequence.map((scene, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 bg-background rounded-lg border">
+                            <span className="flex items-center gap-3">
+                              <Badge variant="outline" className="bg-primary/10">{index + 1}</Badge>
+                              {scene}
+                            </span>
+                            <Button variant="ghost" size="sm" onClick={() => handleRemoveScene(index)}>
+                              Remove
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Available scenes */}
+                <div>
+                  <h3 className="font-semibold mb-3">Available Scenes (click to add):</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {availableScenes.map((scene) => (
+                      <Button
+                        key={scene}
+                        variant="outline"
+                        className="h-auto py-3 justify-start text-left hover:bg-primary/10 hover:border-primary"
+                        onClick={() => handleSceneClick(scene)}
+                      >
+                        {scene}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Hint */}
+                {showHint && (
+                  <div className="p-4 bg-amber-100 dark:bg-amber-900/30 rounded-lg border border-amber-300">
+                    <p className="text-amber-800 dark:text-amber-200">
+                      <strong>Hint:</strong> The story starts with "{currentQuiz.correct[0]}"
+                    </p>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex gap-3">
+                  <Button
+                    onClick={checkSequenceAnswer}
+                    disabled={userSequence.length !== currentQuiz.sequence.length}
+                    className="flex-1"
+                    size="lg"
+                  >
+                    Check Answer
+                  </Button>
+                  {!showHint && (
+                    <Button onClick={useHint} variant="outline" size="lg">
+                      <HelpCircle className="mr-2 h-4 w-4" />
+                      Hint
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Genesis Chapters Game */}
+          {isInteractive && interactiveMode && game.gameType === "genesis_chapters" && !result && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Genesis Chapter {genesisChapters[genesisQuestionIndex].chapter}</CardTitle>
+                <CardDescription>What happens in this chapter?</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  {genesisChapters[genesisQuestionIndex].options.map((option) => (
+                    <Button
+                      key={option}
+                      variant={selectedAnswer === option ? "default" : "outline"}
+                      className="h-auto py-4 justify-start text-left"
+                      onClick={() => setSelectedAnswer(option)}
+                    >
+                      {option}
+                    </Button>
+                  ))}
+                </div>
+                <Button
+                  onClick={() => {
+                    const correct = checkMCAnswer(genesisChapters[genesisQuestionIndex].event);
+                    setTimeout(() => {
+                      setSelectedAnswer("");
+                      nextGenesisQuestion();
+                    }, 1000);
+                  }}
+                  disabled={!selectedAnswer}
+                  className="w-full"
+                  size="lg"
+                >
+                  Submit Answer
+                </Button>
+                <div className="text-sm text-muted-foreground text-center">
+                  Question {genesisQuestionIndex + 1} of {genesisChapters.length}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Story Identification Game */}
+          {isInteractive && interactiveMode && game.gameType === "story_match" && !result && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Identify the Story</CardTitle>
+                <CardDescription>Which Bible story do these scenes describe?</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Show scenes */}
+                <div className="p-4 bg-muted/50 rounded-lg space-y-2">
+                  {storyIdentification[identificationQuizIndex].scenes.map((scene, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <Badge variant="outline">{idx + 1}</Badge>
+                      <span>{scene}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Answer options */}
+                <div className="grid grid-cols-1 gap-3">
+                  {storyIdentification[identificationQuizIndex].options.map((option) => (
+                    <Button
+                      key={option}
+                      variant={selectedAnswer === option ? "default" : "outline"}
+                      className="h-auto py-4 justify-start text-left"
+                      onClick={() => setSelectedAnswer(option)}
+                    >
+                      {option}
+                    </Button>
+                  ))}
+                </div>
+                <Button
+                  onClick={() => {
+                    const correct = checkMCAnswer(storyIdentification[identificationQuizIndex].story);
+                    setTimeout(() => {
+                      setSelectedAnswer("");
+                      nextIdentificationQuestion();
+                    }, 1000);
+                  }}
+                  disabled={!selectedAnswer}
+                  className="w-full"
+                  size="lg"
+                >
+                  Submit Answer
+                </Button>
+                <div className="text-sm text-muted-foreground text-center">
+                  Question {identificationQuizIndex + 1} of {storyIdentification.length}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Non-interactive games: Instructions & Text Input */}
+          {!isInteractive && (
+            <>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Lightbulb className="h-5 w-5 text-yellow-500" />
+                    Instructions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{game.instructions}</p>
+                </CardContent>
+              </Card>
+
+              {!result && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Your Response</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">
+                        Verse/Passage Reference (optional)
+                      </label>
+                      <Input
+                        value={verseReference}
+                        onChange={(e) => setVerseReference(e.target.value)}
+                        placeholder="e.g., Genesis 1:1-5 or John 3:16"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">
+                        Your Answer
+                      </label>
+                      <Textarea
+                        value={userInput}
+                        onChange={(e) => setUserInput(e.target.value)}
+                        placeholder="Type your response here..."
+                        className="min-h-[200px]"
+                      />
+                    </div>
+                    <Button
+                      onClick={handleSubmit}
+                      disabled={isSubmitting || !userInput.trim()}
+                      className="w-full"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Validating...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="mr-2 h-4 w-4" />
+                          Submit Answer
+                        </>
+                      )}
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+            </>
+          )}
+
+          {/* Result Display */}
+          {result && (
             <Card className={result.valid ? "border-green-500/50" : "border-yellow-500/50"}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -838,10 +1360,15 @@ export function RoomGamePlay() {
                   <span className="text-xl font-bold text-primary">+{result.score}</span>
                 </div>
                 <div className="flex gap-3">
-                  <Button onClick={handleNextRound} className="flex-1">
-                    Play Again
+                  <Button onClick={isInteractive ? nextRound : handleNextRound} className="flex-1">
+                    <RotateCcw className="mr-2 h-4 w-4" />
+                    {isInteractive ? "Next Round" : "Play Again"}
                   </Button>
-                  <Button variant="outline" onClick={() => navigate(-1)}>
+                  <Button variant="outline" onClick={() => {
+                    setInteractiveMode(false);
+                    setResult(null);
+                    navigate(-1);
+                  }}>
                     Back to Room
                   </Button>
                 </div>

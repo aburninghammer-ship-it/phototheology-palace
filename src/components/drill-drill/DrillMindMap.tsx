@@ -6,8 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Save, Download, ChevronDown, ChevronRight, BookOpen, Eye, Sparkles, Search, Target, Telescope, Globe, Flame, Book, Loader2, RefreshCw } from "lucide-react";
-import { DrillSession } from "@/pages/DrillDrill";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Save, Download, ChevronDown, ChevronRight, BookOpen, Eye, Sparkles, Search, Target, Telescope, Globe, Flame, Book, Loader2, RefreshCw, Cross, Heart, Layers, Share2 } from "lucide-react";
+import { QuickShareButton } from "@/components/social/QuickShareButton";
+import { DrillSession, DrillVariation, DrillResponse } from "@/pages/DrillDrill";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,20 +41,46 @@ const FLOOR_COLORS: Record<number, string> = {
   7: "from-red-500/20 to-orange-500/20 border-red-500/30"
 };
 
+const VARIATION_ICONS: Record<string, any> = {
+  "Christ-Centered": Cross,
+  "Practical Application": Heart,
+  "Cosmic Context": Layers
+};
+
+const VARIATION_COLORS: Record<string, string> = {
+  "Christ-Centered": "text-rose-500",
+  "Practical Application": "text-emerald-500",
+  "Cosmic Context": "text-indigo-500"
+};
+
 export const DrillMindMap = ({ session, onSave, onRefresh }: DrillMindMapProps) => {
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [drillName, setDrillName] = useState("");
   const [expandedFloors, setExpandedFloors] = useState<number[]>([1, 2, 3, 4, 5, 6, 7]);
   const [expoundingRoomId, setExpoundingRoomId] = useState<string | null>(null);
   const [expoundedResponses, setExpoundedResponses] = useState<Record<string, string>>({});
+  const [activeVariation, setActiveVariation] = useState("0");
+
+  // Get variations or create a single variation from responses
+  const variations: DrillVariation[] = session.variations && session.variations.length > 0 
+    ? session.variations 
+    : [{
+        theme: "Comprehensive Analysis",
+        description: "Full palace analysis",
+        responses: session.responses
+      }];
+
+  // Get current variation's responses
+  const currentVariation = variations[parseInt(activeVariation)] || variations[0];
+  const currentResponses = currentVariation?.responses || session.responses;
 
   // Group responses by floor
-  const responsesByFloor = session.responses.reduce((acc, resp) => {
+  const responsesByFloor = currentResponses.reduce((acc, resp) => {
     const floor = resp.floorNumber;
     if (!acc[floor]) acc[floor] = [];
     acc[floor].push(resp);
     return acc;
-  }, {} as Record<number, typeof session.responses>);
+  }, {} as Record<number, DrillResponse[]>);
 
   const toggleFloor = (floor: number) => {
     setExpandedFloors(prev => 
@@ -93,11 +121,12 @@ export const DrillMindMap = ({ session, onSave, onRefresh }: DrillMindMapProps) 
 
       if (error) throw error;
       
-      // Store the expounded response
+      // Store the expounded response with variation index
       if (data?.expoundedText) {
+        const key = `${activeVariation}-${roomId}`;
         setExpoundedResponses(prev => ({
           ...prev,
-          [roomId]: data.expoundedText
+          [key]: data.expoundedText
         }));
         toast.success("Response expounded!");
       } else {
@@ -119,14 +148,29 @@ export const DrillMindMap = ({ session, onSave, onRefresh }: DrillMindMapProps) 
     }
     text += `---\n\n`;
 
-    Object.entries(responsesByFloor).forEach(([floor, responses]) => {
-      text += `## Floor ${floor}\n\n`;
-      responses.forEach(resp => {
-        text += `### ${resp.roomTag} - ${resp.roomName}\n\n`;
-        if (resp.jeevesResponse) {
-          text += `${resp.jeevesResponse}\n\n`;
-        }
+    // Export all variations
+    variations.forEach((variation, vIndex) => {
+      text += `# Variation ${vIndex + 1}: ${variation.theme}\n`;
+      text += `*${variation.description}*\n\n`;
+
+      const varResponsesByFloor = variation.responses.reduce((acc, resp) => {
+        const floor = resp.floorNumber;
+        if (!acc[floor]) acc[floor] = [];
+        acc[floor].push(resp);
+        return acc;
+      }, {} as Record<number, DrillResponse[]>);
+
+      Object.entries(varResponsesByFloor).forEach(([floor, responses]) => {
+        text += `## Floor ${floor}\n\n`;
+        responses.forEach(resp => {
+          text += `### ${resp.roomTag} - ${resp.roomName}\n\n`;
+          if (resp.jeevesResponse) {
+            text += `${resp.jeevesResponse}\n\n`;
+          }
+        });
       });
+
+      text += `\n---\n\n`;
     });
 
     const blob = new Blob([text], { type: "text/markdown" });
@@ -136,7 +180,7 @@ export const DrillMindMap = ({ session, onSave, onRefresh }: DrillMindMapProps) 
     a.download = `drill-${session.verse.replace(/[^a-zA-Z0-9]/g, "-")}.md`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success("Exported to Markdown!");
+    toast.success("Exported all variations to Markdown!");
   };
 
   return (
@@ -181,6 +225,11 @@ export const DrillMindMap = ({ session, onSave, onRefresh }: DrillMindMapProps) 
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
+              <QuickShareButton
+                title={`🔍 Gather the Fragments: ${session.drillType === "thought" ? "Thought Drill" : session.verse}`}
+                content={`I just completed a Phototheology drill on ${session.drillType === "thought" ? `"${session.thought?.slice(0, 100)}${session.thought && session.thought.length > 100 ? '...' : ''}"` : session.verse}!\n\n📊 Explored ${currentResponses.filter(r => r.completed).length} Palace rooms across ${Object.keys(responsesByFloor).length} floors.\n\n"Gather up the fragments that remain, that nothing be lost." - John 6:12`}
+                type="study"
+              />
               {onRefresh && (
                 <Button variant="outline" onClick={onRefresh}>
                   <RefreshCw className="h-4 w-4 mr-2" />
@@ -191,6 +240,54 @@ export const DrillMindMap = ({ session, onSave, onRefresh }: DrillMindMapProps) 
           </div>
         </CardContent>
       </Card>
+
+      {/* Variation Tabs - Only show if multiple variations */}
+      {variations.length > 1 && (
+        <Card className="border-primary/20">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              3 Drill Variations
+            </CardTitle>
+            <CardDescription>
+              Each variation explores the same rooms with different principle combinations
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={activeVariation} onValueChange={setActiveVariation}>
+              <TabsList className="grid w-full grid-cols-3 mb-4">
+                {variations.map((variation, index) => {
+                  const Icon = VARIATION_ICONS[variation.theme] || Sparkles;
+                  const colorClass = VARIATION_COLORS[variation.theme] || "text-primary";
+                  return (
+                    <TabsTrigger key={index} value={index.toString()} className="flex items-center gap-2">
+                      <Icon className={`h-4 w-4 ${colorClass}`} />
+                      <span className="hidden sm:inline">{variation.theme}</span>
+                      <span className="sm:hidden">{index + 1}</span>
+                    </TabsTrigger>
+                  );
+                })}
+              </TabsList>
+              
+              {variations.map((variation, index) => (
+                <TabsContent key={index} value={index.toString()} className="mt-0">
+                  <div className="p-4 rounded-lg bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/10">
+                    <div className="flex items-center gap-2 mb-2">
+                      {(() => {
+                        const Icon = VARIATION_ICONS[variation.theme] || Sparkles;
+                        const colorClass = VARIATION_COLORS[variation.theme] || "text-primary";
+                        return <Icon className={`h-5 w-5 ${colorClass}`} />;
+                      })()}
+                      <h3 className="font-semibold">{variation.theme}</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{variation.description}</p>
+                  </div>
+                </TabsContent>
+              ))}
+            </Tabs>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Mind Map Tree */}
       <div className="space-y-4">
@@ -220,67 +317,70 @@ export const DrillMindMap = ({ session, onSave, onRefresh }: DrillMindMapProps) 
                 <CollapsibleContent>
                   <CardContent className="pt-0">
                     <div className="space-y-4 pl-4 border-l-2 border-border/50">
-                      {responses.map(resp => (
-                        <div key={resp.roomId} className="space-y-2">
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-2">
-                              <Badge variant="secondary">{resp.roomTag}</Badge>
-                              <span className="font-medium">{resp.roomName}</span>
+                      {responses.map(resp => {
+                        const expoundKey = `${activeVariation}-${resp.roomId}`;
+                        return (
+                          <div key={resp.roomId} className="space-y-2">
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2">
+                                <Badge variant="secondary">{resp.roomTag}</Badge>
+                                <span className="font-medium">{resp.roomName}</span>
+                              </div>
+                              {resp.jeevesResponse && resp.jeevesResponse !== "Skipped" && resp.jeevesResponse !== "Analysis pending" && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleExpound(resp.roomId, resp.roomTag, resp.roomName, resp.floorNumber, resp.jeevesResponse!)}
+                                  disabled={expoundingRoomId === resp.roomId}
+                                >
+                                  {expoundingRoomId === resp.roomId ? (
+                                    <>
+                                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                      Expounding...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Book className="h-3 w-3 mr-1" />
+                                      Expound
+                                    </>
+                                  )}
+                                </Button>
+                              )}
                             </div>
                             {resp.jeevesResponse && resp.jeevesResponse !== "Skipped" && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleExpound(resp.roomId, resp.roomTag, resp.roomName, resp.floorNumber, resp.jeevesResponse!)}
-                                disabled={expoundingRoomId === resp.roomId}
-                              >
-                                {expoundingRoomId === resp.roomId ? (
-                                  <>
-                                    <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                                    Expounding...
-                                  </>
-                                ) : (
-                                  <>
-                                    <Book className="h-3 w-3 mr-1" />
-                                    Expound
-                                  </>
+                              <div className="space-y-3">
+                                <div className="bg-background/50 rounded-lg p-4 text-sm">
+                                  <div className="prose prose-sm dark:prose-invert max-w-none">
+                                    <ReactMarkdown>{resp.jeevesResponse}</ReactMarkdown>
+                                  </div>
+                                </div>
+                                
+                                {/* Show expounded content if available */}
+                                {expoundedResponses[expoundKey] && (
+                                  <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 text-sm">
+                                    <div className="flex items-center gap-2 mb-2 text-primary">
+                                      <Sparkles className="h-4 w-4" />
+                                      <span className="font-medium">Expounded Insight</span>
+                                    </div>
+                                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                                      <ReactMarkdown>{expoundedResponses[expoundKey]}</ReactMarkdown>
+                                    </div>
+                                  </div>
                                 )}
-                              </Button>
+                                
+                                {/* Interactive Dialogue */}
+                                <FragmentDialogue
+                                  roomCode={resp.roomTag}
+                                  roomName={resp.roomName}
+                                  initialInsight={resp.jeevesResponse}
+                                  verseText={session.verseText || ""}
+                                  verseReference={session.verse}
+                                />
+                              </div>
                             )}
                           </div>
-                          {resp.jeevesResponse && resp.jeevesResponse !== "Skipped" && (
-                            <div className="space-y-3">
-                              <div className="bg-background/50 rounded-lg p-4 text-sm">
-                                <div className="prose prose-sm dark:prose-invert max-w-none">
-                                  <ReactMarkdown>{resp.jeevesResponse}</ReactMarkdown>
-                                </div>
-                              </div>
-                              
-                              {/* Show expounded content if available */}
-                              {expoundedResponses[resp.roomId] && (
-                                <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 text-sm">
-                                  <div className="flex items-center gap-2 mb-2 text-primary">
-                                    <Sparkles className="h-4 w-4" />
-                                    <span className="font-medium">Expounded Insight</span>
-                                  </div>
-                                  <div className="prose prose-sm dark:prose-invert max-w-none">
-                                    <ReactMarkdown>{expoundedResponses[resp.roomId]}</ReactMarkdown>
-                                  </div>
-                                </div>
-                              )}
-                              
-                              {/* Interactive Dialogue */}
-                              <FragmentDialogue
-                                roomCode={resp.roomTag}
-                                roomName={resp.roomName}
-                                initialInsight={resp.jeevesResponse}
-                                verseText={session.verseText || ""}
-                                verseReference={session.verse}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </CardContent>
                 </CollapsibleContent>

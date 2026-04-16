@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ interface MemoryVerse {
 export default function MemoryGame() {
   const { gameId } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [verses, setVerses] = useState<MemoryVerse[]>([]);
@@ -42,7 +44,7 @@ export default function MemoryGame() {
         .eq("user_id", user.id);
 
       if (!lists || lists.length === 0) {
-        toast.error("No memory lists found. Create a list first!");
+        toast.error(t('memory.game.noListsFound'));
         navigate("/memory");
         return;
       }
@@ -57,7 +59,7 @@ export default function MemoryGame() {
       if (error) throw error;
 
       if (!versesData || versesData.length === 0) {
-        toast.error("No verses found in your lists. Add some verses first!");
+        toast.error(t('memory.game.noVersesFound'));
         navigate("/memory");
         return;
       }
@@ -68,7 +70,7 @@ export default function MemoryGame() {
       setupGame(shuffled[0]);
     } catch (error) {
       console.error("Error loading verses:", error);
-      toast.error("Failed to load verses");
+      toast.error(t('memory.game.failedToLoadVerses'));
     } finally {
       setLoading(false);
     }
@@ -127,9 +129,9 @@ export default function MemoryGame() {
     
     if (correct) {
       setScore(score + 1);
-      toast.success("Correct! 🎉");
+      toast.success(t('memory.game.correct'));
     } else {
-      toast.error("Not quite right. Try again!");
+      toast.error(t('memory.game.notQuiteRight'));
     }
   };
 
@@ -139,7 +141,7 @@ export default function MemoryGame() {
       setCurrentVerseIndex(nextIndex);
       setupGame(verses[nextIndex]);
     } else {
-      toast.success(`Game complete! Score: ${score}/${verses.length}`);
+      toast.success(t('memory.game.gameComplete', { score, total: verses.length }));
       navigate("/memory/games");
     }
   };
@@ -151,14 +153,14 @@ export default function MemoryGame() {
       <div className="min-h-screen flex items-center justify-center">
         <Card>
           <CardHeader>
-            <CardTitle>No Verses Available</CardTitle>
+            <CardTitle>{t('memory.game.noVersesAvailable')}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground mb-4">
-              Add verses to your memory lists to play games!
+              {t('memory.game.addVersesToPlay')}
             </p>
             <Button onClick={() => navigate("/memory")}>
-              Go to Memory
+              {t('memory.game.goToMemory')}
             </Button>
           </CardContent>
         </Card>
@@ -178,7 +180,7 @@ export default function MemoryGame() {
           className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Games
+          {t('memory.game.backToGames')}
         </Button>
 
         <Card>
@@ -186,18 +188,18 @@ export default function MemoryGame() {
             <div className="flex items-center justify-between">
               <CardTitle>{currentVerse.verse_reference}</CardTitle>
               <span className="text-sm font-semibold">
-                Score: {score}/{currentVerseIndex}
+                {t('memory.game.score', { score, total: currentVerseIndex })}
               </span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Verse {currentVerseIndex + 1} of {verses.length}
+              {t('memory.game.verseOf', { current: currentVerseIndex + 1, total: verses.length })}
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
             {gameId === "word-order" && (
               <>
                 <div>
-                  <p className="text-sm font-semibold mb-2">Scrambled words:</p>
+                  <p className="text-sm font-semibold mb-2">{t('memory.game.scrambledWords')}:</p>
                   <div className="flex flex-wrap gap-2">
                     {scrambledWords.map((word, index) => (
                       <Button
@@ -213,11 +215,11 @@ export default function MemoryGame() {
                 </div>
 
                 <div>
-                  <p className="text-sm font-semibold mb-2">Your answer:</p>
+                  <p className="text-sm font-semibold mb-2">{t('memory.game.yourAnswer')}:</p>
                   <div className="min-h-[100px] p-4 border rounded-lg bg-muted/50">
                     {userAnswer.length === 0 ? (
                       <p className="text-muted-foreground text-sm">
-                        Click words above to build the verse...
+                        {t('memory.game.clickWordsToBuild')}
                       </p>
                     ) : (
                       <div className="flex flex-wrap gap-2">
@@ -247,11 +249,11 @@ export default function MemoryGame() {
                     <XCircle className="h-5 w-5 text-red-500" />
                   )}
                   <p className="font-semibold">
-                    {isCorrect ? "Correct!" : "Not quite right"}
+                    {isCorrect ? t('memory.game.correctLabel') : t('memory.game.notQuiteRightLabel')}
                   </p>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Correct verse: {currentVerse.verse_text}
+                  {t('memory.game.correctVerse')}: {currentVerse.verse_text}
                 </p>
               </div>
             )}
@@ -264,7 +266,7 @@ export default function MemoryGame() {
                     disabled={userAnswer.length === 0}
                     className="flex-1"
                   >
-                    Check Answer
+                    {t('memory.game.checkAnswer')}
                   </Button>
                   <Button 
                     onClick={() => setupGame(currentVerse)}
@@ -275,7 +277,7 @@ export default function MemoryGame() {
                 </>
               ) : (
                 <Button onClick={nextVerse} className="w-full">
-                  {currentVerseIndex < verses.length - 1 ? "Next Verse" : "Finish Game"}
+                  {currentVerseIndex < verses.length - 1 ? t('memory.game.nextVerse') : t('memory.game.finishGame')}
                 </Button>
               )}
             </div>

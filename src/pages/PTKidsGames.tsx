@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,7 @@ import {
   Map,
   ArrowRight,
   Lock
-} from "lucide-react";
+, type LucideIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -25,7 +26,7 @@ interface KidsGame {
   id: string;
   title: string;
   description: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   color: string;
   ageRange: string;
   difficulty: "easy" | "medium" | "hard";
@@ -135,6 +136,7 @@ const KIDS_GAMES: KidsGame[] = [
 
 export default function PTKidsGames() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   const categories = [
@@ -177,24 +179,24 @@ export default function PTKidsGames() {
               <div className="inline-flex items-center justify-center gap-3 mb-4">
                 <Sparkles className="h-12 w-12 text-yellow-500 animate-pulse" />
                 <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 bg-clip-text text-transparent">
-                  PT Kids Zone!
+                  {t('kids.ptKidsZone')}
                 </h1>
                 <Sparkles className="h-12 w-12 text-yellow-500 animate-pulse" />
               </div>
             </motion.div>
             <p className="text-xl text-muted-foreground">
-              Learn the Bible Palace through fun games! 🎮✨
+              {t('kids.learnPalaceThroughGames')}
             </p>
             
             {/* Quick stats */}
             <div className="flex items-center justify-center gap-4 mt-4">
               <Badge className="text-lg px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-400">
                 <Star className="h-4 w-4 mr-2" />
-                0 Stars Earned
+                {t('kids.starsEarned', { count: 0 })}
               </Badge>
               <Badge className="text-lg px-4 py-2 bg-gradient-to-r from-purple-400 to-pink-400">
                 <Trophy className="h-4 w-4 mr-2" />
-                Level 1
+                {t('kids.level', { level: 1 })}
               </Badge>
             </div>
           </div>
@@ -250,7 +252,7 @@ export default function PTKidsGames() {
                     <CardContent>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                          <Badge variant="outline">Ages {game.ageRange}</Badge>
+                          <Badge variant="outline">{t('kids.ages', { range: game.ageRange })}</Badge>
                           <div className="flex items-center gap-1">
                             <div className={`w-2 h-2 rounded-full ${getDifficultyColor(game.difficulty)}`} />
                             <span className="text-xs text-muted-foreground capitalize">{game.difficulty}</span>
@@ -261,7 +263,7 @@ export default function PTKidsGames() {
                           <>
                             <Progress value={game.progress} className="h-2" />
                             <Button className="w-full gap-2" variant="outline">
-                              Play Now
+                              {t('kids.playNow')}
                               <ArrowRight className="h-4 w-4" />
                             </Button>
                           </>
@@ -269,7 +271,7 @@ export default function PTKidsGames() {
                         
                         {!game.unlocked && (
                           <div className="text-center text-sm text-muted-foreground">
-                            Complete easier games to unlock!
+                            {t('kids.completeToUnlock')}
                           </div>
                         )}
                       </div>
@@ -286,9 +288,9 @@ export default function PTKidsGames() {
               <div className="flex flex-col md:flex-row items-center gap-4">
                 <div className="text-6xl">🤖</div>
                 <div className="flex-1 text-center md:text-left">
-                  <h3 className="text-2xl font-bold">Ask Kid Jeeves!</h3>
+                  <h3 className="text-2xl font-bold">{t('kids.askKidJeeves')}</h3>
                   <p className="text-muted-foreground">
-                    Have questions about the Bible? Kid Jeeves explains everything in fun, easy ways!
+                    {t('kids.kidJeevesDescription')}
                   </p>
                 </div>
                 <Button 
@@ -297,7 +299,7 @@ export default function PTKidsGames() {
                   className="bg-gradient-to-r from-purple-500 to-pink-500"
                 >
                   <Sparkles className="h-5 w-5 mr-2" />
-                  Talk to Kid Jeeves
+                  {t('kids.talkToKidJeeves')}
                 </Button>
               </div>
             </CardContent>

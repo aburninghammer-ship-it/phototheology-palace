@@ -4,53 +4,82 @@ import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/b
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Provider types
-type TTSProvider = 'openai' | 'elevenlabs' | 'speechify';
-
-// OpenAI TTS voice options
-const OPENAI_VOICES = ['alloy', 'ash', 'ballad', 'coral', 'echo', 'fable', 'nova', 'onyx', 'sage', 'shimmer', 'verse'];
-
-// ElevenLabs voice IDs
+// ── ElevenLabs voice IDs (primary provider) ──────────────────────────
 const ELEVENLABS_VOICES: Record<string, string> = {
-  'george': 'JBFqnCBsd6RMkjVDRZzb',
-  'aria': '9BWtsMINqrJLrRacOk9x',
-  'roger': 'CwhRBWXzGAHq8TQ4Fs17',
-  'sarah': 'EXAVITQu4vr4xnSDxMaL',
-  'charlie': 'IKne3meq5aSn9XLyUdCD',
-  'callum': 'N2lVS1w4EtoT3dr4eOWO',
-  'river': 'SAz9YHcvj6GT2YYXdXww',
-  'liam': 'TX3LPaxmHKxFdv7VOQHJ',
-  'charlotte': 'XB0fDUnXU5powFXDhCwa',
-  'alice': 'Xb7hH8MSUJpSbSDYk0k2',
-  'matilda': 'XrExE9yKIg1WjnnlVkGX',
-  'will': 'bIHbv24MWmeRgasZH58o',
-  'jessica': 'cgSgspJ2msm6clMCkdW9',
-  'eric': 'cjVigY5qzO86Huf0OWal',
-  'chris': 'iP95p4xoKVk53GoZ742B',
-  'brian': 'nPczCjzI2devNBz1zQrb',
-  'daniel': 'onwK4e9ZLuTAKqWW03F9',
-  'lily': 'pFZP5JQG7iQjIQuC4Bku',
-  'bill': 'pqHfZKP75CvOlQylNhV4',
+  epic:      "fjnwTZkKtQOJaYzGLa6n", // William
+  urban:     "cgSgspJ2msm6clMCkdW9", // Jessica
+  ancient:   "onwK4e9ZLuTAKqWW03F9", // Daniel
+  preacher:  "iP95p4xoKVk53GoZ742B", // Chris
+  scholar:   "ErXwobaYiN019PkySvjV", // Antoni
+  counselor: "XrExE9yKIg1WjnnlVkGX", // Matilda (warm, female)
+  kids:      "pFZP5JQG7iQjIQuC4Bku", // Lily
+  mirror:    "SAz9YHcvj6GT2YYXdXww", // River
+  // Legacy name mappings to ElevenLabs IDs
+  george:    "JBFqnCBsd6RMkjVDRZzb",
+  roger:     "CwhRBWXzGAHq8TQ4Fs17",
+  daniel:    "onwK4e9ZLuTAKqWW03F9",
+  brian:     "nPczCjzI2devNBz1zQrb",
+  sarah:     "EXAVITQu4vr4xnSDxMaL",
+  alice:     "Xb7hH8MSUJpSbSDYk0k2",
+  charlie:   "IKne3meq5aSn9XLyUdCD",
+  callum:    "N2lVS1w4EtoT3dr4eOWO",
+  river:     "SAz9YHcvj6GT2YYXdXww",
+  liam:      "TX3LPaxmHKxFdv7VOQHJ",
+  matilda:   "XrExE9yKIg1WjnnlVkGX",
+  will:      "bIHbv24MWmeRgasZH58o",
+  jessica:   "cgSgspJ2msm6clMCkdW9",
+  eric:      "cjVigY5qzO86Huf0OWal",
+  chris:     "iP95p4xoKVk53GoZ742B",
+  lily:      "pFZP5JQG7iQjIQuC4Bku",
+  bill:      "pqHfZKP75CvOlQylNhV4",
 };
 
-// Speechify voice IDs - verified working voices
-// Note: More voices available via list-speechify-voices endpoint
-const SPEECHIFY_VOICES: Record<string, string> = {
-  'henry': 'henry',
-  'mrbeast': 'mrbeast', 
-  'george': 'george',
-  'cliff': 'cliff',
-  'cody': 'cody',
-  'kristy': 'kristy',
-  'natasha': 'natasha',
-  'cindy': 'cindy',
+// ── OpenAI fallback voices (diverse, per persona) ────────────────────
+const OPENAI_FALLBACK_VOICES: Record<string, string> = {
+  epic:      "onyx",    // Deep, authoritative
+  urban:     "nova",    // Warm, expressive
+  ancient:   "fable",   // Measured, narrative
+  preacher:  "echo",    // Clear, bold
+  scholar:   "ash",     // Calm, analytical
+  counselor: "shimmer", // Warm, gentle
+  kids:      "coral",   // Bright, friendly
+  mirror:    "shimmer", // Warm, reflective
+  // Legacy name mappings
+  george:    "onyx",
+  roger:     "onyx",
+  daniel:    "echo",
+  brian:     "echo",
+  sarah:     "nova",
+  alice:     "shimmer",
+  charlie:   "echo",
+  callum:    "ash",
+  river:     "shimmer",
+  liam:      "echo",
+  matilda:   "shimmer",
+  will:      "fable",
+  jessica:   "nova",
+  eric:      "echo",
+  chris:     "onyx",
+  lily:      "coral",
+  bill:      "ash",
+  henry:     "onyx",
+  mrbeast:   "echo",
+  cliff:     "fable",
+  cody:      "echo",
+  kristy:    "nova",
+  natasha:   "shimmer",
+  cindy:     "coral",
+  ballad:    "sage",
+  verse:     "fable",
 };
+
+const OPENAI_VOICES = ['alloy', 'ash', 'coral', 'echo', 'fable', 'nova', 'onyx', 'sage', 'shimmer'];
 
 const MAX_CHARS = 4096;
-const DEFAULT_VOICE = 'onyx';
+const DEFAULT_VOICE = 'echo'; // More neutral default than onyx
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -65,7 +94,7 @@ function normalizeBookName(book: string): string {
   return book.toLowerCase().replace(/\s+/g, '-');
 }
 
-function getStoragePath(book: string, chapter: number, verse: number, voiceId: string, provider: TTSProvider): string {
+function getStoragePath(book: string, chapter: number, verse: number, provider: string, voiceId: string): string {
   return `${provider}/${voiceId}/${normalizeBookName(book)}/${chapter}/${verse}.mp3`;
 }
 
@@ -74,20 +103,16 @@ async function checkCache(
   book: string,
   chapter: number,
   verse: number,
-  voiceId: string,
-  provider: TTSProvider
+  voiceTag: string
 ): Promise<{ found: boolean; url?: string }> {
   try {
-    // Include provider in cache lookup
-    const storagePath = getStoragePath(book, chapter, verse, voiceId, provider);
-
     const { data, error } = await supabase
       .from('bible_audio_cache')
       .select('storage_path')
       .eq('book', book)
       .eq('chapter', chapter)
       .eq('verse', verse)
-      .eq('voice_id', `${provider}:${voiceId}`)
+      .eq('voice_id', voiceTag)
       .single();
 
     if (error || !data) {
@@ -109,13 +134,11 @@ async function storeInCache(
   book: string,
   chapter: number,
   verse: number,
-  voiceId: string,
-  provider: TTSProvider,
+  voiceTag: string,
+  storagePath: string,
   audioBuffer: ArrayBuffer
 ): Promise<string | null> {
   try {
-    const storagePath = getStoragePath(book, chapter, verse, voiceId, provider);
-
     const { error: uploadError } = await supabase.storage
       .from('bible-audio')
       .upload(storagePath, audioBuffer, {
@@ -134,7 +157,7 @@ async function storeInCache(
         book,
         chapter,
         verse,
-        voice_id: `${provider}:${voiceId}`,
+        voice_id: voiceTag,
         storage_path: storagePath,
         file_size_bytes: audioBuffer.byteLength,
       }, {
@@ -204,15 +227,52 @@ function splitTextIntoChunks(text: string, maxChars: number): string[] {
   return chunks.filter(chunk => chunk.length > 0);
 }
 
-// OpenAI TTS
+// ── ElevenLabs TTS ───────────────────────────────────────────────────
+async function generateElevenLabs(
+  text: string,
+  voiceId: string,
+  apiKey: string,
+  speed: number = 1.0
+): Promise<ArrayBuffer> {
+  console.log(`[TTS] ElevenLabs generating with voice ${voiceId}`);
+  const response = await fetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
+    {
+      method: "POST",
+      headers: {
+        "xi-api-key": apiKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text,
+        model_id: "eleven_turbo_v2_5",
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75,
+          style: 0.3,
+          use_speaker_boost: true,
+          speed: Math.max(0.7, Math.min(1.2, speed)),
+        },
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`ElevenLabs TTS error: ${response.status} - ${err}`);
+  }
+
+  return response.arrayBuffer();
+}
+
+// ── OpenAI TTS (fallback) ────────────────────────────────────────────
 async function generateOpenAI(
   text: string,
   voice: string,
   speed: number,
   apiKey: string
 ): Promise<ArrayBuffer> {
-  const selectedVoice = OPENAI_VOICES.includes(voice.toLowerCase()) ? voice.toLowerCase() : DEFAULT_VOICE;
-
+  console.log(`[TTS] OpenAI fallback using voice "${voice}"`);
   const response = await fetch('https://api.openai.com/v1/audio/speech', {
     method: 'POST',
     headers: {
@@ -222,7 +282,7 @@ async function generateOpenAI(
     body: JSON.stringify({
       model: 'tts-1',
       input: text,
-      voice: selectedVoice,
+      voice,
       speed: Math.max(0.25, Math.min(4.0, speed)),
       response_format: 'mp3',
     }),
@@ -230,95 +290,40 @@ async function generateOpenAI(
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
+    throw new Error(`OpenAI TTS error: ${response.status} - ${errorText}`);
   }
 
   return response.arrayBuffer();
 }
 
-// ElevenLabs TTS
-async function generateElevenLabs(
-  text: string,
-  voice: string,
-  speed: number,
-  apiKey: string
-): Promise<ArrayBuffer> {
-  // Get voice ID from name or use directly if it looks like an ID
-  const voiceId = ELEVENLABS_VOICES[voice.toLowerCase()] || voice;
+// ── Resolve voice to provider + ID ───────────────────────────────────
+function resolveVoice(requestedVoice: string, elevenLabsAvailable: boolean): {
+  provider: 'elevenlabs' | 'openai';
+  voiceId: string;
+  voiceTag: string; // for cache key
+} {
+  const key = (requestedVoice || '').toLowerCase();
 
-  const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-    method: 'POST',
-    headers: {
-      'xi-api-key': apiKey,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      text: text,
-      model_id: 'eleven_multilingual_v2',
-      voice_settings: {
-        stability: 0.5,
-        similarity_boost: 0.75,
-        style: 0.3,
-        use_speaker_boost: true,
-        speed: Math.max(0.7, Math.min(1.2, speed)), // ElevenLabs range is 0.7-1.2
-      },
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`ElevenLabs API error: ${response.status} - ${errorText}`);
+  // If it looks like a raw ElevenLabs voice ID (20+ char alphanumeric)
+  if (/^[a-zA-Z0-9]{20,}$/.test(requestedVoice) && elevenLabsAvailable) {
+    return { provider: 'elevenlabs', voiceId: requestedVoice, voiceTag: `elevenlabs:${requestedVoice}` };
   }
 
-  return response.arrayBuffer();
-}
-
-// Speechify TTS
-async function generateSpeechify(
-  text: string,
-  voice: string,
-  speed: number,
-  apiKey: string
-): Promise<ArrayBuffer> {
-  const voiceId = SPEECHIFY_VOICES[voice.toLowerCase()] || voice;
-
-  console.log(`[Speechify] Generating speech with voice: ${voiceId}`);
-
-  // Clean the text - remove SSML tags if present, Speechify expects plain text or proper SSML
-  const cleanText = text.replace(/<[^>]*>/g, '');
-
-  const response = await fetch('https://api.sws.speechify.com/v1/audio/speech', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      input: cleanText,
-      voice_id: voiceId,
-      audio_format: 'mp3',
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`[Speechify] API error ${response.status}: ${errorText}`);
-    throw new Error(`Speechify API error: ${response.status} - ${errorText}`);
+  // Check if it's already an OpenAI voice name
+  if (OPENAI_VOICES.includes(key)) {
+    // Even if they asked for an OpenAI voice, try ElevenLabs if available
+    // Unless they specifically asked for OpenAI-only
+    return { provider: 'openai', voiceId: key, voiceTag: `openai:${key}` };
   }
 
-  const data = await response.json();
-
-  // Speechify returns base64 audio
-  if (data.audio_data) {
-    const binaryString = atob(data.audio_data);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    return bytes.buffer;
+  // Named voice — try ElevenLabs first
+  if (elevenLabsAvailable && ELEVENLABS_VOICES[key]) {
+    return { provider: 'elevenlabs', voiceId: ELEVENLABS_VOICES[key], voiceTag: `elevenlabs:${ELEVENLABS_VOICES[key]}` };
   }
 
-  throw new Error('No audio data received from Speechify');
+  // Fallback to OpenAI with diverse voice
+  const openaiVoice = OPENAI_FALLBACK_VOICES[key] || DEFAULT_VOICE;
+  return { provider: 'openai', voiceId: openaiVoice, voiceTag: `openai:${openaiVoice}` };
 }
 
 serve(async (req) => {
@@ -335,34 +340,23 @@ serve(async (req) => {
       chapter,
       verse,
       useCache = true,
-      provider = 'openai' as TTSProvider,
-      // Backward-compatible: callers can request a URL response to avoid huge base64 payloads
-      returnType = 'base64' as 'base64' | 'url'
+      provider: _provider, // legacy param, ignored — auto-detected
+      returnType = 'url' as 'base64' | 'url'
     } = await req.json();
 
     if (!text) {
       throw new Error("Text is required");
     }
 
-    console.log(`[TTS] Provider: ${provider}, Voice: ${voice}, Text length: ${text.length}`);
+    const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 
-    // Get appropriate API key
-    let apiKey: string | undefined;
-    switch (provider) {
-      case 'elevenlabs':
-        apiKey = Deno.env.get("ELEVENLABS_API_KEY");
-        if (!apiKey) throw new Error("ELEVENLABS_API_KEY is not configured");
-        break;
-      case 'speechify':
-        apiKey = Deno.env.get("SPEECHIFY_API_KEY");
-        if (!apiKey) throw new Error("SPEECHIFY_API_KEY is not configured");
-        break;
-      case 'openai':
-      default:
-        apiKey = Deno.env.get("OPENAI_API_KEY");
-        if (!apiKey) throw new Error("OPENAI_API_KEY is not configured");
-        break;
+    if (!ELEVENLABS_API_KEY && !OPENAI_API_KEY) {
+      throw new Error("No TTS API keys configured");
     }
+
+    const resolved = resolveVoice(voice, !!ELEVENLABS_API_KEY);
+    console.log(`[TTS] Voice: "${voice}" -> provider=${resolved.provider}, id=${resolved.voiceId}, tag=${resolved.voiceTag}, text=${text.length} chars`);
 
     // Initialize Supabase client for caching
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -371,55 +365,91 @@ serve(async (req) => {
 
     // Check cache if verse info provided
     if (useCache && book && chapter !== undefined && verse !== undefined) {
-      console.log(`[TTS] Checking cache: ${book} ${chapter}:${verse} (${provider}:${voice})`);
-
-      const cacheResult = await checkCache(supabase, book, chapter, verse, voice, provider);
+      console.log(`[TTS] Checking cache: ${book} ${chapter}:${verse} (${resolved.voiceTag})`);
+      const cacheResult = await checkCache(supabase, book, chapter, verse, resolved.voiceTag);
 
       if (cacheResult.found && cacheResult.url) {
         console.log(`[TTS] CACHE HIT - ${book} ${chapter}:${verse}`);
         return new Response(
-          JSON.stringify({
-            audioUrl: cacheResult.url,
-            cached: true,
-            provider,
-            contentType: 'audio/mpeg'
-          }),
+          JSON.stringify({ audioUrl: cacheResult.url, cached: true, contentType: 'audio/mpeg' }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-
-      console.log(`[TTS] CACHE MISS - generating audio with ${provider}`);
+      console.log(`[TTS] CACHE MISS - generating audio`);
     }
 
-    // Split text and generate
+    // For non-verse requests with URL return type, check hash-based cache
+    if (returnType === 'url' && (!book || chapter === undefined || verse === undefined)) {
+      const stableKey = await sha256Hex(JSON.stringify({
+        voiceTag: resolved.voiceTag,
+        speed: Math.round(speed * 100) / 100,
+        text: text.trim(),
+      }));
+      const storagePath = `tts/${resolved.provider}/${resolved.voiceId}/${stableKey}.mp3`;
+
+      const { data: existsData } = await supabase.storage
+        .from('bible-audio')
+        .list(`tts/${resolved.provider}/${resolved.voiceId}`, {
+          search: `${stableKey}.mp3`,
+          limit: 1
+        });
+
+      if (existsData && existsData.length > 0) {
+        const { data: urlData } = supabase.storage
+          .from('bible-audio')
+          .getPublicUrl(storagePath);
+
+        console.log(`[TTS] HASH CACHE HIT - returning cached audio`);
+        return new Response(
+          JSON.stringify({ audioUrl: urlData.publicUrl, cached: true, contentType: 'audio/mpeg' }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      console.log(`[TTS] HASH CACHE MISS - generating audio`);
+    }
+
+    // ── Generate audio ─────────────────────────────────────────────
     const chunks = splitTextIntoChunks(text, MAX_CHARS);
-    console.log(`[TTS] Split into ${chunks.length} chunks`);
+    console.log(`[TTS] Split into ${chunks.length} chunks, provider=${resolved.provider}`);
 
-    const audioBuffers: ArrayBuffer[] = [];
+    const BATCH_SIZE = 4;
+    const audioBuffers: ArrayBuffer[] = new Array(chunks.length);
 
-    for (let i = 0; i < chunks.length; i++) {
-      const chunk = chunks[i];
-      console.log(`[TTS] Processing chunk ${i + 1}/${chunks.length} (${chunk.length} chars)`);
+    // Try primary provider, fall back if it fails
+    let actualProvider = resolved.provider;
 
-      let buffer: ArrayBuffer;
-      switch (provider) {
-        case 'elevenlabs':
-          buffer = await generateElevenLabs(chunk, voice, speed, apiKey);
-          break;
-        case 'speechify':
-          buffer = await generateSpeechify(chunk, voice, speed, apiKey);
-          break;
-        case 'openai':
-        default:
-          buffer = await generateOpenAI(chunk, voice, speed, apiKey);
-          break;
+    for (let batchStart = 0; batchStart < chunks.length; batchStart += BATCH_SIZE) {
+      const batchEnd = Math.min(batchStart + BATCH_SIZE, chunks.length);
+      const batchPromises = [];
+
+      for (let i = batchStart; i < batchEnd; i++) {
+        const generateChunk = async () => {
+          try {
+            if (actualProvider === 'elevenlabs' && ELEVENLABS_API_KEY) {
+              audioBuffers[i] = await generateElevenLabs(chunks[i], resolved.voiceId, ELEVENLABS_API_KEY, speed);
+            } else if (OPENAI_API_KEY) {
+              const openaiVoice = resolved.provider === 'openai'
+                ? resolved.voiceId
+                : (OPENAI_FALLBACK_VOICES[(voice || '').toLowerCase()] || DEFAULT_VOICE);
+              audioBuffers[i] = await generateOpenAI(chunks[i], openaiVoice, speed, OPENAI_API_KEY);
+            } else {
+              throw new Error("No TTS provider available");
+            }
+          } catch (err) {
+            // If ElevenLabs fails, fall back to OpenAI for this and remaining chunks
+            if (actualProvider === 'elevenlabs' && OPENAI_API_KEY) {
+              console.warn(`[TTS] ElevenLabs failed, falling back to OpenAI: ${err}`);
+              actualProvider = 'openai';
+              const openaiVoice = OPENAI_FALLBACK_VOICES[(voice || '').toLowerCase()] || DEFAULT_VOICE;
+              audioBuffers[i] = await generateOpenAI(chunks[i], openaiVoice, speed, OPENAI_API_KEY);
+            } else {
+              throw err;
+            }
+          }
+        };
+        batchPromises.push(generateChunk());
       }
-
-      audioBuffers.push(buffer);
-
-      if (i < chunks.length - 1) {
-        await delay(100);
-      }
+      await Promise.all(batchPromises);
     }
 
     // Combine audio buffers
@@ -431,43 +461,54 @@ serve(async (req) => {
       offset += buffer.byteLength;
     }
 
-    console.log(`[TTS] Generated ${totalLength} bytes with ${provider}`);
+    console.log(`[TTS] Generated ${totalLength} bytes via ${actualProvider}`);
 
-    // Store in cache if verse info provided
+    // Update voice tag if we fell back
+    const finalVoiceTag = actualProvider === resolved.provider
+      ? resolved.voiceTag
+      : `openai:${OPENAI_FALLBACK_VOICES[(voice || '').toLowerCase()] || DEFAULT_VOICE}`;
+
+    // For cache-enabled requests, return audio immediately and cache in background
     if (useCache && book && chapter !== undefined && verse !== undefined) {
-      const cachedUrl = await storeInCache(supabase, book, chapter, verse, voice, provider, combined.buffer);
+      const storagePath = getStoragePath(book, chapter, verse, actualProvider, resolved.voiceId);
 
-      if (cachedUrl) {
-        return new Response(
-          JSON.stringify({
-            audioUrl: cachedUrl,
-            cached: false,
-            justCached: true,
-            provider,
-            contentType: 'audio/mpeg'
-          }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
+      const cachePromise = storeInCache(supabase, book, chapter, verse, finalVoiceTag, storagePath, combined.buffer);
+      cachePromise.catch(e => console.error('[TTS] Background cache failed:', e));
+
+      const { data: urlData } = supabase.storage
+        .from('bible-audio')
+        .getPublicUrl(storagePath);
+
+      const base64Audio = base64Encode(combined.buffer);
+
+      return new Response(
+        JSON.stringify({
+          audioUrl: urlData.publicUrl,
+          audioContent: base64Audio,
+          cached: false,
+          justCached: true,
+          contentType: 'audio/mpeg'
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    // If requested, return a URL response to avoid huge base64 payloads (better for mobile)
+    // For URL response type, upload to storage and return URL
     if (returnType === 'url') {
       try {
         const stableKey = await sha256Hex(JSON.stringify({
-          provider,
-          voice,
+          voiceTag: finalVoiceTag,
           speed: Math.round(speed * 100) / 100,
           text: text.trim(),
         }));
 
-        const storagePath = `tts/${provider}/${voice}/${stableKey}.mp3`;
+        const storagePath = `tts/${actualProvider}/${resolved.voiceId}/${stableKey}.mp3`;
 
         const { error: uploadError } = await supabase.storage
           .from('bible-audio')
           .upload(storagePath, combined.buffer, {
             contentType: 'audio/mpeg',
-            upsert: true,
+            upsert: true
           });
 
         if (!uploadError) {
@@ -476,46 +517,28 @@ serve(async (req) => {
             .getPublicUrl(storagePath);
 
           return new Response(
-            JSON.stringify({
-              audioUrl: urlData.publicUrl,
-              cached: false,
-              justCached: false,
-              provider,
-              contentType: 'audio/mpeg'
-            }),
+            JSON.stringify({ audioUrl: urlData.publicUrl, cached: false, contentType: 'audio/mpeg' }),
             { headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
-
-        console.error('[TTS] URL upload failed, falling back to base64:', uploadError);
-      } catch (err) {
-        console.error('[TTS] Failed to return URL, falling back to base64:', err);
+      } catch (urlErr) {
+        console.error('[TTS] URL return type failed, falling back to base64:', urlErr);
       }
     }
 
-    // Return base64 (legacy behavior)
+    // Return base64 (fallback)
     const base64Audio = base64Encode(combined.buffer);
 
     return new Response(
-      JSON.stringify({
-        success: true,
-        audioContent: base64Audio,
-        contentType: 'audio/mpeg',
-        textLength: text.length,
-        voice,
-        provider,
-        chunks: chunks.length
-      }),
+      JSON.stringify({ audioContent: base64Audio, cached: false, contentType: 'audio/mpeg' }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error) {
-    console.error("[TTS Error]:", error);
+  } catch (error: unknown) {
+    console.error("[TTS] Error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
-      {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      JSON.stringify({ error: errorMessage }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });

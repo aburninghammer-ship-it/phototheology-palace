@@ -9,6 +9,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { Globe } from 'lucide-react';
 import { supportedLanguages, setLanguage } from '@/i18n';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 interface LanguageSelectorProps {
   showLabel?: boolean;
@@ -17,9 +18,12 @@ interface LanguageSelectorProps {
 
 export function LanguageSelector({ showLabel = true, className }: LanguageSelectorProps) {
   const { t, i18n } = useTranslation();
+  const { updatePreference } = useUserPreferences();
   
   const handleLanguageChange = (lang: string) => {
     setLanguage(lang);
+    // Sync to database for cross-device persistence
+    updatePreference('language', lang);
   };
 
   return (

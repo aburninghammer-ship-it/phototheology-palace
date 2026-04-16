@@ -67,11 +67,20 @@ serve(async (req) => {
 - Confuse symbolic with literal language
 - Violate historicist interpretation principles`,
 
-      6: `You are grading Floor 6 (Three Heavens - Cosmic Context). Test their ability to place texts in DoL/NE cycles and understand the Three Heavens framework. Push back RUTHLESSLY if they:
+      6: `You are grading Floor 6 (Three Heavens - Cosmic Context). Test their ability to place texts in DoL/NE cycles and understand the Three Heavens framework. 
+
+CRITICAL GUARDRAIL: Three Heavens are DAY-OF-THE-LORD JUDGMENT CYCLES:
+- 1H (DoL¹/NE¹) = Babylon destroys Jerusalem (586 BC) → Post-exilic restoration
+- 2H (DoL²/NE²) = Rome destroys Jerusalem (70 AD) → New Covenant/church order  
+- 3H (DoL³/NE³) = Final cosmic judgment → Literal New Creation (Rev 21-22)
+THREE HEAVENS ARE NOT: atmosphere layers, physical/spiritual/divine realms, or cosmology!
+
+Push back RUTHLESSLY if they:
 - Conflate the three Day-of-the-LORD events
 - Place texts in wrong heaven/cycle
 - Cannot explain covenant transitions
-- Miss the cosmic scope of redemption history`,
+- Miss the cosmic scope of redemption history
+- Interpret Three Heavens as atmospheric layers or cosmological realms (this is a CRITICAL ERROR)`,
 
       7: `You are grading Floor 7 (Spiritual & Emotional - Transformation). Test whether Scripture has transformed their heart. Push back if they:
 - Show head knowledge without heart change

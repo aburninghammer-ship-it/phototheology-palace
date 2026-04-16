@@ -40,10 +40,12 @@ export const SocialShareButton: React.FC<SocialShareButtonProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
   
+  const suiteUrl = "https://phototheologybible.com";
   const shareUrl = url || window.location.href;
-  const shareText = description 
-    ? `${title}\n\n${description}\n\n${shareUrl}`
-    : `${title}\n\n${shareUrl}`;
+  const shareFooter = `\n\n— Shared from Phototheology Palace\n✨ Explore more: ${suiteUrl}`;
+  const shareText = description
+    ? `${title}\n\n${description}${shareUrl !== suiteUrl ? `\n\n${shareUrl}` : ""}${!description.includes(suiteUrl) ? shareFooter : ""}`
+    : `${title}\n\n${shareUrl}${shareUrl !== suiteUrl ? shareFooter : ""}`;
   
   const copyToClipboard = async () => {
     try {

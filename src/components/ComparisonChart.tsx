@@ -28,14 +28,6 @@ const standardFeatures: Feature[] = [
     biblegateway: "yes",
   },
   {
-    name: "Audio Bible",
-    phototheology: "yes",
-    youversion: "yes",
-    blueletter: "yes",
-    logos: "yes",
-    biblegateway: "yes",
-  },
-  {
     name: "Reading Plans",
     description: "PT plans are Palace-integrated — each day maps to rooms, floors, and memory hooks, not just chapters to check off",
     isEnhanced: true,

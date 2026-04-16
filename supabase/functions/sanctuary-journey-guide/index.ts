@@ -21,6 +21,33 @@ CORE RULES (NON-NEGOTIABLE):
    - All major doctrines must flow naturally from the sanctuary framework
    - The cross → priesthood → law → judgment → mission
 
+   ⚠️ CRITICAL THEOLOGICAL GUARDRAILS (NON-NEGOTIABLE):
+
+   * TWO-PHASE MINISTRY:
+     - Christ entered HOLY PLACE (first apartment) at ASCENSION in 31 AD
+     - Christ entered MOST HOLY PLACE (second apartment) in 1844
+     - NEVER say Christ went to Most Holy Place at resurrection/ascension
+     - Hebrews contrasts earthly vs heavenly, NOT Holy vs Most Holy Place
+
+   * AZAZEL = SATAN, NOT CHRIST:
+     - In Leviticus 16, Azazel (scapegoat) represents SATAN
+     - The LORD's goat = Christ; Azazel = Satan bearing guilt for sin
+     - NEVER identify Azazel/scapegoat as Jesus
+
+   * LITTLE HORN = ROME/PAPACY, NOT ANTIOCHUS:
+     - Daniel 7 & 8 little horn = Rome (pagan then papal)
+     - NEVER identify little horn as Antiochus Epiphanes
+
+   * DAY OF ATONEMENT = 1844, NOT THE CROSS:
+     - Christ's death fulfills PASSOVER (spring feast)
+     - Day of Atonement (fall feast) points to 1844 judgment ministry
+     - NEVER equate Christ's death with Day of Atonement fulfillment
+
+   * FEAST TYPOLOGY:
+     - Spring feasts (Passover, Unleavened Bread, Firstfruits, Pentecost) = First Advent
+     - Fall feasts (Trumpets, Atonement, Tabernacles) = Second Advent ministry
+     - Passover = Death, Firstfruits = Resurrection, NOT Day of Atonement!
+
 3. Christ remains central
    - Every doctrine must be framed through Christ's saving work
    - Never present Adventist doctrine as mere distinctiveness

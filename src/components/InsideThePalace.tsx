@@ -1,40 +1,43 @@
+import { useTranslation } from 'react-i18next';
 import { Brain, Building2, Target, Sparkles, BookOpen } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
-const features = [
-  {
-    icon: Building2,
-    title: "Visual Memory System",
-    description: "Every chapter becomes a room. Every theme becomes a floor.",
-  },
-  {
-    icon: Target,
-    title: "Pattern Detection",
-    description: "Trace symbols, words, themes, and prophecies across Scripture.",
-  },
-  {
-    icon: BookOpen,
-    title: "See Jesus in Every Room",
-    description: "Christ-centered pathways built into the app.",
-  },
-  {
-    icon: Sparkles,
-    title: "Guided Training With Jeeves",
-    description: "AI drills, room mastery, and study pathways.",
-  },
-  {
-    icon: Brain,
-    title: "Prophecy Made Clear",
-    description: "Daniel & Revelation integrated into your palace.",
-  },
-];
-
 export const InsideThePalace = () => {
+  const { t } = useTranslation();
+
+  const features = [
+    {
+      icon: Building2,
+      title: t('insidePalace.visualMemory'),
+      description: t('insidePalace.visualMemoryDesc'),
+    },
+    {
+      icon: Target,
+      title: t('insidePalace.patternDetection'),
+      description: t('insidePalace.patternDetectionDesc'),
+    },
+    {
+      icon: BookOpen,
+      title: t('insidePalace.seeJesus'),
+      description: t('insidePalace.seeJesusDesc'),
+    },
+    {
+      icon: Sparkles,
+      title: t('insidePalace.guidedTraining'),
+      description: t('insidePalace.guidedTrainingDesc'),
+    },
+    {
+      icon: Brain,
+      title: t('insidePalace.prophecy'),
+      description: t('insidePalace.prophecyDesc'),
+    },
+  ];
+
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-background">
       <div className="max-w-5xl mx-auto">
         <h2 className="text-4xl md:text-5xl font-bold text-center mb-12">
-          Inside the Palace
+          {t('insidePalace.title')}
         </h2>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

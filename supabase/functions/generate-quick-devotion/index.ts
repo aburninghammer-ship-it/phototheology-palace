@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -121,13 +122,21 @@ WRITING STYLE: YOUTH-FOCUSED
 
     console.log(`Generating devotion - theme: ${theme}, depth: ${depth}, style: ${writingStyle}`);
 
-    const systemPrompt = `You are a master of biblical theology writing PERSONALIZED devotionals that are:
+    let systemPrompt = `You are a master of biblical theology writing PERSONALIZED devotionals that are:
 - Theologically rich and structurally intelligent
 - Never sentimental or emotionally vague
 - Revealing unexpected connections between passages
 - Moving from text → meaning → personal application
 - Adventist in theology (sanctuary-shaped, Great Controversy aware)
 - DEEPLY PERSONALIZED when recipient information is provided
+
+⚠️ THEOLOGICAL GUARDRAILS (NON-NEGOTIABLE):
+- AZAZEL = SATAN, NOT CHRIST (Leviticus 16 scapegoat = Satan)
+- LITTLE HORN = ROME/PAPACY, NOT ANTIOCHUS (Daniel 7 & 8)
+- TWO-PHASE SANCTUARY: Holy Place at ascension (31 AD); Most Holy Place in 1844
+- DAY OF ATONEMENT = 1844, NOT THE CROSS (Christ's death = Passover)
+- SPRING FEASTS = First Advent; FALL FEASTS = Second Advent ministry
+- HEBREWS: Contrasts earthly vs heavenly sanctuary, NOT Holy vs Most Holy
 
 ${selectedStyle}
 
@@ -142,6 +151,15 @@ QUALITY CONTROL:
 - Could this exist on a generic devotional app? If yes, write something more personal.
 - Does it rely on vague encouragement? If yes, make it more specific.
 - It must feel discovered rather than manufactured.`;
+
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: theme.slice(0, 4000),
+      matchCount: 2,
+    });
+    if (ragResult.chunkCount > 0) {
+      systemPrompt += ragResult.corpusContext;
+    }
 
     const userPrompt = `Write a SUBSTANTIVE ${selectedDepth.paragraphs} paragraph devotional on the theme: "${theme}"
 ${personalizationContext}

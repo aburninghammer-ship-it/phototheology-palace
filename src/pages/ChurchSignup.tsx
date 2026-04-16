@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,56 +17,57 @@ import { Footer } from "@/components/Footer";
 
 type Tier = 'tier1' | 'tier2' | 'tier3';
 
-const tiers = {
-  tier1: {
-    name: "Church Access",
-    price: 399,
-    seats: 50,
-    icon: Users,
-    popular: false,
-    features: [
-      "Full Phototheology platform access for all members",
-      "Church-wide study challenges & Living Manna space",
-      "Basic member management",
-      "Member invitation system",
-    ]
-  },
-  tier2: {
-    name: "Leadership Tools",
-    price: 899,
-    seats: 150,
-    icon: Zap,
-    popular: true,
-    features: [
-      "Everything in Church Access",
-      "Leader teaching outlines & discussion guides",
-      "Analytics dashboard for engagement insights",
-      "Advanced campaign management",
-      "Small group leader training materials",
-    ]
-  },
-  tier3: {
-    name: "Enterprise",
-    price: null, // Contact us
-    seats: 150,
-    icon: TrendingUp,
-    popular: false,
-    isContactUs: true,
-    features: [
-      "Everything in Leadership Tools",
-      "150+ seats (custom capacity)",
-      "Ministry Launch Academy training track",
-      "Youth & Kids content packs",
-      "Branded onboarding experience",
-      "Priority support",
-      "Custom campaign creation",
-    ]
-  }
-};
-
 export default function ChurchSignup() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  const tiers = {
+    tier1: {
+      name: t('church.tierChurchAccess'),
+      price: 399,
+      seats: 50,
+      icon: Users,
+      popular: false,
+      features: [
+        t('church.featurePlatformAccess'),
+        t('church.featureStudyChallenges'),
+        t('church.featureBasicManagement'),
+        t('church.featureInvitationSystem'),
+      ]
+    },
+    tier2: {
+      name: t('church.tierLeadershipTools'),
+      price: 899,
+      seats: 150,
+      icon: Zap,
+      popular: true,
+      features: [
+        t('church.featureEverythingChurchAccess'),
+        t('church.featureTeachingOutlines'),
+        t('church.featureAnalyticsDashboard'),
+        t('church.featureAdvancedCampaign'),
+        t('church.featureSmallGroupTraining'),
+      ]
+    },
+    tier3: {
+      name: t('church.tierEnterprise'),
+      price: null, // Contact us
+      seats: 150,
+      icon: TrendingUp,
+      popular: false,
+      isContactUs: true,
+      features: [
+        t('church.featureEverythingLeadership'),
+        t('church.featureCustomCapacity'),
+        t('church.featureMinistryAcademy'),
+        t('church.featureYouthKidsPacks'),
+        t('church.featureBrandedOnboarding'),
+        t('church.featurePrioritySupport'),
+        t('church.featureCustomCampaign'),
+      ]
+    }
+  };
   const [step, setStep] = useState<'tier' | 'info' | 'processing'>('tier');
   const [selectedTier, setSelectedTier] = useState<Tier>('tier2');
   const [loading, setLoading] = useState(false);
@@ -86,13 +88,13 @@ export default function ChurchSignup() {
     e.preventDefault();
 
     if (!user) {
-      toast.error("You must be logged in to register a church");
+      toast.error(t('church.errorMustBeLoggedIn'));
       navigate("/auth");
       return;
     }
 
     if (!churchName || !billingEmail) {
-      toast.error("Please fill in all required fields");
+      toast.error(t('church.errorFillRequiredFields'));
       return;
     }
 
@@ -115,14 +117,14 @@ export default function ChurchSignup() {
       if (error) throw error;
 
       if (!data.url) {
-        throw new Error("Failed to create checkout session");
+        throw new Error(t('church.errorCheckoutSession'));
       }
 
       // Redirect to Stripe Checkout
       window.location.href = data.url;
     } catch (error: any) {
       console.error('Error creating checkout session:', error);
-      toast.error(error.message || "Failed to start checkout");
+      toast.error(error.message || t('church.errorStartCheckout'));
       setStep('info');
       setLoading(false);
     }
@@ -130,14 +132,14 @@ export default function ChurchSignup() {
 
   if (step === 'processing') {
     return (
-      <div className="min-h-screen gradient-dreamy flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="max-w-md w-full">
           <CardContent className="pt-6">
             <div className="text-center">
               <Loader2 className="h-16 w-16 animate-spin text-primary mx-auto mb-4" />
-              <h2 className="text-2xl font-bold mb-2">Setting Up Your Church...</h2>
+              <h2 className="text-2xl font-bold mb-2">{t('church.settingUpChurch')}</h2>
               <p className="text-muted-foreground">
-                Creating your organization, setting up your admin account, and preparing your dashboard.
+                {t('church.settingUpDescription')}
               </p>
             </div>
           </CardContent>
@@ -147,7 +149,7 @@ export default function ChurchSignup() {
   }
 
   return (
-    <div className="min-h-screen gradient-dreamy">
+    <div className="min-h-screen bg-background">
       <Navigation />
       
       <div className="container mx-auto max-w-6xl px-4 py-20">
@@ -157,10 +159,10 @@ export default function ChurchSignup() {
             <Building2 className="h-8 w-8 text-primary" />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Register Your Church
+            {t('church.registerYourChurch')}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Unite your congregation around one discipleship system. Choose your plan and get started today.
+            {t('church.registerDescription')}
           </p>
         </div>
 
@@ -170,14 +172,14 @@ export default function ChurchSignup() {
             <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${step === 'tier' ? 'border-primary bg-primary text-white' : 'border-muted-foreground'}`}>
               1
             </div>
-            <span className="font-medium">Select Tier</span>
+            <span className="font-medium">{t('church.stepSelectTier')}</span>
           </div>
           <ArrowRight className="h-4 w-4 text-muted-foreground" />
           <div className={`flex items-center gap-2 ${step === 'info' ? 'text-primary' : 'text-muted-foreground'}`}>
             <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${step === 'info' ? 'border-primary bg-primary text-white' : 'border-muted-foreground'}`}>
               2
             </div>
-            <span className="font-medium">Church Info</span>
+            <span className="font-medium">{t('church.stepChurchInfo')}</span>
           </div>
         </div>
 
@@ -197,7 +199,7 @@ export default function ChurchSignup() {
                 >
                   {tier.popular && (
                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                      <Badge className="bg-primary">Most Popular</Badge>
+                      <Badge className="bg-primary">{t('church.mostPopular')}</Badge>
                     </div>
                   )}
                   <CardHeader>
@@ -205,18 +207,18 @@ export default function ChurchSignup() {
                       <Icon className="h-8 w-8 text-primary" />
                       <div className="text-right">
                         {isContactUs ? (
-                          <div className="text-xl font-bold">Contact Us</div>
+                          <div className="text-xl font-bold">{t('church.contactUs')}</div>
                         ) : (
                           <>
                             <div className="text-3xl font-bold">${tier.price}</div>
-                            <div className="text-sm text-muted-foreground">/month</div>
+                            <div className="text-sm text-muted-foreground">{t('church.perMonth')}</div>
                           </>
                         )}
                       </div>
                     </div>
                     <CardTitle className="text-xl">{tier.name}</CardTitle>
                     <CardDescription>
-                      {isContactUs ? '150+ active members' : `Up to ${tier.seats} active members`}
+                      {isContactUs ? t('church.membersUnlimited') : t('church.membersUpTo', { count: tier.seats })}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -229,7 +231,7 @@ export default function ChurchSignup() {
                       ))}
                     </ul>
                     <Button className="w-full mt-6" variant={tier.popular ? "default" : "outline"}>
-                      {isContactUs ? 'Contact Sales' : `Select ${tier.name}`}
+                      {isContactUs ? t('church.contactSales') : t('church.selectPlan', { name: tier.name })}
                     </Button>
                   </CardContent>
                 </Card>
@@ -243,9 +245,9 @@ export default function ChurchSignup() {
           <div className="max-w-2xl mx-auto">
             <Card>
               <CardHeader>
-                <CardTitle>Church Information</CardTitle>
+                <CardTitle>{t('church.churchInformation')}</CardTitle>
                 <CardDescription>
-                  Tell us about your church. You'll be set as the admin and can invite members after registration.
+                  {t('church.churchInfoDescription')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -254,25 +256,25 @@ export default function ChurchSignup() {
                   <Alert>
                     <Building2 className="h-4 w-4" />
                     <AlertDescription>
-                      <strong>Selected Plan:</strong> {tiers[selectedTier].name} - ${tiers[selectedTier].price}/month for up to {tiers[selectedTier].seats} members
-                      <Button 
-                        variant="link" 
-                        size="sm" 
+                      <strong>{t('church.selectedPlan')}:</strong> {tiers[selectedTier].name} - ${tiers[selectedTier].price}/{t('church.perMonth')} {t('church.forUpToMembers', { count: tiers[selectedTier].seats })}
+                      <Button
+                        variant="link"
+                        size="sm"
                         className="ml-2 p-0 h-auto"
                         onClick={() => setStep('tier')}
                         type="button"
                       >
-                        Change
+                        {t('common.change')}
                       </Button>
                     </AlertDescription>
                   </Alert>
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="md:col-span-2">
-                      <Label htmlFor="church-name">Church Name *</Label>
+                      <Label htmlFor="church-name">{t('church.churchName')} *</Label>
                       <Input
                         id="church-name"
-                        placeholder="Grace Community Church"
+                        placeholder={t('church.churchNamePlaceholder')}
                         value={churchName}
                         onChange={(e) => setChurchName(e.target.value)}
                         required
@@ -280,46 +282,46 @@ export default function ChurchSignup() {
                     </div>
 
                     <div className="md:col-span-2">
-                      <Label htmlFor="billing-email">Billing Email *</Label>
+                      <Label htmlFor="billing-email">{t('church.billingEmail')} *</Label>
                       <Input
                         id="billing-email"
                         type="email"
-                        placeholder="billing@church.org"
+                        placeholder={t('church.billingEmailPlaceholder')}
                         value={billingEmail}
                         onChange={(e) => setBillingEmail(e.target.value)}
                         required
                       />
                       <p className="text-xs text-muted-foreground mt-1">
-                        Invoices and billing updates will be sent here
+                        {t('church.billingEmailHint')}
                       </p>
                     </div>
 
                     <div>
-                      <Label htmlFor="contact-person">Contact Person</Label>
+                      <Label htmlFor="contact-person">{t('church.contactPerson')}</Label>
                       <Input
                         id="contact-person"
-                        placeholder="Pastor John Smith"
+                        placeholder={t('church.contactPersonPlaceholder')}
                         value={contactPerson}
                         onChange={(e) => setContactPerson(e.target.value)}
                       />
                     </div>
 
                     <div>
-                      <Label htmlFor="contact-phone">Contact Phone</Label>
+                      <Label htmlFor="contact-phone">{t('church.contactPhone')}</Label>
                       <Input
                         id="contact-phone"
                         type="tel"
-                        placeholder="(555) 123-4567"
+                        placeholder={t('church.contactPhonePlaceholder')}
                         value={contactPhone}
                         onChange={(e) => setContactPhone(e.target.value)}
                       />
                     </div>
 
                     <div className="md:col-span-2">
-                      <Label htmlFor="notes">Additional Notes (Optional)</Label>
+                      <Label htmlFor="notes">{t('church.additionalNotes')}</Label>
                       <Textarea
                         id="notes"
-                        placeholder="Any special requirements or questions..."
+                        placeholder={t('church.additionalNotesPlaceholder')}
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         rows={3}
@@ -329,7 +331,7 @@ export default function ChurchSignup() {
 
                   <Alert>
                     <AlertDescription>
-                      <strong>Next Steps:</strong> After registration, you'll be redirected to your admin dashboard where you can invite members, create campaigns, and manage your church.
+                      <strong>{t('church.nextSteps')}:</strong> {t('church.nextStepsDescription')}
                     </AlertDescription>
                   </Alert>
 
@@ -340,18 +342,18 @@ export default function ChurchSignup() {
                       onClick={() => setStep('tier')}
                       disabled={loading}
                     >
-                      Back
+                      {t('common.back')}
                     </Button>
                     <Button type="submit" className="flex-1" disabled={loading}>
                       {loading ? (
                         <>
                           <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                          Creating Church...
+                          {t('church.creatingChurch')}
                         </>
                       ) : (
                         <>
                           <Building2 className="h-4 w-4 mr-2" />
-                          Complete Registration
+                          {t('church.completeRegistration')}
                         </>
                       )}
                     </Button>

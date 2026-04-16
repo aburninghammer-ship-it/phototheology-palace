@@ -23,9 +23,13 @@ export function JeevesWelcomeModal() {
     const checkFirstVisit = async () => {
       if (!user) return;
 
-      // Check if user has dismissed the welcome modal
+      // Check if user has EVER dismissed the welcome modal (persistent)
       const dismissed = localStorage.getItem(`jeeves_welcome_${user.id}`);
-      if (dismissed) return;
+      if (dismissed === "true") return;
+
+      // Also check if they've seen it in this browser session
+      const sessionSeen = sessionStorage.getItem(`jeeves_welcome_shown_${user.id}`);
+      if (sessionSeen) return;
 
       // Check if this is a new user (no first_meaningful_action)
       const { data: profile } = await supabase
@@ -36,9 +40,14 @@ export function JeevesWelcomeModal() {
 
       if (profile) {
         setUserName(getFirstName(profile.display_name));
-        // Only show if they haven't taken a meaningful action
+        // Only show if they haven't taken a meaningful action AND haven't dismissed before
         if (!profile.first_meaningful_action_at) {
+          // Mark as shown this session to prevent re-showing during navigation
+          sessionStorage.setItem(`jeeves_welcome_shown_${user.id}`, "true");
           setOpen(true);
+        } else {
+          // They've taken action, permanently dismiss
+          localStorage.setItem(`jeeves_welcome_${user.id}`, "true");
         }
       }
     };
@@ -106,13 +115,13 @@ export function JeevesWelcomeModal() {
             <Button
               variant="outline"
               className="w-full justify-start h-auto py-3 px-4"
-              onClick={() => handleAction("/read-me-the-bible", "read_bible")}
+              onClick={() => handleAction("/bible", "read_bible")}
             >
               <BookOpen className="h-5 w-5 mr-3 text-primary" />
               <div className="text-left">
-                <div className="font-medium">Read Me The Bible</div>
+                <div className="font-medium">Study the Bible</div>
                 <div className="text-xs text-muted-foreground">
-                  Start with immersive Bible reading
+                  Start with PT Study Bible
                 </div>
               </div>
             </Button>

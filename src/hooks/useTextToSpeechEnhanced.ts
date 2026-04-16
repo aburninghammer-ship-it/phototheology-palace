@@ -1,7 +1,9 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { buildCacheKey, getCachedAudio, setCachedAudio } from '@/lib/ttsAudioCache';
 import { isOnline } from '@/services/offlineAudioCache';
+import { setupMediaSession, updateMediaSessionPlaybackState, clearMediaSession } from '@/lib/mediaSessionHelper';
 
 // Available Speechify voices
 export const OPENAI_VOICES = [
@@ -14,8 +16,6 @@ export const OPENAI_VOICES = [
   { id: 'ash', name: 'Ash', description: 'Soft and gentle' },
   { id: 'coral', name: 'Coral', description: 'Warm and friendly female' },
   { id: 'sage', name: 'Sage', description: 'Calm and thoughtful' },
-  { id: 'ballad', name: 'Ballad', description: 'Smooth storyteller' },
-  { id: 'verse', name: 'Verse', description: 'Poetic and expressive' },
 ] as const;
 
 export type VoiceId = typeof OPENAI_VOICES[number]['id'];
@@ -58,7 +58,17 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
 
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [selectedVoice, setSelectedVoice] = useState<VoiceId>(defaultVoice);
+  const [selectedVoice, _setSelectedVoice] = useState<VoiceId>(() => {
+    try {
+      const saved = localStorage.getItem(`tts_voice_${defaultVoice}`);
+      if (saved && OPENAI_VOICES.some(v => v.id === saved)) return saved as VoiceId;
+    } catch {}
+    return defaultVoice;
+  });
+  const setSelectedVoice = useCallback((voice: VoiceId) => {
+    _setSelectedVoice(voice);
+    try { localStorage.setItem(`tts_voice_${defaultVoice}`, voice); } catch {}
+  }, [defaultVoice]);
   const [wasCached, setWasCached] = useState(false);
   const [currentMode, setCurrentMode] = useState<'openai' | 'browser'>('openai');
   const [networkStatus, setNetworkStatus] = useState<'online' | 'offline' | 'slow'>('online');
@@ -69,6 +79,9 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const keepAliveIntervalRef = useRef<number | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+
+  // Preloaded audio cache: text hash → audio URL
+  const preloadedAudioRef = useRef<Map<string, string>>(new Map());
   
   // Use refs for callbacks to avoid stale closures in event handlers
   const onEndRef = useRef(onEnd);
@@ -202,7 +215,10 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
     speechSynthesis.cancel();
 
     setIsPlaying(false);
-    onEndRef.current?.();
+    updateMediaSessionPlaybackState('none');
+    // NOTE: Do NOT call onEndRef here - onEnd should only fire when audio
+    // naturally completes, not when manually stopped. Calling it here causes
+    // infinite loops when speak() calls stop() to clear previous audio.
   }, []);
 
   // Browser TTS fallback with chunking for long texts
@@ -249,6 +265,7 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
           utterance.rate = 1;
           utterance.pitch = 1;
           utterance.volume = 1;
+          utterance.lang = 'en-US'; // Force English to prevent Hebrew detection
           
           // Use the captured voice to ensure consistency across all chunks
           if (voiceToUse) {
@@ -296,6 +313,68 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
   // OpenAI TTS with timeout
   const speakWithElevenLabs = useCallback(async (text: string, speakOptions?: SpeakOptions) => {
     const opts: SpeakOptions = speakOptions || {};
+    const voiceForCache = (opts.voice || selectedVoice) as string;
+
+    // Check preloaded cache first — instant playback for preloaded sections
+    const cacheKey = `${voiceForCache}:${text.slice(0, 120)}`;
+    const preloadedUrl = preloadedAudioRef.current.get(cacheKey);
+    if (preloadedUrl) {
+      console.log('[TTS] Using preloaded audio — zero gap!');
+      preloadedAudioRef.current.delete(cacheKey);
+
+      if (!audioRef.current) audioRef.current = new Audio();
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      if (audioContextRef.current.state === 'suspended') {
+        await audioContextRef.current.resume();
+      }
+
+      const audio = audioRef.current;
+      const isBlobUrl = preloadedUrl.startsWith('blob:');
+      audio.onended = () => {
+        setIsPlaying(false);
+        if (isBlobUrl) URL.revokeObjectURL(preloadedUrl);
+        updateMediaSessionPlaybackState('none');
+        onEndRef.current?.();
+      };
+      audio.onerror = (e) => {
+        console.error('[TTS] Preloaded audio error:', e);
+        setIsPlaying(false);
+        if (isBlobUrl) URL.revokeObjectURL(preloadedUrl);
+        onErrorRef.current?.('Audio playback failed');
+      };
+      audio.src = preloadedUrl;
+      audio.load();
+      await audio.play();
+      setCurrentMode('openai');
+      setIsPlaying(true);
+      setWasCached(true);
+      onStartRef.current?.();
+      return;
+    }
+
+    // MOBILE FIX: Create and resume AudioContext + prime Audio element immediately
+    // within the user gesture context, BEFORE the async network call.
+    // If we wait until after fetch, the gesture context expires and play() fails.
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+    }
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+    if (audioContextRef.current.state === 'suspended') {
+      await audioContextRef.current.resume();
+    }
+    // Prime the audio element with a silent source so mobile browsers "unlock" it
+    // within the gesture context. This prevents NotAllowedError on play() later.
+    const silentPrime = audioRef.current;
+    try {
+      silentPrime.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+      silentPrime.load();
+      await silentPrime.play().catch(() => {});
+      silentPrime.pause();
+    } catch {}
 
     // Calculate dynamic timeout based on text length (longer texts need more time)
     const baseTimeout = Math.max(timeout, 15000); // At least 15 seconds
@@ -316,71 +395,87 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
     });
 
     try {
-      const invokePromise = supabase.functions.invoke('text-to-speech', {
-        body: {
-          text: text.trim(),
-          voice: opts.voice || selectedVoice,
-          provider: 'openai',
-          book: opts.book,
-          chapter: opts.chapter,
-          verse: opts.verse,
-          useCache: opts.useCache !== false
-        }
-      });
+      const requestedVoice = (opts.voice || selectedVoice) as unknown as string;
+      const normalizedVoice = (requestedVoice === 'ballad'
+        ? 'sage'
+        : requestedVoice === 'verse'
+          ? 'fable'
+          : requestedVoice) as VoiceId;
 
-      // Race between invoke and timeout
-      const { data, error } = await Promise.race([invokePromise, timeoutPromise]) as Awaited<typeof invokePromise>;
-
-      if (timeoutId) clearTimeout(timeoutId);
-      
-      if (timedOut) {
-        throw new Error('Network timeout - connection too slow');
-      }
-
-      if (error) {
-        throw new Error(error.message || 'Failed to generate speech');
-      }
+      const clientCacheKey = await buildCacheKey(text.trim(), normalizedVoice, 'openai');
+      const cachedBlob = await getCachedAudio(clientCacheKey);
 
       let audioUrl: string;
 
-      // Check if we got a cached URL or need to decode base64
-      if (data?.audioUrl) {
-        audioUrl = data.audioUrl;
-        setWasCached(data.cached === true);
-        console.log(`[TTS] Using ${data.cached ? 'cached' : 'newly cached'} audio`);
-      } else if (data?.audioContent) {
-        const audioBlob = new Blob(
-          [Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0))],
-          { type: 'audio/mpeg' }
-        );
-        audioUrl = URL.createObjectURL(audioBlob);
-        setWasCached(false);
+      if (cachedBlob) {
+        if (timeoutId) clearTimeout(timeoutId);
+        audioUrl = URL.createObjectURL(cachedBlob);
+        setWasCached(true);
+        console.log('[TTS Enhanced] Client cache hit, no edge function call');
       } else {
-        throw new Error('No audio content received');
+        const invokePromise = supabase.functions.invoke('text-to-speech', {
+          body: {
+            text: text.trim(),
+            voice: normalizedVoice,
+            provider: 'openai',
+            book: opts.book,
+            chapter: opts.chapter,
+            verse: opts.verse,
+            useCache: opts.useCache !== false
+          }
+        });
+
+        // Race between invoke and timeout
+        const { data, error } = await Promise.race([invokePromise, timeoutPromise]) as Awaited<typeof invokePromise>;
+
+        if (timeoutId) clearTimeout(timeoutId);
+        
+        if (timedOut) {
+          throw new Error('Network timeout - connection too slow');
+        }
+
+        if (error) {
+          throw new Error(error.message || 'Failed to generate speech');
+        }
+
+        // Check if we got a cached URL or need to decode base64
+        if (data?.audioUrl) {
+          try {
+            const resp = await fetch(data.audioUrl);
+            if (resp.ok) {
+              const blob = await resp.blob();
+              setCachedAudio(clientCacheKey, blob);
+              audioUrl = URL.createObjectURL(blob);
+            } else {
+              audioUrl = data.audioUrl;
+            }
+          } catch {
+            audioUrl = data.audioUrl;
+          }
+          setWasCached(data.cached === true);
+          console.log(`[TTS] Using ${data.cached ? 'cached' : 'newly cached'} audio`);
+        } else if (data?.audioContent) {
+          const audioBlob = new Blob(
+            [Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0))],
+            { type: 'audio/mpeg' }
+          );
+          setCachedAudio(clientCacheKey, audioBlob);
+          audioUrl = URL.createObjectURL(audioBlob);
+          setWasCached(false);
+        } else {
+          throw new Error('No audio content received');
+        }
       }
 
-      // Create and play audio with AudioContext for better mobile support
-      if (!audioRef.current) {
-        audioRef.current = new Audio();
-      }
-
-      // Create AudioContext if needed (helps prevent suspension on mobile)
-      if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      }
-
-      // Resume context if suspended
-      if (audioContextRef.current.state === 'suspended') {
-        await audioContextRef.current.resume();
-      }
-
-      const audio = audioRef.current;
+      // Audio element and AudioContext already primed above — reuse them
+      const audio = audioRef.current!;
       const isBlobUrl = audioUrl.startsWith('blob:');
       
       // Set up event handlers BEFORE setting src for reliability
       audio.onended = () => {
         console.log('[TTS Enhanced] Audio ended naturally');
         setIsPlaying(false);
+        updateMediaSessionPlaybackState('none');
         if (isBlobUrl) {
           URL.revokeObjectURL(audioUrl);
         }
@@ -393,7 +488,7 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
         if (isBlobUrl) {
           URL.revokeObjectURL(audioUrl);
         }
-        throw new Error('Audio playback failed');
+        onErrorRef.current?.('Audio playback failed');
       };
 
       audio.onpause = () => {
@@ -408,8 +503,28 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
       setIsPlaying(true);
       onStartRef.current?.();
 
+      // Register MediaSession for lock-screen / background playback on mobile
+      setupMediaSession({
+        title: 'Phototheology Audio',
+        artist: 'Phototheology Palace',
+        album: 'PT Audio',
+        onPlay: () => { audio.play(); updateMediaSessionPlaybackState('playing'); },
+        onPause: () => { audio.pause(); updateMediaSessionPlaybackState('paused'); },
+      });
+      updateMediaSessionPlaybackState('playing');
+
     } catch (error) {
       if (timeoutId) clearTimeout(timeoutId);
+
+      // Clean up audio element to prevent ghost playback after fallback
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.onended = null;
+        audioRef.current.onerror = null;
+        audioRef.current.onpause = null;
+        audioRef.current.removeAttribute('src');
+        audioRef.current.load();
+      }
 
       throw error;
     }
@@ -418,6 +533,12 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
   // Sanitize text for TTS - expand abbreviations and remove patterns that would be read literally
   const sanitizeTextForTTS = (text: string): string => {
     return text
+      // REMOVE UNWANTED PHRASES - banned expressions that AI might still generate
+      .replace(/\bmy dear friend,?\s*/gi, '')
+      .replace(/\bdear friend,?\s*/gi, '')
+      .replace(/\bmy dear student,?\s*/gi, '')
+      .replace(/\bdear student,?\s*/gi, '')
+      .replace(/\bmy friend,?\s*/gi, '')
       // EXPAND ABBREVIATIONS - prevent "dot" being spoken
       .replace(/\bRev\.\s*/gi, 'Revelation ')
       .replace(/\bGen\.\s*/gi, 'Genesis ')
@@ -447,6 +568,53 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
       .replace(/\s+/g, ' ')
       .trim();
   };
+
+  // Preload audio for a text without playing — eliminates gaps between sections
+  const preload = useCallback(async (text: string, speakOptions?: SpeakOptions) => {
+    if (!text.trim()) return;
+    const cleanText = sanitizeTextForTTS(text);
+    const opts: SpeakOptions = speakOptions || {};
+    const requestedVoice = (opts.voice || selectedVoice) as unknown as string;
+    const cacheKey = `${requestedVoice}:${cleanText.slice(0, 120)}`;
+    if (preloadedAudioRef.current.has(cacheKey)) return; // already preloaded
+
+    try {
+      const normalizedVoice = (requestedVoice === 'ballad'
+        ? 'sage'
+        : requestedVoice === 'verse'
+          ? 'fable'
+          : requestedVoice) as VoiceId;
+
+      const { data, error } = await supabase.functions.invoke('text-to-speech', {
+        body: {
+          text: cleanText,
+          voice: normalizedVoice,
+          provider: 'openai',
+          book: opts.book,
+          chapter: opts.chapter,
+          verse: opts.verse,
+          useCache: opts.useCache !== false
+        }
+      });
+
+      if (error || (!data?.audioUrl && !data?.audioContent)) return;
+
+      let audioUrl: string;
+      if (data.audioUrl) {
+        audioUrl = data.audioUrl;
+      } else {
+        const audioBlob = new Blob(
+          [Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0))],
+          { type: 'audio/mpeg' }
+        );
+        audioUrl = URL.createObjectURL(audioBlob);
+      }
+      preloadedAudioRef.current.set(cacheKey, audioUrl);
+      console.log('[TTS] Preloaded audio for next section');
+    } catch {
+      // Preload failures are silent — speak() will fetch normally
+    }
+  }, [selectedVoice]);
 
   const speak = useCallback(async (text: string, speakOptions?: SpeakOptions | VoiceId) => {
     if (!text.trim()) {
@@ -482,18 +650,33 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
       }
 
       if (shouldUseBrowser || networkStatus === 'offline') {
-        // Use browser TTS
+        // Use browser TTS only when explicitly requested or offline
         console.log('[TTS] Using browser TTS (offline or requested)');
         await speakWithBrowser(cleanText);
       } else {
-        // Try ElevenLabs first, fallback to browser on error
-        try {
-          console.log('[TTS] Attempting ElevenLabs TTS');
-          await speakWithElevenLabs(cleanText, opts);
-        } catch (elevenLabsError) {
-          console.warn('[TTS] ElevenLabs failed, falling back to browser TTS:', elevenLabsError);
-          toast.info('Using offline voice mode');
-          await speakWithBrowser(cleanText);
+        // Use OpenAI TTS with one retry — never silently fall back to robotic browser voice
+        let lastError: unknown;
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            console.log(`[TTS] Attempting OpenAI TTS (attempt ${attempt + 1})`);
+            await speakWithElevenLabs(cleanText, opts);
+            lastError = null;
+            break;
+          } catch (openaiError) {
+            lastError = openaiError;
+            console.warn(`[TTS] OpenAI TTS attempt ${attempt + 1} failed:`, openaiError);
+            if (attempt === 0) {
+              // Clean up before retry
+              stop();
+              await new Promise(r => setTimeout(r, 1000));
+            }
+          }
+        }
+        if (lastError) {
+          stop();
+          const msg = lastError instanceof Error ? lastError.message : 'Audio generation failed';
+          toast.error(`Voice generation failed: ${msg}`);
+          throw lastError;
         }
       }
 
@@ -510,6 +693,7 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
   return {
     speak,
     stop,
+    preload,
     isLoading,
     isPlaying,
     selectedVoice,

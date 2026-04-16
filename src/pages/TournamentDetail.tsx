@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 
 export default function TournamentDetail() {
+  const { t } = useTranslation();
   const { tournamentId } = useParams();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -162,12 +164,12 @@ export default function TournamentDetail() {
         .eq("id", tournamentId);
 
       toast({
-        title: "Tournament Started!",
-        description: "Bracket has been generated. Players can now compete!",
+        title: t('principles.tournamentStarted'),
+        description: t('principles.bracketGenerated'),
       });
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: t('common.error'),
         description: error.message,
         variant: "destructive",
       });
@@ -178,7 +180,7 @@ export default function TournamentDetail() {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
-        <div className="container mx-auto px-4 py-24 text-center">Loading...</div>
+        <div className="container mx-auto px-4 py-24 text-center">{t('common.loading')}</div>
       </div>
     );
   }
@@ -205,7 +207,7 @@ export default function TournamentDetail() {
                 <div>
                   <div className="text-2xl font-bold">{participants.length}</div>
                   <div className="text-sm text-muted-foreground">
-                    / {tournament?.max_participants} players
+                    / {tournament?.max_participants} {t('principles.players')}
                   </div>
                 </div>
               </div>
@@ -216,7 +218,7 @@ export default function TournamentDetail() {
                 <Trophy className="w-8 h-8 text-primary" />
                 <div>
                   <div className="text-2xl font-bold">{tournament?.total_rounds}</div>
-                  <div className="text-sm text-muted-foreground">rounds</div>
+                  <div className="text-sm text-muted-foreground">{t('principles.rounds')}</div>
                 </div>
               </div>
             </Card>
@@ -239,9 +241,9 @@ export default function TournamentDetail() {
               <div className="flex items-center gap-3">
                 <Award className="w-8 h-8 text-yellow-500" />
                 <div>
-                  <div className="text-sm font-semibold">Prizes</div>
+                  <div className="text-sm font-semibold">{t('principles.prizes')}</div>
                   <div className="text-xs text-muted-foreground">
-                    {tournament?.prize_pool?.length || 0} rewards
+                    {t('principles.rewardsCount', { count: tournament?.prize_pool?.length || 0 })}
                   </div>
                 </div>
               </div>
@@ -252,7 +254,7 @@ export default function TournamentDetail() {
             <div className="mt-4">
               <Button onClick={startTournament} size="lg" className="w-full">
                 <PlayCircle className="w-5 h-5 mr-2" />
-                Start Tournament
+                {t('principles.startTournament')}
               </Button>
             </div>
           )}
@@ -261,9 +263,9 @@ export default function TournamentDetail() {
         {/* Tabs */}
         <Tabs defaultValue="bracket" className="w-full">
           <TabsList className="w-full justify-start">
-            <TabsTrigger value="bracket">Bracket</TabsTrigger>
-            <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
-            <TabsTrigger value="prizes">Prizes</TabsTrigger>
+            <TabsTrigger value="bracket">{t('principles.bracket')}</TabsTrigger>
+            <TabsTrigger value="leaderboard">{t('guilds.leaderboard')}</TabsTrigger>
+            <TabsTrigger value="prizes">{t('principles.prizes')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="bracket" className="mt-6">
@@ -275,9 +277,9 @@ export default function TournamentDetail() {
             ) : (
               <Card className="p-12 text-center">
                 <Trophy className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-xl font-semibold mb-2">No Bracket Yet</h3>
+                <h3 className="text-xl font-semibold mb-2">{t('principles.noBracketYet')}</h3>
                 <p className="text-muted-foreground">
-                  Waiting for tournament to start...
+                  {t('principles.waitingForTournament')}
                 </p>
               </Card>
             )}
@@ -310,7 +312,7 @@ export default function TournamentDetail() {
                     </div>
                     <div className="text-right">
                       <div className="text-2xl font-bold">{participant.total_score}</div>
-                      <div className="text-xs text-muted-foreground">points</div>
+                      <div className="text-xs text-muted-foreground">{t('common.points')}</div>
                     </div>
                   </div>
                 ))}
@@ -326,7 +328,7 @@ export default function TournamentDetail() {
                     {index === 0 ? "🥇" : index === 1 ? "🥈" : "🥉"}
                   </div>
                   <div className="font-bold text-lg mb-1">
-                    {index === 0 ? "1st" : index === 1 ? "2nd" : "3rd"} Place
+                    {index === 0 ? t('principles.firstPlace') : index === 1 ? t('principles.secondPlace') : t('principles.thirdPlace')}
                   </div>
                   <div className="text-muted-foreground">{prize}</div>
                 </Card>

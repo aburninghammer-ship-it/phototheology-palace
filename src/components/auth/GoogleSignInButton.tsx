@@ -3,27 +3,59 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { ensureStorageSpace, isQuotaError, getStorageErrorMessage } from "@/utils/storageManager";
 
 export function GoogleSignInButton() {
   const [loading, setLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
+
+    // Check and clear storage if needed before OAuth
+    const storageCheck = ensureStorageSpace();
+    if (!storageCheck.success) {
+      toast.error(getStorageErrorMessage());
+      setLoading(false);
+      return;
+    }
+    if (storageCheck.cleared > 0) {
+      console.log(`[GoogleAuth] Cleared ${storageCheck.cleared} cached items to free storage`);
+    }
+
     try {
+      // Preserve any intended post-login redirect (e.g. /auth?redirect=%2Fprofile)
+      const params = new URLSearchParams(window.location.search);
+      const redirectParam = params.get("redirect");
+      const safeRedirect =
+        redirectParam && redirectParam.startsWith("/") && !redirectParam.startsWith("//")
+          ? redirectParam
+          : null;
+
+      const callbackUrl = new URL(`${window.location.origin}/auth/callback`);
+      if (safeRedirect) callbackUrl.searchParams.set("redirect", safeRedirect);
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: callbackUrl.toString(),
         },
       });
 
       if (error) {
-        toast.error("Failed to sign in with Google");
+        if (isQuotaError(error)) {
+          toast.error(getStorageErrorMessage());
+        } else {
+          toast.error("Failed to sign in with Google");
+        }
         console.error("Google sign-in error:", error);
       }
     } catch (err) {
-      toast.error("An unexpected error occurred");
       console.error("Google sign-in error:", err);
+      if (isQuotaError(err)) {
+        toast.error(getStorageErrorMessage());
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     } finally {
       setLoading(false);
     }

@@ -3,10 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ChefHat, Loader2, Eye, RefreshCw, Share2, Facebook, Twitter } from "lucide-react";
+import { ChefHat, Loader2, Eye, RefreshCw, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
+import { GenericChallengeShareDialog } from "./GenericChallengeShareDialog";
+import { PostToPublicChallengeButton } from "./PostToPublicChallengeButton";
 
 interface ChefRecipeChallengeProps {
   challenge: any;
@@ -24,13 +26,19 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
   const [modelAnswer, setModelAnswer] = useState("");
   const [feedback, setFeedback] = useState<any>(null);
   const [difficulty, setDifficulty] = useState<"easy" | "intermediate" | "pro" | "master">("intermediate");
+  const [showShareDialog, setShowShareDialog] = useState(false);
   const { toast } = useToast();
+
+  const theme = challenge.ui_config?.theme || challenge.title || "Biblical Recipe";
+  const shareContent = verses.length > 0
+    ? verses.map((verse: any) => `${verse.reference}: "${verse.text}"`).join("\n\n")
+    : "";
 
   const difficultyConfig = {
     easy: { min: 3, max: 4, label: "Easy", icon: "🌱", description: "3-4 verses" },
     intermediate: { min: 5, max: 6, label: "Intermediate", icon: "🔥", description: "5-6 verses" },
-    pro: { min: 7, max: 8, label: "Pro", icon: "💎", description: "7-8 verses" },
-    master: { min: 9, max: 10, label: "Master", icon: "👑", description: "9-10 verses" }
+    pro: { min: 10, max: 10, label: "Pro", icon: "💎", description: "10 verses" },
+    master: { min: 10, max: 10, label: "Master", icon: "👑", description: "10 verses" }
   };
 
   // Remove auto-generation - user must click the button
@@ -168,19 +176,8 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
     });
   };
 
-  const shareToFacebook = () => {
-    const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent(`I just completed the Chef Challenge on Phototheology! 🍳 Can you create a Bible study from ${verses.length} random verses?`);
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank', 'width=600,height=400');
-  };
-
-  const shareToTwitter = () => {
-    const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent(`I just completed the Chef Challenge on Phototheology! 🍳 Can you create a Bible study from ${verses.length} random verses? #Phototheology #BibleStudy`);
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=600,height=400');
-  };
-
   return (
+    <>
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
@@ -191,12 +188,12 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
           <div className="flex items-center gap-2">
             <Badge>Quick • 5-10 min</Badge>
             <Button
-              onClick={shareToFacebook}
+              onClick={() => setShowShareDialog(true)}
               variant="outline"
               size="sm"
               className="gap-2"
             >
-              <Facebook className="h-4 w-4" />
+              <Share2 className="h-4 w-4" />
               Share
             </Button>
           </div>
@@ -206,10 +203,6 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="bg-muted p-4 rounded-lg">
-          <p className="font-semibold mb-2">🎯 Theme:</p>
-          <p className="text-lg">{challenge.ui_config?.theme || challenge.description}</p>
-        </div>
 
         <div className="space-y-4">
           <div>
@@ -395,15 +388,36 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
                 </Button>
               </>
             ) : (
-              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg space-y-3">
                 <p className="text-green-800 dark:text-green-200">
                   ✓ Recipe Complete! Added to your Growth Journal.
                 </p>
               </div>
             )}
+
+            {verses.length > 0 && (
+              <PostToPublicChallengeButton
+                challengeType="chef"
+                title={`Chef Challenge: ${theme}`}
+                content={verses.map((v: any) => `📖 **${v.reference}**\n> "${v.text}"`).join("\n\n") + `\n\n⚡ Challenge: Weave these random verses into a coherent Bible study recipe!`}
+                difficulty={difficulty}
+                className="w-full"
+              />
+            )}
           </>
         )}
       </CardContent>
     </Card>
+
+    <GenericChallengeShareDialog
+      open={showShareDialog}
+      onOpenChange={setShowShareDialog}
+      challengeType="chef"
+      title={`Chef Challenge: ${theme}`}
+      description={`Theme: ${theme} • ${verses.length} ingredient verses`}
+      difficulty={difficulty}
+      content={shareContent || undefined}
+    />
+    </>
   );
 };

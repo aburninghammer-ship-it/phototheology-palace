@@ -40,7 +40,7 @@ export const OfflineIndicator = () => {
     <Badge
       variant="outline"
       className={cn(
-        "fixed bottom-4 left-4 z-50 gap-1.5 transition-all duration-300",
+        "fixed bottom-24 md:bottom-4 left-4 z-50 gap-1.5 transition-all duration-300",
         isOnline
           ? "bg-green-100 text-green-700 border-green-300"
           : "bg-amber-100 text-amber-700 border-amber-300 animate-pulse"

@@ -15,6 +15,9 @@ import { RefreshCw } from "lucide-react";
 import { BIBLE_BOOK_METADATA } from "@/data/bibleBooks";
 import { BIBLE_TRANSLATIONS } from "@/services/bibleApi";
 import { PTIntegrationPrompt } from "@/components/reading-plans/PTIntegrationPrompt";
+import { useSparks } from "@/hooks/useSparks";
+import { SparkContainer, SparkSettings } from "@/components/sparks";
+import { useTranslation } from 'react-i18next';
 
 type ChapterRef = { book: string; chapter: number };
 
@@ -71,6 +74,7 @@ const generateSequentialPassagesForPlan = (
 };
 
 export default function DailyReading() {
+  const { t } = useTranslation();
   const { userProgress, loading, generateExercises } = useReadingPlans();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -83,6 +87,23 @@ export default function DailyReading() {
   const [completedDayNumber, setCompletedDayNumber] = useState(0);
   const [passagesLoading, setPassagesLoading] = useState(false);
   const [passagesError, setPassagesError] = useState<string | null>(null);
+
+  // Sparks integration
+  const {
+    sparks,
+    preferences: sparkPreferences,
+    openSpark,
+    saveSpark,
+    dismissSpark,
+    exploreSpark,
+    updatePreferences: updateSparkPreferences
+  } = useSparks({
+    surface: 'study',
+    contextType: 'study',
+    contextId: userProgress?.id || 'daily-reading',
+    maxSparks: 3,
+    debounceMs: 90000
+  });
 
   useEffect(() => {
     if (userProgress) {
@@ -106,10 +127,10 @@ export default function DailyReading() {
 
       if (planError || !planData) {
         console.error('Error loading plan:', planError);
-        setPassagesError("Failed to load reading plan");
+        setPassagesError(t('dailyReading.failedToLoadPlan'));
         toast({
-          title: "Error",
-          description: "Failed to load reading plan",
+          title: t('dailyReading.error'),
+          description: t('dailyReading.failedToLoadPlan'),
           variant: "destructive",
         });
         setPassagesLoading(false);
@@ -177,10 +198,10 @@ export default function DailyReading() {
       
       if (passages.length === 0) {
         console.warn('No passages found for current day. Schedule:', schedule);
-        setPassagesError("Unable to determine today's reading passages");
+        setPassagesError(t('dailyReading.unableToDeterminePassages'));
         toast({
-          title: "No Passages Found",
-          description: "Unable to determine today's reading. Please check your plan settings.",
+          title: t('dailyReading.noPassagesFound'),
+          description: t('dailyReading.unableToDetermineReading'),
           variant: "destructive",
         });
         setTodaysPassages([]);
@@ -199,10 +220,10 @@ export default function DailyReading() {
       }
     } catch (error) {
       console.error('Error in loadPlanAndExercises:', error);
-      setPassagesError("Failed to load today's reading");
+      setPassagesError(t('dailyReading.failedToLoadReading'));
       toast({
-        title: "Error",
-        description: "Failed to load today's reading",
+        title: t('dailyReading.error'),
+        description: t('dailyReading.failedToLoadReading'),
         variant: "destructive",
       });
       setPassagesLoading(false);
@@ -240,8 +261,8 @@ export default function DailyReading() {
     } catch (error) {
       console.error('Error generating exercises:', error);
       toast({
-        title: "Error",
-        description: "Failed to generate exercises",
+        title: t('dailyReading.error'),
+        description: t('dailyReading.failedToGenerateExercises'),
         variant: "destructive",
       });
       return null;
@@ -251,8 +272,8 @@ export default function DailyReading() {
   const handleRegenerateExercises = async () => {
     if (!plan || todaysPassages.length === 0) {
       toast({
-        title: "Error",
-        description: "Unable to regenerate without passages",
+        title: t('dailyReading.error'),
+        description: t('dailyReading.unableToRegenerateWithoutPassages'),
         variant: "destructive",
       });
       return;
@@ -264,8 +285,8 @@ export default function DailyReading() {
       if (result) {
         setExercises(result);
         toast({
-          title: "Exercises Refreshed!",
-          description: "New room combinations generated for today's study",
+          title: t('dailyReading.exercisesRefreshed'),
+          description: t('dailyReading.newRoomCombinations'),
         });
       }
     } finally {
@@ -303,8 +324,8 @@ export default function DailyReading() {
     } catch (error) {
       console.error("Error completing day:", error);
       toast({
-        title: "Error",
-        description: "Failed to complete today's reading",
+        title: t('dailyReading.error'),
+        description: t('dailyReading.failedToCompleteReading'),
         variant: "destructive",
       });
     } finally {
@@ -315,8 +336,8 @@ export default function DailyReading() {
   const handleSkipIntegration = () => {
     setShowPTPrompt(false);
     toast({
-      title: "Day Complete!",
-      description: "Moving to next day",
+      title: t('dailyReading.dayComplete'),
+      description: t('dailyReading.movingToNextDay'),
     });
     window.location.reload();
   };
@@ -352,14 +373,14 @@ export default function DailyReading() {
         <div className="container mx-auto px-4 py-8">
           <Card className="p-12 text-center max-w-2xl mx-auto">
             <h2 className="text-2xl font-bold mb-4 text-foreground">
-              No Active Reading Plan
+              {t('dailyReading.noActivePlan')}
             </h2>
             <p className="text-muted-foreground mb-6">
-              Start a reading plan to begin your guided Bible journey
+              {t('dailyReading.startAPlan')}
             </p>
             <Button onClick={() => navigate("/reading-plans")}>
               <Book className="h-4 w-4 mr-2" />
-              Browse Reading Plans
+              {t('dailyReading.browseReadingPlans')}
             </Button>
           </Card>
         </div>
@@ -371,6 +392,28 @@ export default function DailyReading() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Sparks Container */}
+      {sparks.length > 0 && (
+        <div className="fixed bottom-24 right-4 md:bottom-auto md:top-20 z-50">
+          <SparkContainer
+            sparks={sparks}
+            onOpen={openSpark}
+            onSave={saveSpark}
+            onDismiss={dismissSpark}
+            onExplore={exploreSpark}
+            position="floating"
+          />
+        </div>
+      )}
+
+      {/* Spark Settings */}
+      <div className="fixed bottom-24 md:bottom-4 right-4 z-40">
+        <SparkSettings
+          preferences={sparkPreferences}
+          onUpdate={updateSparkPreferences}
+        />
+      </div>
+
       <Navigation />
       
       <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -379,10 +422,10 @@ export default function DailyReading() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-2xl font-bold text-foreground">
-                Day {userProgress.current_day}
+                {t('dailyReading.dayNumber', { day: userProgress.current_day })}
               </h2>
               <p className="text-muted-foreground">
-                Your daily reading assignment
+                {t('dailyReading.yourDailyAssignment')}
               </p>
               {plan && (
                 <div className="flex items-center gap-2 mt-1">
@@ -391,14 +434,14 @@ export default function DailyReading() {
                   </p>
                   {userProgress.preferred_translation && (
                     <Badge variant="outline" className="text-xs">
-                      {BIBLE_TRANSLATIONS.find(t => t.value === userProgress.preferred_translation)?.label.split('(')[1]?.replace(')', '') || userProgress.preferred_translation.toUpperCase()}
+                      {BIBLE_TRANSLATIONS.find(tr => tr.value === userProgress.preferred_translation)?.label.split('(')[1]?.replace(')', '') || userProgress.preferred_translation.toUpperCase()}
                     </Badge>
                   )}
                 </div>
               )}
             </div>
             <div className="text-right">
-              <p className="text-sm text-muted-foreground">Progress</p>
+              <p className="text-sm text-muted-foreground">{t('dailyReading.progress')}</p>
               <p className="text-lg font-bold text-primary">
                 {Math.round(progressPercent)}%
               </p>
@@ -411,12 +454,12 @@ export default function DailyReading() {
         <Card className="p-6 mb-6">
           <h3 className="text-xl font-bold mb-4 text-foreground flex items-center">
             <Book className="h-5 w-5 mr-2 text-primary" />
-            Today's Passages
+            {t('dailyReading.todaysPassages')}
           </h3>
           {passagesLoading ? (
             <div className="text-center py-4 text-muted-foreground">
               <Book className="h-8 w-8 mx-auto mb-2 opacity-50 animate-pulse" />
-              <p>Loading today's passages...</p>
+              <p>{t('dailyReading.loadingPassages')}</p>
             </div>
           ) : passagesError ? (
             <div className="text-center py-4 text-muted-foreground">
@@ -426,7 +469,7 @@ export default function DailyReading() {
                 setPassagesError(null);
                 loadPlanAndExercises();
               }}>
-                Try Again
+                {t('dailyReading.tryAgain')}
               </Button>
             </div>
           ) : todaysPassages.length > 0 ? (
@@ -449,7 +492,7 @@ export default function DailyReading() {
                       {passage.book} {passage.chapter}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Verses {passage.verses}
+                      {t('dailyReading.verses', { verses: passage.verses })}
                     </p>
                   </div>
                   <ArrowRight className="h-4 w-4 text-primary" />
@@ -459,9 +502,9 @@ export default function DailyReading() {
           ) : (
             <div className="text-center py-4 text-muted-foreground">
               <Book className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>No passages found for today</p>
+              <p>{t('dailyReading.noPassagesForToday')}</p>
               <Button variant="outline" size="sm" className="mt-2" onClick={() => loadPlanAndExercises()}>
-                Reload
+                {t('dailyReading.reload')}
               </Button>
             </div>
           )}
@@ -472,7 +515,7 @@ export default function DailyReading() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <Building2 className="h-6 w-6 text-primary" />
-              <h3 className="text-xl font-bold text-foreground">Palace Floor Exercises</h3>
+              <h3 className="text-xl font-bold text-foreground">{t('dailyReading.palaceFloorExercises')}</h3>
             </div>
             <Button
               variant="outline"
@@ -481,14 +524,14 @@ export default function DailyReading() {
               disabled={regenerating || !exercises.length}
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${regenerating ? 'animate-spin' : ''}`} />
-              {regenerating ? 'Generating...' : 'Regenerate'}
+              {regenerating ? t('dailyReading.generating') : t('dailyReading.regenerate')}
             </Button>
           </div>
           
           {exercises.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Building2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>Loading today's exercises...</p>
+              <p>{t('dailyReading.loadingExercises')}</p>
             </div>
           ) : (
             <Tabs defaultValue={`floor-${exercises[0]?.floorNumber}`} className="w-full">
@@ -500,7 +543,7 @@ export default function DailyReading() {
                     className="flex flex-col items-center gap-1 py-3"
                   >
                     <Building2 className="h-4 w-4" />
-                    <span className="text-xs">Floor {exercise.floorNumber}</span>
+                    <span className="text-xs">{t('dailyReading.floorNumber', { number: exercise.floorNumber })}</span>
                   </TabsTrigger>
                 ))}
               </TabsList>
@@ -512,10 +555,10 @@ export default function DailyReading() {
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-2">
                         <h4 className="font-bold text-foreground">{exercise.floorName}</h4>
-                        <Badge variant="outline" className="text-xs">Floor {exercise.floorNumber}</Badge>
+                        <Badge variant="outline" className="text-xs">{t('dailyReading.floorNumber', { number: exercise.floorNumber })}</Badge>
                       </div>
                       <p className="text-sm text-muted-foreground mb-3">
-                        Rooms: {exercise.rooms && Array.isArray(exercise.rooms) ? exercise.rooms.join(" • ") : "Various rooms"}
+                        {t('dailyReading.rooms')}: {exercise.rooms && Array.isArray(exercise.rooms) ? exercise.rooms.join(" • ") : t('dailyReading.variousRooms')}
                       </p>
                     </div>
                   </div>
@@ -528,7 +571,7 @@ export default function DailyReading() {
                     <p className="text-muted-foreground mb-4">{exercise.prompt}</p>
                     
                     <div className="space-y-2">
-                      <p className="text-sm font-medium text-foreground">Guiding Questions:</p>
+                      <p className="text-sm font-medium text-foreground">{t('dailyReading.guidingQuestions')}</p>
                       <ul className="space-y-2">
                         {exercise.questions?.map((q: string, qIdx: number) => (
                           <li key={qIdx} className="text-sm text-muted-foreground flex items-start gap-2">
@@ -553,7 +596,7 @@ export default function DailyReading() {
           className="w-full"
         >
           <CheckCircle className="h-5 w-5 mr-2" />
-          {completing ? "Completing..." : "Complete Today's Reading"}
+          {completing ? t('dailyReading.completing') : t('dailyReading.completeTodaysReading')}
         </Button>
       </div>
 

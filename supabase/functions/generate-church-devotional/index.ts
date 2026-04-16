@@ -69,17 +69,35 @@ TONE REQUIREMENTS:
 - Avoid over-sentimentality, internet slang, or "we're special because we're different" language
 - Address ${churchName} by name at least 2-3 times throughout the devotional
 
+CONTENT UNIQUENESS - CRITICAL:
+- Each devotional MUST offer a FRESH, UNIQUE insight - not repeated lessons
+- INCLUDE specific biblical examples, stories, or characters to illustrate points
+- Paint vivid biblical scenes - don't just quote verses, tell the story
+- Reference specific narratives (Acts church scatter, early believers' challenges, etc.)
+- The lesson must feel NEW each time, even if the day-of-week theme is similar
+
 ${customGuidelines ? `ADDITIONAL GUIDELINES:\n${customGuidelines}` : ''}
+
+TITLE REQUIREMENTS - CRITICAL:
+- Each title MUST be UNIQUE and SPECIFIC to this devotional's central message
+- NEVER use generic titles like "Walking Together", "United in Christ", "Standing Firm", "His Faithfulness"
+- The title should capture the SPECIFIC angle or insight of THIS devotional
+- Make it memorable, declarative, and distinct from any previous devotional title
+- Think: "If someone saw only this title, they'd be curious what's inside"
 
 OUTPUT FORMAT (JSON):
 {
-  "title": "Short, identity-shaping declarative title (not cute or vague)",
+  "title": "Unique, declarative title specific to this devotional's angle (avoid generic church phrases)",
   "anchorScripture": "Full verse reference (e.g., Matthew 18:20)",
-  "scriptureText": "Full text of the scripture verse(s)",
-  "meditation": "2-3 short paragraphs that: 1) Address ${churchName} directly 2) Reframe online/scattered church as biblical, not modern 3) Call to personal holiness without external pressure 4) Link righteousness to mission, not comfort",
-  "communalPractice": "One simple, actionable practice for ${churchName} community engagement (e.g., 'Tag one ${churchName} member and pray for them today')",
-  "closingPrayer": "4-6 lines addressing God on behalf of ${churchName}, always plural (we, not I), focused on: faithfulness, boldness, love, endurance, obedience"
+  "scriptureText": "Full text of the scripture verse(s) - include 2-4 verses if relevant",
+  "meditation": "A substantial, 4-6 paragraph meditation (each paragraph 4-6 sentences) that: 1) Opens by addressing ${churchName} directly with a compelling hook 2) Explores the scripture's original context and meaning 3) Reframes online/scattered church as biblical, not modern 4) Develops the theme with rich theological depth and practical insight 5) Calls to personal holiness without external pressure 6) Links righteousness to mission, not comfort 7) Closes with a Christ-centered synthesis. Write with pastoral warmth and prophetic urgency. Each paragraph should build on the previous one, creating a cohesive spiritual journey through the text.",
+  "communalPractice": "2-3 specific, actionable practices for ${churchName} community engagement throughout the week. Include both digital and in-person options where applicable.",
+  "closingPrayer": "A rich 8-12 line pastoral prayer addressing God on behalf of ${churchName}, always plural (we, not I). Structure: 1) Acknowledge God's character related to today's theme 2) Confess our weakness in this area 3) Ask for specific grace and strength 4) Intercede for the church body 5) Close with a declaration of trust and hope"
 }`;
+
+    // Add date context for unique titles
+    const today = new Date();
+    const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -91,9 +109,10 @@ OUTPUT FORMAT (JSON):
         model: 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Generate a ${dayOfWeek} devotional with the theme: "${dayTheme}". Make it powerful, grounded, and mission-focused for ${churchName}.` }
+          { role: 'user', content: `Generate a ${dayOfWeek} devotional with the theme: "${dayTheme}" for ${dateStr}. Make it powerful, grounded, and mission-focused for ${churchName}. Create a UNIQUE title that hasn't been used before - something fresh and specific to the insight you'll share today.` }
         ],
-        temperature: 0.7,
+        temperature: 0.8,
+        max_tokens: 8192,
       }),
     });
 

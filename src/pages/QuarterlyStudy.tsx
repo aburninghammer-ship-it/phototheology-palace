@@ -1,18 +1,23 @@
 import { useState, useEffect } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { QUARTERLY_STUDY_TOUR } from "@/data/guidedTours";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, BookOpen, Calendar, Sparkles, Bot } from "lucide-react";
+import { Loader2, BookOpen, Calendar, Sparkles, Bot, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentQuarterly, getQuarterlyLesson, type Quarterly, type QuarterlyLesson } from "@/services/quarterlyApi";
 import { Navigation } from "@/components/Navigation";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
+import { q4_2025_lessons } from "@/data/q4-2025-lesson-content";
 
 const QuarterlyStudy = () => {
+  const { t } = useTranslation();
   const [quarterly, setQuarterly] = useState<Quarterly | null>(null);
   const [selectedLesson, setSelectedLesson] = useState<QuarterlyLesson | null>(null);
   const [lessonContent, setLessonContent] = useState<any>(null);
@@ -24,7 +29,9 @@ const QuarterlyStudy = () => {
   const [selectedPrinciple, setSelectedPrinciple] = useState<string>("");
   const [userLessonInput, setUserLessonInput] = useState<string>("");
   const [userQuestion, setUserQuestion] = useState<string>("");
+  const [showPdfViewer, setShowPdfViewer] = useState(false);
   const { toast } = useToast();
+  const [tourOpen, setTourOpen] = useState(false);
 
   const rooms = [
     "Room 1: Story Room (SR)", "Room 2: Imagination Room (IR)", "Room 3: 24FPS Room (24)", 
@@ -86,8 +93,8 @@ const QuarterlyStudy = () => {
         setSelectedLesson(currentLesson);
         loadLessonContent(quarterly.id, currentLesson.id);
         toast({
-          title: "This Week's Lesson",
-          description: `Lesson ${currentLesson.index}: ${currentLesson.title}`,
+          title: t('quarterlyStudy.thisWeeksLesson'),
+          description: t('quarterlyStudy.lessonWithTitle', { index: currentLesson.index, title: currentLesson.title }),
         });
       } else {
         setSelectedLesson(quarterly.lessons[0]);
@@ -103,16 +110,16 @@ const QuarterlyStudy = () => {
         setQuarterly(data);
       } else {
         toast({
-          title: "Unable to load quarterly",
-          description: "Could not fetch the current lesson quarterly",
+          title: t('quarterlyStudy.unableToLoad'),
+          description: t('quarterlyStudy.couldNotFetch'),
           variant: "destructive",
         });
       }
     } catch (error) {
       console.error("Error loading quarterly:", error);
       toast({
-        title: "Error",
-        description: "Failed to load quarterly data",
+        title: t('quarterlyStudy.error'),
+        description: t('quarterlyStudy.failedToLoadQuarterly'),
         variant: "destructive",
       });
     } finally {
@@ -133,8 +140,8 @@ const QuarterlyStudy = () => {
     } catch (error) {
       console.error("Error loading lesson:", error);
       toast({
-        title: "Error",
-        description: "Failed to load lesson content",
+        title: t('quarterlyStudy.error'),
+        description: t('quarterlyStudy.failedToLoadLesson'),
         variant: "destructive",
       });
     } finally {
@@ -156,8 +163,8 @@ const QuarterlyStudy = () => {
   const handleApplyRoomOrPrinciple = async () => {
     if (!selectedRoom && !selectedPrinciple) {
       toast({
-        title: "Selection Required",
-        description: "Please select a room or principle to apply",
+        title: t('quarterlyStudy.selectionRequired'),
+        description: t('quarterlyStudy.pleaseSelectRoomOrPrinciple'),
         variant: "destructive",
       });
       return;
@@ -165,8 +172,8 @@ const QuarterlyStudy = () => {
 
     if (!userLessonInput.trim()) {
       toast({
-        title: "Lesson Content Required",
-        description: "Please paste the lesson content you want to analyze",
+        title: t('quarterlyStudy.lessonContentRequired'),
+        description: t('quarterlyStudy.pleasePasteLessonContent'),
         variant: "destructive",
       });
       return;
@@ -191,14 +198,14 @@ const QuarterlyStudy = () => {
 
       setJeevesResponse(data);
       toast({
-        title: "Analysis Complete",
-        description: "Jeeves has analyzed the lesson with your selected framework",
+        title: t('quarterlyStudy.analysisComplete'),
+        description: t('quarterlyStudy.jeevesAnalyzedLesson'),
       });
     } catch (error: any) {
       console.error("Error analyzing:", error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to analyze lesson",
+        title: t('quarterlyStudy.error'),
+        description: error.message || t('quarterlyStudy.failedToAnalyze'),
         variant: "destructive",
       });
     } finally {
@@ -210,6 +217,16 @@ const QuarterlyStudy = () => {
     if (!lessonContent || !selectedDay) return null;
     return lessonContent.days?.find((d: any) => d.id === selectedDay);
   };
+
+  // Auto-populate the study textarea when a day is selected
+  useEffect(() => {
+    const dayContent = getCurrentDayContent();
+    if (dayContent?.content) {
+      // Strip HTML tags if present, keep plain text
+      const plainText = dayContent.content.replace(/<[^>]*>/g, '').trim();
+      setUserLessonInput(plainText);
+    }
+  }, [selectedDay, lessonContent]);
 
   if (loading && !quarterly) {
     return (
@@ -225,15 +242,16 @@ const QuarterlyStudy = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={QUARTERLY_STUDY_TOUR} onClose={() => setTourOpen(false)} />}
       
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-serif font-bold gradient-text mb-2">
-            Lesson Study with Jeeves
+            {t('quarterlyStudy.pageTitle')}
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Apply the 38 Palace Rooms to your weekly lesson study
+            {t('quarterlyStudy.pageSubtitle')}
           </p>
         </div>
 
@@ -250,7 +268,7 @@ const QuarterlyStudy = () => {
                   className="text-sm bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-all flex items-center gap-2"
                 >
                   <BookOpen className="h-4 w-4" />
-                  Quarterly PDF
+                  {t('quarterlyStudy.quarterlyPdf')}
                 </a>
               </CardTitle>
               <CardDescription className="text-white/90">
@@ -268,7 +286,7 @@ const QuarterlyStudy = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Calendar className="h-5 w-5" />
-                  Select Lesson
+                  {t('quarterlyStudy.selectLesson')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -277,12 +295,12 @@ const QuarterlyStudy = () => {
                   onValueChange={handleLessonSelect}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Choose a lesson" />
+                    <SelectValue placeholder={t('quarterlyStudy.chooseALesson')} />
                   </SelectTrigger>
                   <SelectContent>
                     {quarterly?.lessons.map((lesson) => (
                       <SelectItem key={lesson.id} value={lesson.id}>
-                        Lesson {lesson.index}: {lesson.title}
+                        {t('quarterlyStudy.lessonWithTitle', { index: lesson.index, title: lesson.title })}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -292,22 +310,22 @@ const QuarterlyStudy = () => {
                 {selectedLesson && (
                   <div className="mt-4 p-4 bg-primary/5 rounded-lg border border-primary/20">
                     <p className="text-sm font-medium mb-2">
-                      📖 Access the lesson text:
+                      {t('quarterlyStudy.accessLessonText')}
                     </p>
                     <ol className="text-xs text-muted-foreground space-y-1 mb-3">
-                      <li>1. Click the link below to open the lesson page</li>
-                      <li>2. <strong>Scroll down past the videos</strong> to find "Read Lesson"</li>
-                      <li>3. Copy the text you want to study</li>
-                      <li>4. Paste it into the text area below</li>
+                      <li>{t('quarterlyStudy.step1ClickLink')}</li>
+                      <li>{t('quarterlyStudy.step2ScrollDown')}</li>
+                      <li>{t('quarterlyStudy.step3CopyText')}</li>
+                      <li>{t('quarterlyStudy.step4PasteBelow')}</li>
                     </ol>
                     <a
-                      href={`https://www.sabbath.school/Lesson?year=2025&quarter=4&lesson=${selectedLesson.index}`}
+                      href={`https://www.sabbath.school/Lesson?year=2026&quarter=1&lesson=${selectedLesson.index}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-primary hover:underline font-medium flex items-center gap-2"
                     >
                       <BookOpen className="h-4 w-4" />
-                      Open Lesson {selectedLesson.index}: {selectedLesson.title}
+                      {t('quarterlyStudy.openLesson', { index: selectedLesson.index, title: selectedLesson.title })}
                     </a>
                   </div>
                 )}
@@ -316,16 +334,16 @@ const QuarterlyStudy = () => {
                 {lessonContent && lessonContent.days && (
                   <div className="mt-4">
                     <label className="text-sm font-medium mb-2 block">
-                      Select Day
+                      {t('quarterlyStudy.selectDay')}
                     </label>
                     <Select value={selectedDay} onValueChange={setSelectedDay}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Choose a day..." />
+                        <SelectValue placeholder={t('quarterlyStudy.chooseADay')} />
                       </SelectTrigger>
                       <SelectContent>
                         {lessonContent.days.map((day: any, idx: number) => (
                           <SelectItem key={day.id} value={day.id}>
-                            {day.title || `Day ${idx + 1}`}
+                            {day.title || t('quarterlyStudy.dayNumber', { number: idx + 1 })}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -335,15 +353,58 @@ const QuarterlyStudy = () => {
               </CardContent>
             </Card>
 
+            {/* PDF Viewer */}
+            {selectedLesson && (() => {
+              const lessonKey = selectedLesson.id.padStart(2, '0');
+              const lessonData = q4_2025_lessons[lessonKey];
+              const pdfStartPage = lessonData?.pdfStartPage;
+              if (!pdfStartPage) return null;
+              return (
+                <Card className="border border-primary/20">
+                  <CardHeader className="pb-2">
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-between px-0 hover:bg-transparent"
+                      onClick={() => setShowPdfViewer(!showPdfViewer)}
+                    >
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <FileText className="h-5 w-5 text-primary" />
+                        View Quarterly PDF
+                      </CardTitle>
+                      {showPdfViewer ? (
+                        <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                      ) : (
+                        <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                      )}
+                    </Button>
+                    {!showPdfViewer && (
+                      <CardDescription className="text-xs">
+                        Pages {pdfStartPage}–{lessonData?.pdfEndPage || pdfStartPage} of the quarterly
+                      </CardDescription>
+                    )}
+                  </CardHeader>
+                  {showPdfViewer && (
+                    <CardContent className="pt-0">
+                      <iframe
+                        src={`/quarterlies/Q4-2025-Christ-Object-Lessons.pdf#page=${pdfStartPage}`}
+                        className="w-full h-[600px] rounded-lg border"
+                        title={`Quarterly PDF — Lesson ${selectedLesson.index}`}
+                      />
+                    </CardContent>
+                  )}
+                </Card>
+              );
+            })()}
+
             {/* Lesson Content Input */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BookOpen className="h-5 w-5" />
-                  Paste Lesson Content to Amplify
+                  {t('quarterlyStudy.pasteLessonContent')}
                 </CardTitle>
                 <CardDescription>
-                  Copy text from your quarterly PDF and paste it here to analyze with Palace Rooms and Principles
+                  {t('quarterlyStudy.pasteLessonDescription')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -352,7 +413,7 @@ const QuarterlyStudy = () => {
                     value={userLessonInput}
                     onChange={(e) => setUserLessonInput(e.target.value)}
                     className="w-full min-h-[480px] p-4 rounded-lg border bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary"
-                    placeholder="Paste the lesson content here... Include:&#10;&#10;• Bible passages&#10;• Key quotes from the lesson&#10;• Discussion questions&#10;• Any text you want to analyze&#10;&#10;Then select a Room or Principle below and click 'Apply Framework' to get Jeeves' insights!"
+                    placeholder={t('quarterlyStudy.textareaPlaceholder')}
                   />
                 </ScrollArea>
               </CardContent>
@@ -366,9 +427,9 @@ const QuarterlyStudy = () => {
                 <div className="flex items-center gap-2">
                   <Bot className="h-6 w-6" />
                   <div>
-                    <CardTitle className="font-serif">Jeeves Analysis</CardTitle>
+                    <CardTitle className="font-serif">{t('quarterlyStudy.jeevesAnalysis')}</CardTitle>
                     <CardDescription className="text-white/90">
-                      Apply Palace Framework
+                      {t('quarterlyStudy.applyPalaceFramework')}
                     </CardDescription>
                   </div>
                 </div>
@@ -377,11 +438,11 @@ const QuarterlyStudy = () => {
                 {/* Room Selection */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Select a Palace Room
+                    {t('quarterlyStudy.selectAPalaceRoom')}
                   </label>
                   <Select value={selectedRoom} onValueChange={setSelectedRoom}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Choose a room..." />
+                      <SelectValue placeholder={t('quarterlyStudy.chooseARoom')} />
                     </SelectTrigger>
                     <SelectContent>
                       {rooms.map((room) => (
@@ -396,11 +457,11 @@ const QuarterlyStudy = () => {
                 {/* Principle Selection */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Select a Principle
+                    {t('quarterlyStudy.selectAPrinciple')}
                   </label>
                   <Select value={selectedPrinciple} onValueChange={setSelectedPrinciple}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Choose a principle..." />
+                      <SelectValue placeholder={t('quarterlyStudy.chooseAPrinciple')} />
                     </SelectTrigger>
                     <SelectContent className="max-h-[400px]">
                       {principles.map((principle) => (
@@ -415,13 +476,13 @@ const QuarterlyStudy = () => {
                 {/* Question Input */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Ask Jeeves a Question (Optional)
+                    {t('quarterlyStudy.askJeevesQuestion')}
                   </label>
                   <textarea
                     value={userQuestion}
                     onChange={(e) => setUserQuestion(e.target.value)}
                     className="w-full min-h-[80px] p-3 rounded-lg border bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-                    placeholder="E.g., How does this passage reveal Christ? What pattern repeats throughout Scripture? How can I apply this today?"
+                    placeholder={t('quarterlyStudy.questionPlaceholder')}
                   />
                 </div>
 
@@ -433,12 +494,12 @@ const QuarterlyStudy = () => {
                   {analyzing ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Analyzing...
+                      {t('quarterlyStudy.analyzing')}
                     </>
                   ) : (
                     <>
                       <Sparkles className="h-4 w-4 mr-2" />
-                      Apply Framework
+                      {t('quarterlyStudy.applyFramework')}
                     </>
                   )}
                 </Button>
@@ -449,7 +510,7 @@ const QuarterlyStudy = () => {
                     <div className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl border-2 border-primary/30">
                       <div className="flex items-center gap-2 mb-3">
                         <Bot className="h-5 w-5 text-primary" />
-                        <span className="font-semibold">Jeeves says:</span>
+                        <span className="font-semibold">{t('quarterlyStudy.jeevesSays')}</span>
                       </div>
                       <div className="prose prose-sm max-w-none">
                         {formatJeevesResponse(jeevesResponse.content || '')}

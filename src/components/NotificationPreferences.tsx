@@ -28,6 +28,7 @@ export function NotificationPreferences() {
     connect6_challenges: true,
     fruit_check_challenges: true,
     community_posts: true,
+    global_live_chat: true,
     study_reminders: true,
     renewal_reminders: true,
     video_tutorials: true,
@@ -95,6 +96,7 @@ export function NotificationPreferences() {
           connect6_challenges: data.connect6_challenges,
           fruit_check_challenges: data.fruit_check_challenges,
           community_posts: data.community_posts,
+          global_live_chat: (data as any).global_live_chat ?? true,
           study_reminders: data.study_reminders,
           renewal_reminders: data.renewal_reminders ?? true,
           video_tutorials: data.video_tutorials ?? true,
@@ -126,6 +128,8 @@ export function NotificationPreferences() {
           user_id: user.id,
           [key]: value,
           updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_id',
         });
 
       if (error) throw error;
@@ -286,6 +290,20 @@ export function NotificationPreferences() {
             id="community-posts"
             checked={preferences.community_posts}
             onCheckedChange={(checked) => updatePreference('community_posts', checked)}
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label htmlFor="global-live-chat">Global Live Chat Notifications</Label>
+            <p className="text-sm text-muted-foreground">
+              Get notified about new messages in the global live chat
+            </p>
+          </div>
+          <Switch
+            id="global-live-chat"
+            checked={preferences.global_live_chat}
+            onCheckedChange={(checked) => updatePreference('global_live_chat', checked)}
           />
         </div>
 

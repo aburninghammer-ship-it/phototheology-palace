@@ -18,9 +18,11 @@ import {
   Target,
   Zap
 } from "lucide-react";
-import { bibleRenderedSets, BibleRenderedSet } from "@/data/bibleRenderedSets";
+import { bibleRenderedSets, BibleRenderedSet, getTotalChapters, getTotalRenders } from "@/data/bibleRenderedSets";
+import { getBibleRenderedImage } from "@/assets/bible-rendered";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { SaveDrillButton } from "@/components/drills/SaveDrillButton";
 
 type DrillMode = "learn" | "symbol-to-range" | "range-to-symbol" | "name-to-symbol" | "full-quiz";
 
@@ -180,7 +182,15 @@ const BibleRenderedDrill = () => {
                   exit={{ rotateY: -90 }}
                   className="text-center space-y-6"
                 >
-                  <div className="text-8xl">{currentSet.symbol}</div>
+                  {getBibleRenderedImage(currentSet.number) ? (
+                    <img
+                      src={getBibleRenderedImage(currentSet.number)}
+                      alt={`Set ${currentSet.number}`}
+                      className="w-48 h-48 mx-auto rounded-xl object-cover shadow-lg"
+                    />
+                  ) : (
+                    <div className="text-8xl">{currentSet.symbol}</div>
+                  )}
                   <div className="text-sm text-muted-foreground flex items-center gap-2 justify-center">
                     <Eye className="h-4 w-4" />
                     Tap to reveal
@@ -192,12 +202,35 @@ const BibleRenderedDrill = () => {
                   initial={{ rotateY: 90 }}
                   animate={{ rotateY: 0 }}
                   exit={{ rotateY: -90 }}
-                  className="text-center space-y-4"
+                  className="text-center space-y-3"
                 >
-                  <Badge className="mb-2">Set {currentSet.number}</Badge>
+                  <div className="flex items-center justify-center gap-2">
+                    <Badge className="mb-1">Set {currentSet.number}</Badge>
+                    <Badge variant="outline" className="mb-1">
+                      {currentSet.chapters} ch / {currentSet.renders} renders
+                    </Badge>
+                    <Badge variant={currentSet.testament === 'new' ? 'default' : 'secondary'} className="mb-1">
+                      {currentSet.testament === 'new' ? 'NT' : 'OT'}
+                    </Badge>
+                  </div>
                   <h2 className="text-2xl font-bold">{currentSet.name}</h2>
                   <p className="text-lg text-primary font-semibold">{currentSet.range}</p>
                   <p className="text-muted-foreground text-sm max-w-md">{currentSet.description}</p>
+                  {currentSet.symbols && currentSet.symbols.length > 0 && (
+                    <div className="mt-3 pt-3 border-t">
+                      <p className="text-xs text-muted-foreground mb-2">Symbol Pack:</p>
+                      <div className="flex flex-wrap gap-1 justify-center max-w-md">
+                        {currentSet.symbols.slice(0, 6).map((sym, i) => (
+                          <Badge key={i} variant="outline" className="text-xs">
+                            {sym}
+                          </Badge>
+                        ))}
+                        {currentSet.symbols.length > 6 && (
+                          <Badge variant="outline" className="text-xs">+{currentSet.symbols.length - 6}</Badge>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   <div className="text-sm text-muted-foreground flex items-center gap-2 justify-center mt-4">
                     <EyeOff className="h-4 w-4" />
                     Tap to hide
@@ -251,7 +284,7 @@ const BibleRenderedDrill = () => {
                 <p className="text-sm text-muted-foreground">Accuracy</p>
               </div>
             </div>
-            <div className="flex gap-3 justify-center">
+            <div className="flex gap-3 justify-center flex-wrap">
               <Button onClick={shuffleSets}>
                 <Shuffle className="h-4 w-4 mr-2" />
                 Try Again (Shuffled)
@@ -260,6 +293,25 @@ const BibleRenderedDrill = () => {
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Reset Order
               </Button>
+              <SaveDrillButton
+                drillData={{
+                  verse_reference: `Bible Rendered - ${mode}`,
+                  mode: mode,
+                  drill_type: "bible-rendered",
+                  floor_number: 1,
+                  room_id: "bible-rendered",
+                  drill_data: {
+                    correct: correctCount,
+                    incorrect: results.length - correctCount,
+                    accuracy,
+                    totalSets: results.length,
+                    filterCategory,
+                    results,
+                  },
+                }}
+                defaultName={`Bible Rendered ${mode} - ${accuracy}%`}
+                isCompleted={true}
+              />
             </div>
           </CardContent>
         </Card>
@@ -285,7 +337,15 @@ const BibleRenderedDrill = () => {
       switch (mode) {
         case "symbol-to-range":
         case "full-quiz":
-          return <div className="text-8xl">{currentSet.symbol}</div>;
+          return getBibleRenderedImage(currentSet.number) ? (
+            <img
+              src={getBibleRenderedImage(currentSet.number)}
+              alt={`Set ${currentSet.number}`}
+              className="w-40 h-40 mx-auto rounded-xl object-cover shadow-lg"
+            />
+          ) : (
+            <div className="text-8xl">{currentSet.symbol}</div>
+          );
         case "range-to-symbol":
           return (
             <div className="text-center">
@@ -316,7 +376,15 @@ const BibleRenderedDrill = () => {
           );
         case "range-to-symbol":
         case "name-to-symbol":
-          return <div className="text-4xl">{set.symbol}</div>;
+          return getBibleRenderedImage(set.number) ? (
+            <img
+              src={getBibleRenderedImage(set.number)}
+              alt={`Set ${set.number}`}
+              className="w-12 h-12 mx-auto rounded-lg object-cover"
+            />
+          ) : (
+            <div className="text-4xl">{set.symbol}</div>
+          );
         default:
           return null;
       }
@@ -498,7 +566,9 @@ const BibleRenderedDrill = () => {
         <Card className="bg-muted/50">
           <CardHeader>
             <CardTitle className="text-lg">Quick Reference</CardTitle>
-            <CardDescription>All 50 sets at a glance</CardDescription>
+            <CardDescription>
+              All 51 sets at a glance • {getTotalChapters()} chapters • {getTotalRenders()} renders
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-5 md:grid-cols-10 gap-2">
@@ -507,16 +577,27 @@ const BibleRenderedDrill = () => {
                   key={set.number}
                   variant={idx === currentIndex ? "default" : "ghost"}
                   size="sm"
-                  className="h-12 w-12 text-xl p-0"
+                  className={cn(
+                    "h-12 w-12 text-xl p-0",
+                    set.testament === 'new' && idx !== currentIndex && "bg-blue-50 dark:bg-blue-950/30"
+                  )}
                   onClick={() => {
                     setCurrentIndex(idx);
                     setShowAnswer(false);
                   }}
-                  title={`${set.name}: ${set.range}`}
+                  title={`${set.name}: ${set.range} (${set.chapters} ch, ${set.renders} renders)`}
                 >
                   {set.symbol}
                 </Button>
               ))}
+            </div>
+            <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded bg-muted border"></span> Old Testament
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded bg-blue-50 dark:bg-blue-950/30 border"></span> New Testament
+              </span>
             </div>
           </CardContent>
         </Card>

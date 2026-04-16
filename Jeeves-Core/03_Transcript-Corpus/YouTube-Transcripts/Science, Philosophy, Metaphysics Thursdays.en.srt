@@ -1,0 +1,955 @@
+1
+00:00:00,799 --> 00:00:02,070
+
+hello
+
+2
+00:00:02,070 --> 00:00:02,080
+hello
+ 
+
+3
+00:00:02,080 --> 00:00:04,950
+hello
+my name is dr sabot pandit
+
+4
+00:00:04,950 --> 00:00:04,960
+my name is dr sabot pandit
+ 
+
+5
+00:00:04,960 --> 00:00:07,670
+my name is dr sabot pandit
+and it's nice to meet you all
+
+6
+00:00:07,670 --> 00:00:07,680
+and it's nice to meet you all
+ 
+
+7
+00:00:07,680 --> 00:00:10,709
+and it's nice to meet you all
+have you ever asked big questions
+
+8
+00:00:10,709 --> 00:00:10,719
+have you ever asked big questions
+ 
+
+9
+00:00:10,719 --> 00:00:13,589
+have you ever asked big questions
+i mean big questions like
+
+10
+00:00:13,589 --> 00:00:13,599
+i mean big questions like
+ 
+
+11
+00:00:13,599 --> 00:00:17,189
+i mean big questions like
+does god really exist
+
+12
+00:00:17,189 --> 00:00:17,199
+does god really exist
+ 
+
+13
+00:00:17,199 --> 00:00:19,029
+does god really exist
+of course you have
+
+14
+00:00:19,029 --> 00:00:19,039
+of course you have
+ 
+
+15
+00:00:19,039 --> 00:00:21,349
+of course you have
+everyone has asked this question at some
+
+16
+00:00:21,349 --> 00:00:21,359
+everyone has asked this question at some
+ 
+
+17
+00:00:21,359 --> 00:00:23,349
+everyone has asked this question at some
+time or the other
+
+18
+00:00:23,349 --> 00:00:23,359
+time or the other
+ 
+
+19
+00:00:23,359 --> 00:00:27,029
+time or the other
+some quickly push it out of their minds
+
+20
+00:00:27,029 --> 00:00:27,039
+some quickly push it out of their minds
+ 
+
+21
+00:00:27,039 --> 00:00:29,669
+some quickly push it out of their minds
+some struggle for a little while to
+
+22
+00:00:29,669 --> 00:00:29,679
+some struggle for a little while to
+ 
+
+23
+00:00:29,679 --> 00:00:31,669
+some struggle for a little while to
+answer it and then when it gets all
+
+24
+00:00:31,669 --> 00:00:31,679
+answer it and then when it gets all
+ 
+
+25
+00:00:31,679 --> 00:00:34,709
+answer it and then when it gets all
+sticky they just give up
+
+26
+00:00:34,709 --> 00:00:34,719
+sticky they just give up
+ 
+
+27
+00:00:34,719 --> 00:00:37,670
+sticky they just give up
+others are convinced that it can never
+
+28
+00:00:37,670 --> 00:00:37,680
+others are convinced that it can never
+ 
+
+29
+00:00:37,680 --> 00:00:39,750
+others are convinced that it can never
+ever be answered
+
+30
+00:00:39,750 --> 00:00:39,760
+ever be answered
+ 
+
+31
+00:00:39,760 --> 00:00:40,790
+ever be answered
+but
+
+32
+00:00:40,790 --> 00:00:40,800
+but
+ 
+
+33
+00:00:40,800 --> 00:00:43,430
+but
+what if there is a reasonable approach
+
+34
+00:00:43,430 --> 00:00:43,440
+what if there is a reasonable approach
+ 
+
+35
+00:00:43,440 --> 00:00:45,270
+what if there is a reasonable approach
+to the question
+
+36
+00:00:45,270 --> 00:00:45,280
+to the question
+ 
+
+37
+00:00:45,280 --> 00:00:48,229
+to the question
+and what if it leads to a reasonable
+
+38
+00:00:48,229 --> 00:00:48,239
+and what if it leads to a reasonable
+ 
+
+39
+00:00:48,239 --> 00:00:51,910
+and what if it leads to a reasonable
+conclusion that satisfies the mind
+
+40
+00:00:51,910 --> 00:00:51,920
+conclusion that satisfies the mind
+ 
+
+41
+00:00:51,920 --> 00:00:54,069
+conclusion that satisfies the mind
+by satisfaction
+
+42
+00:00:54,069 --> 00:00:54,079
+by satisfaction
+ 
+
+43
+00:00:54,079 --> 00:00:56,869
+by satisfaction
+i don't mean absolute proof
+
+44
+00:00:56,869 --> 00:00:56,879
+i don't mean absolute proof
+ 
+
+45
+00:00:56,879 --> 00:00:59,189
+i don't mean absolute proof
+there is no such thing on earth you know
+
+46
+00:00:59,189 --> 00:00:59,199
+there is no such thing on earth you know
+ 
+
+47
+00:00:59,199 --> 00:01:00,470
+there is no such thing on earth you know
+why
+
+48
+00:01:00,470 --> 00:01:00,480
+why
+ 
+
+49
+00:01:00,480 --> 00:01:02,389
+why
+because belief
+
+50
+00:01:02,389 --> 00:01:02,399
+because belief
+ 
+
+51
+00:01:02,399 --> 00:01:03,670
+because belief
+finally
+
+52
+00:01:03,670 --> 00:01:03,680
+finally
+ 
+
+53
+00:01:03,680 --> 00:01:07,590
+finally
+is a very personal and private choice
+
+54
+00:01:07,590 --> 00:01:07,600
+is a very personal and private choice
+ 
+
+55
+00:01:07,600 --> 00:01:11,990
+is a very personal and private choice
+that you and i are morally free to make
+
+56
+00:01:11,990 --> 00:01:12,000
+that you and i are morally free to make
+ 
+
+57
+00:01:12,000 --> 00:01:14,310
+that you and i are morally free to make
+so when i use the words mentally
+
+58
+00:01:14,310 --> 00:01:14,320
+so when i use the words mentally
+ 
+
+59
+00:01:14,320 --> 00:01:16,870
+so when i use the words mentally
+satisfying i am talking about a
+
+60
+00:01:16,870 --> 00:01:16,880
+satisfying i am talking about a
+ 
+
+61
+00:01:16,880 --> 00:01:20,789
+satisfying i am talking about a
+conclusion that is so reasonable
+
+62
+00:01:20,789 --> 00:01:20,799
+conclusion that is so reasonable
+ 
+
+63
+00:01:20,799 --> 00:01:23,590
+conclusion that is so reasonable
+that even if you choose to not believe
+
+64
+00:01:23,590 --> 00:01:23,600
+that even if you choose to not believe
+ 
+
+65
+00:01:23,600 --> 00:01:24,310
+that even if you choose to not believe
+it
+
+66
+00:01:24,310 --> 00:01:24,320
+it
+ 
+
+67
+00:01:24,320 --> 00:01:26,749
+it
+you cannot provide a logical
+
+68
+00:01:26,749 --> 00:01:26,759
+you cannot provide a logical
+ 
+
+69
+00:01:26,759 --> 00:01:29,429
+you cannot provide a logical
+counter-argument to it you cannot
+
+70
+00:01:29,429 --> 00:01:29,439
+counter-argument to it you cannot
+ 
+
+71
+00:01:29,439 --> 00:01:32,789
+counter-argument to it you cannot
+intellectually refute the evidence
+
+72
+00:01:32,789 --> 00:01:32,799
+intellectually refute the evidence
+ 
+
+73
+00:01:32,799 --> 00:01:33,830
+intellectually refute the evidence
+now
+
+74
+00:01:33,830 --> 00:01:33,840
+now
+ 
+
+75
+00:01:33,840 --> 00:01:37,030
+now
+what if it is possible
+
+76
+00:01:37,030 --> 00:01:37,040
+what if it is possible
+ 
+
+77
+00:01:37,040 --> 00:01:40,469
+what if it is possible
+what if it is within our reach would you
+
+78
+00:01:40,469 --> 00:01:40,479
+what if it is within our reach would you
+ 
+
+79
+00:01:40,479 --> 00:01:44,310
+what if it is within our reach would you
+be interested really really interested
+
+80
+00:01:44,310 --> 00:01:44,320
+be interested really really interested
+ 
+
+81
+00:01:44,320 --> 00:01:45,590
+be interested really really interested
+if you are
+
+82
+00:01:45,590 --> 00:01:45,600
+if you are
+ 
+
+83
+00:01:45,600 --> 00:01:47,109
+if you are
+then come
+
+84
+00:01:47,109 --> 00:01:47,119
+then come
+ 
+
+85
+00:01:47,119 --> 00:01:49,109
+then come
+we will look at this together in an
+
+86
+00:01:49,109 --> 00:01:49,119
+we will look at this together in an
+ 
+
+87
+00:01:49,119 --> 00:01:51,590
+we will look at this together in an
+honest and open manner
+
+88
+00:01:51,590 --> 00:01:51,600
+honest and open manner
+ 
+
+89
+00:01:51,600 --> 00:01:54,069
+honest and open manner
+no tricky explanations with hidden
+
+90
+00:01:54,069 --> 00:01:54,079
+no tricky explanations with hidden
+ 
+
+91
+00:01:54,079 --> 00:01:55,990
+no tricky explanations with hidden
+agendas trying to hook the people and
+
+92
+00:01:55,990 --> 00:01:56,000
+agendas trying to hook the people and
+ 
+
+93
+00:01:56,000 --> 00:01:57,749
+agendas trying to hook the people and
+pull them to one side
+
+94
+00:01:57,749 --> 00:01:57,759
+pull them to one side
+ 
+
+95
+00:01:57,759 --> 00:02:00,469
+pull them to one side
+and on the other hand no stubbornly
+
+96
+00:02:00,469 --> 00:02:00,479
+and on the other hand no stubbornly
+ 
+
+97
+00:02:00,479 --> 00:02:03,350
+and on the other hand no stubbornly
+holding to a position no matter what
+
+98
+00:02:03,350 --> 00:02:03,360
+holding to a position no matter what
+ 
+
+99
+00:02:03,360 --> 00:02:05,270
+holding to a position no matter what
+even though the evidence does not
+
+100
+00:02:05,270 --> 00:02:05,280
+even though the evidence does not
+ 
+
+101
+00:02:05,280 --> 00:02:07,510
+even though the evidence does not
+support it but actually points to the
+
+102
+00:02:07,510 --> 00:02:07,520
+support it but actually points to the
+ 
+
+103
+00:02:07,520 --> 00:02:09,109
+support it but actually points to the
+other side
+
+104
+00:02:09,109 --> 00:02:09,119
+other side
+ 
+
+105
+00:02:09,119 --> 00:02:10,869
+other side
+in other words
+
+106
+00:02:10,869 --> 00:02:10,879
+in other words
+ 
+
+107
+00:02:10,879 --> 00:02:13,910
+in other words
+we make a conscious choice
+
+108
+00:02:13,910 --> 00:02:13,920
+we make a conscious choice
+ 
+
+109
+00:02:13,920 --> 00:02:17,670
+we make a conscious choice
+to go where the evidence leads
+
+110
+00:02:17,670 --> 00:02:17,680
+to go where the evidence leads
+ 
+
+111
+00:02:17,680 --> 00:02:20,229
+to go where the evidence leads
+like plateau the greek thinker
+
+112
+00:02:20,229 --> 00:02:20,239
+like plateau the greek thinker
+ 
+
+113
+00:02:20,239 --> 00:02:22,869
+like plateau the greek thinker
+he quoted socrates and said
+
+114
+00:02:22,869 --> 00:02:22,879
+he quoted socrates and said
+ 
+
+115
+00:02:22,879 --> 00:02:25,990
+he quoted socrates and said
+go where the argument leads
+
+116
+00:02:25,990 --> 00:02:26,000
+go where the argument leads
+ 
+
+117
+00:02:26,000 --> 00:02:27,350
+go where the argument leads
+sounds good
+
+118
+00:02:27,350 --> 00:02:27,360
+sounds good
+ 
+
+119
+00:02:27,360 --> 00:02:28,470
+sounds good
+impressive
+
+120
+00:02:28,470 --> 00:02:28,480
+impressive
+ 
+
+121
+00:02:28,480 --> 00:02:31,030
+impressive
+it is also a caution don't pull the
+
+122
+00:02:31,030 --> 00:02:31,040
+it is also a caution don't pull the
+ 
+
+123
+00:02:31,040 --> 00:02:34,309
+it is also a caution don't pull the
+argument where you want it to go so our
+
+124
+00:02:34,309 --> 00:02:34,319
+argument where you want it to go so our
+ 
+
+125
+00:02:34,319 --> 00:02:37,589
+argument where you want it to go so our
+aim is to be pulled by the evidence to
+
+126
+00:02:37,589 --> 00:02:37,599
+aim is to be pulled by the evidence to
+ 
+
+127
+00:02:37,599 --> 00:02:40,470
+aim is to be pulled by the evidence to
+the truth of the matter
+
+128
+00:02:40,470 --> 00:02:40,480
+the truth of the matter
+ 
+
+129
+00:02:40,480 --> 00:02:43,910
+the truth of the matter
+so the two big fundamental questions are
+
+130
+00:02:43,910 --> 00:02:43,920
+so the two big fundamental questions are
+ 
+
+131
+00:02:43,920 --> 00:02:47,990
+so the two big fundamental questions are
+does god really exist and number two
+
+132
+00:02:47,990 --> 00:02:48,000
+does god really exist and number two
+ 
+
+133
+00:02:48,000 --> 00:02:51,110
+does god really exist and number two
+can we identify this god with any degree
+
+134
+00:02:51,110 --> 00:02:51,120
+can we identify this god with any degree
+ 
+
+135
+00:02:51,120 --> 00:02:52,949
+can we identify this god with any degree
+of confidence
+
+136
+00:02:52,949 --> 00:02:52,959
+of confidence
+ 
+
+137
+00:02:52,959 --> 00:02:55,030
+of confidence
+what do you think
+
+138
+00:02:55,030 --> 00:02:55,040
+what do you think
+ 
+
+139
+00:02:55,040 --> 00:02:56,229
+what do you think
+listen
+
+140
+00:02:56,229 --> 00:02:56,239
+listen
+ 
+
+141
+00:02:56,239 --> 00:02:58,470
+listen
+after talking with smart people all over
+
+142
+00:02:58,470 --> 00:02:58,480
+after talking with smart people all over
+ 
+
+143
+00:02:58,480 --> 00:03:00,390
+after talking with smart people all over
+the world for years
+
+144
+00:03:00,390 --> 00:03:00,400
+the world for years
+ 
+
+145
+00:03:00,400 --> 00:03:03,030
+the world for years
+i am convinced that we can tackle these
+
+146
+00:03:03,030 --> 00:03:03,040
+i am convinced that we can tackle these
+ 
+
+147
+00:03:03,040 --> 00:03:06,390
+i am convinced that we can tackle these
+questions with good reliable information
+
+148
+00:03:06,390 --> 00:03:06,400
+questions with good reliable information
+ 
+
+149
+00:03:06,400 --> 00:03:09,270
+questions with good reliable information
+placed in a logical sequence so you and
+
+150
+00:03:09,270 --> 00:03:09,280
+placed in a logical sequence so you and
+ 
+
+151
+00:03:09,280 --> 00:03:11,509
+placed in a logical sequence so you and
+i can see and follow the steps of
+
+152
+00:03:11,509 --> 00:03:11,519
+i can see and follow the steps of
+ 
+
+153
+00:03:11,519 --> 00:03:12,790
+i can see and follow the steps of
+reasoning
+
+154
+00:03:12,790 --> 00:03:12,800
+reasoning
+ 
+
+155
+00:03:12,800 --> 00:03:14,710
+reasoning
+and when that is done
+
+156
+00:03:14,710 --> 00:03:14,720
+and when that is done
+ 
+
+157
+00:03:14,720 --> 00:03:18,309
+and when that is done
+we can reach an intellectually sound and
+
+158
+00:03:18,309 --> 00:03:18,319
+we can reach an intellectually sound and
+ 
+
+159
+00:03:18,319 --> 00:03:20,630
+we can reach an intellectually sound and
+satisfying conclusion
+
+160
+00:03:20,630 --> 00:03:20,640
+satisfying conclusion
+ 
+
+161
+00:03:20,640 --> 00:03:22,390
+satisfying conclusion
+so i invite you
+
+162
+00:03:22,390 --> 00:03:22,400
+so i invite you
+ 
+
+163
+00:03:22,400 --> 00:03:24,710
+so i invite you
+if you feel inclined
+
+164
+00:03:24,710 --> 00:03:24,720
+if you feel inclined
+ 
+
+165
+00:03:24,720 --> 00:03:27,430
+if you feel inclined
+whether believers skeptic atheist or
+
+166
+00:03:27,430 --> 00:03:27,440
+whether believers skeptic atheist or
+ 
+
+167
+00:03:27,440 --> 00:03:30,390
+whether believers skeptic atheist or
+agnostic let's do it together
+
+168
+00:03:30,390 --> 00:03:30,400
+agnostic let's do it together
+ 
+
+169
+00:03:30,400 --> 00:03:32,550
+agnostic let's do it together
+of course it will challenge you and it
+
+170
+00:03:32,550 --> 00:03:32,560
+of course it will challenge you and it
+ 
+
+171
+00:03:32,560 --> 00:03:34,229
+of course it will challenge you and it
+will make you think
+
+172
+00:03:34,229 --> 00:03:34,239
+will make you think
+ 
+
+173
+00:03:34,239 --> 00:03:37,430
+will make you think
+but it will also be very enjoyable in
+
+174
+00:03:37,430 --> 00:03:37,440
+but it will also be very enjoyable in
+ 
+
+175
+00:03:37,440 --> 00:03:39,350
+but it will also be very enjoyable in
+fact i promise there's plenty of
+
+176
+00:03:39,350 --> 00:03:39,360
+fact i promise there's plenty of
+ 
+
+177
+00:03:39,360 --> 00:03:43,350
+fact i promise there's plenty of
+information just waiting for you so come
+
+178
+00:03:43,350 --> 00:03:43,360
+information just waiting for you so come
+ 
+
+179
+00:03:43,360 --> 00:03:45,430
+information just waiting for you so come
+come search with me
+
+180
+00:03:45,430 --> 00:03:45,440
+come search with me
+ 
+
+181
+00:03:45,440 --> 00:03:47,750
+come search with me
+every presentation
+
+182
+00:03:47,750 --> 00:03:47,760
+every presentation
+ 
+
+183
+00:03:47,760 --> 00:03:51,430
+every presentation
+will be followed by a q a session
+
+184
+00:03:51,430 --> 00:03:51,440
+will be followed by a q a session
+ 
+
+185
+00:03:51,440 --> 00:03:53,830
+will be followed by a q a session
+come with your questions
+
+186
+00:03:53,830 --> 00:03:53,840
+come with your questions
+ 
+
+187
+00:03:53,840 --> 00:03:57,750
+come with your questions
+no matter how simple or complex they are
+
+188
+00:03:57,750 --> 00:03:57,760
+no matter how simple or complex they are
+ 
+
+189
+00:03:57,760 --> 00:03:58,830
+no matter how simple or complex they are
+see you at the
+
+190
+00:03:58,830 --> 00:03:58,840
+see you at the
+ 
+
+191
+00:03:58,840 --> 00:04:03,560
+see you at the
+meeting have a great day
+

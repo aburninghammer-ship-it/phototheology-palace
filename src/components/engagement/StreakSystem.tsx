@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Flame, Trophy, Calendar, Zap, Crown, Star, Gift } from "lucide-react";
+import { Flame, Trophy, Calendar, Zap, Crown, Star, Gift , type LucideIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
@@ -11,7 +11,7 @@ interface StreakMilestone {
   days: number;
   title: string;
   reward: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   color: string;
 }
 

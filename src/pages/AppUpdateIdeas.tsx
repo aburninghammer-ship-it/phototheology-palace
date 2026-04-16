@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,6 +40,7 @@ interface Idea {
 }
 
 export default function AppUpdateIdeas() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [ideas, setIdeas] = useState<Idea[]>([]);
@@ -70,7 +72,7 @@ export default function AppUpdateIdeas() {
       setIdeas(data || []);
     } catch (error) {
       console.error("Error fetching ideas:", error);
-      toast.error("Failed to load your ideas");
+      toast.error(t('ideas.errorLoadIdeas'));
     } finally {
       setLoading(false);
     }
@@ -79,7 +81,7 @@ export default function AppUpdateIdeas() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user?.id) {
-      toast.error("Please log in to submit ideas");
+      toast.error(t('ideas.errorLoginRequired'));
       return;
     }
 
@@ -104,7 +106,7 @@ export default function AppUpdateIdeas() {
 
       if (error) throw error;
 
-      toast.success("Thank you! Your idea has been submitted!");
+      toast.success(t('ideas.ideaSubmitted'));
       setTitle("");
       setDescription("");
       setCategory("");
@@ -118,10 +120,10 @@ export default function AppUpdateIdeas() {
           }
         });
         setErrors(fieldErrors);
-        toast.error("Please fix the errors in the form");
+        toast.error(t('ideas.errorFixForm'));
       } else {
         console.error("Error submitting idea:", error);
-        toast.error("Failed to submit idea");
+        toast.error(t('ideas.errorSubmitIdea'));
       }
     } finally {
       setSubmitting(false);
@@ -145,10 +147,10 @@ export default function AppUpdateIdeas() {
 
   const getCategoryLabel = (cat: string) => {
     const labels: { [key: string]: string } = {
-      feature: "New Feature",
-      improvement: "Improvement",
-      bug: "Bug Report",
-      other: "Other",
+      feature: t('ideas.categoryFeature'),
+      improvement: t('ideas.categoryImprovement'),
+      bug: t('ideas.categoryBug'),
+      other: t('ideas.categoryOther'),
     };
     return labels[cat] || cat;
   };
@@ -167,10 +169,10 @@ export default function AppUpdateIdeas() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <Lightbulb className="h-8 w-8 text-primary" />
-            <h1 className="text-4xl font-serif font-bold">App Update Ideas</h1>
+            <h1 className="text-4xl font-serif font-bold">{t('ideas.title')}</h1>
           </div>
           <p className="text-lg text-muted-foreground">
-            Share your ideas, suggestions, and feedback to help improve Phototheology!
+            {t('ideas.description')}
           </p>
         </div>
 
@@ -179,25 +181,25 @@ export default function AppUpdateIdeas() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Send className="h-5 w-5" />
-                Submit Your Idea
+                {t('ideas.submitYourIdea')}
               </CardTitle>
               <CardDescription>
-                Help us make Phototheology better by sharing your thoughts
+                {t('ideas.submitDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="category">Category *</Label>
+                  <Label htmlFor="category">{t('ideas.category')} *</Label>
                   <Select value={category} onValueChange={setCategory}>
                     <SelectTrigger id="category" className={errors.category ? "border-destructive" : ""}>
-                      <SelectValue placeholder="Select a category" />
+                      <SelectValue placeholder={t('ideas.selectCategory')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="feature">New Feature Request</SelectItem>
-                      <SelectItem value="improvement">Improvement Suggestion</SelectItem>
-                      <SelectItem value="bug">Bug Report</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem value="feature">{t('ideas.newFeatureRequest')}</SelectItem>
+                      <SelectItem value="improvement">{t('ideas.improvementSuggestion')}</SelectItem>
+                      <SelectItem value="bug">{t('ideas.bugReport')}</SelectItem>
+                      <SelectItem value="other">{t('ideas.categoryOther')}</SelectItem>
                     </SelectContent>
                   </Select>
                   {errors.category && (
@@ -206,34 +208,34 @@ export default function AppUpdateIdeas() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="title">Title *</Label>
+                  <Label htmlFor="title">{t('ideas.titleLabel')} *</Label>
                   <Input
                     id="title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Brief summary of your idea"
+                    placeholder={t('ideas.titlePlaceholder')}
                     maxLength={200}
                     className={errors.title ? "border-destructive" : ""}
                   />
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>{errors.title || "5-200 characters"}</span>
+                    <span>{errors.title || t('ideas.titleCharLimit')}</span>
                     <span>{title.length}/200</span>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description *</Label>
+                  <Label htmlFor="description">{t('ideas.descriptionLabel')} *</Label>
                   <Textarea
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Describe your idea in detail..."
+                    placeholder={t('ideas.descriptionPlaceholder')}
                     rows={8}
                     maxLength={2000}
                     className={errors.description ? "border-destructive" : ""}
                   />
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>{errors.description || "20-2000 characters"}</span>
+                    <span>{errors.description || t('ideas.descriptionCharLimit')}</span>
                     <span>{description.length}/2000</span>
                   </div>
                 </div>
@@ -242,12 +244,12 @@ export default function AppUpdateIdeas() {
                   {submitting ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Submitting...
+                      {t('ideas.submitting')}
                     </>
                   ) : (
                     <>
                       <Send className="h-4 w-4 mr-2" />
-                      Submit Idea
+                      {t('ideas.submitIdea')}
                     </>
                   )}
                 </Button>
@@ -257,8 +259,8 @@ export default function AppUpdateIdeas() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Your Submitted Ideas</CardTitle>
-              <CardDescription>Track the status of your suggestions</CardDescription>
+              <CardTitle>{t('ideas.yourSubmittedIdeas')}</CardTitle>
+              <CardDescription>{t('ideas.trackStatus')}</CardDescription>
             </CardHeader>
             <CardContent>
               {loading ? (
@@ -268,8 +270,8 @@ export default function AppUpdateIdeas() {
               ) : ideas.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <Lightbulb className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                  <p>No ideas submitted yet</p>
-                  <p className="text-sm">Share your first idea!</p>
+                  <p>{t('ideas.noIdeasYet')}</p>
+                  <p className="text-sm">{t('ideas.shareFirstIdea')}</p>
                 </div>
               ) : (
                 <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
@@ -285,24 +287,24 @@ export default function AppUpdateIdeas() {
                               {getCategoryLabel(idea.category)}
                             </Badge>
                             <Badge className={`text-xs ${getStatusBadgeColor(idea.status)} text-white`}>
-                              {idea.status === "under_review" ? "Under Review" :
-                               idea.status === "implemented" ? "Implemented ✓" :
+                              {idea.status === "under_review" ? t('ideas.statusUnderReview') :
+                               idea.status === "implemented" ? t('ideas.statusImplemented') :
                                idea.status.charAt(0).toUpperCase() + idea.status.slice(1)}
                             </Badge>
                           </div>
                           <h4 className="font-semibold">{idea.title}</h4>
                         </div>
                       </div>
-                      <p className="text-sm text-muted-foreground line-clamp-3 mb-2">
+                      <p className="text-sm text-muted-foreground mb-2 whitespace-pre-wrap">
                         {idea.description}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Submitted {new Date(idea.created_at).toLocaleDateString()}
+                        {t('ideas.submitted')} {new Date(idea.created_at).toLocaleDateString()}
                       </p>
                       {idea.status === "implemented" && (
                         <div className="mt-2 flex items-center gap-1 text-green-600 text-sm">
                           <CheckCircle className="h-4 w-4" />
-                          <span>This feature has been implemented!</span>
+                          <span>{t('ideas.featureImplemented')}</span>
                         </div>
                       )}
                     </div>

@@ -92,16 +92,42 @@ All devotionals must remain ALIGNED WITH:
 - Biblical hope and transformation
 
 PERSONALIZATION RULES:
+CRITICAL: The devotional is written DIRECTLY TO the person named—they are the READER. You are NOT writing about them for someone else to read. You are addressing THEM.
+
 When writing for a specific person:
+- Write TO them, not ABOUT them. They are the recipient and reader.
 - Their struggles become the ENTRY POINT
 - The solution is always Christ revealed through Scripture
 - Address them by name SPARINGLY and NATURALLY (1-2 times per section max)
 - Always capitalize names properly
-- Sound like a pastor writing a personal letter, not a mail-merge template
-- Their pain meets His provision at specific sanctuary stations (implicitly)`;
+- Sound like a pastor writing a personal letter TO THIS PERSON, not a mail-merge template
+- Their pain meets His provision at specific sanctuary stations (implicitly)
+
+CHILDREN'S DEVOTIONAL RULES:
+When age_group is "child" or "children" or "kids":
+- Write content that speaks DIRECTLY TO the child at their level
+- Use simple vocabulary, short sentences, and concrete examples
+- Include imagination-sparking descriptions children can visualize
+- The parent/creator will READ THIS TO THE CHILD—so address the child as "you"
+- Make Jesus feel real, close, and loving to a young heart
+- Include a simple question or activity the child can respond to
+- Avoid abstract theological concepts—use story and image instead`;
 
 function buildPersonalizedPrompt(profile: ProfileContext, theme?: string, scripture?: string): string {
-  let prompt = `Create a DENSE, theologically rich Phototheology devotional for ${profile.name}.
+  const isChild = profile.age_group?.toLowerCase().includes("child") || 
+                  profile.age_group?.toLowerCase().includes("kid") ||
+                  profile.age_group?.toLowerCase() === "children";
+  
+  let prompt = isChild 
+    ? `Create a CHILD-FRIENDLY Phototheology devotional written DIRECTLY TO ${profile.name}. 
+This is for a parent/leader to read TO the child—so write it addressing the child as "you."
+Use simple words, vivid imagery, and speak to a young heart about Jesus's love.
+
+ABOUT THIS CHILD:
+- Name: ${profile.name}
+- Age Group: ${profile.age_group || "child"}`
+    : `Create a DENSE, theologically rich Phototheology devotional written DIRECTLY TO ${profile.name}.
+CRITICAL: You are writing TO ${profile.name}—they are the READER. Do NOT write about them for someone else. Address THEM directly.
 
 ABOUT THIS PERSON:
 - Relationship: ${profile.relationship}
@@ -152,7 +178,10 @@ CONTENT DEPTH REQUIREMENTS:
 - Begin with a vivid scene that draws them in with sensory details and emotional weight
 - Reveal a surprising theological angle most readers miss
 - Draw hidden threads and connections across Scripture (Genesis to Revelation, sanctuary patterns)
+- INCLUDE specific biblical examples, stories, or characters to illustrate points
+- Reference specific biblical narratives (not just verses) - tell the story, paint the scene
 - Build to a central "gem" insight about Christ that meets their specific need
+- The lesson/insight must be FRESH and UNIQUE - avoid repeating common devotional themes
 - End with an appeal that transforms the heart, not generic moralism
 - Close with a strike line that lingers for days
 
@@ -166,9 +195,16 @@ EACH OUTPUT FIELD MUST BE SUBSTANTIAL:
 
 The devotional must feel personal and theologically rich while reading like a narrative that unfolds naturally. Never sound formulaic.
 
+TITLE REQUIREMENTS - CRITICAL:
+- Each title MUST be UNIQUE and SPECIFIC to this devotional's central insight
+- NEVER use generic titles like "Walking in Faith", "Trust in God", "His Promises", "Finding Peace"
+- The title should hint at the SPECIFIC gem/revelation in THIS devotional
+- Include a vivid word or phrase that makes it memorable and distinct
+- Think of titles like sermon titles that make you curious what's inside
+
 OUTPUT (JSON):
 {
-  "title": "Evocative, specific title",
+  "title": "Unique, evocative title specific to this devotional's central insight (avoid generic religious phrases)",
   "scripture_reference": "Book Chapter:Verse(s)",
   "scripture_text": "Full KJV text (3-8 verses)",
   "devotional_body": "Complete 5 paragraph devotional. Separate paragraphs with double newlines. Each paragraph 4-6 sentences minimum. 500-750 words total.",
@@ -209,7 +245,12 @@ serve(async (req) => {
 
     console.log(`Generating Phototheology devotion for: ${profile.name}, theme: ${theme || "general"}`);
 
-    const userPrompt = buildPersonalizedPrompt(profile, theme, scripture);
+    // Add date context for variety
+    const today = new Date();
+    const dateContext = `\n\nGENERATION DATE: ${today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+Use this date to inspire fresh, timely angles. Create a title and content that would feel unique to THIS day.`;
+
+    const userPrompt = buildPersonalizedPrompt(profile, theme, scripture) + dateContext;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

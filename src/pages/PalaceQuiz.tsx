@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ interface Question {
 }
 
 const PalaceQuiz = () => {
+  const { t } = useTranslation();
   const { mode } = useParams<{ mode?: string }>();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -115,13 +117,13 @@ const PalaceQuiz = () => {
       setScore(score + points);
       
       toast({
-        title: "Correct! 🎉",
-        description: `+${points} points`,
+        title: t('palaceQuiz.correct'),
+        description: t('palaceQuiz.pointsEarned', { points }),
       });
     } else {
       toast({
-        title: "Incorrect",
-        description: `The correct answer was ${questions[currentQuestion].correctRoom}`,
+        title: t('palaceQuiz.incorrect'),
+        description: t('palaceQuiz.correctAnswerWas', { room: questions[currentQuestion].correctRoom }),
         variant: "destructive",
       });
     }
@@ -167,7 +169,7 @@ const PalaceQuiz = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -187,36 +189,36 @@ const PalaceQuiz = () => {
               <CardHeader>
                 <div className="text-6xl mb-4">{won ? "🏆" : "🎯"}</div>
                 <CardTitle className="text-3xl">
-                  {won ? "Congratulations!" : "Good Try!"}
+                  {won ? t('palaceQuiz.congratulations') : t('palaceQuiz.goodTry')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 bg-primary/10 rounded-lg">
-                    <p className="text-sm text-muted-foreground">Your Score</p>
+                    <p className="text-sm text-muted-foreground">{t('palaceQuiz.yourScore')}</p>
                     <p className="text-3xl font-bold">{score}</p>
                   </div>
                   {isVsJeeves && (
                     <div className="p-4 bg-muted rounded-lg">
-                      <p className="text-sm text-muted-foreground">Jeeves' Score</p>
+                      <p className="text-sm text-muted-foreground">{t('palaceQuiz.jeevesScore')}</p>
                       <p className="text-3xl font-bold">{jeevesScore}</p>
                     </div>
                   )}
                 </div>
                 
                 <p className="text-muted-foreground">
-                  {won 
-                    ? "Excellent knowledge of the Palace principles!" 
-                    : "Keep studying the Palace to improve your mastery!"}
+                  {won
+                    ? t('palaceQuiz.excellentKnowledge')
+                    : t('palaceQuiz.keepStudying')}
                 </p>
 
                 <div className="flex gap-4 justify-center">
                   <Button onClick={() => window.location.reload()} size="lg">
-                    Play Again
+                    {t('palaceQuiz.playAgain')}
                   </Button>
                   <Button onClick={() => navigate("/games")} variant="outline" size="lg">
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Games
+                    {t('palaceQuiz.backToGames')}
                   </Button>
                 </div>
               </CardContent>
@@ -238,7 +240,7 @@ const PalaceQuiz = () => {
           <div className="flex items-center justify-between">
             <Button onClick={() => navigate("/games")} variant="ghost">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Exit Game
+              {t('palaceQuiz.exitGame')}
             </Button>
             <div className="flex gap-4">
               <Badge variant="outline" className="text-lg px-4 py-2">
@@ -259,7 +261,7 @@ const PalaceQuiz = () => {
                 <div className="flex items-center gap-2">
                   <Target className="h-5 w-5" />
                   <span className="font-semibold">
-                    Question {currentQuestion + 1} of {questions.length}
+                    {t('palaceQuiz.questionOf', { current: currentQuestion + 1, total: questions.length })}
                   </span>
                 </div>
                 <Badge variant={timeLeft < 10 ? "destructive" : "default"} className="text-lg px-3 py-1">
@@ -271,7 +273,7 @@ const PalaceQuiz = () => {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="text-center p-6 bg-primary/5 rounded-lg">
-                <p className="text-sm text-muted-foreground mb-2">Which room does this principle belong to?</p>
+                <p className="text-sm text-muted-foreground mb-2">{t('palaceQuiz.whichRoom')}</p>
                 <h3 className="text-2xl font-bold">{question.principle}</h3>
               </div>
 
@@ -299,10 +301,10 @@ const PalaceQuiz = () => {
 
               {showExplanation && (
                 <div className="p-4 bg-muted rounded-lg space-y-4">
-                  <p className="text-sm font-medium">Explanation:</p>
+                  <p className="text-sm font-medium">{t('palaceQuiz.explanation')}</p>
                   <p className="text-sm text-muted-foreground">{question.explanation}</p>
                   <Button onClick={nextQuestion} className="w-full" size="lg">
-                    {currentQuestion < questions.length - 1 ? "Next Question" : "See Results"}
+                    {currentQuestion < questions.length - 1 ? t('palaceQuiz.nextQuestion') : t('palaceQuiz.seeResults')}
                   </Button>
                 </div>
               )}

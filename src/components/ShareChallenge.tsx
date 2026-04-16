@@ -25,13 +25,13 @@ export const ShareChallenge: React.FC<ShareChallengeProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
   
-  // Generate referral URL with 14-day free trial
+  // Generate referral URL with 30-day free trial
   const baseUrl = window.location.origin;
-  const challengeUrl = challengeType === "treasure-hunt" 
+  const challengeUrl = challengeType === "treasure-hunt"
     ? `${baseUrl}/treasure-hunt/${challengeId}`
     : `${baseUrl}/escape-room/play/${challengeId}`;
   const shareUrl = `${challengeUrl}?ref=share&trial=14days`;
-  
+
   const shareText = `Join me in this biblical challenge: ${challengeTitle}! 🏆\n\nGet 14 days free full access to try it out.\n\n${shareUrl}`;
   
   const copyToClipboard = async () => {
@@ -72,7 +72,7 @@ export const ShareChallenge: React.FC<ShareChallengeProps> = ({
         <DialogHeader>
           <DialogTitle>Share This Challenge</DialogTitle>
           <DialogDescription>
-            Invite friends to join with a 14-day free trial
+            Invite friends to join with a 30-day free trial
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
@@ -121,7 +121,7 @@ export const ShareChallenge: React.FC<ShareChallengeProps> = ({
           </div>
           
           <div className="text-xs text-muted-foreground text-center pt-2">
-            Shared links include a 14-day free trial for new users
+            Shared links include a 30-day free trial for new users
           </div>
         </div>
       </DialogContent>

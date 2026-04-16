@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Confetti from "react-confetti";
 import { ShareAchievementDialog } from "./ShareAchievementDialog";
 import { AchievementCertificate } from "./AchievementCertificate";
+import { ShareToProfileButton } from "@/components/social/ShareToProfileButton";
 
 interface Achievement {
   id: string;
@@ -84,9 +85,11 @@ export function AchievementNotification({ achievement, onClose }: AchievementNot
             }}
             className="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4"
           >
-            <Card className="relative overflow-hidden border-2 border-primary/50 shadow-2xl bg-gradient-to-br from-primary/10 via-background to-secondary/10">
-              {/* Animated background effects */}
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 animate-pulse" />
+            <Card className="relative overflow-hidden border-2 border-yellow-500/50 shadow-[0_8px_40px_-8px_rgba(234,179,8,0.5),0_0_0_1px_rgba(255,255,255,0.15)_inset] bg-gradient-to-br from-yellow-500/15 via-amber-500/10 to-orange-500/15 backdrop-blur-xl">
+              {/* Glassy overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/5" />
+              {/* Animated rainbow border glow */}
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/30 via-amber-500/30 to-orange-400/30 animate-pulse" />
               
               {/* Shine effect */}
               <motion.div
@@ -209,13 +212,27 @@ export function AchievementNotification({ achievement, onClose }: AchievementNot
                         <Printer className="h-3.5 w-3.5" />
                         Print
                       </Button>
+                      {achievement && (
+                        <ShareToProfileButton
+                          sharedContent={{
+                            source_type: "achievement",
+                            source_id: achievement.id,
+                            source_title: achievement.name,
+                            source_excerpt: achievement.description,
+                            source_icon: achievement.icon,
+                            source_metadata: { points: achievement.points },
+                          }}
+                          size="sm"
+                          variant="outline"
+                        />
+                      )}
                     </motion.div>
                   </div>
                 </div>
               </div>
 
-              {/* Bottom glow effect */}
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-primary animate-pulse" />
+              {/* Bottom rainbow glow effect */}
+              <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-400 animate-pulse shadow-[0_0_20px_4px_rgba(234,179,8,0.5)]" />
             </Card>
           </motion.div>
 

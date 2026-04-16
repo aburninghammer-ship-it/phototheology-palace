@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.76.0";
+import { getContentBehavioralEngine } from '../_shared/content-behavioral-engine.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -197,6 +198,7 @@ Generate ONLY day ${dayNumber} as a JSON object via tool call.`;
           },
         ],
         tool_choice: { type: "function", function: { name: "create_devotional_day" } },
+        max_tokens: 8192,
       }),
     });
 

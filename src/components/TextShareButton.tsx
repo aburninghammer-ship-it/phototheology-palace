@@ -15,7 +15,7 @@ interface TextShareButtonProps {
 }
 
 const generateShareMessage = (type: string, title: string, description?: string, data?: Record<string, any>): string => {
-  const appUrl = window.location.origin;
+  const appUrl = 'https://phototheologybible.com';
   
   const messages = {
     challenge: `🎯 Join me in this Phototheology Challenge!\n\n${title}\n${description || ""}\n\n💡 Can you solve it? Let's study the Bible together in a whole new way!\n\n✨ Try it here: ${appUrl}\n\n🎓 Phototheology - Master the Bible through the Palace Method!`,

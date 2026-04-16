@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +28,20 @@ export function ThemeAudioPlayer({ onClose, className }: ThemeAudioPlayerProps) 
   const [isPlaying, setIsPlaying] = useState(false);
   const [themeName, setThemeName] = useState<string>("");
 
+  // Refs to avoid stale closures in onEnd callback
+  const currentIndexRef = useRef(0);
+  const versesRef = useRef<VerseSuggestion[]>([]);
+  const playVerseRef = useRef<((index: number) => Promise<void>) | null>(null);
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    currentIndexRef.current = currentIndex;
+  }, [currentIndex]);
+
+  useEffect(() => {
+    versesRef.current = verses;
+  }, [verses]);
+
   const {
     speak,
     stop,
@@ -35,31 +49,56 @@ export function ThemeAudioPlayer({ onClose, className }: ThemeAudioPlayerProps) 
     isPlaying: ttsPlaying,
   } = useTextToSpeechEnhanced({
     onEnd: () => {
-      // Auto-advance to next verse
-      if (currentIndex < verses.length - 1) {
-        setCurrentIndex(prev => prev + 1);
-        playVerse(currentIndex + 1);
+      // Auto-advance to next verse using refs to avoid stale closures
+      const idx = currentIndexRef.current;
+      const vs = versesRef.current;
+      console.log("[ThemeAudioPlayer] onEnd - idx:", idx, "total:", vs.length, "playVerseRef:", !!playVerseRef.current);
+
+      if (idx < vs.length - 1) {
+        const nextIdx = idx + 1;
+        console.log("[ThemeAudioPlayer] Advancing to verse:", nextIdx);
+        // Update ref BEFORE calling playVerse
+        currentIndexRef.current = nextIdx;
+        setCurrentIndex(nextIdx);
+        // Use ref to call playVerse with current verses
+        playVerseRef.current?.(nextIdx);
       } else {
+        console.log("[ThemeAudioPlayer] Reached end of verses");
         setIsPlaying(false);
       }
     },
   });
 
   const playVerse = useCallback(async (index: number) => {
-    if (index >= 0 && index < verses.length) {
-      const verse = verses[index];
+    const vs = versesRef.current;
+    if (index >= 0 && index < vs.length) {
+      const verse = vs[index];
+      // Update ref immediately before state
+      currentIndexRef.current = index;
       setCurrentIndex(index);
       await speak(`${verse.reference}. ${verse.text}`);
     }
-  }, [verses, speak]);
+  }, [speak]);
+
+  // Keep playVerse ref updated
+  useEffect(() => {
+    playVerseRef.current = playVerse;
+  }, [playVerse]);
 
   const handlePlayVerses = (selectedVerses: VerseSuggestion[]) => {
+    // Update refs IMMEDIATELY before state (refs are sync, state is async)
+    versesRef.current = selectedVerses;
+    currentIndexRef.current = 0;
+
     setVerses(selectedVerses);
     setCurrentIndex(0);
     setIsPlaying(true);
-    // Start playing first verse
+
+    // Start playing first verse after refs are definitely set
     setTimeout(() => {
-      playVerse(0);
+      if (versesRef.current.length > 0) {
+        playVerse(0);
+      }
     }, 100);
   };
 
@@ -67,29 +106,36 @@ export function ThemeAudioPlayer({ onClose, className }: ThemeAudioPlayerProps) 
     if (ttsPlaying) {
       stop();
       setIsPlaying(false);
-    } else if (verses.length > 0) {
+    } else if (versesRef.current.length > 0) {
       setIsPlaying(true);
-      playVerse(currentIndex);
+      playVerse(currentIndexRef.current);
     }
   };
 
   const handlePrevious = () => {
-    if (currentIndex > 0) {
+    const idx = currentIndexRef.current;
+    if (idx > 0) {
       stop();
-      playVerse(currentIndex - 1);
+      currentIndexRef.current = idx - 1;
+      setCurrentIndex(idx - 1);
+      playVerse(idx - 1);
     }
   };
 
   const handleNext = () => {
-    if (currentIndex < verses.length - 1) {
+    const idx = currentIndexRef.current;
+    if (idx < versesRef.current.length - 1) {
       stop();
-      playVerse(currentIndex + 1);
+      currentIndexRef.current = idx + 1;
+      setCurrentIndex(idx + 1);
+      playVerse(idx + 1);
     }
   };
 
   const handleStop = () => {
     stop();
     setIsPlaying(false);
+    currentIndexRef.current = 0;
     setCurrentIndex(0);
   };
 
@@ -198,6 +244,8 @@ export function ThemeAudioPlayer({ onClose, className }: ThemeAudioPlayerProps) 
                   }`}
                   onClick={() => {
                     stop();
+                    currentIndexRef.current = index;
+                    setCurrentIndex(index);
                     playVerse(index);
                   }}
                 >

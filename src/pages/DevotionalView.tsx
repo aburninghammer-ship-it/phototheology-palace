@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Check, ChevronLeft, ChevronRight, BookOpen, Sparkles, Heart, MessageSquare, Star, Loader2, Share2, Wand2, ExternalLink, Lock, AlertCircle, RefreshCw } from "lucide-react";
+import { ArrowLeft, Check, ChevronLeft, ChevronRight, BookOpen, Sparkles, Heart, MessageSquare, Star, Loader2, Share2, Wand2, ExternalLink, Lock, AlertCircle, RefreshCw, Highlighter, Save, Edit } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
@@ -10,13 +11,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDevotionalPlan, useDevotionals } from "@/hooks/useDevotionals";
 import { ShareDevotionalDialog } from "@/components/devotionals/ShareDevotionalDialog";
+import { ExtendDevotionalDialog } from "@/components/devotionals/ExtendDevotionalDialog";
 import { FreeAudioButton } from "@/components/audio/FreeAudioButton";
+import { DevotionalTextHighlighter } from "@/components/devotionals/DevotionalTextHighlighter";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { useSparks } from "@/hooks/useSparks";
+import { SparkContainer, SparkSettings } from "@/components/sparks";
+import { ShareToProfileButton } from "@/components/social/ShareToProfileButton";
 
 import {
   Tooltip,
@@ -33,6 +38,13 @@ const formatGradients: Record<string, string> = {
   "verse-genetics": "from-rose-500 via-pink-500 to-purple-500",
 };
 
+// Helper to get the calendar date for a devotional day
+const getDayDate = (startedAt: string, dayNumber: number): string => {
+  const started = new Date(startedAt);
+  const dayDate = new Date(started.getTime() + (dayNumber - 1) * 24 * 60 * 60 * 1000);
+  return dayDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+};
+
 // Helper to format time until unlock
 const getTimeUntilUnlock = (startedAt: string, dayNumber: number): string => {
   const started = new Date(startedAt);
@@ -47,12 +59,13 @@ const getTimeUntilUnlock = (startedAt: string, dayNumber: number): string => {
 };
 
 export default function DevotionalView() {
+  const { t } = useTranslation();
   const { planId } = useParams<{ planId: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const { preferences } = useUserPreferences();
-  const { plan, days, completedDayIds, completeDay, planLoading, isCompleting, isDayUnlocked, unlockedDayNumber } = useDevotionalPlan(planId || "");
+  const { plan, days, progress, completedDayIds, completeDay, planLoading, isCompleting, isDayUnlocked, unlockedDayNumber } = useDevotionalPlan(planId || "");
   const { generateDevotional, isGenerating } = useDevotionals();
 
   const { toast } = useToast();
@@ -61,6 +74,64 @@ export default function DevotionalView() {
   const [rating, setRating] = useState(0);
   const [hasInitializedDay, setHasInitializedDay] = useState(false);
   const [isRegeneratingDay, setIsRegeneratingDay] = useState(false);
+  const [isAutoGenerating, setIsAutoGenerating] = useState(false);
+  const [isEditingJournal, setIsEditingJournal] = useState(false);
+  const [isSavingJournal, setIsSavingJournal] = useState(false);
+  const autoGenerateTriggered = useRef(false);
+
+  // Sparks integration
+  const {
+    sparks,
+    preferences: sparkPreferences,
+    openSpark,
+    saveSpark,
+    dismissSpark,
+    exploreSpark,
+    updatePreferences: updateSparkPreferences
+  } = useSparks({
+    surface: 'study',
+    contextType: 'study',
+    contextId: planId || 'devotional',
+    maxSparks: 3,
+    debounceMs: 90000
+  });
+
+  // Auto-generate missing unlocked days on page load
+  useEffect(() => {
+    if (autoGenerateTriggered.current) return;
+    if (!plan?.id || !plan.started_at || plan.status !== "active") return;
+    if (!days) return; // Wait for days to load
+
+    const existingDayNumbers = new Set(days.map(d => d.day_number));
+    let hasMissingUnlockedDays = false;
+    for (let day = 1; day <= unlockedDayNumber; day++) {
+      if (!existingDayNumbers.has(day)) {
+        hasMissingUnlockedDays = true;
+        break;
+      }
+    }
+
+    if (hasMissingUnlockedDays) {
+      autoGenerateTriggered.current = true;
+      setIsAutoGenerating(true);
+      supabase.functions.invoke("batch-generate-devotional-days", {
+        body: { planId: plan.id, maxDaysPerPlan: 10 },
+      }).then(({ data, error }) => {
+        if (!error && data?.totalDaysGenerated > 0) {
+          queryClient.invalidateQueries({ queryKey: ["devotional-days", plan.id] });
+          queryClient.invalidateQueries({ queryKey: ["devotional-plan", plan.id] });
+          toast({
+            title: t('devotionalView.newDaysReady'),
+            description: t('devotionalView.newDaysGenerated', { count: data.totalDaysGenerated }),
+          });
+        }
+      }).catch((err) => {
+        console.error("Auto-generate failed:", err);
+      }).finally(() => {
+        setIsAutoGenerating(false);
+      });
+    }
+  }, [plan?.id, plan?.started_at, plan?.status, days, unlockedDayNumber]);
 
   // Auto-select the current unlocked day ONLY on initial load
   useEffect(() => {
@@ -77,11 +148,26 @@ export default function DevotionalView() {
     }
   }, [days, unlockedDayNumber, completedDayIds, isDayUnlocked, hasInitializedDay]);
 
+  // Load existing journal entry when switching to a completed day
+  useEffect(() => {
+    if (!days || !progress) return;
+    const currentDay = days[selectedDayIndex];
+    if (!currentDay) return;
+    
+    const existingProgress = progress.find(p => p.day_id === currentDay.id);
+    if (existingProgress?.journal_entry) {
+      setJournalEntry(existingProgress.journal_entry);
+    } else {
+      setJournalEntry("");
+    }
+    setIsEditingJournal(false);
+  }, [selectedDayIndex, days, progress]);
+
   const handleCrossReferenceClick = (ref: string) => {
     navigator.clipboard.writeText(ref);
     toast({
-      title: "Reference Copied",
-      description: `"${ref}" copied to clipboard`,
+      title: t('devotionalView.referenceCopied'),
+      description: t('devotionalView.referenceCopiedDesc', { ref }),
     });
   };
 
@@ -102,8 +188,8 @@ export default function DevotionalView() {
     const dayNumber = selectedDayIndex + 1;
     if (!isDayUnlocked(dayNumber)) {
       toast({
-        title: "Day Locked",
-        description: "That day isn't unlocked yet.",
+        title: t('devotionalView.dayLocked'),
+        description: t('devotionalView.dayLockedDesc'),
         variant: "default",
       });
       return;
@@ -121,14 +207,14 @@ export default function DevotionalView() {
       await queryClient.invalidateQueries({ queryKey: ["devotional-days", plan.id] });
 
       toast({
-        title: "Devotion Regenerated",
-        description: `Day ${dayNumber} has been refreshed with profile context.`,
+        title: t('devotionalView.devotionRegenerated'),
+        description: t('devotionalView.devotionRegeneratedDesc', { dayNumber }),
       });
     } catch (err: any) {
       console.error("Regenerate day error:", err);
       toast({
-        title: "Couldn't Regenerate",
-        description: err?.message || "Please try again.",
+        title: t('devotionalView.couldntRegenerate'),
+        description: err?.message || t('devotionalView.pleaseTryAgain'),
         variant: "destructive",
       });
     } finally {
@@ -141,7 +227,7 @@ export default function DevotionalView() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin text-purple-500 mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading your devotional...</p>
+          <p className="text-muted-foreground">{t('devotionalView.loadingDevotional')}</p>
         </div>
       </div>
     );
@@ -152,11 +238,11 @@ export default function DevotionalView() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
         <div className="text-center">
           <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-2">Devotional Not Found</h2>
-          <p className="text-muted-foreground mb-4">This devotional may have been deleted or doesn't exist.</p>
+          <h2 className="text-xl font-bold mb-2">{t('devotionalView.notFound')}</h2>
+          <p className="text-muted-foreground mb-4">{t('devotionalView.notFoundDesc')}</p>
           <Button onClick={() => navigate("/devotionals")}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Devotionals
+            {t('devotionalView.backToDevotionals')}
           </Button>
         </div>
       </div>
@@ -192,10 +278,10 @@ export default function DevotionalView() {
                     <Sparkles className="h-10 w-10 text-white animate-spin" />
                   </div>
                   <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
-                    Generating Your Devotional...
+                    {t('devotionalView.generatingTitle')}
                   </h3>
                   <p className="text-muted-foreground mb-4 max-w-md mx-auto">
-                    Jeeves is crafting {plan.duration} days of Christ-centered content. This may take a minute.
+                    {t('devotionalView.generatingDesc', { duration: plan.duration })}
                   </p>
                   <div className="flex justify-center gap-2">
                     {[0, 1, 2].map((i) => (
@@ -209,23 +295,31 @@ export default function DevotionalView() {
                 </>
               ) : plan.status === "failed" ? (
                 <>
-                  <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-rose-400 to-red-400 flex items-center justify-center mb-6 shadow-xl">
-                    <AlertCircle className="h-10 w-10 text-white" />
+                  <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center mb-6 shadow-xl">
+                    <RefreshCw className="h-10 w-10 text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-rose-600 to-red-600 bg-clip-text text-transparent">
-                    Generation Failed
+                  <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                    {t('devotionalView.generationTimedOut')}
                   </h3>
-                  <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                    Something went wrong while generating your devotional. This can happen with longer devotionals. Click below to try again.
+                  <p className="text-muted-foreground mb-4 max-w-md mx-auto">
+                    {t('devotionalView.generationTimedOutDesc')}
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
+                    {t('devotionalView.retryHint')}
                   </p>
                   <div className="space-y-4">
                     <Button
                       onClick={handleGenerate}
+                      disabled={isGenerating}
                       size="lg"
-                      className="bg-gradient-to-r from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600"
+                      className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
                     >
-                      <RefreshCw className="h-5 w-5 mr-2" />
-                      Retry Generation
+                      {isGenerating ? (
+                        <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                      ) : (
+                        <RefreshCw className="h-5 w-5 mr-2" />
+                      )}
+                      {isGenerating ? t('devotionalView.generatingEllipsis') : t('devotionalView.retryGeneration')}
                     </Button>
                   </div>
                 </>
@@ -235,18 +329,18 @@ export default function DevotionalView() {
                     <Wand2 className="h-10 w-10 text-white" />
                   </div>
                   <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
-                    Ready to Generate
+                    {t('devotionalView.readyToGenerate')}
                   </h3>
                   <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                    Your devotional plan is set up. Click below to have Jeeves generate {plan.duration} days of personalized, Christ-centered content.
+                    {t('devotionalView.readyToGenerateDesc', { duration: plan.duration })}
                   </p>
                   <div className="space-y-4">
                     <div className="flex flex-wrap justify-center gap-2 text-sm">
                       <Badge variant="outline" className="border-amber-400 text-amber-700 dark:text-amber-300">
-                        {plan.duration} Days
+                        {t('devotionalView.daysLabel', { count: plan.duration })}
                       </Badge>
                       <Badge variant="outline" className="border-amber-400 text-amber-700 dark:text-amber-300">
-                        {plan.format} Format
+                        {t('devotionalView.formatLabel', { format: plan.format })}
                       </Badge>
                     </div>
                     <Button
@@ -255,7 +349,7 @@ export default function DevotionalView() {
                       className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
                     >
                       <Sparkles className="h-5 w-5 mr-2" />
-                      Generate Devotional
+                      {t('devotionalView.generateDevotional')}
                     </Button>
                   </div>
                 </>
@@ -277,9 +371,41 @@ export default function DevotionalView() {
       dayId: currentDay.id,
       journalEntry: journalEntry || undefined,
       rating: rating || undefined,
+    }, {
+      onSuccess: () => {
+        setJournalEntry("");
+        setRating(0);
+      },
     });
-    setJournalEntry("");
-    setRating(0);
+  };
+
+  const handleSaveJournal = async () => {
+    if (!currentDay || !planId) return;
+    setIsSavingJournal(true);
+    try {
+      const { error } = await supabase
+        .from("devotional_progress")
+        .update({ journal_entry: journalEntry })
+        .eq("plan_id", planId)
+        .eq("day_id", currentDay.id);
+      
+      if (error) throw error;
+      
+      queryClient.invalidateQueries({ queryKey: ["devotional-progress", planId] });
+      setIsEditingJournal(false);
+      toast({
+        title: "Journal Updated",
+        description: "Your reflection has been saved.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save journal entry.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSavingJournal(false);
+    }
   };
 
   const goToPrevDay = () => setSelectedDayIndex(Math.max(0, selectedDayIndex - 1));
@@ -287,6 +413,28 @@ export default function DevotionalView() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Sparks Container */}
+      {sparks.length > 0 && (
+        <div className="fixed bottom-24 right-4 md:bottom-auto md:top-20 z-50">
+          <SparkContainer
+            sparks={sparks}
+            onOpen={openSpark}
+            onSave={saveSpark}
+            onDismiss={dismissSpark}
+            onExplore={exploreSpark}
+            position="floating"
+          />
+        </div>
+      )}
+
+      {/* Spark Settings */}
+      <div className="fixed bottom-24 md:bottom-4 right-4 z-40">
+        <SparkSettings
+          preferences={sparkPreferences}
+          onUpdate={updateSparkPreferences}
+        />
+      </div>
+
       {/* Navigation */}
       {preferences.navigation_style === "simplified" ? <SimplifiedNav /> : <Navigation />}
 
@@ -294,47 +442,64 @@ export default function DevotionalView() {
       <div className={`relative bg-gradient-to-r ${gradient} py-6 px-4`}>
         <div className="absolute inset-0 bg-black/10 pointer-events-none" />
         <div className="relative max-w-4xl mx-auto">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
-              <Button variant="ghost" size="icon" onClick={() => navigate("/devotionals")} className="hidden md:flex text-white hover:bg-white/20 shrink-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" onClick={() => navigate("/devotionals")} className="hidden md:flex text-white hover:bg-white/20">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
-              <div className="min-w-0">
-                <h1 className="font-bold text-white text-lg truncate">{plan.title}</h1>
-                <p className="text-white/80 text-sm">Day {selectedDayIndex + 1} of {plan.duration}</p>
+              <div>
+                <h1 className="font-bold text-white text-lg truncate max-w-[200px] md:max-w-none">{plan.title}</h1>
+                <p className="text-white/80 text-sm">
+                  {t('devotionalView.dayOfTotal', { day: selectedDayIndex + 1, total: plan.duration })}
+                  {plan.started_at && <span className="text-white/60 ml-2">· {getDayDate(plan.started_at, selectedDayIndex + 1)}</span>}
+                </p>
               </div>
             </div>
-            <div className="flex items-center gap-1 shrink-0">
+            <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleRegenerateDay}
                 disabled={isRegeneratingDay}
-                className="text-white hover:bg-white/20 disabled:opacity-30 h-9 w-9"
+                className="text-white hover:bg-white/20 disabled:opacity-30"
                 aria-label="Regenerate this day's devotional"
               >
                 {isRegeneratingDay ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
-                  <RefreshCw className="h-4 w-4" />
+                  <RefreshCw className="h-5 w-5" />
                 )}
               </Button>
               {plan && currentDay && (
-                <ShareDevotionalDialog 
-                  plan={plan} 
-                  day={currentDay}
-                  trigger={
-                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 h-9 w-9">
-                      <Share2 className="h-4 w-4" />
-                    </Button>
-                  }
-                />
+                <>
+                  <ShareDevotionalDialog
+                    plan={plan}
+                    day={currentDay}
+                    trigger={
+                      <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
+                        <Share2 className="h-5 w-5" />
+                      </Button>
+                    }
+                  />
+                  <ShareToProfileButton
+                    sharedContent={{
+                      source_type: "devotional",
+                      source_id: plan.id,
+                      source_title: `${plan.title} - Day ${selectedDayIndex + 1}`,
+                      source_excerpt: (currentDay.devotional_text || currentDay.application || "").slice(0, 300),
+                      verse_reference: currentDay.scripture_reference,
+                    }}
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:bg-white/20"
+                  />
+                </>
               )}
-              <Button variant="ghost" size="icon" onClick={goToPrevDay} disabled={selectedDayIndex === 0} className="text-white hover:bg-white/20 disabled:opacity-30 h-9 w-9">
-                <ChevronLeft className="h-4 w-4" />
+              <Button variant="ghost" size="icon" onClick={goToPrevDay} disabled={selectedDayIndex === 0} className="text-white hover:bg-white/20 disabled:opacity-30">
+                <ChevronLeft className="h-5 w-5" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={goToNextDay} disabled={selectedDayIndex === (days?.length || 1) - 1} className="text-white hover:bg-white/20 disabled:opacity-30 h-9 w-9">
-                <ChevronRight className="h-4 w-4" />
+              <Button variant="ghost" size="icon" onClick={goToNextDay} disabled={selectedDayIndex === (days?.length || 1) - 1} className="text-white hover:bg-white/20 disabled:opacity-30">
+                <ChevronRight className="h-5 w-5" />
               </Button>
             </div>
           </div>
@@ -344,8 +509,9 @@ export default function DevotionalView() {
       {/* Day Progress - Colorful Pills with Lock for Future Days */}
       <div className="bg-background/95 backdrop-blur border-b sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-3">
-          <ScrollArea className="w-full">
-            <div className="flex gap-2 pb-2">
+          {/* Use native scroll for reliable mobile horizontal scrolling */}
+          <div className="overflow-x-auto overflow-y-hidden scrollbar-hide -mx-4 px-4" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="flex gap-2 pb-2 min-w-max">
               <TooltipProvider>
                 {days?.map((day, idx) => {
                   const dayNumber = idx + 1;
@@ -396,11 +562,11 @@ export default function DevotionalView() {
                 })}
               </TooltipProvider>
             </div>
-          </ScrollArea>
+          </div>
           {/* Show unlock info */}
           {plan?.started_at && unlockedDayNumber < (days?.length || 0) && (
             <p className="text-xs text-muted-foreground text-center mt-1">
-              Day {unlockedDayNumber + 1} unlocks tomorrow • New content daily
+              {t('devotionalView.unlocksTomorrow', { day: unlockedDayNumber + 1 })}
             </p>
           )}
         </div>
@@ -421,14 +587,18 @@ export default function DevotionalView() {
 
           {/* Essay-style Devotional Content */}
           {currentDay.devotional_text ? (
-            // New essay-style format - flowing paragraphs
+            // New essay-style format - flowing paragraphs with highlighting
             <Card className="border-0 shadow-xl overflow-hidden">
               <div className={`h-2 bg-gradient-to-r ${gradient}`} />
               <CardHeader className="bg-gradient-to-br from-slate-50 to-purple-50/30 dark:from-slate-950/50 dark:to-purple-950/30 pb-2">
                 <CardTitle className="text-base flex items-center justify-between text-slate-700 dark:text-slate-300">
                   <div className="flex items-center gap-2">
                     <BookOpen className="h-5 w-5" />
-                    Today's Reading
+                    {t('devotionalView.todaysReading')}
+                    <Badge variant="outline" className="text-xs font-normal gap-1">
+                      <Highlighter className="h-3 w-3" />
+                      {t('devotionalView.selectToHighlight')}
+                    </Badge>
                   </div>
                   <FreeAudioButton 
                     text={currentDay.devotional_text || ''}
@@ -440,15 +610,20 @@ export default function DevotionalView() {
               <CardContent className="pt-6 pb-8">
                 <div className="prose prose-lg dark:prose-invert max-w-none">
                   {currentDay.devotional_text.split('\n\n').map((paragraph, idx) => (
-                    <p key={idx} className="text-lg leading-relaxed text-slate-800 dark:text-slate-200 mb-6 last:mb-0 font-serif">
-                      {paragraph}
-                    </p>
+                    <DevotionalTextHighlighter
+                      key={idx}
+                      text={paragraph}
+                      devotionalDayId={currentDay.id}
+                      sectionKey={`p${idx}`}
+                      className="mb-6 last:mb-0"
+                      textClassName="text-lg leading-relaxed text-slate-800 dark:text-slate-200 font-serif"
+                    />
                   ))}
                 </div>
               </CardContent>
             </Card>
           ) : (
-            // Legacy format - fragmented sections
+            // Legacy format - fragmented sections with highlighting
             <>
               {/* Scripture Card */}
               <Card className="overflow-hidden border-0 shadow-xl">
@@ -458,6 +633,10 @@ export default function DevotionalView() {
                     <div className="flex items-center gap-2">
                       <BookOpen className="h-5 w-5" />
                       {currentDay.scripture_reference}
+                      <Badge variant="outline" className="text-xs font-normal gap-1 border-indigo-300">
+                        <Highlighter className="h-3 w-3" />
+                        {t('devotionalView.selectToHighlight')}
+                      </Badge>
                     </div>
                     <FreeAudioButton 
                       text={`${currentDay.scripture_reference}. ${currentDay.scripture_text || ''}`}
@@ -467,9 +646,12 @@ export default function DevotionalView() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 pt-0">
-                  <p className="text-xl italic leading-relaxed text-indigo-900 dark:text-indigo-100 font-serif">
-                    "{currentDay.scripture_text}"
-                  </p>
+                  <DevotionalTextHighlighter
+                    text={currentDay.scripture_text || ''}
+                    devotionalDayId={currentDay.id}
+                    sectionKey="scripture"
+                    textClassName="text-xl italic leading-relaxed text-indigo-900 dark:text-indigo-100 font-serif"
+                  />
                 </CardContent>
               </Card>
 
@@ -478,7 +660,7 @@ export default function DevotionalView() {
                 <CardHeader className="pb-2 relative">
                   <CardTitle className="text-lg flex items-center gap-2">
                     <Heart className="h-6 w-6 fill-white" />
-                    Christ Connection
+                    {t('devotionalView.christConnection')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="relative">
@@ -514,22 +696,63 @@ export default function DevotionalView() {
               {/* Journal Section - Always visible */}
               <Card className="border-pink-200 dark:border-pink-800 bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-950/30 dark:to-rose-950/30">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm flex items-center gap-2 text-pink-700 dark:text-pink-300">
-                    <MessageSquare className="h-4 w-4" />
-                    {currentDay.journal_prompt ? "Reflection Question" : "Your Journal"}
-                  </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm flex items-center gap-2 text-pink-700 dark:text-pink-300">
+                      <MessageSquare className="h-4 w-4" />
+                      {currentDay.journal_prompt ? t('devotionalView.reflectionQuestion') : t('devotionalView.yourJournal')}
+                    </CardTitle>
+                    {isCompleted && !isEditingJournal && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs text-pink-600 hover:text-pink-700"
+                        onClick={() => setIsEditingJournal(true)}
+                      >
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit
+                      </Button>
+                    )}
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {currentDay.journal_prompt && (
                     <p className="mb-4 text-pink-900 dark:text-pink-100 font-medium">{currentDay.journal_prompt}</p>
                   )}
                   <Textarea
-                    placeholder={currentDay.journal_prompt ? "Write your reflection..." : "Write your thoughts, prayers, or insights from today's devotion..."}
+                    placeholder={currentDay.journal_prompt ? t('devotionalView.writeReflection') : t('devotionalView.writeThoughts')}
                     value={journalEntry}
                     onChange={(e) => setJournalEntry(e.target.value)}
                     className="min-h-[150px] border-pink-200 dark:border-pink-800 focus:ring-pink-500"
-                    disabled={isCompleted}
+                    disabled={isCompleted && !isEditingJournal}
                   />
+                  {isCompleted && isEditingJournal && (
+                    <div className="flex gap-2 mt-3">
+                      <Button
+                        size="sm"
+                        onClick={handleSaveJournal}
+                        disabled={isSavingJournal}
+                        className="bg-pink-600 hover:bg-pink-700 text-white"
+                      >
+                        {isSavingJournal ? (
+                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                        ) : (
+                          <Save className="h-3 w-3 mr-1" />
+                        )}
+                        Save Journal
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          const existingProgress = progress?.find(p => p.day_id === currentDay.id);
+                          setJournalEntry(existingProgress?.journal_entry || "");
+                          setIsEditingJournal(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -537,7 +760,7 @@ export default function DevotionalView() {
               {!isCompleted && (
                 <Card className="border-amber-200 dark:border-amber-800 bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm text-amber-700 dark:text-amber-300">⭐ Rate Today's Devotion</CardTitle>
+                    <CardTitle className="text-sm text-amber-700 dark:text-amber-300">{t('devotionalView.rateTodaysDevotion')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex gap-2">
@@ -568,7 +791,7 @@ export default function DevotionalView() {
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2 text-blue-700 dark:text-blue-300">
                       <BookOpen className="h-4 w-4" />
-                      Cross References
+                      {t('devotionalView.crossReferences')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -595,7 +818,7 @@ export default function DevotionalView() {
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2 text-emerald-700 dark:text-emerald-300">
                       <Sparkles className="h-4 w-4" />
-                      Today's Challenge
+                      {t('devotionalView.todaysChallenge')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -610,7 +833,7 @@ export default function DevotionalView() {
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2 text-purple-700 dark:text-purple-300">
                       <Heart className="h-4 w-4" />
-                      Prayer
+                      {t('devotionalView.prayer')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -624,13 +847,31 @@ export default function DevotionalView() {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm flex items-center gap-2 text-rose-700 dark:text-rose-300">
                     <Share2 className="h-4 w-4" />
-                    Share this Devotional
+                    {t('devotionalView.shareThisDevotional')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ShareDevotionalDialog plan={plan} day={currentDay} />
                 </CardContent>
               </Card>
+
+              {/* Extend this devotional */}
+              {plan?.status === "completed" && (
+                <Card className="border-emerald-200 dark:border-emerald-800 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2 text-emerald-700 dark:text-emerald-300">
+                      <Sparkles className="h-4 w-4" />
+                      {t('devotionalView.continueYourJourney')}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      {t('devotionalView.extendDescription')}
+                    </p>
+                    <ExtendDevotionalDialog plan={plan} />
+                  </CardContent>
+                </Card>
+              )}
             </TabsContent>
           </Tabs>
 
@@ -645,12 +886,12 @@ export default function DevotionalView() {
               {isCompleting ? (
                 <>
                   <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                  Saving...
+                  {t('devotionalView.saving')}
                 </>
               ) : (
                 <>
                   <Check className="h-5 w-5 mr-2" />
-                  Complete Day {selectedDayIndex + 1}
+                  {t('devotionalView.completeDay', { day: selectedDayIndex + 1 })}
                 </>
               )}
             </Button>
@@ -658,7 +899,7 @@ export default function DevotionalView() {
             <div className="text-center py-4">
               <Badge className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white border-0 text-lg py-2 px-4">
                 <Check className="h-4 w-4 mr-2" />
-                Day Completed! 🎉
+                {t('devotionalView.dayCompleted')}
               </Badge>
             </div>
           )}

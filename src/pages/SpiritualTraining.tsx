@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { SPIRITUAL_TRAINING_TOUR } from "@/data/guidedTours";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { GlassBubbles } from "@/components/ui/glass-bubbles";
@@ -8,8 +10,9 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sword, Shield, Target, BookOpen, Flame, Trophy, Scroll, Loader2, GraduationCap, Dumbbell } from "lucide-react";
+import { Sword, Shield, Target, BookOpen, Flame, Trophy, Scroll, Loader2, GraduationCap, Dumbbell, Swords, Calendar, User, Landmark } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SpacedRepetitionReview } from "@/components/SpacedRepetitionReview";
@@ -18,6 +21,10 @@ import { LessonCard } from "@/components/dojo/LessonCard";
 import { LessonDetail } from "@/components/dojo/LessonDetail";
 import { ThirtyDayChallenge } from "@/components/dojo/ThirtyDayChallenge";
 import { CharacteristicTracker } from "@/components/dojo/CharacteristicTracker";
+import { WarriorProfile } from "@/components/dojo/WarriorProfile";
+import { CombatArena } from "@/components/dojo/CombatArena";
+import { DailyTraining } from "@/components/dojo/DailyTraining";
+import { DeathChamber } from "@/components/dojo/DeathChamber";
 
 const FRUITS_OF_SPIRIT = [
   { name: "Love", description: "Selfless care for others", color: "bg-red-500" },
@@ -299,6 +306,7 @@ const TRAINING_SCENARIOS: Scenario[] = [
 ];
 
 export default function SpiritualTraining() {
+  const { t } = useTranslation();
   const [dailyEncouragement, setDailyEncouragement] = useState("");
   const [loadingEncouragement, setLoadingEncouragement] = useState(false);
   const [selectedScenario, setSelectedScenario] = useState<Scenario | null>(null);
@@ -352,7 +360,7 @@ export default function SpiritualTraining() {
 
   const handleLessonComplete = async (lessonId: string, notes: string) => {
     if (!userId) {
-      toast.error("Please log in to save progress");
+      toast.error(t('training.spiritual.loginToSave'));
       return;
     }
 
@@ -371,11 +379,11 @@ export default function SpiritualTraining() {
 
       if (error) throw error;
 
-      toast.success("Lesson progress saved!");
+      toast.success(t('training.spiritual.lessonSaved'));
       await fetchLessonProgress();
     } catch (error) {
       console.error("Error saving lesson:", error);
-      toast.error("Failed to save progress");
+      toast.error(t('training.spiritual.failedToSave'));
     }
   };
 
@@ -392,7 +400,7 @@ export default function SpiritualTraining() {
       setDailyEncouragement(data.content);
     } catch (error) {
       console.error("Error fetching encouragement:", error);
-      toast.error("Failed to fetch daily encouragement");
+      toast.error(t('training.spiritual.failedToFetchEncouragement'));
     } finally {
       setLoadingEncouragement(false);
     }
@@ -411,7 +419,7 @@ export default function SpiritualTraining() {
 
   const handleApplyWeapon = async () => {
     if (!selectedWeapon || !lifeSituation.trim()) {
-      toast.error("Please select a weapon and describe your situation");
+      toast.error(t('training.spiritual.selectWeaponAndSituation'));
       return;
     }
 
@@ -431,14 +439,16 @@ export default function SpiritualTraining() {
       }
 
       setWeaponGuidance(data.guidance);
-      toast.success("Guidance received!");
+      toast.success(t('training.spiritual.guidanceReceived'));
     } catch (error) {
       console.error('Error getting weapon guidance:', error);
-      toast.error("Failed to get guidance. Please try again.");
+      toast.error(t('training.spiritual.failedToGetGuidance'));
     } finally {
       setIsLoadingGuidance(false);
     }
   };
+
+  const [tourOpen, setTourOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">
@@ -449,25 +459,31 @@ export default function SpiritualTraining() {
         <section className="text-center space-y-4">
           <div className="flex items-center justify-center gap-2">
             <Sword className="w-12 h-12 text-primary" />
-            <h1 className="text-4xl font-bold">Christian Art of War</h1>
+            <h1 className="text-4xl font-bold">{t('training.spiritual.title')}</h1>
             <Shield className="w-12 h-12 text-primary" />
           </div>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            "The greatest battle humanity faces is the war against self. This is true holy war."
+            {t('training.spiritual.heroQuote')}
           </p>
-          <Badge variant="outline" className="text-lg px-4 py-2">
-            What you do in the drill matters, but what you do in the battle, matters more.
-          </Badge>
+          <div className="flex items-center justify-center gap-2">
+            <Badge variant="outline" className="text-lg px-4 py-2">
+              {t('training.spiritual.heroBadge')}
+            </Badge>
+            <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+              <GraduationCap className="h-4 w-4" /> Tour
+            </Button>
+          </div>
         </section>
+        {tourOpen && <GuidedTourOverlay steps={SPIRITUAL_TRAINING_TOUR} onClose={() => setTourOpen(false)} />}
 
         {/* Daily Encouragement */}
         <Card variant="glass" className="border-primary/20">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Flame className="w-6 h-6 text-orange-500" />
-              <CardTitle>Today's Victory Thought</CardTitle>
+              <CardTitle>{t('training.spiritual.todaysVictoryThought')}</CardTitle>
             </div>
-            <CardDescription>Daily encouragement from Jeeves for victory over sin</CardDescription>
+            <CardDescription>{t('training.spiritual.dailyEncouragementDesc')}</CardDescription>
           </CardHeader>
           <CardContent>
             {dailyEncouragement ? (
@@ -476,38 +492,59 @@ export default function SpiritualTraining() {
               </div>
             ) : (
               <Button onClick={fetchDailyEncouragement} disabled={loadingEncouragement}>
-                {loadingEncouragement ? "Loading..." : "Get Today's Encouragement"}
+                {loadingEncouragement ? t('common.loading') : t('training.spiritual.getEncouragement')}
               </Button>
             )}
           </CardContent>
         </Card>
 
+        {/* Warrior Profile Section */}
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="md:col-span-1">
+            <WarriorProfile />
+          </div>
+          <div className="md:col-span-2">
+            <DailyTraining />
+          </div>
+        </div>
+
         {/* Training Tabs */}
-        <Tabs defaultValue="lessons" className="w-full">
-          <ScrollArea className="w-full">
-            <TabsList className="inline-flex w-full">
-              <TabsTrigger value="lessons" className="flex-1">
+        <Tabs defaultValue="arena" className="w-full">
+            <TabsList>
+              <TabsTrigger value="arena" className="whitespace-nowrap px-3">
+                <Swords className="w-4 h-4 mr-2" />
+                {t('training.spiritual.combatArena')}
+              </TabsTrigger>
+              <TabsTrigger value="lessons" className="whitespace-nowrap px-3">
                 <GraduationCap className="w-4 h-4 mr-2" />
-                Lessons
+                {t('training.spiritual.lessons')}
               </TabsTrigger>
-              <TabsTrigger value="challenges" className="flex-1">
+              <TabsTrigger value="challenges" className="whitespace-nowrap px-3">
                 <Dumbbell className="w-4 h-4 mr-2" />
-                30-Day Challenge
+                {t('training.spiritual.thirtyDayChallenge')}
               </TabsTrigger>
-              <TabsTrigger value="characteristics" className="flex-1">
+              <TabsTrigger value="characteristics" className="whitespace-nowrap px-3">
                 <Target className="w-4 h-4 mr-2" />
-                Character Tracker
+                {t('training.spiritual.characterTracker')}
               </TabsTrigger>
-              <TabsTrigger value="scenarios" className="flex-1">
+              <TabsTrigger value="scenarios" className="whitespace-nowrap px-3">
                 <Shield className="w-4 h-4 mr-2" />
-                Battle Scenarios
+                {t('training.spiritual.battleScenarios')}
               </TabsTrigger>
-              <TabsTrigger value="weapons" className="flex-1">
+              <TabsTrigger value="weapons" className="whitespace-nowrap px-3">
                 <Sword className="w-4 h-4 mr-2" />
-                Weapons
+                {t('training.spiritual.weapons')}
+              </TabsTrigger>
+              <TabsTrigger value="death-chamber" className="whitespace-nowrap px-3">
+                <Landmark className="w-4 h-4 mr-2" />
+                Death Chamber
               </TabsTrigger>
             </TabsList>
-          </ScrollArea>
+
+          {/* Combat Arena Tab */}
+          <TabsContent value="arena" className="space-y-4">
+            <CombatArena />
+          </TabsContent>
 
           {/* Lessons Tab */}
           <TabsContent value="lessons" className="space-y-4">
@@ -523,10 +560,10 @@ export default function SpiritualTraining() {
               <div className="space-y-4">
                 <Card variant="glass">
                   <CardHeader>
-                    <CardTitle>Art of War Training Manual</CardTitle>
+                    <CardTitle>{t('training.spiritual.artOfWarManual')}</CardTitle>
                     <CardDescription>
-                      Master the principles of spiritual warfare through systematic study of holy war against self.
-                      Progress: {completedLessons.length} / {DOJO_LESSONS.length} lessons
+                      {t('training.spiritual.artOfWarDesc')}
+                      {' '}{t('training.spiritual.lessonsProgress', { completed: completedLessons.length, total: DOJO_LESSONS.length })}
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -565,10 +602,10 @@ export default function SpiritualTraining() {
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <Target className="w-6 h-6 text-primary" />
-                  <CardTitle>What Would You Do?</CardTitle>
+                  <CardTitle>{t('training.spiritual.whatWouldYouDo')}</CardTitle>
                 </div>
                 <CardDescription>
-                  Real-life scenarios testing your spiritual warfare readiness
+                  {t('training.spiritual.scenariosDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -581,7 +618,7 @@ export default function SpiritualTraining() {
                           <CardDescription className="line-clamp-3">
                             {scenario.situation}
                           </CardDescription>
-                          <Button className="w-full mt-4">Begin Training</Button>
+                          <Button className="w-full mt-4">{t('training.spiritual.beginTraining')}</Button>
                         </CardHeader>
                       </Card>
                     ))}
@@ -592,7 +629,7 @@ export default function SpiritualTraining() {
                       <h3 className="text-2xl font-bold mb-2">{selectedScenario.title}</h3>
                       <p className="text-lg mb-4">{selectedScenario.situation}</p>
                       <p className="text-muted-foreground">
-                        Which combination of the Fruits of the Spirit would you need to exercise?
+                        {t('training.spiritual.whichFruitsQuestion')}
                       </p>
                     </div>
 
@@ -615,12 +652,12 @@ export default function SpiritualTraining() {
                             </div>
                             {option.animal && (
                               <div className="text-sm text-muted-foreground">
-                                Style: {option.animal}
+                                {t('training.spiritual.styleLabel')}: {option.animal}
                               </div>
                             )}
                             {option.weapon && (
                               <div className="text-sm text-muted-foreground">
-                                Weapon: {option.weapon}
+                                {t('training.spiritual.weaponLabel')}: {option.weapon}
                               </div>
                             )}
                           </div>
@@ -633,7 +670,7 @@ export default function SpiritualTraining() {
                         <CardContent className="pt-6">
                           <p className="mb-4">{selectedScenario.options[userAnswer].explanation}</p>
                           <div className="flex gap-2">
-                            <Button onClick={resetScenario}>Choose Another Scenario</Button>
+                            <Button onClick={resetScenario}>{t('training.spiritual.chooseAnotherScenario')}</Button>
                           </div>
                         </CardContent>
                       </Card>
@@ -648,9 +685,9 @@ export default function SpiritualTraining() {
           <TabsContent value="besetting" className="space-y-4">
             <Card variant="glass">
               <CardHeader>
-                <CardTitle>Besetting Sins: Know Your Enemy</CardTitle>
+                <CardTitle>{t('training.spiritual.besettingSinsTitle')}</CardTitle>
                 <CardDescription>
-                  Every warrior faces recurring battles. These sins "easily beset us" (Hebrews 12:1). Training identifies the patterns without confession—learn to recognize and defeat them.
+                  {t('training.spiritual.besettingSinsDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -662,7 +699,7 @@ export default function SpiritualTraining() {
                         <CardDescription className="space-y-2">
                           <p className="text-sm italic">{sin.weakness}</p>
                           <div className="pt-2">
-                            <p className="text-xs font-semibold">Counter with:</p>
+                            <p className="text-xs font-semibold">{t('training.spiritual.counterWith')}:</p>
                             <div className="flex flex-wrap gap-1 mt-1">
                               {sin.counter.map((fruit) => (
                                 <Badge key={fruit} variant="outline" className="text-xs">
@@ -672,7 +709,7 @@ export default function SpiritualTraining() {
                             </div>
                           </div>
                           <p className="text-xs pt-2">
-                            <span className="font-semibold">Animal Style:</span> {sin.animal}
+                            <span className="font-semibold">{t('training.spiritual.animalStyleLabel')}:</span> {sin.animal}
                           </p>
                         </CardDescription>
                       </CardHeader>
@@ -687,9 +724,9 @@ export default function SpiritualTraining() {
           <TabsContent value="animals" className="space-y-4">
             <Card variant="glass">
               <CardHeader>
-                <CardTitle>Biblical Animal Styles</CardTitle>
+                <CardTitle>{t('training.spiritual.animalStylesTitle')}</CardTitle>
                 <CardDescription>
-                  Scripture uses animals to teach spiritual warfare tactics. Each style represents different aspects of Christ-like character.
+                  {t('training.spiritual.animalStylesDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -717,9 +754,9 @@ export default function SpiritualTraining() {
           <TabsContent value="weapons" className="space-y-4">
             <Card variant="glass">
               <CardHeader>
-                <CardTitle>Armor of God: Spiritual Weapons</CardTitle>
+                <CardTitle>{t('training.spiritual.armorOfGodTitle')}</CardTitle>
                 <CardDescription>
-                  "Put on the whole armor of God, that you may be able to stand against the schemes of the devil." - Ephesians 6:11
+                  {t('training.spiritual.armorOfGodDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -747,15 +784,15 @@ export default function SpiritualTraining() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Shield className="w-5 h-5" />
-                  Apply Weapons to Your Life
+                  {t('training.spiritual.applyWeaponsTitle')}
                 </CardTitle>
                 <CardDescription>
-                  Get personalized guidance on how to apply a spiritual weapon to a specific situation you're facing.
+                  {t('training.spiritual.applyWeaponsDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Select a Weapon</label>
+                  <label className="text-sm font-medium">{t('training.spiritual.selectWeapon')}</label>
                   <Select
                     value={selectedWeapon?.name}
                     onValueChange={(name) => {
@@ -765,7 +802,7 @@ export default function SpiritualTraining() {
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Choose a spiritual weapon..." />
+                      <SelectValue placeholder={t('training.spiritual.chooseWeaponPlaceholder')} />
                     </SelectTrigger>
                     <SelectContent>
                       {SPIRITUAL_WEAPONS.map((weapon) => (
@@ -778,9 +815,9 @@ export default function SpiritualTraining() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Describe Your Situation</label>
+                  <label className="text-sm font-medium">{t('training.spiritual.describeSituation')}</label>
                   <Textarea
-                    placeholder="Example: I'm facing criticism at work and struggling not to respond defensively..."
+                    placeholder={t('training.spiritual.situationPlaceholder')}
                     value={lifeSituation}
                     onChange={(e) => setLifeSituation(e.target.value)}
                     className="min-h-[100px]"
@@ -795,12 +832,12 @@ export default function SpiritualTraining() {
                   {isLoadingGuidance ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Getting Guidance...
+                      {t('training.spiritual.gettingGuidance')}
                     </>
                   ) : (
                     <>
                       <Sword className="w-4 h-4 mr-2" />
-                      Get Application Guidance
+                      {t('training.spiritual.getApplicationGuidance')}
                     </>
                   )}
                 </Button>
@@ -822,9 +859,9 @@ export default function SpiritualTraining() {
           <TabsContent value="fruits" className="space-y-4">
             <Card variant="glass">
               <CardHeader>
-                <CardTitle>9 Fruits of the Spirit</CardTitle>
+                <CardTitle>{t('training.spiritual.fruitsOfSpiritTitle')}</CardTitle>
                 <CardDescription>
-                  Master the spiritual weapons for every trial and temptation
+                  {t('training.spiritual.fruitsOfSpiritDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -849,10 +886,10 @@ export default function SpiritualTraining() {
           <TabsContent value="courses" className="space-y-4">
             <div className="grid gap-6 md:grid-cols-2">
               {[
-                { title: "50-Day Phototheology Course", description: "Visual theology memory palace training", icon: BookOpen, link: "/phototheology-course" },
-                { title: "40-Day Daniel Course", description: "Prophecy, faithfulness, and God's sovereignty", icon: Scroll, link: "/daniel-course" },
-                { title: "The Blueprint Course", description: "Foundation for spiritual warfare", icon: Shield, link: "/blueprint-course" },
-                { title: "Revelation Course", description: "Understanding end-time warfare", icon: Flame, link: null },
+                { title: t('training.spiritual.phototheologyCourse'), description: t('training.spiritual.phototheologyCourseDesc'), icon: BookOpen, link: "/phototheology-course" },
+                { title: t('training.spiritual.danielCourse'), description: t('training.spiritual.danielCourseDesc'), icon: Scroll, link: "/daniel-course" },
+                { title: t('training.spiritual.blueprintCourse'), description: t('training.spiritual.blueprintCourseDesc'), icon: Shield, link: "/blueprint-course" },
+                { title: t('training.spiritual.revelationCourse'), description: t('training.spiritual.revelationCourseDesc'), icon: Flame, link: null },
               ].map((course) => (
                 <Card key={course.title} variant="glass">
                   <CardHeader>
@@ -865,18 +902,18 @@ export default function SpiritualTraining() {
                 <CardContent className="space-y-2">
                   {course.link ? (
                     <Link to={course.link}>
-                      <Button className="w-full">Start Course</Button>
+                      <Button className="w-full">{t('training.spiritual.startCourse')}</Button>
                     </Link>
                   ) : (
                     <>
                       <Button className="w-full" variant="outline" disabled>
-                        Adult Version
+                        {t('training.spiritual.adultVersion')}
                       </Button>
                       <Button className="w-full" variant="outline" disabled>
-                        Kids Version
+                        {t('training.spiritual.kidsVersion')}
                       </Button>
                       <p className="text-sm text-muted-foreground text-center pt-2">
-                        Course content coming soon
+                        {t('training.spiritual.courseComingSoon')}
                       </p>
                     </>
                   )}
@@ -885,14 +922,19 @@ export default function SpiritualTraining() {
               ))}
             </div>
           </TabsContent>
+
+          {/* Death Chamber Tab */}
+          <TabsContent value="death-chamber" className="space-y-4">
+            <DeathChamber />
+          </TabsContent>
         </Tabs>
 
         {/* Divine Objective Section */}
         <Card variant="glass">
           <CardHeader>
-            <CardTitle>Divine Objective: Contain and Destroy</CardTitle>
+            <CardTitle>{t('training.spiritual.divineObjectiveTitle')}</CardTitle>
             <CardDescription>
-              The goal of self is to be free to do as he pleases. Our mission as faith-fighters is to contain self and destroy the old man.
+              {t('training.spiritual.divineObjectiveDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -900,19 +942,19 @@ export default function SpiritualTraining() {
               <div className="space-y-2">
                 <h3 className="font-semibold text-lg flex items-center gap-2">
                   <Shield className="w-5 h-5" />
-                  Contain
+                  {t('training.spiritual.contain')}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Keep the warfare internal. Practice self-containment, never allowing the battle to become external through acts of wickedness.
+                  {t('training.spiritual.containDesc')}
                 </p>
               </div>
               <div className="space-y-2">
                 <h3 className="font-semibold text-lg flex items-center gap-2">
                   <Sword className="w-5 h-5" />
-                  Destroy
+                  {t('training.spiritual.destroy')}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  The old man must be crucified daily. There can be no treaty, no peaceful coexisting. One must die, that one may live.
+                  {t('training.spiritual.destroyDesc')}
                 </p>
               </div>
             </div>

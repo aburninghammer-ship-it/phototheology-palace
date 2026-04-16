@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +22,7 @@ const GENRES = [
 
 export default function Connect6Draft() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [hand, setHand] = useState<typeof GENRES>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [doctrine, setDoctrine] = useState("");
@@ -52,15 +55,15 @@ export default function Connect6Draft() {
 
   const handleSubmit = async () => {
     if (selectedGenres.length !== 2) {
-      toast.error("Select exactly 2 genres");
+      toast.error(t('games.connect6Draft.errorSelectGenres'));
       return;
     }
     if (!doctrine.trim()) {
-      toast.error("Enter a doctrine or theme");
+      toast.error(t('games.connect6Draft.errorEnterDoctrine'));
       return;
     }
     if (selectedGenres.some(g => !verseExplanations[g]?.trim())) {
-      toast.error("Provide verse + explanation for both genres");
+      toast.error(t('games.connect6Draft.errorProvideVerses'));
       return;
     }
 
@@ -82,7 +85,7 @@ export default function Connect6Draft() {
 
       if (isCoherent) {
         setScore(prev => prev + points);
-        toast.success(`Valid connection! +${points} points`);
+        toast.success(t('games.connect6Draft.validConnection', { points }));
         
         const remaining = hand.filter(g => !selectedGenres.includes(g.code));
         const newGenres = GENRES
@@ -95,11 +98,11 @@ export default function Connect6Draft() {
         setDoctrine("");
         setVerseExplanations({});
       } else {
-        toast.error(`Connection weak: ${feedback}`);
+        toast.error(t('games.connect6Draft.connectionWeak', { feedback }));
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to validate");
+      toast.error(t('games.common.errorValidation'));
     } finally {
       setIsSubmitting(false);
     }
@@ -111,21 +114,21 @@ export default function Connect6Draft() {
         <div className="flex justify-between items-center mb-8">
           <Button variant="ghost" onClick={() => navigate("/games")} className="text-white">
             <ArrowLeft className="mr-2" />
-            Back
+            {t('common.back')}
           </Button>
           <h1 className="text-4xl font-bold text-emerald-400" style={{ fontFamily: "'Cinzel', serif" }}>
-            📚 CONNECT-6 DRAFT
+            {t('games.connect6Draft.title')}
           </h1>
           <div className="text-right">
             <div className="text-emerald-400 text-3xl font-bold">{score}</div>
-            <div className="text-emerald-200/60 text-sm">POINTS</div>
+            <div className="text-emerald-200/60 text-sm">{t('games.common.points')}</div>
           </div>
         </div>
 
         <div className="max-w-4xl mx-auto space-y-6">
           <Card className="bg-black/40 border-emerald-500/50">
             <CardHeader>
-              <CardTitle className="text-emerald-300">Your Hand</CardTitle>
+              <CardTitle className="text-emerald-300">{t('games.common.yourHand')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -147,15 +150,15 @@ export default function Connect6Draft() {
 
           <Card className="bg-black/40 border-emerald-500/50">
             <CardHeader>
-              <CardTitle className="text-emerald-300">Build Your Connection</CardTitle>
+              <CardTitle className="text-emerald-300">{t('games.connect6Draft.buildConnection')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="text-sm text-emerald-200 mb-2 block">Doctrine or Theme</label>
+                <label className="text-sm text-emerald-200 mb-2 block">{t('games.connect6Draft.doctrineOrTheme')}</label>
                 <Input
                   value={doctrine}
                   onChange={(e) => setDoctrine(e.target.value)}
-                  placeholder="e.g., Sabbath, State of the Dead, Justification..."
+                  placeholder={t('games.connect6Draft.doctrinePlaceholder')}
                   className="bg-black/60 border-emerald-500/30 text-white"
                 />
               </div>
@@ -165,12 +168,12 @@ export default function Connect6Draft() {
                 return (
                   <div key={genreCode}>
                     <label className="text-sm text-emerald-200 mb-2 block">
-                      {genre?.name} - Verse & Explanation
+                      {t('games.connect6Draft.verseAndExplanation', { genre: genre?.name })}
                     </label>
                     <Textarea
                       value={verseExplanations[genreCode] || ""}
                       onChange={(e) => setVerseExplanations({ ...verseExplanations, [genreCode]: e.target.value })}
-                      placeholder={`Name a ${genre?.name} verse that supports this doctrine and explain how...`}
+                      placeholder={t('games.connect6Draft.genrePlaceholder', { genre: genre?.name })}
                       className="bg-black/60 border-emerald-500/30 text-white"
                     />
                   </div>
@@ -178,12 +181,13 @@ export default function Connect6Draft() {
               })}
 
               <Button onClick={handleSubmit} disabled={isSubmitting} className="w-full">
-                {isSubmitting ? "Validating..." : "Submit Connection"}
+                {isSubmitting ? t('games.common.validating') : t('games.connect6Draft.submitConnection')}
               </Button>
             </CardContent>
           </Card>
         </div>
       </div>
+      <FloatingGameChat gameType="connect6-draft" />
     </div>
   );
 }

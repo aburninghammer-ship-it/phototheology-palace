@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
 import { Activity, BookOpen, Heart, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useChurchActiveUsers } from "@/hooks/useChurchActiveUsers";
 
 interface ActivityPulseProps {
   churchId: string;
@@ -11,15 +12,14 @@ interface ActivityPulseProps {
 interface ActivityStats {
   prayersThisWeek: number;
   studiesCompletedToday: number;
-  activeMembers: number;
   lastActivityAt: Date | null;
 }
 
 export function ActivityPulse({ churchId }: ActivityPulseProps) {
+  const { liveCount } = useChurchActiveUsers(churchId);
   const [stats, setStats] = useState<ActivityStats>({
     prayersThisWeek: 0,
     studiesCompletedToday: 0,
-    activeMembers: 0,
     lastActivityAt: null
   });
   const [loading, setLoading] = useState(true);
@@ -43,12 +43,6 @@ export function ActivityPulse({ churchId }: ActivityPulseProps) {
         .select('*', { count: 'exact', head: true })
         .gte('completed_at', new Date(new Date().setHours(0, 0, 0, 0)).toISOString());
 
-      // Get active church members
-      const { count: memberCount } = await supabase
-        .from('church_members')
-        .select('*', { count: 'exact', head: true })
-        .eq('church_id', churchId);
-
       // Get last activity (most recent prayer or attendance)
       const { data: lastPrayer } = await supabase
         .from('church_prayer_requests')
@@ -61,7 +55,6 @@ export function ActivityPulse({ churchId }: ActivityPulseProps) {
       setStats({
         prayersThisWeek: prayerCount || 0,
         studiesCompletedToday: studyCount || 0,
-        activeMembers: memberCount || 0,
         lastActivityAt: lastPrayer?.created_at ? new Date(lastPrayer.created_at) : null
       });
     } catch (error) {
@@ -90,14 +83,14 @@ export function ActivityPulse({ churchId }: ActivityPulseProps) {
     },
     {
       icon: Users,
-      value: stats.activeMembers,
-      label: stats.activeMembers === 1 ? "member connected" : "members connected",
-      show: stats.activeMembers > 0
+      value: liveCount,
+      label: liveCount === 1 ? "member connected" : "members connected",
+      show: liveCount > 0
     }
   ].filter(i => i.show);
 
   // Don't show if everything is zero
-  const hasAnyActivity = stats.prayersThisWeek > 0 || stats.studiesCompletedToday > 0 || stats.activeMembers > 0;
+  const hasAnyActivity = stats.prayersThisWeek > 0 || stats.studiesCompletedToday > 0 || liveCount > 0;
 
   if (!hasAnyActivity) {
     return null; // Gracefully hide when no activity exists yet

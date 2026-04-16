@@ -15,8 +15,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { GlobalSearch } from "./GlobalSearch";
 import { NavigationStyleToggle } from "./NavigationStyleToggle";
+import { NotificationCenter } from "@/components/NotificationCenter";
 import { BackButton } from "@/components/BackButton";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { GlobalStudyBanner } from "@/components/GlobalStudyBanner";
+import { PhototheologyOSLogo } from "@/components/PhototheologyOSLogo";
 
 export const SimplifiedNav = () => {
   const { user, signOut } = useAuth();
@@ -32,10 +35,10 @@ export const SimplifiedNav = () => {
   const studyLinks = [
     { to: "/dashboard", label: "Dashboard", icon: Home },
     { to: "/daily-verse", label: "Verse of the Day", icon: BookOpen },
-    { to: "/bible", label: "Bible Reader", icon: BookOpen },
+    { to: "/bible", label: "PT Study Bible", icon: BookOpen },
+    { to: "/bible-image-library", label: "PT Image Bible", icon: BookOpen },
     { to: "/bible/search", label: "Search", icon: BookOpen },
-    { to: "/palace/floor/1/room/gr", label: "Produce a Gem", icon: BookOpen },
-    { to: "/bible-image-library", label: "Image Library", icon: BookOpen },
+    { to: "/give-me-a-gem", label: "Give Me A Gem", icon: BookOpen },
     { to: "/quarterly-study", label: "Quarterly Study", icon: BookOpen },
     { to: "/memorization", label: "Memorization", icon: BookOpen },
     { to: "/notes", label: "Notes", icon: StickyNote },
@@ -50,6 +53,7 @@ export const SimplifiedNav = () => {
   ];
 
   const researchLinks = [
+    { to: "/research-assistant", label: "Research Assistant", icon: BookOpen },
     { to: "/research-mode", label: "Research Mode", icon: BookOpen },
     { to: "/prophecy-watch", label: "Prophecy Watch", icon: BookOpen },
     { to: "/culture-controversy", label: "Culture & Controversy", icon: BookOpen },
@@ -74,10 +78,7 @@ export const SimplifiedNav = () => {
       <>
         <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2">
-            <BookOpen className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl">Phototheology</span>
-          </Link>
+          <PhototheologyOSLogo />
           <div className="flex items-center gap-2">
             <Button asChild variant="ghost">
               <Link to="/pricing">Pricing</Link>
@@ -101,10 +102,7 @@ export const SimplifiedNav = () => {
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
             <BackButton />
-            <Link to="/dashboard" className="flex items-center space-x-2">
-              <BookOpen className="h-6 w-6 text-primary" />
-              <span className="font-bold text-xl hidden md:inline">Phototheology</span>
-            </Link>
+            <PhototheologyOSLogo to="/dashboard" />
           </div>
 
           {/* Desktop Navigation */}
@@ -198,6 +196,8 @@ export const SimplifiedNav = () => {
           <GlobalSearch />
           
           <NavigationStyleToggle />
+          
+          <NotificationCenter />
           
           <Button asChild variant="ghost" size="sm" className="hidden md:flex">
             <Link to="/pricing"><Crown className="h-4 w-4 mr-1" />Upgrade</Link>
@@ -378,6 +378,7 @@ export const SimplifiedNav = () => {
         </div>
       </div>
     </nav>
+    {user && <GlobalStudyBanner userId={user.id} userEmail={user.email ?? null} />}
     {/* Spacer for sticky nav */}
     <div className="h-16" />
     </>

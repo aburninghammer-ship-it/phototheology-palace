@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { Trophy, Lightbulb, CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
+import { HelpMeButton } from "@/components/HelpMeButton";
 
 interface Clue {
   clue_number: number;
@@ -44,6 +46,7 @@ interface Participation {
 }
 
 const TreasureHuntPlay = () => {
+  const { t } = useTranslation();
   const { huntId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -92,8 +95,8 @@ const TreasureHuntPlay = () => {
     } catch (error) {
       console.error('Error fetching hunt data:', error);
       toast({
-        title: "Error",
-        description: "Failed to load treasure hunt",
+        title: t('common.error'),
+        description: t('treasureHunt.failedToLoad'),
         variant: "destructive",
       });
     } finally {
@@ -152,8 +155,8 @@ const TreasureHuntPlay = () => {
             .eq('id', participation.id);
 
           toast({
-            title: "🎉 Hunt Completed!",
-            description: "You found the treasure verse!",
+            title: t('treasureHunt.huntCompleted'),
+            description: t('treasureHunt.foundTreasureVerse'),
           });
           fetchHuntData();
         } else {
@@ -167,7 +170,7 @@ const TreasureHuntPlay = () => {
             .eq('id', participation.id);
 
           toast({
-            title: "✓ Correct!",
+            title: t('treasureHunt.correctAnswer'),
             description: currentClue.explanation,
           });
           setUserAnswer("");
@@ -183,8 +186,8 @@ const TreasureHuntPlay = () => {
           .eq('id', participation.id);
 
         toast({
-          title: "Not quite",
-          description: "Try again or view the hint for guidance.",
+          title: t('treasureHunt.notQuite'),
+          description: t('treasureHunt.tryAgainHint'),
           variant: "destructive",
         });
         setShowHint(true);
@@ -192,8 +195,8 @@ const TreasureHuntPlay = () => {
     } catch (error) {
       console.error('Error submitting answer:', error);
       toast({
-        title: "Error",
-        description: "Failed to submit answer",
+        title: t('common.error'),
+        description: t('treasureHunt.failedToSubmit'),
         variant: "destructive",
       });
     } finally {
@@ -203,10 +206,10 @@ const TreasureHuntPlay = () => {
 
   const getClueTypeLabel = (type: string) => {
     const labels = {
-      theme: 'Theme/Concept',
-      room: 'Palace Room',
-      principle: 'Biblical Principle',
-      verse: 'Scripture Reference'
+      theme: t('treasureHunt.clueTypeTheme'),
+      room: t('treasureHunt.clueTypeRoom'),
+      principle: t('treasureHunt.clueTypePrinciple'),
+      verse: t('treasureHunt.clueTypeVerse')
     };
     return labels[type as keyof typeof labels] || type;
   };
@@ -239,12 +242,12 @@ const TreasureHuntPlay = () => {
         <div className="flex items-center justify-center h-screen">
           <Card className="max-w-md">
             <CardHeader>
-              <CardTitle>Hunt Not Found</CardTitle>
-              <CardDescription>This treasure hunt doesn't exist or you haven't joined it yet.</CardDescription>
+              <CardTitle>{t('treasureHunt.huntNotFound')}</CardTitle>
+              <CardDescription>{t('treasureHunt.huntNotFoundDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
               <Button onClick={() => navigate('/treasure-hunt')} className="w-full">
-                Back to Treasure Hunts
+                {t('treasureHunt.backToHunts')}
               </Button>
             </CardContent>
           </Card>
@@ -268,15 +271,15 @@ const TreasureHuntPlay = () => {
                   <Trophy className="h-10 w-10 text-primary" />
                 </div>
                 <div>
-                  <CardTitle className="text-3xl">Treasure Found!</CardTitle>
+                  <CardTitle className="text-3xl">{t('treasureHunt.treasureFound')}</CardTitle>
                   <CardDescription className="text-lg mt-2">
-                    You've completed {hunt.title}
+                    {t('treasureHunt.completedHunt', { title: hunt.title })}
                   </CardDescription>
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="text-center space-y-2">
-                  <p className="text-sm text-muted-foreground">Completion Time</p>
+                  <p className="text-sm text-muted-foreground">{t('treasureHunt.completionTime')}</p>
                   <p className="text-2xl font-bold">{minutes}m {seconds}s</p>
                 </div>
 
@@ -284,7 +287,7 @@ const TreasureHuntPlay = () => {
 
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline">{getClueTypeIcon('verse')} Final Verse</Badge>
+                    <Badge variant="outline">{getClueTypeIcon('verse')} {t('treasureHunt.finalVerse')}</Badge>
                   </div>
                   <div className="bg-secondary/50 p-4 rounded-lg space-y-2">
                     <p className="font-semibold text-primary">{hunt.final_verse}</p>
@@ -297,7 +300,7 @@ const TreasureHuntPlay = () => {
                 <div className="space-y-2">
                   <h4 className="font-semibold flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-primary" />
-                    Biblical Insight
+                    {t('treasureHunt.biblicalInsight')}
                   </h4>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     {hunt.biblical_conclusion}
@@ -306,10 +309,10 @@ const TreasureHuntPlay = () => {
 
                 <div className="flex gap-2 pt-4">
                   <Button onClick={() => navigate('/treasure-hunt')} className="flex-1">
-                    More Hunts
+                    {t('treasureHunt.moreHunts')}
                   </Button>
                   <Button onClick={() => navigate('/dashboard')} variant="outline" className="flex-1">
-                    Dashboard
+                    {t('common.dashboard')}
                   </Button>
                 </div>
               </CardContent>
@@ -340,9 +343,9 @@ const TreasureHuntPlay = () => {
               </div>
               <div className="space-y-2 pt-4">
                 <div className="flex justify-between text-sm">
-                  <span>Progress</span>
+                  <span>{t('treasureHunt.progressLabel')}</span>
                   <span className="font-medium">
-                    Clue {currentClue?.clue_number} of {hunt.clues.length}
+                    {t('treasureHunt.clueOf', { current: currentClue?.clue_number, total: hunt.clues.length })}
                   </span>
                 </div>
                 <Progress value={progress} className="h-2" />
@@ -356,7 +359,7 @@ const TreasureHuntPlay = () => {
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">{getClueTypeIcon(currentClue.clue_type)}</span>
                   <div>
-                    <CardTitle>Clue {currentClue.clue_number}</CardTitle>
+                    <CardTitle>{t('treasureHunt.clueNumber', { number: currentClue.clue_number })}</CardTitle>
                     <CardDescription>{getClueTypeLabel(currentClue.clue_type)}</CardDescription>
                   </div>
                 </div>
@@ -370,28 +373,28 @@ const TreasureHuntPlay = () => {
                   <div className="bg-primary/10 border border-primary/20 p-4 rounded-lg space-y-2">
                     <div className="flex items-center gap-2 text-primary">
                       <Lightbulb className="h-4 w-4" />
-                      <span className="font-semibold text-sm">Hint</span>
+                      <span className="font-semibold text-sm">{t('treasureHunt.hint')}</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      You're looking for: {currentClue.clue_type === 'verse' ? 'A specific Bible verse reference' : 
-                      currentClue.clue_type === 'room' ? 'A Palace room name or tag (e.g., SR, TR, PR)' :
-                      currentClue.clue_type === 'principle' ? 'A biblical principle or concept' :
-                      'A theme or theological concept'}
+                      {t('treasureHunt.lookingFor')}: {currentClue.clue_type === 'verse' ? t('treasureHunt.hintVerse') :
+                      currentClue.clue_type === 'room' ? t('treasureHunt.hintRoom') :
+                      currentClue.clue_type === 'principle' ? t('treasureHunt.hintPrinciple') :
+                      t('treasureHunt.hintTheme')}
                     </p>
                   </div>
                 )}
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Your Answer</label>
+                    <label className="text-sm font-medium">{t('treasureHunt.yourAnswer')}</label>
                     <Input
                       value={userAnswer}
                       onChange={(e) => setUserAnswer(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && submitAnswer()}
                       placeholder={
-                        currentClue.clue_type === 'verse' ? 'e.g., John 3:16' :
-                        currentClue.clue_type === 'room' ? 'e.g., Symbol Room or SR' :
-                        'Type your answer...'
+                        currentClue.clue_type === 'verse' ? t('treasureHunt.placeholderVerse') :
+                        currentClue.clue_type === 'room' ? t('treasureHunt.placeholderRoom') :
+                        t('treasureHunt.placeholderDefault')
                       }
                       disabled={submitting}
                       className="text-lg"
@@ -404,7 +407,7 @@ const TreasureHuntPlay = () => {
                       disabled={!userAnswer.trim() || submitting}
                       className="flex-1"
                     >
-                      {submitting ? 'Checking...' : 'Submit Answer'}
+                      {submitting ? t('common.checking') : t('common.submitAnswer')}
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                     {!showHint && (
@@ -415,6 +418,14 @@ const TreasureHuntPlay = () => {
                         <Lightbulb className="h-4 w-4" />
                       </Button>
                     )}
+                    <HelpMeButton
+                      contextType="game"
+                      question={currentClue.hint}
+                      context={`This is a Phototheology Palace Treasure Hunt clue. The clue type is "${currentClue.clue_type}". The user needs to identify a Palace room, principle, verse, or theme. Guide them toward the answer without giving it away directly. The correct answer is one of: ${currentClue.correct_answers?.join(', ')}. Remind them what each Palace room does if relevant.`}
+                      userAttempt={userAnswer || undefined}
+                      variant="outline"
+                      size="sm"
+                    />
                   </div>
                 </div>
 
@@ -422,13 +433,13 @@ const TreasureHuntPlay = () => {
                   <div className="pt-4 border-t space-y-3">
                     <h4 className="text-sm font-semibold flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      Completed Clues
+                      {t('treasureHunt.completedClues')}
                     </h4>
                     <div className="space-y-2">
                       {participation.clues_completed.map((completed: any, idx: number) => (
                         <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
                           <CheckCircle2 className="h-3 w-3 text-green-500" />
-                          <span>Clue {completed.clue_number}: {completed.answer}</span>
+                          <span>{t('treasureHunt.clueNumber', { number: completed.clue_number })}: {completed.answer}</span>
                         </div>
                       ))}
                     </div>

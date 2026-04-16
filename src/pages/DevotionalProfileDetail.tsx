@@ -1,13 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Send, Calendar, MessageSquare, Sparkles, Plus, Pin, Trash2, Clock, History as HistoryIcon, Lightbulb, Zap } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { ArrowLeft, Send, Calendar, MessageSquare, Sparkles, Plus, Pin, Trash2, Clock, History as HistoryIcon, Lightbulb, Zap, Phone, ToggleLeft, ToggleRight, RefreshCw, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useDevotionalProfile } from "@/hooks/useDevotionalProfiles";
+import { Switch } from "@/components/ui/switch";
+import { useDevotionalProfile, useDevotionalProfiles } from "@/hooks/useDevotionalProfiles";
 import { useDevotionalPlan, useDevotionals } from "@/hooks/useDevotionals";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
@@ -15,6 +19,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProfileDevotionGenerator } from "@/components/devotionals/ProfileDevotionGenerator";
 import { format, formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
+import { toast as sonnerToast } from "sonner";
+
+const COUNTRY_CODES = [
+  { code: "+1", label: "US/Canada (+1)" },
+  { code: "+44", label: "UK (+44)" },
+  { code: "+61", label: "Australia (+61)" },
+  { code: "+91", label: "India (+91)" },
+  { code: "+234", label: "Nigeria (+234)" },
+  { code: "+254", label: "Kenya (+254)" },
+  { code: "+27", label: "South Africa (+27)" },
+  { code: "+63", label: "Philippines (+63)" },
+];
 
 const NOTE_TYPES = [
   { value: "observation", label: "Observation", icon: "👁️" },
@@ -39,17 +55,232 @@ const STRUGGLE_LABELS: Record<string, { label: string; emoji: string }> = {
   purity: { label: "Purity", emoji: "🕊️" },
 };
 
+// SMS Settings Card Component
+function SMSSettingsCard({ profile, profileId }: { profile: any; profileId: string }) {
+  const { t } = useTranslation();
+  const { updateProfile } = useDevotionalProfiles();
+  const [phoneNumber, setPhoneNumber] = useState(profile?.phone_number || "");
+  const [countryCode, setCountryCode] = useState(profile?.phone_country_code || "+1");
+  const [smsOptIn, setSmsOptIn] = useState(profile?.sms_opt_in || false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      // Clean phone number
+      const cleanPhone = phoneNumber.replace(/\D/g, '');
+
+      await updateProfile.mutateAsync({
+        id: profileId,
+        phone_number: cleanPhone || null,
+        phone_country_code: countryCode,
+        sms_opt_in: smsOptIn && !!cleanPhone,
+      });
+
+      sonnerToast.success(t('devotionalProfile.smsSettingsSaved'));
+    } catch (error) {
+      sonnerToast.error(t('devotionalProfile.failedToSaveSms'));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const formatPhoneDisplay = (phone: string) => {
+    const cleaned = phone.replace(/\D/g, '');
+    if (cleaned.length === 10) {
+      return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+    }
+    return phone;
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Phone className="h-5 w-5" />
+          {t('devotionalProfile.smsDevotionals')}
+        </CardTitle>
+        <CardDescription>
+          {t('devotionalProfile.smsDescription', { name: profile?.name })}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Phone Number Input */}
+        <div className="space-y-2">
+          <Label>{t('devotionalProfile.phoneNumber')}</Label>
+          <div className="flex gap-2">
+            <Select value={countryCode} onValueChange={setCountryCode}>
+              <SelectTrigger className="w-[160px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {COUNTRY_CODES.map(cc => (
+                  <SelectItem key={cc.code} value={cc.code}>{cc.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="relative flex-1">
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="555-123-4567"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* SMS Opt-in Toggle */}
+        <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/30">
+          <div className="space-y-1">
+            <Label className="text-base">{t('devotionalProfile.enableSms')}</Label>
+            <p className="text-sm text-muted-foreground">
+              {t('devotionalProfile.smsReceiveDesc', { name: profile?.name })}
+            </p>
+          </div>
+          <Switch
+            checked={smsOptIn}
+            onCheckedChange={setSmsOptIn}
+            disabled={!phoneNumber.replace(/\D/g, '')}
+          />
+        </div>
+
+        {/* Stats */}
+        {(profile?.total_sms_sent > 0 || profile?.last_sms_sent_at) && (
+          <div className="flex gap-4 text-sm">
+            {profile.total_sms_sent > 0 && (
+              <div className="bg-primary/10 px-3 py-1.5 rounded-lg">
+                <span className="text-muted-foreground">{t('devotionalProfile.totalSent')}: </span>
+                <span className="font-medium">{profile.total_sms_sent}</span>
+              </div>
+            )}
+            {profile.last_sms_sent_at && (
+              <div className="bg-muted px-3 py-1.5 rounded-lg">
+                <span className="text-muted-foreground">{t('devotionalProfile.lastSent')}: </span>
+                <span className="font-medium">
+                  {formatDistanceToNow(new Date(profile.last_sms_sent_at), { addSuffix: true })}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Save Button */}
+        <Button onClick={handleSave} disabled={isSaving} className="w-full">
+          {isSaving ? t('devotionalProfile.savingEllipsis') : t('devotionalProfile.saveSmsSettings')}
+        </Button>
+
+        {/* Info Text */}
+        <p className="text-xs text-muted-foreground text-center">
+          {t('devotionalProfile.smsConsentNotice', { name: profile?.name })}
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function DevotionalProfileDetail() {
+  const { t } = useTranslation();
   const { profileId } = useParams<{ profileId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { profile, notes, history, insights, profileLoading, addNote } = useDevotionalProfile(profileId || "");
-  const { plan, days, completedDayIds } = useDevotionalPlan(profile?.active_plan_id || "");
+  const { plan, days, completedDayIds, unlockedDayNumber } = useDevotionalPlan(profile?.active_plan_id || "");
   const { createPlan, generateDevotional, isGenerating } = useDevotionals();
 
   const [newNote, setNewNote] = useState("");
   const [noteType, setNoteType] = useState("observation");
+  const [isGeneratingDays, setIsGeneratingDays] = useState(false);
+  const autoGenerateTriggered = useRef(false);
+
+  // Calculate missing days
+  const totalDays = plan?.duration || 0;
+  const existingDays = days?.length || 0;
+  const missingDaysCount = totalDays - existingDays;
+
+  // Auto-generate missing unlocked days on page load
+  useEffect(() => {
+    if (autoGenerateTriggered.current) return;
+    if (!plan?.id || !plan.started_at || plan.status !== "active") return;
+    if (!days) return; // Wait for days to load
+
+    // Check if there are unlocked days that haven't been generated yet
+    const existingDayNumbers = new Set(days.map(d => d.day_number));
+    let hasMissingUnlockedDays = false;
+    for (let day = 1; day <= unlockedDayNumber; day++) {
+      if (!existingDayNumbers.has(day)) {
+        hasMissingUnlockedDays = true;
+        break;
+      }
+    }
+
+    if (hasMissingUnlockedDays) {
+      autoGenerateTriggered.current = true;
+      setIsGeneratingDays(true);
+      supabase.functions.invoke("batch-generate-devotional-days", {
+        body: { planId: plan.id, maxDaysPerPlan: 10 },
+      }).then(({ data, error }) => {
+        if (!error && data?.totalDaysGenerated > 0) {
+          queryClient.invalidateQueries({ queryKey: ["devotional-days", plan.id] });
+          queryClient.invalidateQueries({ queryKey: ["devotional-plan", plan.id] });
+          sonnerToast.success(t('devotionalProfile.daysGeneratedDesc', { count: data.totalDaysGenerated, name: profile?.name }));
+        }
+      }).catch((err) => {
+        console.error("Auto-generate failed:", err);
+      }).finally(() => {
+        setIsGeneratingDays(false);
+      });
+    }
+  }, [plan?.id, plan?.started_at, plan?.status, days, unlockedDayNumber]);
+
+  const handleGenerateMissingDays = async () => {
+    if (!plan?.id) return;
+
+    setIsGeneratingDays(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("batch-generate-devotional-days", {
+        body: {
+          planId: plan.id,
+          maxDaysPerPlan: 10 // Generate up to 10 days at once
+        },
+      });
+
+      if (error) throw error;
+
+      // Refresh the plan data
+      queryClient.invalidateQueries({ queryKey: ["devotional-days", plan.id] });
+      queryClient.invalidateQueries({ queryKey: ["devotional-plan", plan.id] });
+
+      if (data?.totalDaysGenerated > 0) {
+        toast({
+          title: t('devotionalProfile.daysGenerated'),
+          description: t('devotionalProfile.daysGeneratedDesc', { count: data.totalDaysGenerated, name: profile?.name }),
+        });
+      } else if (data?.results?.[0]?.errors?.length > 0) {
+        toast({
+          title: t('devotionalProfile.generationIssue'),
+          description: data.results[0].errors[0],
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: t('devotionalProfile.allCaughtUp'),
+          description: t('devotionalProfile.noNewDaysNeeded'),
+        });
+      }
+    } catch (error: any) {
+      console.error("Error generating days:", error);
+      toast({
+        title: t('devotionalProfile.generationFailed'),
+        description: error?.message || t('devotionalProfile.couldNotGenerate'),
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingDays(false);
+    }
+  };
 
   const handleGeneratePlan = async () => {
     if (!profile) return;
@@ -102,14 +333,14 @@ export default function DevotionalProfileDetail() {
       queryClient.invalidateQueries({ queryKey: ["devotional-profile", profileId] });
       
       toast({
-        title: "Devotional Plan Created!",
-        description: `A 7-day plan has been generated for ${profile.name}.`,
+        title: t('devotionalProfile.planCreated'),
+        description: t('devotionalProfile.planCreatedDesc', { name: profile.name }),
       });
     } catch (error: any) {
       console.error("Error generating plan:", error);
       const errorMessage = error?.message || "Could not generate the devotional plan. Please try again.";
       toast({
-        title: "Generation Failed",
+        title: t('devotionalProfile.generationFailed'),
         description: errorMessage,
         variant: "destructive",
       });
@@ -130,7 +361,7 @@ export default function DevotionalProfileDetail() {
   if (profileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Loading profile...</div>
+        <div className="animate-pulse text-muted-foreground">{t('devotionalProfile.loadingProfile')}</div>
       </div>
     );
   }
@@ -139,8 +370,8 @@ export default function DevotionalProfileDetail() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Profile Not Found</h2>
-          <Button onClick={() => navigate("/devotionals")}>Back to Devotionals</Button>
+          <h2 className="text-xl font-semibold mb-2">{t('devotionalProfile.profileNotFound')}</h2>
+          <Button onClick={() => navigate("/devotionals")}>{t('devotionalProfile.backToDevotionals')}</Button>
         </div>
       </div>
     );
@@ -157,7 +388,7 @@ export default function DevotionalProfileDetail() {
             onClick={() => navigate("/devotionals")}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Devotionals
+            {t('devotionalProfile.backToDevotionals')}
           </Button>
 
           <div className="flex items-start gap-4">
@@ -165,7 +396,7 @@ export default function DevotionalProfileDetail() {
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-white">{profile.name}</h1>
               <p className="text-white/70 capitalize">
-                {profile.relationship} • {profile.age_group?.replace("_", " ") || "Age not specified"}
+                {profile.relationship} • {profile.age_group?.replace("_", " ") || t('devotionalProfile.ageNotSpecified')}
               </p>
               <div className="flex flex-wrap gap-2 mt-3">
                 {profile.struggles.map((struggle) => (
@@ -188,7 +419,7 @@ export default function DevotionalProfileDetail() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-rose-500" />
-                  Today's Recommended Devotional
+                  {t('devotionalProfile.todaysRecommended')}
                 </CardTitle>
                 <Badge className="bg-rose-500">Day {currentDay.day_number}</Badge>
               </div>
@@ -200,11 +431,11 @@ export default function DevotionalProfileDetail() {
               <div className="flex gap-2">
                 <Button className="bg-gradient-to-r from-rose-500 to-pink-500">
                   <Send className="h-4 w-4 mr-2" />
-                  Share with {profile.name}
+                  {t('devotionalProfile.shareWith', { name: profile.name })}
                 </Button>
                 <Button variant="outline">
                   <Calendar className="h-4 w-4 mr-2" />
-                  Schedule
+                  {t('devotionalProfile.schedule')}
                 </Button>
               </div>
             </CardContent>
@@ -213,15 +444,29 @@ export default function DevotionalProfileDetail() {
 
         {/* Tabs */}
         <Tabs defaultValue="generate" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="generate" className="flex items-center gap-1">
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 h-auto gap-1">
+            <TabsTrigger value="generate" className="flex items-center gap-1 text-xs md:text-sm py-2">
               <Zap className="h-3 w-3" />
-              Generate
+              <span className="hidden sm:inline">{t('devotionalProfile.tabGenerate')}</span>
+              <span className="sm:hidden">{t('devotionalProfile.tabGenerateShort')}</span>
             </TabsTrigger>
-            <TabsTrigger value="devotionals">Devotionals</TabsTrigger>
-            <TabsTrigger value="notes">Notes</TabsTrigger>
-            <TabsTrigger value="history">History</TabsTrigger>
-            <TabsTrigger value="insights">Insights</TabsTrigger>
+            <TabsTrigger value="devotionals" className="text-xs md:text-sm py-2">
+              <span className="hidden sm:inline">{t('devotionalProfile.tabDevotionals')}</span>
+              <span className="sm:hidden">{t('devotionalProfile.tabDevotionalsShort')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="sms" className="flex items-center gap-1 text-xs md:text-sm py-2">
+              <Phone className="h-3 w-3" />
+              {t('devotionalProfile.tabSMS')}
+            </TabsTrigger>
+            <TabsTrigger value="notes" className="text-xs md:text-sm py-2">{t('devotionalProfile.tabNotes')}</TabsTrigger>
+            <TabsTrigger value="history" className="text-xs md:text-sm py-2">
+              <span className="hidden sm:inline">{t('devotionalProfile.tabHistory')}</span>
+              <span className="sm:hidden">{t('devotionalProfile.tabHistoryShort')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="insights" className="text-xs md:text-sm py-2">
+              <span className="hidden sm:inline">{t('devotionalProfile.tabInsights')}</span>
+              <span className="sm:hidden">{t('devotionalProfile.tabInsightsShort')}</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* Generate Deep Devotion Tab */}
@@ -231,6 +476,46 @@ export default function DevotionalProfileDetail() {
 
           {/* Devotionals Tab */}
           <TabsContent value="devotionals" className="space-y-4">
+            {/* Missing Days Alert */}
+            {plan && missingDaysCount > 0 && (
+              <Card className="border-amber-400 bg-amber-50/50 dark:bg-amber-950/30">
+                <CardContent className="py-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-full bg-amber-100 dark:bg-amber-900/50">
+                        <RefreshCw className="h-5 w-5 text-amber-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-amber-800 dark:text-amber-200">
+                          {t('devotionalProfile.daysNotGenerated', { count: missingDaysCount })}
+                        </p>
+                        <p className="text-sm text-amber-600 dark:text-amber-400">
+                          {t('devotionalProfile.planDaysProgress', { total: totalDays, generated: existingDays })}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={handleGenerateMissingDays}
+                      disabled={isGeneratingDays}
+                      className="bg-amber-600 hover:bg-amber-700"
+                    >
+                      {isGeneratingDays ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          {t('devotionalProfile.generatingEllipsis')}
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw className="h-4 w-4 mr-2" />
+                          {t('devotionalProfile.generateNow')}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {days && days.length > 0 ? (
               <div className="space-y-3">
                 {days.map((day) => {
@@ -260,7 +545,7 @@ export default function DevotionalProfileDetail() {
                         </div>
                         <Button size="sm" variant={isCurrent ? "default" : "outline"}>
                           <Send className="h-3 w-3 mr-1" />
-                          Share
+                          {t('devotionalProfile.share')}
                         </Button>
                       </CardContent>
                     </Card>
@@ -271,9 +556,9 @@ export default function DevotionalProfileDetail() {
               <Card className="border-dashed">
                 <CardContent className="py-10 text-center">
                   <Sparkles className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-                  <h3 className="font-semibold mb-2">No Active Plan</h3>
+                  <h3 className="font-semibold mb-2">{t('devotionalProfile.noActivePlan')}</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Generate a devotional plan tailored for {profile.name}.
+                    {t('devotionalProfile.generatePlanFor', { name: profile.name })}
                   </p>
                   <Button 
                     className="bg-gradient-to-r from-rose-500 to-pink-500"
@@ -281,11 +566,16 @@ export default function DevotionalProfileDetail() {
                     disabled={isGenerating || createPlan.isPending}
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    {isGenerating || createPlan.isPending ? "Generating..." : "Generate Devotional Plan"}
+                    {isGenerating || createPlan.isPending ? t('devotionalProfile.generatingEllipsis') : t('devotionalProfile.generateDevotionalPlan')}
                   </Button>
                 </CardContent>
               </Card>
             )}
+          </TabsContent>
+
+          {/* SMS Tab */}
+          <TabsContent value="sms" className="space-y-4">
+            <SMSSettingsCard profile={profile} profileId={profileId || ""} />
           </TabsContent>
 
           {/* Notes Tab */}
@@ -295,7 +585,7 @@ export default function DevotionalProfileDetail() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
                   <MessageSquare className="h-4 w-4" />
-                  Add a Note
+                  {t('devotionalProfile.addANote')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -312,12 +602,12 @@ export default function DevotionalProfileDetail() {
                   </SelectContent>
                 </Select>
                 <Textarea
-                  placeholder={`Write an observation, prayer point, or breakthrough about ${profile.name}...`}
+                  placeholder={t('devotionalProfile.notePlaceholder', { name: profile.name })}
                   value={newNote}
                   onChange={(e) => setNewNote(e.target.value)}
                 />
                 <Button onClick={handleAddNote} disabled={!newNote.trim() || addNote.isPending}>
-                  {addNote.isPending ? "Saving..." : "Save Note"}
+                  {addNote.isPending ? t('devotionalProfile.savingEllipsis') : t('devotionalProfile.saveNote')}
                 </Button>
               </CardContent>
             </Card>
@@ -349,7 +639,7 @@ export default function DevotionalProfileDetail() {
               <Card className="border-dashed">
                 <CardContent className="py-8 text-center text-muted-foreground">
                   <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  No notes yet. Add observations, prayer points, or breakthroughs above.
+                  {t('devotionalProfile.noNotesYet')}
                 </CardContent>
               </Card>
             )}
@@ -367,7 +657,7 @@ export default function DevotionalProfileDetail() {
                           <Send className="h-4 w-4" />
                         </div>
                         <div>
-                          <p className="font-medium">Shared via {item.shared_via}</p>
+                          <p className="font-medium">{t('devotionalProfile.sharedVia', { method: item.shared_via })}</p>
                           <p className="text-xs text-muted-foreground">
                             {format(new Date(item.shared_at), "MMM d, yyyy 'at' h:mm a")}
                           </p>
@@ -375,7 +665,7 @@ export default function DevotionalProfileDetail() {
                       </div>
                       {item.viewed_at && (
                         <Badge variant="secondary" className="bg-green-100 text-green-700">
-                          Viewed
+                          {t('devotionalProfile.viewed')}
                         </Badge>
                       )}
                     </CardContent>
@@ -386,7 +676,7 @@ export default function DevotionalProfileDetail() {
               <Card className="border-dashed">
                 <CardContent className="py-8 text-center text-muted-foreground">
                   <HistoryIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  No sharing history yet. Share a devotional to see it here.
+                  {t('devotionalProfile.noHistoryYet')}
                 </CardContent>
               </Card>
             )}
@@ -400,7 +690,7 @@ export default function DevotionalProfileDetail() {
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
                       <Lightbulb className="h-5 w-5 text-amber-500" />
-                      Weekly Summary
+                      {t('devotionalProfile.weeklySummary')}
                     </CardTitle>
                     <CardDescription>
                       {format(new Date(insights.insight_period_start), "MMM d")} -{" "}
@@ -408,14 +698,14 @@ export default function DevotionalProfileDetail() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm">{insights.weekly_summary || "No summary generated yet."}</p>
+                    <p className="text-sm">{insights.weekly_summary || t('devotionalProfile.noSummaryYet')}</p>
                   </CardContent>
                 </Card>
 
                 {insights.areas_needing_prayer.length > 0 && (
                   <Card>
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-base">Areas Needing Prayer</CardTitle>
+                      <CardTitle className="text-base">{t('devotionalProfile.areasNeedingPrayer')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <ul className="space-y-1">
@@ -434,14 +724,14 @@ export default function DevotionalProfileDetail() {
                     <CardHeader className="pb-2">
                       <CardTitle className="text-base flex items-center gap-2">
                         <Sparkles className="h-4 w-4 text-amber-500" />
-                        Suggested Message for {profile.name}
+                        {t('devotionalProfile.suggestedMessage', { name: profile.name })}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm italic">"{insights.suggested_message}"</p>
                       <Button size="sm" className="mt-3" variant="outline">
                         <Send className="h-3 w-3 mr-1" />
-                        Send This Message
+                        {t('devotionalProfile.sendThisMessage')}
                       </Button>
                     </CardContent>
                   </Card>
@@ -451,8 +741,8 @@ export default function DevotionalProfileDetail() {
               <Card className="border-dashed">
                 <CardContent className="py-8 text-center text-muted-foreground">
                   <Lightbulb className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p>No insights generated yet.</p>
-                  <p className="text-xs mt-1">Insights are generated weekly based on activity.</p>
+                  <p>{t('devotionalProfile.noInsightsYet')}</p>
+                  <p className="text-xs mt-1">{t('devotionalProfile.insightsWeekly')}</p>
                 </CardContent>
               </Card>
             )}
